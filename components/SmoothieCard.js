@@ -32,6 +32,9 @@ const SmoothieCard = ({ smoothie }) => {
 		//console.log("e.target.value ", e.target.value);
 		setVote(value);
 		console.log("value", value);
+
+
+		
 		const { data, error } = await supabase
 			.from("sneakers")
 			.update({ vote: value })
@@ -46,6 +49,7 @@ const SmoothieCard = ({ smoothie }) => {
 			// console.log("smoothie", smoothie);
 			console.log("My Vote", vote);
 			console.log("Voted");
+			//const { data } = await supabase.from("sneakers").select();
 			//setData(data)
 			//onRating(smoothie.id);
 			//onDelete(smoothie.id);
@@ -69,7 +73,10 @@ const SmoothieCard = ({ smoothie }) => {
 						src={smoothie.main_image}
 						alt='product image'
 					/>
-					<p className='absolute bottom-0 left-0'>My vote</p>
+
+					<p class='px-4 py-2 my-2 mx-2 absolute top-0 right-0  text-base rounded-full text-indigo-600 border border-indigo-600 bg-indigo-200 '>
+						{smoothie.vote === null ? "Pending Vote" : smoothie.vote}
+					</p>
 				</div>
 
 				<div className='px-5 pb-5'>
@@ -84,101 +91,73 @@ const SmoothieCard = ({ smoothie }) => {
 					</div>
 
 					<div class='flex justify-center align-middle items-center max-w-sm mx-auto'>
-						<button onClick={(e) => {
-							handleRating("Drip", e);
-						}}
-							type='button'
-							class='flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b border-l rounded-l-md hover:bg-green-300'>
-							<svg
-								xmlns='http://www.w3.org/2000/svg'
-								viewBox='0 0 20 20'
-								fill='currentColor'
-								className='w-6 h-6 mr-2  '>
-								<path d='M1 8.25a1.25 1.25 0 1 1 2.5 0v7.5a1.25 1.25 0 1 1-2.5 0v-7.5ZM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0 1 14 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 0 1-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 0 1-1.341-.317l-2.734-1.366A3 3 0 0 0 6.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 0 1 2.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388Z' />
-							</svg>
-							Drip
-						</button>
-						<button onClick={(e) => {
-							handleRating("Flip", e);
-						}}
-							type='button'
-							class='flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b  border-l border-gray-200  hover:bg-yellow-300'>
-							<svg
-								xmlns='http://www.w3.org/2000/svg'
-								viewBox='0 0 24 24'
-								fill='currentColor'
-								className='w-6 h-6 mr-2 '>
-								<path
-									fill-rule='evenodd'
-									d='M15.97 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 1 1-1.06-1.06l3.22-3.22H7.5a.75.75 0 0 1 0-1.5h11.69l-3.22-3.22a.75.75 0 0 1 0-1.06Zm-7.94 9a.75.75 0 0 1 0 1.06l-3.22 3.22H16.5a.75.75 0 0 1 0 1.5H4.81l3.22 3.22a.75.75 0 1 1-1.06 1.06l-4.5-4.5a.75.75 0 0 1 0-1.06l4.5-4.5a.75.75 0 0 1 1.06 0Z'
-									clip-rule='evenodd'
-								/>
-							</svg>
-							Flip
-						</button>
-						<button onClick={(e) => {
-							handleRating("Skip", e);
-						}}
-							type='button'
-							class='flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b border-l rounded-r-md hover:bg-red-300'>
-							<svg
-								xmlns='http://www.w3.org/2000/svg'
-								viewBox='0 0 20 20'
-								fill='currentColor'
-								className='w-6 h-6 mr-2 '>
-								<path d='M18.905 12.75a1.25 1.25 0 1 1-2.5 0v-7.5a1.25 1.25 0 0 1 2.5 0v7.5ZM8.905 17v1.3c0 .268-.14.526-.395.607A2 2 0 0 1 5.905 17c0-.995.182-1.948.514-2.826.204-.54-.166-1.174-.744-1.174h-2.52c-1.243 0-2.261-1.01-2.146-2.247.193-2.08.651-4.082 1.341-5.974C2.752 3.678 3.833 3 5.005 3h3.192a3 3 0 0 1 1.341.317l2.734 1.366A3 3 0 0 0 13.613 5h1.292v7h-.963c-.685 0-1.258.482-1.612 1.068a4.01 4.01 0 0 1-2.166 1.73c-.432.143-.853.386-1.011.814-.16.432-.248.9-.248 1.388Z' />
-							</svg>
-							Skip
-						</button>
-					</div>
-
-					<div className='mb-4'>
-						<div
-							onClick={(e) => {
-								handleRating("Drip", e);
-							}}
-							className='flex'>
-							<ThumbsUpIcon />
-
-							<label className='ml-2 text-sm' htmlFor='regular'>
+						<div className='relative group'>
+							<button
+								onClick={(e) => {
+									handleRating("Drip", e);
+								}}
+								type='button'
+								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b border-l rounded-l-md hover:bg-green-300 ${smoothie.vote ==="Drip" ? "bg-green-300": "" } ` }>
+								<svg
+									xmlns='http://www.w3.org/2000/svg'
+									viewBox='0 0 20 20'
+									fill='currentColor'
+									className='w-6 h-6 mr-2  '>
+									<path d='M1 8.25a1.25 1.25 0 1 1 2.5 0v7.5a1.25 1.25 0 1 1-2.5 0v-7.5ZM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0 1 14 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 0 1-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 0 1-1.341-.317l-2.734-1.366A3 3 0 0 0 6.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 0 1 2.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388Z' />
+								</svg>
 								Drip
-							</label>
+							</button>
+							<span class='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
+								I love it ❤️
+							</span>
 						</div>
-						<p className='text-sm mt-1 ml-8'>
-							I love it and would purchase it 😻
-						</p>
-					</div>
-					<div>
-						<div
-							onClick={(e) => {
-								handleRating("Flip", e);
-							}}
-							className='flex'>
-							<FlipIcon />
 
-							<label className='ml-2 text-lg' htmlFor='regular'>
+						<div className='relative group'>
+							<button
+								onClick={(e) => {
+									handleRating("Flip", e);
+								}}
+								type='button'
+								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b  border-l border-gray-200  hover:bg-yellow-300 ${smoothie.vote ==="Flip" ? "bg-yellow-300": "" } `}>
+								<svg
+									xmlns='http://www.w3.org/2000/svg'
+									viewBox='0 0 24 24'
+									fill='currentColor'
+									className='w-6 h-6 mr-2 '>
+									<path
+										fill-rule='evenodd'
+										d='M15.97 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 1 1-1.06-1.06l3.22-3.22H7.5a.75.75 0 0 1 0-1.5h11.69l-3.22-3.22a.75.75 0 0 1 0-1.06Zm-7.94 9a.75.75 0 0 1 0 1.06l-3.22 3.22H16.5a.75.75 0 0 1 0 1.5H4.81l3.22 3.22a.75.75 0 1 1-1.06 1.06l-4.5-4.5a.75.75 0 0 1 0-1.06l4.5-4.5a.75.75 0 0 1 1.06 0Z'
+										clip-rule='evenodd'
+									/>
+								</svg>
 								Flip
-							</label>
+							</button>
+							<span class='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
+								Only purchase on sale 😇
+							</span>
 						</div>
-						<p className='text-base mt-1 ml-8'>
-							I like it but would only purchase it on sale 😇
-						</p>
-					</div>
-					<div>
-						<div
-							onClick={(e) => {
-								handleRating("Skip", e);
-							}}
-							className='flex'>
-							<ThumbsDownIcon />
 
-							<label className='ml-2 text-lg' htmlFor='regular'>
+						<div className='relative group'>
+							<button
+								onClick={(e) => {
+									handleRating("Skip", e);
+								}}
+								type='button'
+								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b border-l rounded-r-md hover:bg-red-300 ${smoothie.vote ==="Skip" ? "bg-red-300": "" } `}>
+								<svg
+									xmlns='http://www.w3.org/2000/svg'
+									viewBox='0 0 20 20'
+									fill='currentColor'
+									className='w-6 h-6 mr-2 '>
+									<path d='M18.905 12.75a1.25 1.25 0 1 1-2.5 0v-7.5a1.25 1.25 0 0 1 2.5 0v7.5ZM8.905 17v1.3c0 .268-.14.526-.395.607A2 2 0 0 1 5.905 17c0-.995.182-1.948.514-2.826.204-.54-.166-1.174-.744-1.174h-2.52c-1.243 0-2.261-1.01-2.146-2.247.193-2.08.651-4.082 1.341-5.974C2.752 3.678 3.833 3 5.005 3h3.192a3 3 0 0 1 1.341.317l2.734 1.366A3 3 0 0 0 13.613 5h1.292v7h-.963c-.685 0-1.258.482-1.612 1.068a4.01 4.01 0 0 1-2.166 1.73c-.432.143-.853.386-1.011.814-.16.432-.248.9-.248 1.388Z' />
+								</svg>
 								Skip
-							</label>
+							</button>
+
+							<span class='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
+								F*ck No! 🤡
+							</span>
 						</div>
-						<p className='text-base mt-1 ml-8'>
-							F*ck No! I don't like it at all 🤡
-						</p>
 					</div>
 
 					{/*<label htmlFor='medium'>
@@ -204,11 +183,9 @@ const SmoothieCard = ({ smoothie }) => {
 					/>
 						<label htmlFor='large'>Large</label>*/}
 
-					<p>
+					{/*	<p>
 						Select topping <strong>{smoothie.vote}</strong>
-					</p>
-
-					{/*<div className='flex items-center justify-between'>
+					</p><div className='flex items-center justify-between'>
 						<span className='text-3xl font-bold text-gray-900 dark:text-white'>
 							$599
 						</span>
@@ -366,4 +343,54 @@ export default SmoothieCard;
 // 								</li>
 // 							</ul>
 // 						</div>
+// 					</div>
+
+// <div className='mb-4'>
+// 						<div
+// 							onClick={(e) => {
+// 								handleRating("Drip", e);
+// 							}}
+// 							className='flex'>
+// 							<ThumbsUpIcon />
+
+// 							<label className='ml-2 text-sm' htmlFor='regular'>
+// 								Drip
+// 							</label>
+// 						</div>
+// 						<p className='text-sm mt-1 ml-8'>
+// 							I love it and would purchase it 😻
+// 						</p>
+// 					</div>
+
+// 					<div>
+// 						<div
+// 							onClick={(e) => {
+// 								handleRating("Flip", e);
+// 							}}
+// 							className='flex'>
+// 							<FlipIcon />
+
+// 							<label className='ml-2 text-lg' htmlFor='regular'>
+// 								Flip
+// 							</label>
+// 						</div>
+// 						<p className='text-base mt-1 ml-8'>
+// 							I like it but would only purchase it on sale 😇
+// 						</p>
+// 					</div>
+// 					<div>
+// 						<div
+// 							onClick={(e) => {
+// 								handleRating("Skip", e);
+// 							}}
+// 							className='flex'>
+// 							<ThumbsDownIcon />
+
+// 							<label className='ml-2 text-lg' htmlFor='regular'>
+// 								Skip
+// 							</label>
+// 						</div>
+// 						<p className='text-base mt-1 ml-8'>
+// 							F*ck No! I don't like it at all 🤡
+// 						</p>
 // 					</div>
