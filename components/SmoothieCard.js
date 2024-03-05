@@ -81,7 +81,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 								}}
 								type='button'
 								class={`flex items-center w-full px-4 py-2 md:text-base font-medium text-black bg-white border-t border-b border-l rounded-l-md hover:bg-green-300 ${
-									smoothie.vote === "Drip" ? "bg-green-400" : ""
+									smoothie.vote === "Drip" ?   " bg-green-400 " : " "
 								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
