@@ -5,7 +5,7 @@ import ThumbsDownIcon from "./ThumbsDownIcon";
 import ThumbsUpIcon from "./ThumbsUpIcon";
 import FlipIcon from "./FlipIcon";
 
-const SmoothieCard = ({ smoothie }) => {
+const SmoothieCard = ({ smoothie, onVote }) => {
 	console.log("smoothie", smoothie.vote);
 
 	const [vote, setVote] = useState("");
@@ -23,45 +23,28 @@ const SmoothieCard = ({ smoothie }) => {
 			console.log(error);
 		}
 		if (data) {
-			//console.log(data);
 			onDelete(smoothie.id);
 		}
 	};
 
 	const handleRating = async (value, e) => {
-		//console.log("e.target.value ", e.target.value);
 		setVote(value);
 		console.log("value", value);
 
-
-		
 		const { data, error } = await supabase
 			.from("sneakers")
 			.update({ vote: value })
 			.select()
-			.eq("id", smoothie.id);
+			.eq("id", smoothie.id).order("name", { ascending: false });;
+
 		if (error) {
 			console.log(error);
 		}
 		if (data) {
 			console.log("Vote data ID **", smoothie.id);
-			setVote(value);
-			// console.log("smoothie", smoothie);
-			console.log("My Vote", vote);
-			console.log("Voted");
-			//const { data } = await supabase.from("sneakers").select();
-			//setData(data)
-			//onRating(smoothie.id);
-			//onDelete(smoothie.id);
-
-			//.order(orderBy, { ascending: false });
-
-			//setUpdatedData(data)
+			setVote(null);
+			onVote(smoothie);
 		}
-	};
-
-	const onOptionChange = (e) => {
-		//setVote(e.target.value);
 	};
 
 	return (
@@ -74,7 +57,7 @@ const SmoothieCard = ({ smoothie }) => {
 						alt='product image'
 					/>
 
-					<p class='px-4 py-2 my-2 mx-2 absolute top-0 right-0  text-base rounded-full text-indigo-600 border border-indigo-600 bg-indigo-200 '>
+					<p class='px-4 py-2 my-2 mx-2 absolute top-0 right-0  text-base rounded-full text-indigo-600 border border-indigo-600 '>
 						{smoothie.vote === null ? "Pending Vote" : smoothie.vote}
 					</p>
 				</div>
@@ -97,7 +80,9 @@ const SmoothieCard = ({ smoothie }) => {
 									handleRating("Drip", e);
 								}}
 								type='button'
-								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b border-l rounded-l-md hover:bg-green-300 ${smoothie.vote ==="Drip" ? "bg-green-300": "" } ` }>
+								class={`flex items-center w-full px-4 py-2 md:text-base font-medium text-black bg-white border-t border-b border-l rounded-l-md hover:bg-green-300 ${
+									smoothie.vote === "Drip" ? "bg-green-300" : ""
+								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
 									viewBox='0 0 20 20'
@@ -118,7 +103,9 @@ const SmoothieCard = ({ smoothie }) => {
 									handleRating("Flip", e);
 								}}
 								type='button'
-								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b  border-l border-gray-200  hover:bg-yellow-300 ${smoothie.vote ==="Flip" ? "bg-yellow-300": "" } `}>
+								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b  border-l border-gray-200  hover:bg-yellow-300 ${
+									smoothie.vote === "Flip" ? "bg-yellow-300" : ""
+								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
 									viewBox='0 0 24 24'
@@ -143,7 +130,9 @@ const SmoothieCard = ({ smoothie }) => {
 									handleRating("Skip", e);
 								}}
 								type='button'
-								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b border-l rounded-r-md hover:bg-red-300 ${smoothie.vote ==="Skip" ? "bg-red-300": "" } `}>
+								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b border-l rounded-r-md hover:bg-red-300 ${
+									smoothie.vote === "Skip" ? "bg-red-300" : ""
+								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
 									viewBox='0 0 20 20'

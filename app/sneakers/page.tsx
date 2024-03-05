@@ -16,10 +16,16 @@ export default function Page() {
 	// 		return prevSmoothies?.filter((sm) => sm.id !== id);
 	// 	});
 	// };
+	const handleVote = async () => {
+		const { data } =  await supabase.from("sneakers").select().order("name", { ascending: false });;
+
+		setSneakers(data);
+		return sneakers
+	};
 
 	useEffect(() => {
 		const getData = async () => {
-			const { data } = await supabase.from("sneakers").select();
+			const { data } = await supabase.from("sneakers").select().order("name", { ascending: false });;
 			setSneakers(data);
 		};
 		getData();
@@ -27,11 +33,14 @@ export default function Page() {
 
 	return (
 		<div>
-			{/* <pre>{JSON.stringify(sneakers, null, 2)}</pre> */}
 			<div className='containner mx-auto'>
-				<div className='grid grid-cols-3  gap-10'>
+				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-10'>
 					{sneakers?.map((sneaker) => (
-						<SmoothieCard key={sneaker.id} smoothie={sneaker} />
+						<SmoothieCard
+							key={sneaker.id}
+							smoothie={sneaker}
+							onVote={handleVote}
+						/>
 					))}
 				</div>
 			</div>
