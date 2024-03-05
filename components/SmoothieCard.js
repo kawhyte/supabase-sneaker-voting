@@ -67,7 +67,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 						{smoothie.name}
 					</h5>
 
-					<div className='flex flex-row text-xs border-t border-b justify-between   gap-y-3 items-start mt-2.5 mb-5'>
+					<div className='flex flex-row text-gray-400 text-sm border-t border-b justify-between   gap-y-3 items-start mt-2.5 mb-5'>
 						<p className='my-3 '>Release: {smoothie.release_date}</p>
 						<p className='my-3 '>Brand: {smoothie.brand}</p>
 						<p className='my-3 '>Retail: ${smoothie.price}</p>
@@ -80,8 +80,8 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 									handleRating("Drip", e);
 								}}
 								type='button'
-								class={`flex items-center w-full px-4 py-2 md:text-base font-medium text-black bg-white border-t border-b border-l rounded-l-md hover:bg-green-300 ${
-									smoothie.vote === "Drip" ?   " bg-yellow-300 " : " "
+								class={`flex items-center w-full px-4 py-2 md:text-base font-medium text-black  border-t border-b border-l rounded-l-md hover:bg-green-300 ${
+									smoothie.vote === "Drip" ?   ` bg-green-200 ` : "bg-white "
 								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
@@ -103,8 +103,8 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 									handleRating("Flip", e);
 								}}
 								type='button'
-								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b  border-l border-gray-200  hover:bg-yellow-300 ${
-									smoothie.vote === "Flip" ? "bg-yellow-300" : ""
+								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black  border-t border-b  border-l border-gray-200  hover:bg-yellow-300 ${
+									smoothie.vote === "Flip" ? "bg-yellow-200" : "bg-white"
 								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
@@ -130,8 +130,8 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 									handleRating("Skip", e);
 								}}
 								type='button'
-								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black bg-white border-t border-b border-l rounded-r-md hover:bg-red-300 ${
-									smoothie.vote === "Skip" ? "bg-yellow-300" : ""
+								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black  border-t border-b border-l rounded-r-md hover:bg-red-300  ${
+									smoothie.vote === "Skip" ? ` bg-red-200` : "bg-white"
 								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
