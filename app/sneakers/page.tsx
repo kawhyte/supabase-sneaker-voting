@@ -17,7 +17,7 @@ export default function Page() {
 	// 	});
 	// };
 	const handleVote = async () => {
-		const { data } =  await supabase.from("sneakers").select()
+		const { data } =  await supabase.from("sneakers").select().order("name", { ascending: true })
 
 		setSneakers(data);
 		return sneakers
@@ -25,7 +25,7 @@ export default function Page() {
 
 	useEffect(() => {
 		const getData = async () => {
-			const { data } = await supabase.from("sneakers").select()
+			const { data } = await supabase.from("sneakers").select().order("name", { ascending: true })
 			setSneakers(data);
 		};
 		getData();

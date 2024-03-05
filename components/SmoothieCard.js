@@ -35,7 +35,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 			.from("sneakers")
 			.update({ vote: value })
 			.select()
-			.eq("id", smoothie.id)
+			.eq("id", smoothie.id).order("name", { ascending: true })
 
 		if (error) {
 			console.log(error);
@@ -67,7 +67,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 						{smoothie.name}
 					</h5>
 
-					<div className='flex flex-row text-gray-400 text-sm border-t border-b justify-between   gap-y-3 items-start mt-2.5 mb-5'>
+					<div className='flex flex-row text-gray-400 text-xs md:text-sm border-t border-b justify-between   gap-y-3 items-start mt-2.5 mb-5'>
 						<p className='my-3 '>Release: {smoothie.release_date}</p>
 						<p className='my-3 '>Brand: {smoothie.brand}</p>
 						<p className='my-3 '>Retail: ${smoothie.price}</p>
