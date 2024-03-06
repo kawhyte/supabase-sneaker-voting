@@ -35,7 +35,8 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 			.from("sneakers")
 			.update({ vote: value })
 			.select()
-			.eq("id", smoothie.id).order("name", { ascending: true })
+			.eq("id", smoothie.id)
+			.order("name", { ascending: true });
 
 		if (error) {
 			console.log(error);
@@ -57,7 +58,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 						alt='product image'
 					/>
 
-					<p class='px-4 py-2 my-2 mx-2 absolute top-0 right-0  text-base rounded-full text-indigo-600 border border-indigo-600 '>
+					<p className='px-4 py-2 my-2 mx-2 absolute top-0 right-0  text-base rounded-full text-indigo-600 border border-indigo-600 '>
 						{smoothie.vote === null ? "Pending Vote" : smoothie.vote}
 					</p>
 				</div>
@@ -73,15 +74,15 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 						<p className='my-3 '>Retail: ${smoothie.price}</p>
 					</div>
 
-					<div class='flex justify-center align-middle items-center max-w-sm mx-auto'>
+					<div className='flex justify-center align-middle items-center max-w-sm mx-auto'>
 						<div className='relative group'>
 							<button
 								onClick={(e) => {
 									handleRating("Drip", e);
 								}}
 								type='button'
-								class={`flex items-center w-full px-4 py-2 md:text-base font-medium text-black  border-t border-b border-l rounded-l-md hover:bg-green-300 ${
-									smoothie.vote === "Drip" ?   ` bg-green-200 ` : "bg-white "
+								className={`flex items-center w-full px-4 py-2 md:text-base font-medium text-black  border-t border-b border-l rounded-l-md hover:bg-green-300 ${
+									smoothie.vote === "Drip" ? ` bg-green-200 ` : "bg-white "
 								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
@@ -92,7 +93,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 								</svg>
 								Drip
 							</button>
-							<span class='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
+							<span className='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
 								I love it ❤️
 							</span>
 						</div>
@@ -103,7 +104,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 									handleRating("Flip", e);
 								}}
 								type='button'
-								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black  border-t border-b  border-l border-gray-200  hover:bg-yellow-300 ${
+								className={`flex items-center w-full px-4 py-2 text-base font-medium text-black  border-t border-b  border-l border-gray-200  hover:bg-yellow-300 ${
 									smoothie.vote === "Flip" ? "bg-yellow-200" : "bg-white"
 								} `}>
 								<svg
@@ -119,7 +120,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 								</svg>
 								Flip
 							</button>
-							<span class='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
+							<span className='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
 								Only purchase on sale 😇
 							</span>
 						</div>
@@ -130,7 +131,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 									handleRating("Skip", e);
 								}}
 								type='button'
-								class={`flex items-center w-full px-4 py-2 text-base font-medium text-black  border-t border-b border-l rounded-r-md hover:bg-red-300  ${
+								className={`flex items-center w-full px-4 py-2 text-base font-medium text-black  border-t border-b border-l rounded-r-md hover:bg-red-300  ${
 									smoothie.vote === "Skip" ? ` bg-red-200` : "bg-white"
 								} `}>
 								<svg
@@ -143,7 +144,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 								Skip
 							</button>
 
-							<span class='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
+							<span className='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
 								F*ck No! 🤡
 							</span>
 						</div>
