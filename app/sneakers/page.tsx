@@ -16,11 +16,11 @@ export default function Page() {
 
 	const supabase = createClient();
 
-	// const handleDelete = (id) => {
-	// 	setSneakers((prevSmoothies) => {
-	// 		return prevSmoothies?.filter((sm) => sm.id !== id);
-	// 	});
-	// };
+	const handleDelete = (id:any) => {
+		setSneakers((prevSmoothies:any) => {
+			return prevSmoothies?.filter((sm:any) => sm.id !== id);
+		});
+	};
 	const handleVote = async () => {
 		const { data } =  await supabase.from("sneakers").select().order("name", { ascending: true })
 
@@ -53,6 +53,7 @@ export default function Page() {
 							key={sneaker.id}
 							smoothie={sneaker}
 							onVote={handleVote}
+							onDelete={handleDelete}
 						/>
 					))}
 				</div>

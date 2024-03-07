@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import ThumbsDownIcon from "./ThumbsDownIcon";
+import DripIcon from "./DripIcon";
+import SkipIcon from "./SkipIcon";
+import PendingIcon from "./PendingIcon";
 import ThumbsUpIcon from "./ThumbsUpIcon";
-import FlipIcon from "./FlipIcon";
+import FlipIcon from "./FlipLogo";
 
-const SmoothieCard = ({ smoothie, onVote }) => {
-	console.log("smoothie Vote", smoothie.vote);
+const SmoothieCard = ({ smoothie, onDelete, onVote }) => {
+	console.log("Name:", smoothie.name, "smoothie Vote:", smoothie.vote);
 
 	const [vote, setVote] = useState(smoothie.vote);
 	//const [sneakers, setUpdatedData] = useState(smoothie);
@@ -28,7 +30,7 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 	};
 
 	const handleRating = async (value, e) => {
-		setVote(value);
+		//setVote(value);
 		console.log("value", value);
 
 		const { data, error } = await supabase
@@ -58,9 +60,22 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 						alt='product image'
 					/>
 
-					<p className='px-4 py-2 my-2 mx-2 absolute top-0 right-0  text-base rounded-full text-indigo-600 border border-indigo-600 '>
-						{smoothie.vote === null ? "Pending Vote" : smoothie.vote}
-					</p>
+					{smoothie.vote === null ? <PendingIcon /> : ""}
+					{smoothie.vote !== null && smoothie.vote === "Drip" ? (
+						<DripIcon />
+					) : (
+						""
+					)}
+					{smoothie.vote !== null && smoothie.vote === "Flip" ? (
+						<FlipIcon />
+					) : (
+						""
+					)}
+					{smoothie.vote !== null && smoothie.vote === "Skip" ? (
+						<SkipIcon />
+					) : (
+						""
+					)}
 				</div>
 
 				<div className='px-5 pb-5'>
@@ -68,10 +83,26 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 						{smoothie.name}
 					</h5>
 
-					<div className='flex flex-row text-gray-400 text-xs md:text-sm border-t border-b justify-between   gap-y-3 items-start mt-2.5 mb-5'>
-						<p className='my-3 '>Release: {smoothie.release_date}</p>
-						<p className='my-3 '>Brand: {smoothie.brand}</p>
-						<p className='my-3 '>Retail: ${smoothie.price}</p>
+					<div className='flex flex-col text-gray-400 text-xs md:text-sm border-t border-b justify-between   gap-y-2 items-start mt-2.5 mb-5'>
+						<p className='mt-2  '>
+							<span className='uppercase mr-4'> Release:</span>
+							<span className='text-bold font-light'>
+								{smoothie.release_date}
+							</span>
+						</p>
+						<p className=' '>
+							<span className='uppercase mr-7'> Brand:</span>
+							<span className='text-bold font-light'>
+							{smoothie.brand}
+							</span>
+						</p>
+						<p className=' mb-2 '>
+							<span className='uppercase mr-7'> Retail:</span>
+							<span className='text-bold font-light'>
+								${smoothie.price}
+							</span>
+						</p>
+					
 					</div>
 
 					<div className='flex justify-center align-middle items-center max-w-sm mx-auto'>
@@ -113,9 +144,9 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 									fill='currentColor'
 									className='w-6 h-6 mr-2 '>
 									<path
-										fill-rule='evenodd'
+										fillRule='evenodd'
 										d='M15.97 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 1 1-1.06-1.06l3.22-3.22H7.5a.75.75 0 0 1 0-1.5h11.69l-3.22-3.22a.75.75 0 0 1 0-1.06Zm-7.94 9a.75.75 0 0 1 0 1.06l-3.22 3.22H16.5a.75.75 0 0 1 0 1.5H4.81l3.22 3.22a.75.75 0 1 1-1.06 1.06l-4.5-4.5a.75.75 0 0 1 0-1.06l4.5-4.5a.75.75 0 0 1 1.06 0Z'
-										clip-rule='evenodd'
+										clipRule='evenodd'
 									/>
 								</svg>
 								Flip
@@ -147,6 +178,34 @@ const SmoothieCard = ({ smoothie, onVote }) => {
 							<span className='absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100'>
 								F*ck No! 🤡
 							</span>
+						</div>
+					</div>
+
+					<div>
+						<div className='flex justify-between mt-6'>
+							<Link href={"/sneakers/edit/" + smoothie.id}>
+								<svg
+									xmlns='http://www.w3.org/2000/svg'
+									viewBox='0 0 24 24'
+									fill='currentColor'
+									className='w-6 h-6 hover:fill-indigo-400'>
+									<path d='M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z' />
+									<path d='M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z' />
+								</svg>
+							</Link>
+
+							<svg
+								onClick={handleDelete}
+								xmlns='http://www.w3.org/2000/svg'
+								viewBox='0 0 24 24'
+								fill='currentColor'
+								className='w-6 h-6 hover:fill-red-400'>
+								<path
+									fillRule='evenodd'
+									d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z'
+									clipRule='evenodd'
+								/>
+							</svg>
 						</div>
 					</div>
 

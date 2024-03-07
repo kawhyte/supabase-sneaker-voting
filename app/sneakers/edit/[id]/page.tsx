@@ -2,40 +2,48 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SmoothieCard from "../../../components/SmoothieCard";
+import SmoothieCard from "../../../../components/SmoothieCard";
 import Header from "@/components/Header";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
 
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from "next/navigation";
 
-const Create = () => {
+const Edit = ({ params }: { params: any }) => {
 	//const navigate = useNavigate();
+	// const id = useParams<{ tag: string; item: string }>();
+
+	const id = params.id;
 
 	const [name, setName] = useState("");
-	const [date, setDate] = useState('');
+	const [date, setDate] = useState("");
 	const [brand, setBrand] = useState("Nike");
 	const [price, setPrice] = useState("");
 	const [formError, setFormError] = useState("");
-	const [main_image, setImage] = useState("https://placehold.co/600x290?text=Add+Sneaker+Image");
+	const [main_image, setImage] = useState(
+		"https://placehold.co/600x400?text=Add+Sneaker+Image"
+	);
 	const supabase = createClient();
-	const router = useRouter()
+	const router = useRouter();
 
-	const handleSubmit = async (e:any) => {
+	//console.log("useParams ", id);
+
+	const handleSubmit = async (e: any) => {
 		e.preventDefault();
 
 		console.log("handleSubmit ", e);
 
 		if (!name || !date || !brand || !price || !main_image) {
-		setFormError("Please fill in all the fields correctly.");
-		//console.log("ERRRRROORRR!!1")
-		return;
+			setFormError("Please fill in all the fields correctly.");
+			//console.log("ERRRRROORRR!!1")
+			return;
 		}
 
 		console.log(
 			"Name:",
 			name,
-			"date:", date,
+			"date:",
+			date,
 			"Brand:",
 			brand,
 			"Price:",
@@ -46,27 +54,60 @@ const Create = () => {
 
 		const { data, error } = await supabase
 			.from("sneakers")
-			.insert([
-				{ name: name, brand: brand, release_date:date, price: price, main_image: main_image },
-			])
+			.update({
+				name: name,
+				brand: brand,
+				release_date: date,
+				price: price,
+				main_image: main_image,
+			})
+			.eq("id", id)
 			.select();
 
 		if (error) {
-		console.log(error);
-		setFormError("Please fill in all the fields correctly.");
-		//console.log("ERRRRROORRR")
+			console.log(error);
+			setFormError("Please fill in all the fields correctly.");
+			//console.log("ERRRRROORRR")
 		}
 		if (data) {
 			console.log(data);
 			setFormError("");
-			router.push('/sneakers')
-		//navigate("/");
+			router.push("/sneakers");
+			//navigate("/");
 		}
 	};
 
+	useEffect(() => {
+		const fetchSmoothie = async () => {
+			const { data, error } = await supabase
+				.from("sneakers")
+				.select()
+				.eq("id", id)
+				.single();
+
+			if (error) {
+				//navigate("/", { replace: true });
+			}
+
+			if (data) {
+				setName(data.name);
+				setImage(data.main_image);
+				setBrand(data.brand);
+				setDate(data.release_date);
+				setPrice(data.price);
+
+				console.log(data);
+			}
+		};
+		fetchSmoothie();
+		// return () => {
+		//   second
+		// }
+	}, [id, router]);
+
 	return (
 		<div className='page create'>
-			<h2>Create Page</h2>
+			<h2>Edit Page for {id}</h2>
 
 			<form
 				onSubmit={handleSubmit}
@@ -85,14 +126,11 @@ const Create = () => {
 						<input
 							value={name}
 							onChange={(e) => setName(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white'
 							id='grid-first-name'
 							type='text'
 							placeholder='Air Jordan 1'
 						/>
-						<p className='text-red-500 text-xs italic'>
-							Please fill out this field.
-						</p>
 					</div>
 					<div className='w-full md:w-1/2 px-3'>
 						<label
@@ -101,12 +139,14 @@ const Create = () => {
 							Release Date
 						</label>
 						<input
-						onChange={(e) => setDate(e.target.value)}
+							onChange={(e) => setDate(e.target.value)}
 							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 							id='grid-last-name'
 							type='date'
 							placeholder='02-10-24'
+							value={date}
 						/>
+						{date}
 					</div>
 				</div>
 				<div className='flex flex-wrap -mx-3 mb-6'>
@@ -142,12 +182,12 @@ const Create = () => {
 								onChange={(e) => setBrand(e.target.value)}
 								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 								id='grid-state'>
-								<option value="Nike">Nike</option>
-								<option value="Adidas">Adidas</option>
-								<option value="Jordan">Jordan</option>
-								<option value="Asics">Asics</option>
-								<option value="Saucony">Saucony</option>
-								<option value="Other">Other</option>
+								<option value='Nike'>Nike</option>
+								<option value='Adidas'>Adidas</option>
+								<option value='Jordan'>Jordan</option>
+								<option value='Asics'>Asics</option>
+								<option value='Saucony'>Saucony</option>
+								<option value='Other'>Other</option>
 							</select>
 							<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
 								<svg
@@ -178,30 +218,43 @@ const Create = () => {
 				<button
 					type='submit'
 					className='py-4 px-4 my-6 inline-flex items-center bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg '>
-					
-					<svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path></svg>
 
-					Create Sneaker Listing
-				
-				
+					<svg
+						xmlns='http://www.w3.org/2000/svg'
+						viewBox='0 0 24 24'
+						fill='currentColor'
+						className='w-6 h-6 mr-1'>
+						<path
+							fillRule='evenodd'
+							d='M21.53 9.53a.75.75 0 0 1-1.06 0l-4.72-4.72V15a6.75 6.75 0 0 1-13.5 0v-3a.75.75 0 0 1 1.5 0v3a5.25 5.25 0 1 0 10.5 0V4.81L9.53 9.53a.75.75 0 0 1-1.06-1.06l6-6a.75.75 0 0 1 1.06 0l6 6a.75.75 0 0 1 0 1.06Z'
+							clipRule='evenodd'
+						/>
+					</svg>
+					Update Sneaker Listing
 				</button>
 				{formError && <p className='error'>{formError}</p>}
 
-
-
-
-				{formError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-  <strong className="font-bold">Holy smokes!</strong>
-  <span className="block sm:inline">{formError}</span>
-  <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
-    <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
-  </span>
-</div>} 
-
-
+				{formError && (
+					<div
+						className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative'
+						role='alert'>
+						<strong className='font-bold'>Holy smokes!</strong>
+						<span className='block sm:inline'>{formError}</span>
+						<span className='absolute top-0 bottom-0 right-0 px-4 py-3'>
+							<svg
+								className='fill-current h-6 w-6 text-red-500'
+								role='button'
+								xmlns='http://www.w3.org/2000/svg'
+								viewBox='0 0 20 20'>
+								<title>Close</title>
+								<path d='M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z' />
+							</svg>
+						</span>
+					</div>
+				)}
 			</form>
 		</div>
 	);
 };
 
-export default Create;
+export default Edit;
