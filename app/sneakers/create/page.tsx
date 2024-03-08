@@ -145,6 +145,7 @@ const Create = () => {
 								<option value="Nike">Nike</option>
 								<option value="Adidas">Adidas</option>
 								<option value="Jordan">Jordan</option>
+								<option value="New Balance">New Balance</option>
 								<option value="Asics">Asics</option>
 								<option value="Saucony">Saucony</option>
 								<option value="Other">Other</option>
