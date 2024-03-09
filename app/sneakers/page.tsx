@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import SmoothieCard from "../../components/SmoothieCard";
-import Header from "@/components/Header";
+import SectionHeader from "@/components/SectionHeader";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
 import Link from "next/link";
@@ -47,7 +47,8 @@ export default function Page() {
 		
       </nav>
 		<div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3">
-        <Header />
+        <SectionHeader name={"Sneaker Ranking"} />
+		
 		
 			<div className='container mx-auto flex flex-col gap-16 items-center'>
 				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-10'>
