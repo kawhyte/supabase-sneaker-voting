@@ -8,7 +8,7 @@ import ThumbsUpIcon from "./ThumbsUpIcon";
 import FlipIcon from "./FlipLogo";
 
 const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
-	console.log("Name:", sneaker.name, "smoothie Vote:", sneaker.vote);
+	//console.log("Name:", sneaker.name, "smoothie Vote:", sneaker.vote);
 
 	const [vote, setVote] = useState(sneaker.vote);
 	//const [sneakers, setUpdatedData] = useState(smoothie);
@@ -56,6 +56,8 @@ const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 				<div className='relative'>
 
 				<div className="">
+
+				
 					<img
 						className='rounded-t-lg'
 						src={sneaker.main_image}

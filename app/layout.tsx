@@ -1,14 +1,15 @@
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 
+
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Sneaker Collection",
-  description: "Sneaker Collection & Tracking",
+  title: "MTW Sneaker Collection",
+  description: "MTW Sneaker Collection & Tracking",
 };
 
 export default function RootLayout({
@@ -23,6 +24,7 @@ export default function RootLayout({
           {children}
         </main>
       </body>
+ 
     </html>
   );
 }

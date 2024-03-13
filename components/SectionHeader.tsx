@@ -3,34 +3,7 @@ import NextLogo from "./NextLogo";
 import SupabaseLogo from "./SupabaseLogo";
 
 export default function Header({name}: {name:string}) {
-	const sneakers = [
-		{
-			name: "Chunky Dunky",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709927401/sneakers/1.png",
-		},
 
-		{
-			name: "Spider-Verse",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709927406/sneakers/6.png",
-		},
-
-		{
-			name: "990V3 Outside Clothes",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709931661/sneakers/The_Ultimate_Sneaker_Voting_1.png",
-		},
-		{
-			name: "Lightning",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709927404/sneakers/5.png",
-		},
-		{
-			name: "Dia de Los Muertos",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709927398/sneakers/4.png",
-		},
-		{
-			name: "Grinch",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709930979/sneakers/7.png",
-		},
-	];
 
 	return (
 		<div className=' '>
@@ -57,23 +30,22 @@ export default function Header({name}: {name:string}) {
 			</div>
 
 	
-      <div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
 
 			<div className=' flex flex-row gap-x-8 sm:gap-x-8 md:gap-x-20 justify-center items-center mx-auto'>
-				<Link href={"/sneakers"}>
+				
 
-					<button
-						type='button'
-						className=' hover:bg-yellow-500/80 border-2 items-center transition ease-in duration-200 py-2 px-3 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] text-xs md:text-sm'>
-						Sneaker collection
-					</button>
-				</Link>
+					<span
+					
+						className='border-2 items-center transition ease-in duration-200 py-2 px-3 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] text-xs md:text-sm'>
+						Total Sneakers:
+					</span>
+				
 				<Link href={"/sneakers"}>
 
 					<button
 						type='button'
 						className=' hover:bg-blue-500/80 border-2 items-center transition ease-in duration-200 py-2 px-3 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] text-xs md:text-sm'>
-						Sneaker Tracker
+						Vote Required:
 					</button>
 				</Link>
 				<Link href={"/sneakers"}>
@@ -87,6 +59,7 @@ export default function Header({name}: {name:string}) {
 
 		
 			</div>
+				<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
 		</div>
 	);
 }

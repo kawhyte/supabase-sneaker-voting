@@ -7,6 +7,7 @@ import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
 import Link from "next/link";
 import Collection from "@/components/CollectionCard";
+import Header from "@/components/Header";
 
 export default function Page() {
 
@@ -31,14 +32,19 @@ export default function Page() {
 
 	useEffect(() => {
 		const getData = async () => {
-			const { data } = await supabase.from("collection").select().order("name", { ascending: true })
+			
+			const { data } = await supabase.from("sneakers").select().match({in_collection:true }).order("name", { ascending: true })
+
 			setSneakers(data);
+			console.log(data)
 		};
 		getData();
 	}, []);
 
 	return (
 		<> 
+
+		
 		<nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
         <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
           <DeployButton />
@@ -49,11 +55,18 @@ export default function Page() {
 		<div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3">
         <SectionHeader name={"Sneaker Collection"} />
 		
+
+
+
+
+
+
 		
-        <div className='grid grid-cols-3 sm:grid-cols-4  grid-row-2 gap-y-10  gap-x-12 mt-10'>
+		
+        <div className='grid grid-cols-2 sm:grid-cols-4  grid-row-2 gap-y-10  gap-x-12 mt-10'>
 				{sneakers?.map((sneaker) => (
 					<div className='flex flex-col justify-center align-middle text-center items-center'>
-						<img src={sneaker.link} alt={`${sneaker.name + "sneaker"}`} />
+						<img src={sneaker.collection_image} alt={`${sneaker.name + "sneaker"}`} />
 						<p className='text-[0.8rem] font-mono leading-[1.2] mt-1 mb-2'>{sneaker.brand}</p>
 						<p className='text-[0.8rem] font-mono leading-[1.2] '>{sneaker.name}</p>
 					</div>

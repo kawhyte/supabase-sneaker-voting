@@ -31,7 +31,7 @@ const Edit = ({ params }: { params: any }) => {
 	const handleSubmit = async (e: any) => {
 		e.preventDefault();
 
-		console.log("handleSubmit ", e);
+		//console.log("handleSubmit ", e);
 
 		if (!name || !date || !brand || !price || !main_image) {
 			setFormError("Please fill in all the fields correctly.");
@@ -39,18 +39,18 @@ const Edit = ({ params }: { params: any }) => {
 			return;
 		}
 
-		console.log(
-			"Name:",
-			name,
-			"date:",
-			date,
-			"Brand:",
-			brand,
-			"Price:",
-			price,
-			"main Image:",
-			main_image
-		);
+		// console.log(
+		// 	"Name:",
+		// 	name,
+		// 	"date:",
+		// 	date,
+		// 	"Brand:",
+		// 	brand,
+		// 	"Price:",
+		// 	price,
+		// 	"main Image:",
+		// 	main_image
+		// );
 
 		const { data, error } = await supabase
 			.from("sneakers")

@@ -20,7 +20,7 @@ const Create = () => {
 			setFormError("Please fill in all the fields correctly.");
 			return;
 		}
-		console.log("Name:",name,"Brand:", brand,"Price:",price,"main Image:", main_image);
+		// console.log("Name:",name,"Brand:", brand,"Price:",price,"main Image:", main_image);
 		// const { data, error } = await supabase
 		// 	.from("sneakers")
 		// 	.insert([
