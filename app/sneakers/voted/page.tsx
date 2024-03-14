@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SmoothieCard from "@/components/SmoothieCard";
+import SmoothieCard from "@/components/SneakerCard";
 import SectionHeader from "@/components/SectionHeader";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
@@ -10,6 +10,8 @@ import Link from "next/link";
 
 export default function Voted() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
+    const [sneakersVotes, setSneakersVotes] = useState<number | undefined>(undefined);;
+
 	
 	const [orderBy, setOrderBy] = useState("created_at");
 	const [fetchError, setFetchError] = useState(null);
@@ -18,7 +20,10 @@ export default function Voted() {
 
 	const handleDelete = (id: any) => {
 		setSneakers((prevSmoothies: any) => {
-			return prevSmoothies?.filter((sm: any) => sm.id !== id);
+            const updatedSneakers = prevSmoothies?.filter((sm: any) => sm.id !== id);
+            setSneakersVotes(updatedSneakers?.length)
+
+            return updatedSneakers
 		});
 	};
 	const handleVote = async () => {
@@ -40,7 +45,7 @@ export default function Voted() {
 				.match({ in_collection: false  }).not("vote","is", null)
 				.order("name", { ascending: true });
 			setSneakers(data);
-
+            setSneakersVotes(data?.length)
 			// setSneakersPendingVote(data?.filter((test) => test?.vote === null));
 			// setSneakersDrip(data?.filter((test) => test?.vote === "Drip"));
 			// setSneakersSkip(data?.filter((test) => test?.vote === "Skip"))
@@ -60,9 +65,8 @@ export default function Voted() {
 		
       </nav> */}
 			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3'>
-				<SectionHeader name={" Ranked Sneaker"} />
+				<SectionHeader name={"Recent Votes"} total={sneakersVotes} sectiontext={"Sneaker Vote Count"} />
 
-				<div className="font-serif flex flex-col  drop-shadow-xl mt-10 md:ml-12  text-[1.85rem] sm:text-[2.5rem] tracking-[-0.03em] leading-[0.88] font-bold">Voted</div>
 				<div className='container mx-auto flex flex-col gap-16 items-center '>
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-10'>
 						{sneakers?.map((sneaker) => (

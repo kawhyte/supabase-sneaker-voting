@@ -1,15 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
-import { useEffect, useState } from "react";
-import DripIcon from "./DripIcon";
-import SkipIcon from "./SkipIcon";
+import { useState } from "react";
 import PendingIcon from "./PendingIcon";
-import ThumbsUpIcon from "./ThumbsUpIcon";
-import FlipIcon from "./FlipLogo";
-import ImageGallery from "react-image-gallery";
 
-
-const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
+const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 	//console.log("Name:", sneaker.name, "smoothie Vote:", sneaker.vote);
 
 	const [vote, setVote] = useState(sneaker.vote);
@@ -43,7 +37,6 @@ const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 			console.log(error);
 		}
 		if (data) {
-
 			onDelete(sneaker.id);
 		}
 	};
@@ -71,7 +64,6 @@ const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 
 	return (
 		<div>
-		
 			<div className='w-full max-w-2xl  container bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
 				<div className='relative'>
 					<div className=''>
@@ -80,7 +72,6 @@ const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 							src={sneaker.main_image}
 							alt='product image'
 						/>
-
 					</div>
 					<p className='absolute top-2 right-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
 						${sneaker.price}
@@ -92,7 +83,7 @@ const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 				</div>
 				{sneaker.vote === null ? <PendingIcon /> : ""}
 
-				<div className='px-5 pb-5'>
+				<div className='px-5 pb-2'>
 					<h5 className='font-serif flex flex-col normal-case text-center  drop-shadow-xl  text-[1.2rem] sm:text-[1.1rem] tracking-[-0.02em] leading-[1.33] my-8 font-semibold'>
 						{sneaker.name}
 					</h5>
@@ -134,15 +125,10 @@ const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 									sneaker.vote === "Flip" ? "bg-yellow-500" : ""
 								} `}>
 								<svg
-									xmlns='http://www.w3.org/2000/svg'
 									viewBox='0 0 24 24'
 									fill='currentColor'
 									className='w-4 h-4 mr-2 '>
-									<path
-										fillRule='evenodd'
-										d='M15.97 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 1 1-1.06-1.06l3.22-3.22H7.5a.75.75 0 0 1 0-1.5h11.69l-3.22-3.22a.75.75 0 0 1 0-1.06Zm-7.94 9a.75.75 0 0 1 0 1.06l-3.22 3.22H16.5a.75.75 0 0 1 0 1.5H4.81l3.22 3.22a.75.75 0 1 1-1.06 1.06l-4.5-4.5a.75.75 0 0 1 0-1.06l4.5-4.5a.75.75 0 0 1 1.06 0Z'
-										clipRule='evenodd'
-									/>
+									<path d='M22.5,10H15.75C15.13,10 14.6,10.38 14.37,10.91L12.11,16.2C12.04,16.37 12,16.56 12,16.75V18A1,1 0 0,0 13,19H18.18L17.5,22.18V22.42C17.5,22.73 17.63,23 17.83,23.22L18.62,24L23.56,19.06C23.83,18.79 24,18.41 24,18V11.5A1.5,1.5 0 0,0 22.5,10M12,6A1,1 0 0,0 11,5H5.82L6.5,1.82V1.59C6.5,1.28 6.37,1 6.17,0.79L5.38,0L0.44,4.94C0.17,5.21 0,5.59 0,6V12.5A1.5,1.5 0 0,0 1.5,14H8.25C8.87,14 9.4,13.62 9.63,13.09L11.89,7.8C11.96,7.63 12,7.44 12,7.25V6Z' />
 								</svg>
 								Flip
 							</button>
@@ -210,13 +196,20 @@ const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 					</svg>
 				</Link>
 
-
-				<svg onClick={(e) => {
-					handleAddToCollection("true", e);
-				}} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className='w-6 h-6 hover:fill-yellow-400'>
-				<path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
-			  </svg>
-			  
+				<svg
+					onClick={(e) => {
+						handleAddToCollection("true", e);
+					}}
+					xmlns='http://www.w3.org/2000/svg'
+					viewBox='0 0 24 24'
+					fill='currentColor'
+					className='w-6 h-6 hover:fill-yellow-400'>
+					<path
+						fill-rule='evenodd'
+						d='M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z'
+						clip-rule='evenodd'
+					/>
+				</svg>
 
 				{/*<svg
 							onClick={handleDelete}
@@ -235,4 +228,4 @@ const SmoothieCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 	);
 };
 
-export default SmoothieCard;
+export default SneakerCard;

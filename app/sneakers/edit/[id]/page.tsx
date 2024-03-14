@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SmoothieCard from "../../../../components/SmoothieCard";
+import SmoothieCard from "../../../../components/SneakerCard";
 import Header from "@/components/Header";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
@@ -218,7 +218,6 @@ const Edit = ({ params }: { params: any }) => {
 				<button
 					type='submit'
 					className='py-4 px-4 my-6 inline-flex items-center bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg '>
-
 					<svg
 						xmlns='http://www.w3.org/2000/svg'
 						viewBox='0 0 24 24'

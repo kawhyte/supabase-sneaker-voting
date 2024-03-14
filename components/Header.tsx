@@ -20,27 +20,27 @@ export default function Header() {
 	const isSupabaseConnected = canInitSupabaseClient();
 
 	return (
-		<div className=' mb-20 '>
+		<div className=' md:mb-20 '>
 			<nav className='w-full flex justify-center border-b border-b-foreground/10 h-16'>
 				<div className='w-full max-w-4xl flex justify-between items-center p-3 text-sm'>
 					<DeployButton />
 
+					<Link href={"/sneakers/pending"}>
+						<span className=' hidden md:block hover:text-green-500/80 items-center transition ease-in duration-200 py-2 px-3 opacity translate-y-[10px] group font-mono leading-[1.2] text-xs md:text-sm'>
+							Pending Vote
+						</span>
+					</Link>
+					<Link href={"/sneakers/voted"}>
+						<span className='hidden md:block hover:text-blue-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px] group font-mono leading-[1.2] text-xs md:text-sm'>
+							Recent Votes
+						</span>
+					</Link>
 					<Link href={"/sneakers/collection"}>
-						<span className=' hover:text-yellow-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px] group font-mono  leading-[1.2] text-xs md:text-sm'>
+						<span className=' hidden md:block hover:text-yellow-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px] group font-mono  leading-[1.2] text-xs md:text-sm'>
 							Our Collection
 						</span>
 					</Link>
 
-					<Link href={"/sneakers"}>
-						<span className=' hover:text-blue-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px] group font-mono leading-[1.2] text-xs md:text-sm'>
-							Tracker
-						</span>
-					</Link>
-					<Link href={"/sneakers"}>
-						<span className=' hover:text-green-500/80 items-center transition ease-in duration-200 py-2 px-3 opacity translate-y-[10px] group font-mono leading-[1.2] text-xs md:text-sm'>
-							Ranking
-						</span>
-					</Link>
 					{isSupabaseConnected && <AuthButton />}
 				</div>
 			</nav>

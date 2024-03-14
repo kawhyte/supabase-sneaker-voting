@@ -2,52 +2,60 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SmoothieCard from "../../../components/SmoothieCard";
+import SmoothieCard from "../../../components/SneakerCard";
 import Header from "@/components/Header";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 const Create = () => {
 	//const navigate = useNavigate();
 
 	const [name, setName] = useState("");
-	const [date, setDate] = useState('');
+	const [date, setDate] = useState("");
 	const [brand, setBrand] = useState("Nike");
 	const [price, setPrice] = useState("");
 	const [formError, setFormError] = useState("");
-	const [main_image, setImage] = useState("https://placehold.co/600x290?text=Add+Sneaker+Image");
+	const [main_image, setImage] = useState(
+		"https://placehold.co/600x290?text=Add+Sneaker+Image"
+	);
 	const supabase = createClient();
-	const router = useRouter()
+	const router = useRouter();
 
-	const handleSubmit = async (e:any) => {
+	const handleSubmit = async (e: any) => {
 		e.preventDefault();
 
 		console.log("handleSubmit ", e);
 
 		if (!name || !date || !brand || !price || !main_image) {
-		setFormError("Please fill in all the fields correctly.");
-		//console.log("ERRRRROORRR!!1")
-		return;
+			setFormError("Please fill in all the fields correctly.");
+			//console.log("ERRRRROORRR!!1")
+			return;
 		}
 		const { data, error } = await supabase
 			.from("sneakers")
 			.insert([
-				{ name: name, brand: brand, release_date:date, price: price, main_image: main_image },
+				{
+					name: name,
+					brand: brand,
+					release_date: date,
+					price: price,
+					main_image: main_image,
+				},
 			])
 			.select();
 
 		if (error) {
-		console.log(error);
-		setFormError("Please fill in all the fields correctly.");
-		//console.log("ERRRRROORRR")
+			console.log(error);
+			setFormError("Please fill in all the fields correctly.");
+			//console.log("ERRRRROORRR")
 		}
 		if (data) {
 			console.log(data);
 			setFormError("");
-			router.push('/sneakers')
-		//navigate("/");
+			router.push("/sneakers");
+			//navigate("/");
 		}
 	};
 
@@ -77,7 +85,6 @@ const Create = () => {
 							type='text'
 							placeholder='Air Jordan 1'
 						/>
-						
 					</div>
 					<div className='w-full md:w-1/2 px-3'>
 						<label
@@ -86,7 +93,7 @@ const Create = () => {
 							Release Date
 						</label>
 						<input
-						onChange={(e) => setDate(e.target.value)}
+							onChange={(e) => setDate(e.target.value)}
 							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 							id='grid-last-name'
 							type='date'
@@ -109,7 +116,6 @@ const Create = () => {
 							type='text'
 							placeholder='https://'
 						/>
-						
 					</div>
 				</div>
 				<div className='flex flex-wrap -mx-3 mb-2'>
@@ -125,13 +131,13 @@ const Create = () => {
 								onChange={(e) => setBrand(e.target.value)}
 								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 								id='grid-state'>
-								<option value="Nike">Nike</option>
-								<option value="Adidas">Adidas</option>
-								<option value="Jordan">Jordan</option>
-								<option value="New Balance">New Balance</option>
-								<option value="Asics">Asics</option>
-								<option value="Saucony">Saucony</option>
-								<option value="Other">Other</option>
+								<option value='Nike'>Nike</option>
+								<option value='Adidas'>Adidas</option>
+								<option value='Jordan'>Jordan</option>
+								<option value='New Balance'>New Balance</option>
+								<option value='Asics'>Asics</option>
+								<option value='Saucony'>Saucony</option>
+								<option value='Other'>Other</option>
 							</select>
 							<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
 								<svg
@@ -162,16 +168,19 @@ const Create = () => {
 				<button
 					type='submit'
 					className='py-4 px-4 my-6 inline-flex items-center bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg '>
-					
-					<svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path></svg>
-
+					<svg
+						className='me-1 -ms-1 w-5 h-5'
+						fill='currentColor'
+						viewBox='0 0 20 20'
+						xmlns='http://www.w3.org/2000/svg'>
+						<path
+							fillRule='evenodd'
+							d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z'
+							clipRule='evenodd'></path>
+					</svg>
 					Create Sneaker Listing
-				
-				
 				</button>
 				{formError && <p className='error'>{formError}</p>}
-
-
 			</form>
 		</div>
 	);

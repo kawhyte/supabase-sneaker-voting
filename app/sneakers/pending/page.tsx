@@ -2,14 +2,13 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SmoothieCard from "@/components/SmoothieCard";
+import SmoothieCard from "@/components/SneakerCard";
 import SectionHeader from "@/components/SectionHeader";
-import DeployButton from "@/components/DeployButton";
-import AuthButton from "@/components/AuthButton";
-import Link from "next/link";
+
 
 export default function PendingVote() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
+	const [sneakersPending, setSneakersPending] = useState<number | undefined>(undefined);;
 
 	
 	const [orderBy, setOrderBy] = useState("created_at");
@@ -19,7 +18,12 @@ export default function PendingVote() {
 
 	const handleDelete = (id: any) => {
 		setSneakers((prevSmoothies: any) => {
-			return prevSmoothies?.filter((sm: any) => sm.id !== id);
+			
+            
+            const updatedSneakers = prevSmoothies?.filter((sm: any) => sm.id !== id);
+            setSneakersPending(updatedSneakers?.length)
+
+            return updatedSneakers
 		});
 	};
 	const handleVote = async () => {
@@ -41,6 +45,7 @@ export default function PendingVote() {
 				.match({ in_collection: false  }).is("vote", null)
 				.order("name", { ascending: true });
 			setSneakers(data);
+            setSneakersPending(data?.length)
 
 			// setSneakersPendingVote(data?.filter((test) => test?.vote === null));
 			// setSneakersDrip(data?.filter((test) => test?.vote === "Drip"));
@@ -61,9 +66,10 @@ export default function PendingVote() {
 		
       </nav> */}
 			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3'>
-				<SectionHeader name={"Sneaker Ranking"} />
+				<SectionHeader name={"Sneakers Voting"} total={sneakersPending} sectiontext={"Sneakers Pending Vote:"}  />
 
-				<div className="font-serif flex flex-col  drop-shadow-xl mt-10 md:ml-12  text-[1.85rem] sm:text-[2.5rem] tracking-[-0.03em] leading-[0.88] font-bold">Sneakers Pending Vote</div>
+          
+
 				<div className='container mx-auto flex flex-col gap-16 items-center '>
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 mx-10 md:mx-0  md:gap-10'>
 						{sneakers?.map((sneaker) => (
