@@ -26,13 +26,13 @@ export default async function Index() {
       
 
       <div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-4xl px-3">
-        <Header />
+     
 
   <Hero/>
    
       </div>
 
-      <footer className="w-full border-t border-t-foreground/10 p-8 flex justify-center text-center text-xs">
+      {/* <footer className="w-full border-t border-t-foreground/10 p-8 flex justify-center text-center text-xs">
         <p>
           Powered by{" "}
           <a
@@ -44,7 +44,7 @@ export default async function Index() {
             Supabase
           </a>
         </p>
-      </footer>
+      </footer> */}
     </div>
   );
 }

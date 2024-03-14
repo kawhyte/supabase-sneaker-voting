@@ -45,15 +45,17 @@ export default function Page() {
 		<> 
 
 		
-		<nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
+		{/* <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
         <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
           <DeployButton />
     
         </div>
 		
-      </nav>
+      </nav> */}
+
+
 		<div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3">
-        <SectionHeader name={"Sneaker Collection"} />
+        <SectionHeader name={"Our Sneaker Collection"} />
 		
 
 
@@ -65,10 +67,10 @@ export default function Page() {
 		
         <div className='grid grid-cols-2 sm:grid-cols-4  grid-row-2 gap-y-10  gap-x-12 mt-10'>
 				{sneakers?.map((sneaker) => (
-					<div className='flex flex-col justify-center align-middle text-center items-center'>
-						<img src={sneaker.collection_image} alt={`${sneaker.name + "sneaker"}`} />
-						<p className='text-[0.8rem] font-mono leading-[1.2] mt-1 mb-2'>{sneaker.brand}</p>
-						<p className='text-[0.8rem] font-mono leading-[1.2] '>{sneaker.name}</p>
+					<div key={sneaker.id} className='flex flex-col justify-center align-middle text-center items-center'>
+						<img src={sneaker.collection_image !== null ? sneaker.collection_image: "https://res.cloudinary.com/babyhulk/image/upload/co_rgb:e7e7e7,e_colorize:100/v1709930979/sneakers/7.png"} alt={`${sneaker.name + "sneaker"}`} />
+						{/* <p className='text-[0.8rem] font-mono leading-[1.2] mt-1 mb-2'>{sneaker.brand}</p> */}
+						<p className='text-[0.8rem] font-mono leading-[1.2] mt-1 '>{sneaker.name}</p>
 					</div>
 				))}
 			</div>
