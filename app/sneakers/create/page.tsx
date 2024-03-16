@@ -16,9 +16,10 @@ const Create = () => {
 	const [date, setDate] = useState("");
 	const [brand, setBrand] = useState("Nike");
 	const [price, setPrice] = useState("");
+	const [style, setStyle] = useState("");
 	const [formError, setFormError] = useState("");
 	const [main_image, setImage] = useState(
-		"https://placehold.co/600x290?text=Add+Sneaker+Image"
+		""
 	);
 	const supabase = createClient();
 	const router = useRouter();
@@ -28,7 +29,7 @@ const Create = () => {
 
 		console.log("handleSubmit ", e);
 
-		if (!name || !date || !brand || !price || !main_image) {
+		if (!name || !date || !brand || !price || !style || !main_image) {
 			setFormError("Please fill in all the fields correctly.");
 			//console.log("ERRRRROORRR!!1")
 			return;
@@ -41,6 +42,7 @@ const Create = () => {
 					brand: brand,
 					release_date: date,
 					price: price,
+					style: style,
 					main_image: main_image,
 				},
 			])
@@ -54,7 +56,7 @@ const Create = () => {
 		if (data) {
 			console.log(data);
 			setFormError("");
-			router.push("/sneakers");
+			router.push("/sneakers/pending");
 			//navigate("/");
 		}
 	};
@@ -65,9 +67,9 @@ const Create = () => {
 
 			<form
 				onSubmit={handleSubmit}
-				className='w-full max-w-2xl p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-7005'>
+				className='w-full max-w-xl p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-7005'>
 				<div className='mb-6'>
-					<img src={main_image} alt='Sneaker' />
+					<img src={main_image === "" ? "https://placehold.co/600x290?text=Sneaker+Image": main_image } alt='Sneaker' />
 				</div>
 
 				<div className='flex flex-wrap -mx-3 mb-6'>
@@ -148,6 +150,21 @@ const Create = () => {
 								</svg>
 							</div>
 						</div>
+					</div>
+					<div className='w-full md:w-1/3 px-3 mb-6 md:mb-0'>
+						<label
+							className='block uppercase tracking-wide text-gray-100 text-xs font-bold mb-2'
+							htmlFor='grid-zip'>
+							Style/SKU
+						</label>
+						<input
+							value={style}
+							onChange={(e) => setStyle(e.target.value)}
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							id='grid-zip'
+							type='string'
+							placeholder='AQ9129 500'
+						/>
 					</div>
 					<div className='w-full md:w-1/3 px-3 mb-6 md:mb-0'>
 						<label

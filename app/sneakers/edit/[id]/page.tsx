@@ -19,9 +19,10 @@ const Edit = ({ params }: { params: any }) => {
 	const [date, setDate] = useState("");
 	const [brand, setBrand] = useState("Nike");
 	const [price, setPrice] = useState("");
+	const [style, setStyle] = useState("");
 	const [formError, setFormError] = useState("");
 	const [main_image, setImage] = useState(
-		"https://placehold.co/600x400?text=Add+Sneaker+Image"
+		""
 	);
 	const supabase = createClient();
 	const router = useRouter();
@@ -33,7 +34,7 @@ const Edit = ({ params }: { params: any }) => {
 
 		//console.log("handleSubmit ", e);
 
-		if (!name || !date || !brand || !price || !main_image) {
+		if (!name || !date || !brand || !price || !style || !main_image) {
 			setFormError("Please fill in all the fields correctly.");
 			//console.log("ERRRRROORRR!!1")
 			return;
@@ -59,6 +60,7 @@ const Edit = ({ params }: { params: any }) => {
 				brand: brand,
 				release_date: date,
 				price: price,
+				style: style,
 				main_image: main_image,
 			})
 			.eq("id", id)
@@ -72,7 +74,7 @@ const Edit = ({ params }: { params: any }) => {
 		if (data) {
 			console.log(data);
 			setFormError("");
-			router.push("/sneakers");
+			router.push("/sneakers/pending");
 			//navigate("/");
 		}
 	};
@@ -95,6 +97,7 @@ const Edit = ({ params }: { params: any }) => {
 				setBrand(data.brand);
 				setDate(data.release_date);
 				setPrice(data.price);
+				setStyle(data.style)
 
 				console.log(data);
 			}
@@ -146,7 +149,7 @@ const Edit = ({ params }: { params: any }) => {
 							placeholder='02-10-24'
 							value={date}
 						/>
-						{date}
+						
 					</div>
 				</div>
 				<div className='flex flex-wrap -mx-3 mb-6'>
@@ -185,6 +188,8 @@ const Edit = ({ params }: { params: any }) => {
 								<option value='Nike'>Nike</option>
 								<option value='Adidas'>Adidas</option>
 								<option value='Jordan'>Jordan</option>
+								<option value='New Balance'>New Balance</option>
+
 								<option value='Asics'>Asics</option>
 								<option value='Saucony'>Saucony</option>
 								<option value='Other'>Other</option>
@@ -198,6 +203,22 @@ const Edit = ({ params }: { params: any }) => {
 								</svg>
 							</div>
 						</div>
+					</div>
+
+					<div className='w-full md:w-1/3 px-3 mb-6 md:mb-0'>
+						<label
+							className='block uppercase tracking-wide text-gray-100 text-xs font-bold mb-2'
+							htmlFor='grid-zip'>
+							Style/SKU
+						</label>
+						<input
+							value={style}
+							onChange={(e) => setStyle(e.target.value)}
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							id='grid-zip'
+							type='string'
+							placeholder='AQ9129 500'
+						/>
 					</div>
 					<div className='w-full md:w-1/3 px-3 mb-6 md:mb-0'>
 						<label

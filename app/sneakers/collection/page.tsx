@@ -32,7 +32,7 @@ export default function Page() {
 				.from("sneakers")
 				.select()
 				.match({ in_collection: true })
-				.order("name", { ascending: true });
+				.order("created_at", { ascending: false });
 
 			setSneakers(data);
 			setCollectionCount(data?.length)
@@ -55,6 +55,7 @@ export default function Page() {
 				<SectionHeader name={"Our Sneaker Collection"} total={collectionCount} sectiontext={"Collection Count"} />
 				<div className='grid grid-cols-2 sm:grid-cols-4  grid-row-2 gap-y-10  gap-x-12 md:mt-10'>
 					{sneakers?.map((sneaker) => (
+						<> 
 						<div
 							key={sneaker.id}
 							className='flex flex-col justify-center align-middle text-center items-center'>
@@ -67,10 +68,21 @@ export default function Page() {
 								alt={`${sneaker.name + "sneaker"}`}
 							/>
 							{/* <p className='text-[0.8rem] font-mono leading-[1.2] mt-1 mb-2'>{sneaker.brand}</p> */}
+							
+							
 							<p className='text-[0.7rem] md:text-[0.8rem] font-mono leading-[1.2] mt-1 '>
 								{sneaker.name}
+
 							</p>
+							
 						</div>
+
+						{/* <div className="flex flex-col gap-x-7 justify-center"> 
+						<p>CPW:</p>
+						<p>CPW:</p>
+						<p>CPW:</p>
+						</div> */}
+						</>
 					))}
 				</div>
 			</div>

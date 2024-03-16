@@ -74,7 +74,7 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 						/>
 					</div>
 					<p className='absolute top-2 right-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
-						${sneaker.price}
+						${sneaker.price <10? "TBD": sneaker.price}
 					</p>
 
 					<p className='absolute top-2 left-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
@@ -83,7 +83,7 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 				</div>
 				{sneaker.vote === null ? <PendingIcon /> : ""}
 
-				<div className='px-5 pb-2'>
+				<div className='px-5 pb-3'>
 					<h5 className='font-serif flex flex-col normal-case text-center  drop-shadow-xl  text-[1.2rem] sm:text-[1.1rem] tracking-[-0.02em] leading-[1.33] my-8 font-semibold'>
 						{sneaker.name}
 					</h5>
@@ -168,7 +168,7 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 						</div>
 					</div>
 
-					<div></div>
+					
 				</div>
 			</div>
 			<div className='flex justify-end mt-3'>
@@ -195,7 +195,7 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 						/>
 					</svg>
 				</Link>
-
+{/*
 				<svg
 					onClick={(e) => {
 						handleAddToCollection("true", e);
@@ -209,7 +209,7 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 						d='M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z'
 						clip-rule='evenodd'
 					/>
-				</svg>
+				</svg>*/}
 
 				{/*<svg
 							onClick={handleDelete}

@@ -43,7 +43,7 @@ export default function Voted() {
 				.from("sneakers")
 				.select()
 				.match({ in_collection: false  }).not("vote","is", null)
-				.order("name", { ascending: true });
+				.order("created_at", { ascending: false });
 			setSneakers(data);
             setSneakersVotes(data?.length)
 			// setSneakersPendingVote(data?.filter((test) => test?.vote === null));
