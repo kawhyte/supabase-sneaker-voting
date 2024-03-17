@@ -66,14 +66,24 @@ export default function Page() {
 										: "https://res.cloudinary.com/babyhulk/image/upload/co_rgb:e7e7e7,e_colorize:100/v1709930979/sneakers/7.png"
 								}
 								alt={`${sneaker.name + "sneaker"}`}
+								className="mb-1"
 							/>
 							{/* <p className='text-[0.8rem] font-mono leading-[1.2] mt-1 mb-2'>{sneaker.brand}</p> */}
 							
 							
-							<p className='text-[0.7rem] md:text-[0.8rem] font-mono leading-[1.2] mt-1 '>
+							<p className='text-[0.7rem] md:text-[0.8rem] font-mono leading-[1.2] mt-1  '>
 								{sneaker.name}
 
 							</p>
+							
+							{/* <div className='text-[0.7rem] md:text-[0.8rem] font-mono leading-[1.2] mt-1   grid grid-cols-2 gap-2 '>
+								<p className="border border-dashed "> CPW:{sneaker.price/3}</p>
+								<p className="border border-dashed "> item 2</p>
+								<p className="border border-dashed ">item 3</p>
+								<p className="border border-dashed ">item 4</p>
+								
+
+							</div> */}
 							
 						</div>
 

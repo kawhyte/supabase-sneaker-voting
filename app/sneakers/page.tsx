@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SneakerCard from "../../components/SneakerCard";
+import SneakerTable from "../../components/SneakerTable";
 import SectionHeader from "@/components/SectionHeader";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
@@ -67,62 +67,24 @@ export default function Page() {
         </div>
 		
       </nav> */}
-			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3'>
+			<div className='animate-in flex-1 flex flex-col opacity-0 max-w-8xl px-3'>
 				<SectionHeader name={"Sneaker Ranking"} total={0} sectiontext={""} />
 
-				<div className='container mx-auto flex flex-col gap-16 items-center '>
-					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-10'>
-						{sneakers
-							?.filter((test) => test?.vote === null)
-							.map((sneaker) => (
-								<SneakerCard
-									key={sneaker.id}
-									smoothie={sneaker}
-									onVote={handleVote}
-									onDelete={handleDelete}
+				<div className='  '>
+			
+						
+								<SneakerTable
+								
+									sneakers={sneakers}
+								
 								/>
-							))}
-					</div>
+							
+					
 				</div>
 
-				<div className='font-serif flex flex-col  drop-shadow-xl mt-10 md:ml-12  text-[1.85rem] sm:text-[2.5rem] tracking-[-0.03em] leading-[0.88] font-bold'>
-					Sneakers Wanted
+				
 				</div>
-
-				<div className='container mx-auto flex flex-col gap-16 items-center'>
-					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-10'>
-						{sneakers
-							?.filter((test) => test?.vote === "Drip")
-							.map((sneaker) => (
-								<SneakerCard
-									key={sneaker.id}
-									smoothie={sneaker}
-									onVote={handleVote}
-									onDelete={handleDelete}
-								/>
-							))}
-					</div>
-				</div>
-
-				<div className='font-serif flex flex-col  drop-shadow-xl mt-10 md:ml-12  text-[1.85rem] sm:text-[2.5rem] tracking-[-0.03em] leading-[0.88] font-bold'>
-					Sneakers Disliked
-				</div>
-
-				<div className='container mx-auto flex flex-col gap-16 items-center'>
-					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-10'>
-						{sneakers
-							?.filter((test) => test?.vote === "Skip")
-							.map((sneaker) => (
-								<SneakerCard
-									key={sneaker.id}
-									smoothie={sneaker}
-									onVote={handleVote}
-									onDelete={handleDelete}
-								/>
-							))}
-					</div>
-				</div>
-			</div>
+			
 		</>
 	);
 }
