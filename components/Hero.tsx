@@ -1,39 +1,14 @@
+
+
 import Link from "next/link";
 import NextLogo from "./NextLogo";
 import SupabaseLogo from "./SupabaseLogo";
 import ThumbsUpIcon from "./ThumbsUpIcon";
 
-export default function Hero() {
+export default function Hero({sneakers}:{sneakers:any}) {
 	
-const sneakers = [
-		{
-			name: "Chunky Dunky",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709927401/sneakers/1.png",
-		},
 
-		{
-			name: "Spider-Verse",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709927406/sneakers/6.png",
-		},
-
-		{
-			name: "990V3 Outside Clothes",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709931661/sneakers/The_Ultimate_Sneaker_Voting_1.png",
-		},
-		{
-			name: "Lightning",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709927404/sneakers/5.png",
-		},
-		{
-			name: "Dia de Los Muertos",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709927398/sneakers/4.png",
-		},
-		{
-			name: "Grinch",
-			link: "https://res.cloudinary.com/babyhulk/image/upload/v1709930979/sneakers/7.png",
-		},
-	];
-
+	
 	return (
 		<div className=' '>
 			{/* <div className='flex gap-8 justify-center items-center'>
@@ -58,11 +33,11 @@ const sneakers = [
 				</div>
 			</div>
 
-			<div className='grid grid-cols-3 sm:grid-cols-6  grid-row-2 gap-y-8  gap-x-7'>
-				{sneakers.map((sneaker) => (
+			<div className='grid grid-cols-3 grid-rows-1 sm:grid-cols-6  sm:grid-row-2 gap-y-8  gap-x-7'>
+				{sneakers.map((sneaker:any) => (
 					<div className='flex flex-col justify-center align-middle items-center'>
-						<img src={sneaker.link} alt='test' />
-						<p className='text-[0.59rem] font-mono leading-[1.2]'>{sneaker.name}</p>
+						<img src={sneaker.collection_image} alt={sneaker.name} />
+						<p className='text-[0.59rem] font-mono leading-[1.2] text-center hidden sm:block'>{sneaker.name}</p>
 					</div>
 				))}
 			</div>
