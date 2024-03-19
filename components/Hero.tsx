@@ -1,9 +1,7 @@
 
 
 import Link from "next/link";
-import NextLogo from "./NextLogo";
-import SupabaseLogo from "./SupabaseLogo";
-import ThumbsUpIcon from "./ThumbsUpIcon";
+import Image from"next/image"
 
 export default function Hero({sneakers}:{sneakers:any}) {
 	
@@ -36,7 +34,7 @@ export default function Hero({sneakers}:{sneakers:any}) {
 			<div className='grid grid-cols-3 grid-rows-1 sm:grid-cols-6  sm:grid-row-2 gap-y-8  gap-x-7'>
 				{sneakers.map((sneaker:any) => (
 					<div className='flex flex-col justify-center align-middle items-center'>
-						<img src={sneaker.collection_image} alt={sneaker.name} />
+						<Image width={300} height={200} src={sneaker.collection_image} alt={sneaker.name} blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==" loading="lazy" placeholder="blur" />
 						<p className='text-[0.59rem] font-mono leading-[1.2] text-center hidden sm:block'>{sneaker.name}</p>
 					</div>
 				))}
@@ -77,3 +75,7 @@ export default function Hero({sneakers}:{sneakers:any}) {
  
 	);
 }
+function getImageBlurSvg() {
+	throw new Error("Function not implemented.");
+}
+

@@ -66,7 +66,7 @@ export default function Page() {
 										: "https://res.cloudinary.com/babyhulk/image/upload/co_rgb:e7e7e7,e_colorize:100/v1709930979/sneakers/7.png"
 								}
 								alt={`${sneaker.name + "sneaker"}`}
-								className="mb-1"
+								className="mb-1  hover:scale-105 img-outline  transition duration-300 ease-in-out cursor-pointer"
 							/>
 							{/* <p className='text-[0.8rem] font-mono leading-[1.2] mt-1 mb-2'>{sneaker.brand}</p> */}
 							
@@ -75,6 +75,17 @@ export default function Page() {
 								{sneaker.name}
 
 							</p>
+
+							
+						
+							{/* <div className='border  w-full flex flex-col border-dotted bg-gray-800  px-2 py-1 text-[0.7rem] md:text-[0.8rem] font-mono leading-[1.2] mt-2  '>
+							<p className="mb-1">Overall rating  </p>
+							
+							<p> {'5/10'}</p>
+
+							</div>
+							 */}
+							
 							
 							{/* <div className='text-[0.7rem] md:text-[0.8rem] font-mono leading-[1.2] mt-1   grid grid-cols-2 gap-2 '>
 								<p className="border border-dashed "> CPW:{sneaker.price/3}</p>

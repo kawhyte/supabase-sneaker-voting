@@ -66,13 +66,17 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 		<div>
 			<div className='w-full max-w-2xl  container bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
 				<div className='relative'>
+				
 					<div className=''>
+				<Link href={`/sneakers/detail/${sneaker.id}`}> 
 						<img
 							className='rounded-t-lg'
 							src={sneaker.main_image}
 							alt='product image'
-						/>
+						/>	
+					</Link>
 					</div>
+				
 					<p className='absolute top-2 right-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
 						${sneaker.price <10? "TBD": sneaker.price}
 					</p>
