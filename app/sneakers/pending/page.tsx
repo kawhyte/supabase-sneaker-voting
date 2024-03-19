@@ -41,7 +41,7 @@ export default function PendingVote() {
 		const getData = async () => {
 			const { data } = await supabase
 				.from("sneakers")
-				.select()
+				.select(`*, images(*),brand_id(*)`)
 				.match({ in_collection: false  }).is("vote", null)
 				.order("name", { ascending: true });
 			setSneakers(data);

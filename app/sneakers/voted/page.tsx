@@ -41,7 +41,7 @@ export default function Voted() {
 		const getData = async () => {
 			const { data } = await supabase
 				.from("sneakers")
-				.select()
+				.select(`*, images(*),brand_id(*)`)
 				.match({ in_collection: false  }).not("vote","is", null)
 				.order("created_at", { ascending: false });
 			setSneakers(data);

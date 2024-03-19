@@ -17,7 +17,7 @@ const Edit = ({ params }: { params: any }) => {
 
 	const [name, setName] = useState("");
 	const [date, setDate] = useState("");
-	const [brand, setBrand] = useState("Nike");
+	const [brand, setBrand] = useState("1");
 	const [price, setPrice] = useState("");
 	const [style, setStyle] = useState("");
 	const [formError, setFormError] = useState("");
@@ -57,7 +57,7 @@ const Edit = ({ params }: { params: any }) => {
 			.from("sneakers")
 			.update({
 				name: name,
-				brand: brand,
+				brand_id: brand,
 				release_date: date,
 				price: price,
 				style: style,
@@ -94,7 +94,7 @@ const Edit = ({ params }: { params: any }) => {
 			if (data) {
 				setName(data.name);
 				setImage(data.main_image);
-				setBrand(data.brand);
+				setBrand(data.brand_id);
 				setDate(data.release_date);
 				setPrice(data.price);
 				setStyle(data.style)
@@ -185,14 +185,15 @@ const Edit = ({ params }: { params: any }) => {
 								onChange={(e) => setBrand(e.target.value)}
 								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 								id='grid-state'>
-								<option value='Nike'>Nike</option>
-								<option value='Adidas'>Adidas</option>
-								<option value='Jordan'>Jordan</option>
-								<option value='New Balance'>New Balance</option>
-
-								<option value='Asics'>Asics</option>
-								<option value='Saucony'>Saucony</option>
-								<option value='Other'>Other</option>
+						<option value='1'>Jordan</option>
+								<option value= "2" >Nike</option>
+								<option value= "3">Adidas</option>
+								<option value='4'>Asics</option>
+								<option value='5'>New Balance</option>
+								<option value='6'>Saucony</option>
+								<option value='7'>Reebok</option>
+								<option value='8'>Puma</option>
+								<option value='9'>Other</option>
 							</select>
 							<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
 								<svg

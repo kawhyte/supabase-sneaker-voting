@@ -20,7 +20,7 @@ export default function SneakerDetail({ params }: { params: any }) {
 		const fetchSmoothie = async () => {
 			const { data, error } = await supabase
 				.from("sneakers")
-				.select(`*, images(*)`)
+				.select(`*, images(*),brand_id(*)`)
 				.eq("id", id)
 				.single();
 
@@ -32,7 +32,8 @@ export default function SneakerDetail({ params }: { params: any }) {
 				console.log("DETAIL", data);
 				setName(data.name);
 				setImage(data.main_image);
-				setBrand(data.brand);
+				//setBrand(data.brand);
+				setBrand(data.brand_id.name);
 				setDate(data.release_date);
 				setPrice(data.price);
 				setStyle(data.style);
@@ -55,7 +56,7 @@ export default function SneakerDetail({ params }: { params: any }) {
 
 			<div>{name}</div>
 		
-
+<div>{brand}</div>
 	
 			<div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 max-w-[800px] md:max-w-[1300px] place-items-center">
    

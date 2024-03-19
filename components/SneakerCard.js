@@ -82,7 +82,7 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 					</p>
 
 					<p className='absolute top-2 left-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
-						{sneaker.brand}
+						{sneaker.brand_id?.name}
 					</p>
 				</div>
 				{sneaker.vote === null ? <PendingIcon /> : ""}
@@ -191,11 +191,11 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 						xmlns='http://www.w3.org/2000/svg'
 						viewBox='0 0 24 24'
 						fill='currentColor'
-						class='w-6 h-6 hover:fill-indigo-400'>
+						className='w-6 h-6 hover:fill-indigo-400'>
 						<path
-							fill-rule='evenodd'
+							fillRule='evenodd'
 							d='M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z'
-							clip-rule='evenodd'
+							clipRule='evenodd'
 						/>
 					</svg>
 				</Link>
@@ -209,9 +209,9 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 					fill='currentColor'
 					className='w-6 h-6 hover:fill-yellow-400'>
 					<path
-						fill-rule='evenodd'
+						fillRule='evenodd'
 						d='M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z'
-						clip-rule='evenodd'
+						clipRule='evenodd'
 					/>
 				</svg>*/}
 
