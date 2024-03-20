@@ -8,7 +8,7 @@ export default function SneakerDetail({ params }: { params: any }) {
 
 	const [name, setName] = useState("");
 	const [date, setDate] = useState("");
-	const [brand, setBrand] = useState("Nike");
+	const [brand, setBrand] = useState("1");
 	const [price, setPrice] = useState("");
 	const [style, setStyle] = useState("");
 	const [moreImages, setmoreImages] = useState<any[]>([]);
