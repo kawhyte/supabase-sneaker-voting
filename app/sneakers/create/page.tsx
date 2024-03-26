@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SmoothieCard from "../../../components/SneakerCard";
+import SmoothieCard from "../../../components/SneakerRecentVoteCard";
 import Header from "@/components/Header";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
@@ -18,9 +18,7 @@ const Create = () => {
 	const [price, setPrice] = useState("");
 	const [style, setStyle] = useState("");
 	const [formError, setFormError] = useState("");
-	const [main_image, setImage] = useState(
-		""
-	);
+	const [main_image, setImage] = useState("");
 	const supabase = createClient();
 	const router = useRouter();
 
@@ -39,7 +37,7 @@ const Create = () => {
 			.insert([
 				{
 					name: name,
-					brand_id: parseInt(brand,10),
+					brand_id: parseInt(brand, 10),
 					release_date: date,
 					price: price,
 					style: style,
@@ -69,7 +67,14 @@ const Create = () => {
 				onSubmit={handleSubmit}
 				className='w-full max-w-xl p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-7005'>
 				<div className='mb-6'>
-					<img src={main_image === "" ? "https://placehold.co/600x290?text=Sneaker+Image": main_image } alt='Sneaker' />
+					<img
+						src={
+							main_image === ""
+								? "https://placehold.co/600x290?text=Sneaker+Image"
+								: main_image
+						}
+						alt='Sneaker'
+					/>
 				</div>
 
 				<div className='flex flex-wrap -mx-3 mb-6'>
@@ -130,13 +135,12 @@ const Create = () => {
 						<div className='relative'>
 							<select
 								value={brand}
-								
 								onChange={(e) => setBrand(e.target.value)}
 								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 								id='grid-state'>
 								<option value='1'>Jordan</option>
-								<option value= "2" >Nike</option>
-								<option value= "3">Adidas</option>
+								<option value='2'>Nike</option>
+								<option value='3'>Adidas</option>
 								<option value='4'>Asics</option>
 								<option value='5'>New Balance</option>
 								<option value='6'>Saucony</option>

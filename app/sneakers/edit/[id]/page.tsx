@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SmoothieCard from "../../../../components/SneakerCard";
+import SmoothieCard from "../../../../components/SneakerRecentVoteCard";
 import Header from "@/components/Header";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
@@ -21,9 +21,7 @@ const Edit = ({ params }: { params: any }) => {
 	const [price, setPrice] = useState("");
 	const [style, setStyle] = useState("");
 	const [formError, setFormError] = useState("");
-	const [main_image, setImage] = useState(
-		""
-	);
+	const [main_image, setImage] = useState("");
 	const supabase = createClient();
 	const router = useRouter();
 
@@ -97,7 +95,7 @@ const Edit = ({ params }: { params: any }) => {
 				setBrand(data.brand_id);
 				setDate(data.release_date);
 				setPrice(data.price);
-				setStyle(data.style)
+				setStyle(data.style);
 
 				console.log(data);
 			}
@@ -149,7 +147,6 @@ const Edit = ({ params }: { params: any }) => {
 							placeholder='02-10-24'
 							value={date}
 						/>
-						
 					</div>
 				</div>
 				<div className='flex flex-wrap -mx-3 mb-6'>
@@ -185,9 +182,9 @@ const Edit = ({ params }: { params: any }) => {
 								onChange={(e) => setBrand(e.target.value)}
 								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 								id='grid-state'>
-						<option value='1'>Jordan</option>
-								<option value= "2" >Nike</option>
-								<option value= "3">Adidas</option>
+								<option value='1'>Jordan</option>
+								<option value='2'>Nike</option>
+								<option value='3'>Adidas</option>
 								<option value='4'>Asics</option>
 								<option value='5'>New Balance</option>
 								<option value='6'>Saucony</option>

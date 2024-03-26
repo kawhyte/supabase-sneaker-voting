@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SmoothieCard from "@/components/SneakerCard";
+import SneakerCard from "@/components/SneakerCard";
 import SectionHeader from "@/components/SectionHeader";
 
 
@@ -39,19 +39,27 @@ export default function PendingVote() {
 
 	useEffect(() => {
 		const getData = async () => {
-			const { data } = await supabase
-				.from("sneakers")
-				.select(`*, images(*),brand_id(*)`)
-				.match({ in_collection: false  }).is("vote", null)
-				.order("name", { ascending: true });
-			setSneakers(data);
-            setSneakersPending(data?.length)
+			// const { data } = await supabase
+			// 	.from("sneakers")
+			// 	.select(`*, images(*),brand_id(*)`)
+			// 	.match({ in_collection: false  }).is("vote", null)
+			// 	.order("name", { ascending: true });
 
-			// setSneakersPendingVote(data?.filter((test) => test?.vote === null));
-			// setSneakersDrip(data?.filter((test) => test?.vote === "Drip"));
-			// setSneakersSkip(data?.filter((test) => test?.vote === "Skip"))
+			const { data: rating, error } = await supabase.from("rating").select(`
+			*,
+			vote (*),sneaker_details(*, brand_id(name))
+		  `).is( 'vote', null );
+		  setSneakers(rating);
+		  //setSneakersVotes(rating?.length)
+
+
+
+			//setSneakers(data);
+            setSneakersPending(rating?.length)
+
+		
 			console.log(
-				"Sneakers Ken",data);
+				"Sneakers Ken",rating);
 		};
 		getData();
 	}, []);
@@ -73,9 +81,9 @@ export default function PendingVote() {
 				<div className='container mx-auto flex flex-col gap-16 items-center '>
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 mx-10 md:mx-0  md:gap-10'>
 						{sneakers?.map((sneaker) => (
-							<SmoothieCard
+							<SneakerCard
 								key={sneaker.id}
-								smoothie={sneaker}
+								sneaker={sneaker}
 								onVote={handleVote}
 								onDelete={handleDelete}
 							/>

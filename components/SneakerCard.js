@@ -3,12 +3,20 @@ import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
 import PendingIcon from "./PendingIcon";
 
-const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
-	//console.log("Name:", sneaker.name, "smoothie Vote:", sneaker.vote);
 
-	const [vote, setVote] = useState(sneaker.vote);
+const SneakerCard = ({ sneaker, onDelete, onVote }) => {
+	//console.log("Cards", sneaker);
+	
+
+	const [vote, setVote] = useState((sneaker?.vote?.vote_id)?.toString());
+
+	console.log("Cards vote", vote)
 	//const [sneakers, setUpdatedData] = useState(smoothie);
 	const supabase = createClient();
+
+	const refreshData = () => {
+		router.replace(router.asPath);
+	};
 
 	const handleDelete = async () => {
 		const { data, error } = await supabase
@@ -44,20 +52,30 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 	const handleRating = async (value, e) => {
 		//setVote(value);
 
+		console.log(value);
+
+		// const { data, error } = await supabase
+		// .from('rating')
+		// .update({ vote: parseInt(value,10) })
+		// .eq("sneaker_details.id", sneaker.sneaker_details.id)
+		// .select()
+
 		const { data, error } = await supabase
-			.from("sneakers")
-			.update({ vote: value })
-			.select()
-			.eq("id", sneaker.id)
+			.from("rating")
+			.update({ vote: parseInt(value, 10) })
+			.select(`sneaker_details(*)`)
+			.eq("sneaker_details", sneaker.sneaker_details.id)
 			.order("name", { ascending: true });
 
 		if (error) {
 			console.log(error);
 		}
 		if (data) {
-			console.log("Vote data ID **", sneaker.id);
-			setVote(null);
-			onDelete(sneaker.id);
+			console.log("Vote data ID **", sneaker.sneaker_details.id);
+			setVote(value);
+			//setVote(null);
+			//refreshData()
+			//onDelete(sneaker.id);
 			//onVote(sneaker);
 		}
 	};
@@ -66,41 +84,43 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 		<div>
 			<div className='w-full max-w-2xl  container bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
 				<div className='relative'>
-				
 					<div className=''>
-				<Link href={`/sneakers/detail/${sneaker.id}`}> 
-						<img
-							className='rounded-t-lg'
-							src={sneaker.main_image}
-							alt='product image'
-						/>	
-					</Link>
+						<Link href={`/sneakers/detail/${sneaker?.sneaker_details?.id}`}>
+							<img
+								className='rounded-t-lg'
+								src={sneaker?.sneaker_details?.main_image}
+								alt='product image'
+							/>
+						</Link>
 					</div>
-				
+
 					<p className='absolute top-2 right-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
-						${sneaker.price <10? "TBD": sneaker.price}
+						${sneaker.price < 10 ? "TBD" : sneaker.sneaker_details.price}
 					</p>
 
 					<p className='absolute top-2 left-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
-						{sneaker.brand_id?.name}
+						{sneaker.sneaker_details.brand_id?.name}
 					</p>
 				</div>
 				{sneaker.vote === null ? <PendingIcon /> : ""}
 
 				<div className='px-5 pb-3'>
 					<h5 className='font-serif flex flex-col normal-case text-center  drop-shadow-xl  text-[1.2rem] sm:text-[1.1rem] tracking-[-0.02em] leading-[1.33] my-8 font-semibold'>
-						{sneaker.name}
+						{sneaker.sneaker_details.name}
+						
 					</h5>
 
 					<div className='flex justify-center align-middle items-center max-w-sm mx-auto mb-7'>
+						
+
 						<div className='relative group flex justify-center'>
 							<button
 								onClick={(e) => {
-									handleRating("Drip", e);
+									handleRating("1", e);
 								}}
 								type='button'
-								className={`flex items-center w-full px-3 py-2 text-xs   text-white transition ease-in duration-200 font-mono uppercase leading-[1.2]  border-t border-b border-l rounded-l-md hover:bg-green-500 ${
-									sneaker.vote === "Drip" ? " bg-green-500 " : " "
+								className={`flex items-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]  border-t border-b  border-l  hover:bg-yellow-500 ${
+									vote === "1" ? " bg-green-500" : " "
 								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
@@ -113,20 +133,19 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 							</button>
 							<span
 								className={`absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 ${
-									sneaker.vote === "Drip" ? "scale-100" : ""
+									vote === "1" ? "scale-100" : ""
 								}`}>
-								I love it ❤️
+								I like it 😇
 							</span>
 						</div>
-
 						<div className='relative group flex justify-center'>
 							<button
 								onClick={(e) => {
-									handleRating("Flip", e);
+									handleRating("2", e);
 								}}
 								type='button'
 								className={`flex items-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]  border-t border-b  border-l  hover:bg-yellow-500 ${
-									sneaker.vote === "Flip" ? "bg-yellow-500" : ""
+									vote === "2" ? " bg-yellow-500" : " "
 								} `}>
 								<svg
 									viewBox='0 0 24 24'
@@ -138,7 +157,7 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 							</button>
 							<span
 								className={`absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 ${
-									sneaker.vote === "Flip" ? "scale-100" : ""
+									vote === "2" ? "scale-100" : ""
 								}`}>
 								I like it 😇
 							</span>
@@ -147,11 +166,11 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 						<div className='relative group flex justify-center '>
 							<button
 								onClick={(e) => {
-									handleRating("Skip", e);
+									handleRating("3", e);
 								}}
 								type='button'
 								className={`flex items-center w-full px-3 py-2 text-xs text-white transition ease-in duration-200 font-mono uppercase leading-[1.2] border-t border-b border-l  border-r rounded-r-md hover:bg-red-500  ${
-									sneaker.vote === "Skip" ? "bg-red-500" : ""
+									vote === "3" ? "bg-red-500" : ""
 								} `}>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
@@ -165,18 +184,18 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 
 							<span
 								className={`absolute top-10 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 ${
-									sneaker.vote === "Skip" ? "scale-100" : ""
+									vote === "3" ? "scale-100" : ""
 								}`}>
 								Hell No 🤡
 							</span>
 						</div>
 					</div>
-
-					
 				</div>
 			</div>
 			<div className='flex justify-end mt-3'>
-				<Link className='mr-5' href={"/sneakers/edit/" + sneaker.id}>
+				<Link
+					className='mr-5'
+					href={"/sneakers/edit/" + sneaker.sneaker_details.id}>
 					<svg
 						xmlns='http://www.w3.org/2000/svg'
 						viewBox='0 0 24 24'
@@ -199,7 +218,7 @@ const SneakerCard = ({ smoothie: sneaker, onDelete, onVote }) => {
 						/>
 					</svg>
 				</Link>
-{/*
+				{/*
 				<svg
 					onClick={(e) => {
 						handleAddToCollection("true", e);
