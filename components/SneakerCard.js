@@ -62,7 +62,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 
 		const { data, error } = await supabase
 			.from("rating")
-			.update({ vote: parseInt(value, 10) })
+			.update({ vote: parseInt(value, 10) , voted_at })
 			.select(`sneaker_details(*)`)
 			.eq("sneaker_details", sneaker.sneaker_details.id)
 			.order("name", { ascending: true });
