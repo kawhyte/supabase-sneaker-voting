@@ -102,10 +102,10 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 				</div>
 
 				<div class='w-1/2 p-4 md:p-4'>
-					<h1 class='font-serif normal-case   text-[1.2rem] sm:text-[1.0rem] tracking-[-0.02em] leading-[1.33] my-2 font-semibold line-clamp-2 break-words'>
+					<h1 class='font-serif normal-case   text-[1.2rem] sm:text-[0.9rem] tracking-[-0.02em] leading-[1.33] my-2 font-semibold line-clamp-2 break-words'>
 						{sneaker.sneaker_details.name}
 					</h1>
-					<span className='sm:text-sm text-gray-400 font-extralight'>
+					<span className='sm:text-sm text-gray-400 font-light'>
 						{" "}
 						{`Voted: ${new Date(sneaker?.voted_at).toLocaleDateString()}`}
 					</span>

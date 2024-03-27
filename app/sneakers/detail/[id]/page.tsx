@@ -37,13 +37,12 @@ export default function SneakerDetail({ params }: { params: any }) {
 				setDate(data.release_date);
 				setPrice(data.price);
 				setStyle(data.style);
-				setmoreImages(data.images)
+				setmoreImages(data.images);
 
 				console.log(data);
 			}
 		};
 		fetchSmoothie();
-
 
 		// return () => {
 		//   second
@@ -55,23 +54,16 @@ export default function SneakerDetail({ params }: { params: any }) {
 			<div>{id}</div>
 
 			<div>{name}</div>
-		
-<div>{brand}</div>
-	
-			<div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 max-w-[800px] md:max-w-[1300px] place-items-center">
-   
 
-   
-   {moreImages.map(item=>(
+			<div>{brand}</div>
 
-
-	   <img src={item?.image_link} />
-
-   ))}
-   
-</div>
-
-			
+			<div className='grid grid-cols-2 md:grid-cols-3 gap-3 p-4 max-w-[800px] md:max-w-[1300px] place-items-center'>
+				{moreImages.map((item) => (
+					<div key={item.id}>
+						<img src={item?.image_link} />
+					</div>
+				))}
+			</div>
 		</>
 	);
 }

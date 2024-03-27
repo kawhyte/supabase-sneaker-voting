@@ -82,20 +82,21 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 
 	return (
 		<div>
-			<div className='w-full max-w-2xl  container bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
+			<div className='w-full max-w-2xl flex flex-col  container bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
 				<div className='relative'>
 					<div className=''>
 						<Link href={`/sneakers/detail/${sneaker?.sneaker_details?.id}`}>
 							<img
-								className='rounded-t-lg'
+								className='rounded-t-lg w-full  h-60 object-cover'
 								src={sneaker?.sneaker_details?.main_image}
 								alt='product image'
+								loading="lazy"
 							/>
 						</Link>
 					</div>
 
 					<p className='absolute top-2 right-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
-						${sneaker.price < 10 ? "TBD" : sneaker.sneaker_details.price}
+						${sneaker.sneaker_details.price < 10 ? "TBD" : sneaker.sneaker_details.price}
 					</p>
 
 					<p className='absolute top-2 left-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
