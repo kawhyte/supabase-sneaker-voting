@@ -4,9 +4,9 @@ import { useState } from "react";
 import PendingIcon from "./PendingIcon";
 
 const SneakerCard = ({ sneaker, onDelete, onVote }) => {
-	//console.log("Cards", sneaker);
+	console.log("Cards", sneaker);
 
-	const [vote, setVote] = useState(sneaker?.vote?.vote_id?.toString());
+	const [vote, setVote] = useState(sneaker?.rating_id?.vote?.vote_id.toString());
 
 	console.log("Cards vote", sneaker);
 	//const [sneakers, setUpdatedData] = useState(smoothie);
@@ -80,11 +80,11 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 
 	return (
 		<>
-			<div class='flex max-w-md justify-center align-middle items-center  h-32 overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800'>
+			<div class='flex max-w-md justify-center align-middle items-center  h-32 overflow-hidden  rounded-lg shadow-lg bg-gray-800'>
 				<div class='w-1/2 ml-2 relative  '>
 					<img
 						className='bg-cover '
-						src={sneaker?.sneaker_details?.main_image}
+						src={sneaker?.main_image}
 					/>
 
 					<p
@@ -97,17 +97,17 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 								? " bg-red-500"
 								: ""
 						} `}>
-						{sneaker?.vote?.vote_name}
+						{sneaker?.rating_id.vote?.vote_name}
 					</p>
 				</div>
 
 				<div class='w-1/2 p-4 md:p-4'>
 					<h1 class='font-serif normal-case   text-[1.2rem] sm:text-[0.9rem] tracking-[-0.02em] leading-[1.33] my-2 font-semibold line-clamp-2 break-words'>
-						{sneaker.sneaker_details.name}
+						{sneaker.name}
 					</h1>
 					<span className='sm:text-sm text-gray-400 font-light'>
-						{" "}
-						{`Voted: ${new Date(sneaker?.voted_at).toLocaleDateString()}`}
+						
+						{`Voted: ${new Date(sneaker?.rating_id.voted_at).toLocaleDateString()}`}
 					</span>
 				</div>
 			</div>

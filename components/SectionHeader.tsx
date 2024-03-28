@@ -27,11 +27,12 @@ export default function Header({
 			</div> */}
 			{/* <h1 className='sr-only'>Supabase and Next.js Starter Template</h1> */}
 
-			<div className='text-2xl lg:text-3xl !leading-tight mx-auto max-w-4xl text-center mb-16'>
+			<div className='text-2xl  lg:text-3xl !leading-tight mx-auto max-w-4xl text-center mb-16'>
 				<div className='font-serif flex flex-col -skew-y-3 drop-shadow-xl my-10  text-[4.25rem] sm:text-[5.5rem] tracking-[-0.03em] leading-[0.88] font-bold'>
 					<span className='underline decoration-green-500/50'>{name}</span>
 				</div>
 			</div>
+			
 			<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
 
 			<div className=' flex flex-row gap-x-8 sm:gap-x-8 md:gap-x-20 justify-center items-center mx-auto'>

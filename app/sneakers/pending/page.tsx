@@ -3,14 +3,15 @@
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import SneakerCard from "@/components/SneakerCard";
+import SneakerCardUi from "@/components/SneakerCardUI";
 import SectionHeader from "@/components/SectionHeader";
-
 
 export default function PendingVote() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
-	const [sneakersPending, setSneakersPending] = useState<number | undefined>(undefined);;
+	const [sneakersPending, setSneakersPending] = useState<number | undefined>(
+		undefined
+	);
 
-	
 	const [orderBy, setOrderBy] = useState("created_at");
 	const [fetchError, setFetchError] = useState(null);
 
@@ -18,12 +19,10 @@ export default function PendingVote() {
 
 	const handleDelete = (id: any) => {
 		setSneakers((prevSmoothies: any) => {
-			
-            
-            const updatedSneakers = prevSmoothies?.filter((sm: any) => sm.id !== id);
-            setSneakersPending(updatedSneakers?.length)
+			const updatedSneakers = prevSmoothies?.filter((sm: any) => sm.id !== id);
+			setSneakersPending(updatedSneakers?.length);
 
-            return updatedSneakers
+			return updatedSneakers;
 		});
 	};
 	const handleVote = async () => {
@@ -32,34 +31,22 @@ export default function PendingVote() {
 			.select()
 			.order("name", { ascending: true });
 
-	
-		;
 		return sneakers;
 	};
 
 	useEffect(() => {
 		const getData = async () => {
-			// const { data } = await supabase
-			// 	.from("sneakers")
-			// 	.select(`*, images(*),brand_id(*)`)
-			// 	.match({ in_collection: false  }).is("vote", null)
-			// 	.order("name", { ascending: true });
+			const { data } = await supabase
+				.from("sneakers")
+				.select(`*, rating_id(*), images(*),brand_id(*)`)
 
-			const { data: rating, error } = await supabase.from("rating").select(`
-			*,
-			vote (*),sneaker_details(*, brand_id(name))
-		  `).is( 'vote', null );
-		  setSneakers(rating);
-		  //setSneakersVotes(rating?.length)
+				.match({ in_collection: false })
+				.is("rating_id", null)
+				.order("created_at", { ascending: false });
 
+			setSneakers(data);
 
-
-			//setSneakers(data);
-            setSneakersPending(rating?.length)
-
-		
-			console.log(
-				"Sneakers Ken",rating);
+			setSneakersPending(data?.length);
 		};
 		getData();
 	}, []);
@@ -74,27 +61,27 @@ export default function PendingVote() {
 		
       </nav> */}
 			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3'>
-				<SectionHeader name={"Sneakers Voting"} total={sneakersPending} sectiontext={"Sneakers Pending Vote:"}  />
-
-          
+				<SectionHeader
+					name={"Sneakers Voting"}
+					total={sneakersPending}
+					sectiontext={"Sneakers Pending Vote:"}
+				/>
 
 				<div className='container mx-auto flex flex-col gap-16 items-center '>
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 mx-10 md:mx-0  md:gap-10'>
 						{sneakers?.map((sneaker) => (
-							<SneakerCard
-								key={sneaker.id}
-								sneaker={sneaker}
-								onVote={handleVote}
-								onDelete={handleDelete}
-							/>
+							<div key={sneaker.id}>
+								<SneakerCard
+									key={sneaker.id}
+									sneaker={sneaker}
+									onVote={handleVote}
+									onDelete={handleDelete}
+								/>
+								{/* <SneakerCardUi 	sneaker={sneaker}/> */}
+							</div>
 						))}
 					</div>
 				</div>
-
-		
-
-
-			
 			</div>
 		</>
 	);

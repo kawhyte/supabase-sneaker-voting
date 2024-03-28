@@ -112,7 +112,7 @@ const Edit = ({ params }: { params: any }) => {
 
 			<form
 				onSubmit={handleSubmit}
-				className='w-full max-w-2xl p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-7005'>
+				className='w-full max-w-2xl p-5  border border-gray-200 rounded-lg shadow bg-gray-800 border-gray-7005'>
 				<div className='mb-6'>
 					<img src={main_image} alt='Sneaker' />
 				</div>

@@ -18,7 +18,7 @@ export default function Hero({ sneakers }: { sneakers: any }) {
 			</div> */}
 			{/* <h1 className='sr-only'>Supabase and Next.js Starter Template</h1> */}
 
-			<div className='text-2xl lg:text-3xl !leading-tight mx-auto max-w-4xl text-center mb-10'>
+			<div className='text-2xl lg:text-3xl !leading-tight mx-auto max-w-4xl text-center mb-10 '>
 				<div className='font-serif flex flex-col -skew-y-3 drop-shadow-xl  text-[4.25rem] sm:text-[8rem] tracking-[-0.03em] leading-[0.88] font-bold'>
 					<span className='underline decoration-sky-500/30   '>MTW's</span>
 					<span className=''> Ultimate Sneaker</span>

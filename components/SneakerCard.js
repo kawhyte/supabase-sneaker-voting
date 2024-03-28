@@ -3,14 +3,19 @@ import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
 import PendingIcon from "./PendingIcon";
 
-
 const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 	//console.log("Cards", sneaker);
-	
 
-	const [vote, setVote] = useState((sneaker?.vote?.vote_id)?.toString());
+	const [vote, setVote] = useState(
+		sneaker?.rating_id?.vote?.vote_id?.toString()
+	);
 
-	console.log("Cards vote", vote)
+	const [sneakerId, setSneakerId] = useState(
+		null
+	);
+
+
+	//console.log("Cards vote", vote)
 	//const [sneakers, setUpdatedData] = useState(smoothie);
 	const supabase = createClient();
 
@@ -29,6 +34,9 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 			console.log(error);
 		}
 		if (data) {
+
+
+
 			onDelete(sneaker.id);
 		}
 	};
@@ -52,7 +60,37 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 	const handleRating = async (value, e) => {
 		//setVote(value);
 
-		console.log(value);
+		console.log("Value",value);
+
+		console.log("sneaker DDDDAAT", sneaker)
+
+		// const { data, error } = await supabase
+		// .from("sneakers")
+		// .insert([
+		// 	{
+		// 		name: name,
+		// 		brand_id: parseInt(brand, 10),
+		// 		release_date: date,
+		// 		price: price,
+		// 		style: style,
+		// 		main_image: main_image,
+		// 	},
+		// ])
+		// .select();
+
+		const { data:rating_data, error } = await supabase
+			.from("rating")
+			.insert([
+				{ vote: value, user_id: "2b7ed0de-da19-441f-acdd-5fc0814f3cb9", sneaker_id: sneaker.id },
+			])
+			.select();
+
+		
+		const sneakerID = rating_data[0].id
+		console.log("SetID", sneakerID)
+		
+		console.log("rating updated ", rating_data);
+        //setSneakerId(data[0].id)
 
 		// const { data, error } = await supabase
 		// .from('rating')
@@ -60,60 +98,71 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 		// .eq("sneaker_details.id", sneaker.sneaker_details.id)
 		// .select()
 
-		const { data, error } = await supabase
-			.from("rating")
-			.update({ vote: parseInt(value, 10) , voted_at })
-			.select(`sneaker_details(*)`)
-			.eq("sneaker_details", sneaker.sneaker_details.id)
-			.order("name", { ascending: true });
+		// const { data, error } = await supabase
+		// 	.from("sneakers")
+		// 	.update({ vote: parseInt(value, 10) , voted_at })
+		// 	.select(`sneaker_details(*)`)
+		// 	.eq("sneaker_details", sneaker.sneaker_details.id)
+		// 	.order("name", { ascending: true });
 
 		if (error) {
 			console.log(error);
 		}
-		if (data) {
-			console.log("Vote data ID **", sneaker.sneaker_details.id);
+		if (rating_data) {
+ //console.log("LOVE ")
+			//setSneakerId(data[0].id)
+			//const voteid = data[0];
+
+			
+
+			const { data, error } = await supabase
+				.from("sneakers")
+				.update({ rating_id: sneakerID })
+				.select()
+				.eq("id", sneaker.id)
+				//.order("name", { ascending: true });
+
+				console.log("New data sneaker_data", data)
+			console.log("Vote data ID **", sneaker.id);
 			setVote(value);
 			//setVote(null);
 			//refreshData()
-			//onDelete(sneaker.id);
+			onDelete(sneaker.id);
 			//onVote(sneaker);
 		}
 	};
 
 	return (
 		<div>
-			<div className='w-full max-w-2xl flex flex-col  container bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
+			<div className='w-full max-w-2xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700'>
 				<div className='relative'>
 					<div className=''>
-						<Link href={`/sneakers/detail/${sneaker?.sneaker_details?.id}`}>
+						<Link href={`/sneakers/detail/${sneaker?.id}`}>
 							<img
 								className='rounded-t-lg w-full  h-60 object-cover'
-								src={sneaker?.sneaker_details?.main_image}
+								src={sneaker?.main_image}
 								alt='product image'
-								loading="lazy"
+								loading='lazy'
 							/>
 						</Link>
 					</div>
 
 					<p className='absolute top-2 right-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
-						${sneaker.sneaker_details.price < 10 ? "TBD" : sneaker.sneaker_details.price}
+						${sneaker.price < 10 ? "TBD" : sneaker.price}
 					</p>
 
 					<p className='absolute top-2 left-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
-						{sneaker.sneaker_details.brand_id?.name}
+						{sneaker.brand_id?.name}
 					</p>
 				</div>
-				{sneaker.vote === null ? <PendingIcon /> : ""}
+				{sneaker.rating_id === null ? <PendingIcon /> : ""}
 
 				<div className='px-5 pb-3'>
 					<h5 className='font-serif flex flex-col normal-case text-center  drop-shadow-xl  text-[1.2rem] sm:text-[1.1rem] tracking-[-0.02em] leading-[1.33] my-8 font-semibold'>
-						{sneaker.sneaker_details.name}
-						
+						{sneaker.name}
 					</h5>
 
 					<div className='flex justify-center align-middle items-center max-w-sm mx-auto mb-7'>
-						
-
 						<div className='relative group flex justify-center'>
 							<button
 								onClick={(e) => {
@@ -194,9 +243,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 				</div>
 			</div>
 			<div className='flex justify-end mt-3'>
-				<Link
-					className='mr-5'
-					href={"/sneakers/edit/" + sneaker.sneaker_details.id}>
+				<Link className='mr-5' href={"/sneakers/edit/" + sneaker.id}>
 					<svg
 						xmlns='http://www.w3.org/2000/svg'
 						viewBox='0 0 24 24'

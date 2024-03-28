@@ -54,7 +54,7 @@ const Create = () => {
 		if (data) {
 			console.log(data);
 			setFormError("");
-			//router.push("/sneakers/pending");
+			router.push("/sneakers/pending");
 			//navigate("/");
 		}
 	};
@@ -65,7 +65,7 @@ const Create = () => {
 
 			<form
 				onSubmit={handleSubmit}
-				className='w-full max-w-xl p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-7005'>
+				className='w-full max-w-xl p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
 				<div className='mb-6'>
 					<img
 						src={

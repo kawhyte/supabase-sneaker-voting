@@ -29,7 +29,7 @@ export default function Voted() {
 	};
 	const handleVote = async (sneakers:any) => {
 
-		console.log("handle Vote", sneakers)
+		//console.log("handle Vote", sneakers)
 		// const { data } = await supabase
 		// 	.from("sneakers")
 		// 	.select()
@@ -44,22 +44,24 @@ export default function Voted() {
 
 	useEffect(() => {
 		const getData = async () => {
-			// const { data } = await supabase
-			// 	.from("sneakers")
-			// 	.select(`*, images(*),brand_id(*)`)
-			// 	.match({ in_collection: false  }).not("vote","is", null)
-			// 	.order("created_at", { ascending: false });
-			// setSneakers(data);
-			// setSneakersVotes(data?.length)
+			const { data } = await supabase
+				.from("sneakers")
+				.select(`*, rating_id!inner(*, vote(*)),brand_id(*)`)
+				.eq( 'in_collection', false ).not("rating_id","is", null)
+				.order("created_at", { ascending: false });
 
-			const { data: rating, error } = await supabase.from("rating").select(`
-			  *,
-			  vote (*),sneaker_details!inner(*, brand_id(name))
-			`).eq( 'sneaker_details.in_collection', false  ).not( 'vote', 'is', null )
-			setSneakers(rating);
-			setSneakersVotes(rating?.length)
 
-			// console.log("Sneakers Ken sneakers", rating);
+			 setSneakers(data);
+			 setSneakersVotes(data?.length)
+
+			// const { data: rating, error } = await supabase.from("rating").select(`
+			//   *,
+			//   vote (*),sneaker_details!inner(*, brand_id(name))
+			// `).eq( 'sneaker_details.in_collection', false  ).not( 'vote', 'is', null )
+			// setSneakers(rating);
+			// setSneakersVotes(rating?.length)
+
+			 console.log("Sneakers Ken sneakers2", data);
 		};
 		getData();
 	}, []);
