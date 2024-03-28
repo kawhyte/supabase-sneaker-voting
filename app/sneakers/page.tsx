@@ -2,7 +2,6 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SneakerTable from "../../components/SneakerTable";
 import SectionHeader from "@/components/SectionHeader";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
@@ -73,11 +72,7 @@ export default function Page() {
 				<div className='  '>
 			
 						
-								<SneakerTable
-								
-									sneakers={sneakers}
-								
-								/>
+							
 							
 					
 				</div>
