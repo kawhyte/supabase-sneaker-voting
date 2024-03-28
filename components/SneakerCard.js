@@ -10,18 +10,9 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 		sneaker?.rating_id?.vote?.vote_id?.toString()
 	);
 
-	const [sneakerId, setSneakerId] = useState(
-		null
-	);
-
-
 	//console.log("Cards vote", vote)
 	//const [sneakers, setUpdatedData] = useState(smoothie);
 	const supabase = createClient();
-
-	const refreshData = () => {
-		router.replace(router.asPath);
-	};
 
 	const handleDelete = async () => {
 		const { data, error } = await supabase
@@ -34,9 +25,6 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 			console.log(error);
 		}
 		if (data) {
-
-
-
 			onDelete(sneaker.id);
 		}
 	};
@@ -60,9 +48,9 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 	const handleRating = async (value, e) => {
 		//setVote(value);
 
-		console.log("Value",value);
+		// console.log("Value",value);
 
-		console.log("sneaker DDDDAAT", sneaker)
+		// console.log("sneaker DDDDAAT", sneaker)
 
 		// const { data, error } = await supabase
 		// .from("sneakers")
@@ -78,19 +66,22 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 		// ])
 		// .select();
 
-		const { data:rating_data, error } = await supabase
+		const { data: rating_data, error } = await supabase
 			.from("rating")
 			.insert([
-				{ vote: value, user_id: "2b7ed0de-da19-441f-acdd-5fc0814f3cb9", sneaker_id: sneaker.id },
+				{
+					vote: value,
+					user_id: "2b7ed0de-da19-441f-acdd-5fc0814f3cb9",
+					sneaker_id: sneaker.id,
+				},
 			])
 			.select();
 
-		
-		const sneakerID = rating_data[0].id
-		console.log("SetID", sneakerID)
-		
-		console.log("rating updated ", rating_data);
-        //setSneakerId(data[0].id)
+		const sneakerID = rating_data[0].id;
+		// console.log("SetID", sneakerID)
+
+		// console.log("rating updated ", rating_data);
+		//setSneakerId(data[0].id)
 
 		// const { data, error } = await supabase
 		// .from('rating')
@@ -109,21 +100,15 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 			console.log(error);
 		}
 		if (rating_data) {
- //console.log("LOVE ")
-			//setSneakerId(data[0].id)
-			//const voteid = data[0];
-
-			
-
 			const { data, error } = await supabase
 				.from("sneakers")
 				.update({ rating_id: sneakerID })
 				.select()
-				.eq("id", sneaker.id)
-				//.order("name", { ascending: true });
+				.eq("id", sneaker.id);
+			//.order("name", { ascending: true });
 
-				console.log("New data sneaker_data", data)
-			console.log("Vote data ID **", sneaker.id);
+			console.log("New data sneaker_data", data);
+
 			setVote(value);
 			//setVote(null);
 			//refreshData()
