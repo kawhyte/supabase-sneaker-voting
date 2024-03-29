@@ -1,6 +1,6 @@
 export default function ThumbsDownIcon() {
 	return (
-		<span className='px-2 py-1   font-mono uppercase leading-[1.2]  flex items-center justify-center text-xs  text-green-600  bg-green-200 '>
+		<span className='px-2 py-1 rounded-xl border border-solid broder-gray-400    font-mono uppercase leading-[1.2]  flex items-center justify-center text-xs  text-green-600  bg-green-200 '>
 			<svg
 				xmlns='http://www.w3.org/2000/svg'
 				viewBox='0 0 24 24'

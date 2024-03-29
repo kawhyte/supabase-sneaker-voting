@@ -46,8 +46,10 @@ export default function Voted() {
 		const getData = async () => {
 			const { data } = await supabase
 				.from("sneakers")
-				.select(`*, rating_id!inner(*, vote(*)),brand_id(*)`)
-				.eq( 'in_collection', false ).not("rating_id","is", null)
+				.select(`*, rating_id(*, vote(*)), images(*),brand_id(*)`)
+				.match({ in_collection: false })
+				
+				.not("rating_id","is", null)
 				.order("created_at", { ascending: false });
 
 
@@ -61,7 +63,7 @@ export default function Voted() {
 			// setSneakers(rating);
 			// setSneakersVotes(rating?.length)
 
-			 console.log("Sneakers Ken sneakers2", data);
+			 //console.log("Sneakers Ken sneakers2", data);
 		};
 		getData();
 	}, []);
@@ -82,8 +84,8 @@ export default function Voted() {
 					sectiontext={"Sneaker Vote Count"}
 				/>
 
-				<div className='container mx-auto flex flex-col gap-16 items-center '>
-					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-10'>
+				<div className='container mx-auto flex flex-col gap-9 items-center '>
+					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-3'>
 						{sneakers?.map((sneaker) => (
 							<SneakerRecentVoteCard
 								key={sneaker.id}

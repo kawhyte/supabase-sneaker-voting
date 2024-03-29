@@ -3,8 +3,25 @@ import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
 import PendingIcon from "./PendingIcon";
 
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+	CarouselNext,
+	CarouselPrevious,
+} from "@/components/ui/carousel";
+
+import { Button } from "@/components/ui/button";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+
 const SneakerCard = ({ sneaker, onDelete, onVote }) => {
-	//console.log("Cards", sneaker);
+	console.log("Cards Sneakers", sneaker);
+
+	//const newArray =  sneaker?.main_image?.unshift(sneaker?.images)
+
+	const { toast } = useToast();
 
 	const [vote, setVote] = useState(
 		sneaker?.rating_id?.vote?.vote_id?.toString()
@@ -107,6 +124,10 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 				.eq("id", sneaker.id);
 			//.order("name", { ascending: true });
 
+			toast({
+				description: "Horray! You successfully voted ⚡️",
+			});
+
 			console.log("New data sneaker_data", data);
 
 			setVote(value);
@@ -119,33 +140,59 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 
 	return (
 		<div>
-			<div className='w-full max-w-2xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700'>
-				<div className='relative'>
+			<div className='w-full max-w-5xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700 '>
+				<div className='relative bg-white'>
 					<div className=''>
-						<Link href={`/sneakers/detail/${sneaker?.id}`}>
-							<img
-								className='rounded-t-lg w-full  h-60 object-cover'
-								src={sneaker?.main_image}
-								alt='product image'
-								loading='lazy'
-							/>
-						</Link>
+						<Carousel className='w-full max-w-lg '>
+							<CarouselContent>
+								{sneaker.images
+									.sort((a, b) => b.main_image - a.main_image)
+									.map((item) => (
+										<CarouselItem key={item.id}>
+											<div className='w-full'>
+												<img
+													className=' w-full  h-72  object-cover'
+													src={item?.image_link}
+													alt='product image'
+													loading='lazy'
+												/>
+											</div>
+										</CarouselItem>
+									))}
+							</CarouselContent>
+							<CarouselPrevious className=' mx-16 my-28' />
+							<CarouselNext className='mx-16 my-28 ' />
+						</Carousel>
 					</div>
 
-					<p className='absolute top-2 right-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
+					{/*<p className='absolute top-2 right-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
 						${sneaker.price < 10 ? "TBD" : sneaker.price}
-					</p>
+									</p>*/}
 
-					<p className='absolute top-2 left-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
-						{sneaker.brand_id?.name}
-					</p>
+					{sneaker.rating_id === null ? (
+						<p className='absolute top-3 left-3 rounded  text-black font-mono uppercase leading-[1.2] text-xs'>
+							<PendingIcon classname='' />
+						</p>
+					) : (
+						""
+					)}
 				</div>
-				{sneaker.rating_id === null ? <PendingIcon /> : ""}
+
+				{/*<p className='absolute top-2 left-2 rounded border py-1 px-2 bg-blue-200 text-black font-mono uppercase leading-[1.2] text-xs'>
+				{sneaker.brand_id?.name}
+				</p>/*}
+
+{/*sneaker.rating_id === null ? <PendingIcon classname="" /> : ""*/}
 
 				<div className='px-5 pb-3'>
-					<h5 className='font-serif flex flex-col normal-case text-center  drop-shadow-xl  text-[1.2rem] sm:text-[1.1rem] tracking-[-0.02em] leading-[1.33] my-8 font-semibold'>
-						{sneaker.name}
+					<h5 className=' font-mono flex flex-col normal-case text-start  drop-shadow-xl  text-[1.2rem] sm:text-[1.1rem] tracking-[-0.01em] leading-[1.33] mt-8 font-semibold'>
+						{sneaker.name}{sneaker.id}
+						
 					</h5>
+					<p className="tracking-wide text-[0.9rem] title-font font-medium text-gray-400 mb-1 mt-3 font-mono">Brand: {sneaker.brand_id?.name}</p>
+
+					<p className="tracking-wide text-[0.9rem] title-font font-medium text-gray-400 my-1 font-mono">Release Date: {sneaker.release_date}</p>
+					<p className="tracking-wide text-[0.9rem] title-font font-medium text-gray-400 my-1 font-mono">Price: {sneaker.price < 10 ? "TBD" :`$${sneaker.price}`}</p>
 
 					<div className='flex justify-center align-middle items-center max-w-sm mx-auto mb-7'>
 						<div className='relative group flex justify-center'>
@@ -285,3 +332,12 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 };
 
 export default SneakerCard;
+
+// <Link href={`/sneakers/detail/${sneaker?.id}`}>
+// <img
+// 	className='rounded-t-lg w-full  h-60 object-cover'
+// 	src={sneaker?.main_image}
+// 	alt='product image'
+// 	loading='lazy'
+// />
+// </Link>

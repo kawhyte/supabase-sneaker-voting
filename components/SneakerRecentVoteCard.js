@@ -80,15 +80,15 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 
 	return (
 		<>
-			<div class='flex max-w-md justify-center align-middle items-center  h-32 overflow-hidden  rounded-lg shadow-lg bg-gray-800'>
-				<div class='w-1/2 ml-2 relative  '>
+			<div class='w-full max-w-5xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700'>
+				<div class=' relative  '>
+				<div className="flex justify-center align-middle items-center"> 
 					<img
-						className='bg-cover '
-						src={sneaker?.main_image}
-					/>
-
+						className='w-full h-40  object-cover '
+						src={sneaker?.images[0]?.image_link || sneaker.main_image}
+					/></div>
 					<p
-						className={`flex text-center absolute left-2 top-2 my-3 sm:my-0 text-sm sm:text-xs items-center justify-center w-12 px-2 py-1  rounded-xl  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]  border-t border-b  border-l  ${
+						className={`flex text-center absolute left-2 top-2 my-3 sm:my-0 text-sm sm:text-[0.7rem]  items-center justify-center w-12 px-2 py-1  rounded-xl  text-white  transition ease-in duration-200 font-mono leading-[1.2]  border-t border-b  border-l  ${
 							vote === "1"
 								? " bg-green-500"
 								: vote === "2"
@@ -101,11 +101,13 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 					</p>
 				</div>
 
-				<div class='w-1/2 p-4 md:p-4'>
-					<h1 class='font-serif normal-case   text-[1.2rem] sm:text-[0.9rem] tracking-[-0.02em] leading-[1.33] my-2 font-semibold line-clamp-2 break-words'>
+				<div class='w-full p-4 md:p-4'>
+					<h1 class='font-mono  normal-case   text-[1.2rem] sm:text-[0.9rem] tracking-[-0.02em] leading-[1.33] my-2 font-semibold '>
 						{sneaker.name}
 					</h1>
-					<span className='sm:text-sm text-gray-400 font-light'>
+					<p className="tracking-wide text-[0.9rem] title-font font-medium text-gray-400 mb-1 mt-3 font-mono">Brand: {sneaker.brand_id?.name}</p>
+
+					<span className='sm:text-sm text-gray-400 font-mono '>
 						
 						{`Voted: ${new Date(sneaker?.rating_id.voted_at).toLocaleDateString()}`}
 					</span>
