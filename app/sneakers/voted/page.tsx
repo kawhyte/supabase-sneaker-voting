@@ -85,7 +85,7 @@ export default function Voted() {
 				/>
 
 				<div className='container mx-auto flex flex-col gap-9 items-center '>
-					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-3'>
+					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-x-5 gap-y-6'>
 						{sneakers?.map((sneaker) => (
 							<SneakerRecentVoteCard
 								key={sneaker.id}
