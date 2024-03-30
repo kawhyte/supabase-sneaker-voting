@@ -92,7 +92,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 							src={sneaker?.images[0]?.image_link || sneaker.main_image}
 						/>
 					</div>
-					<p
+					{/*<p
 						className={`flex text-center absolute bottom-1 left-2 my-3 sm:my-0 text-sm sm:text-[0.7rem]  items-center justify-center w-12 px-2 py-1  rounded-xl  text-white  transition ease-in duration-200 font-mono leading-[1.2]  border-t border-b  border-l  ${
 							vote === "1"
 								? " bg-green-500"
@@ -107,8 +107,8 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 
 					<p className='absolute bottom-1 right-2 rounded-xl border py-1 px-2 text-blue-600  bg-blue-200 font-mono leading-[1.2] text-xs'>
 						{databaseDate > todayDate ? "Upcoming" : "Released"}
-					</p>
-				</div>
+					</p>*/}
+					</div>
 
 				<div class='w-full p-4 md:p-4'>
 					<h1 class='font-mono  normal-case   text-[1.2rem] sm:text-[0.9rem] tracking-[-0.02em] leading-[1.33] my-2 font-semibold '>
@@ -124,10 +124,28 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 						).toLocaleDateString()}`}
 					</span>
 				</div>
+
+				<div className='ml-4 flex flex-row gap-x-4 mb-4'>
+					<p
+						className={`flex text-center  my-3 sm:my-0 text-sm sm:text-[0.7rem]  items-center justify-center w-12 px-2 py-1  rounded-xl  text-white  transition ease-in duration-200 font-mono leading-[1.2]  border-t border-b  border-l  ${
+							vote === "1"
+								? " bg-green-500"
+								: vote === "2"
+								? " bg-yellow-500"
+								: vote === "3"
+								? " bg-red-500"
+								: ""
+						} `}>
+						{sneaker?.rating_id.vote?.vote_name}
+					</p>
+
+					<p className=' flex text-center text-blue-600  bg-blue-200 my-3 sm:my-0 text-sm sm:text-[0.7rem]  items-center justify-center w-20 px-2 py-1  rounded-xl   transition ease-in duration-200 font-mono leading-[1.2]  border-t border-b  border-l '>
+						{databaseDate > todayDate ? "Upcoming" : "Released"}
+					</p>
+				</div>
 			</div>
 		</>
 	);
 };
 
 export default SneakerCard;
-

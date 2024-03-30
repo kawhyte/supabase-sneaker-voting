@@ -193,17 +193,21 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 						Retail: {sneaker.price < 10 ? "TBD" : `$${sneaker.price}`}
 					</p>
 
-					<div className='flex justify-center align-middle items-center max-w-sm mx-auto my-7 '>
-						<h2 className='tracking-wide text-[0.9rem] title-font font-medium text-gray-400 my-1 mr-1 font-mono'>
+					<div className='flex bg-gray-600 rounded-xl  justify-between align-middle items-center max-w-sm mx-auto my-7 '>
+						<h2 className='tracking-wide ml-7 text-[0.9rem] title-font font-medium text-blue-400 my-1 mr-1 font-mono'>
 							Select one:
 						</h2>
+						<div className=" flex justify-end"> 
+
+
+
 						<div className='relative group flex justify-center'>
 							<button
 								onClick={(e) => {
 									handleRating("1", e);
 								}}
 								type='button'
-								className={`flex items-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]  border-t border-b  border-l  hover:bg-yellow-500 ${
+								className={`flex items-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]    border-l  hover:bg-yellow-500 ${
 									vote === "1" ? " bg-green-500" : " "
 								} `}>
 								<svg
@@ -228,7 +232,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 									handleRating("2", e);
 								}}
 								type='button'
-								className={`flex items-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]  border-t border-b  border-l  hover:bg-yellow-500 ${
+								className={`flex items-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]     border-l  hover:bg-yellow-500 ${
 									vote === "2" ? " bg-yellow-500" : " "
 								} `}>
 								<svg
@@ -247,13 +251,13 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 							</span>
 						</div>
 
-						<div className='relative group flex justify-center '>
+						<div className='relative group flex justify-end '>
 							<button
 								onClick={(e) => {
 									handleRating("3", e);
 								}}
 								type='button'
-								className={`flex items-center w-full px-3 py-2 text-xs text-white transition ease-in duration-200 font-mono uppercase leading-[1.2] border-t border-b border-l  border-r rounded-r-md hover:bg-red-500  ${
+								className={`flex items-center justify-end align-middle w-full px-3 py-2 text-xs text-white transition ease-in duration-200 font-mono uppercase leading-[1.2]   border-l  rounded-r-xl hover:bg-red-500  ${
 									vote === "3" ? "bg-red-500" : ""
 								} `}>
 								<svg
@@ -273,6 +277,8 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 								Hell No 🤡
 							</span>
 						</div>
+</div>
+
 					</div>
 				</div>
 			</div>
