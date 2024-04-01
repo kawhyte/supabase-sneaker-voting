@@ -112,10 +112,10 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 
 				<div class='w-full p-4 md:p-4'>
 					<h1 class='font-mono  normal-case   text-[1.2rem] sm:text-[0.9rem] tracking-[-0.02em] leading-[1.33] my-2 font-semibold '>
-						{sneaker.name}
+						{sneaker.name}{"  "}{sneaker.id}
 					</h1>
 					<p className='tracking-wide text-[0.9rem] title-font font-medium text-gray-400 mb-1 mt-3 font-mono'>
-						Brand: {sneaker.brand_id?.name}
+						Brand: {sneaker.brand_id?.name} 
 					</p>
 
 					<span className='sm:text-sm text-gray-400 font-mono '>

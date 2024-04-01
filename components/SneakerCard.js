@@ -142,15 +142,15 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 			<div className='w-full max-w-5xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700 '>
 				<div className='relative bg-white'>
 					<div className=''>
-						<Carousel className='w-full max-w-lg  '>
+						<Carousel className=' '>
 							<CarouselContent>
 								{sneaker.images
 									.sort((a, b) => b.main_image - a.main_image)
 									.map((item) => (
 										<CarouselItem key={item.id}>
-											<div className='w-full h-80 flex justify-center items-center align-middle'>
+											<div className='w-full h-80 sm:h-96 md:h-80 lg:h-72 flex justify-center items-center align-middle container mx-auto   '>
 												<img
-													className=' w-full h-80  object-cover'
+													className=' w-full   h-80 sm:h-96 md:h-80 lg:h-72 items-center  object-cover mx-auto'
 													src={item?.image_link}
 													alt='product image'
 													loading='lazy'
@@ -177,7 +177,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 					)}
 				</div>
 
-				<div className='px-5 pb-3'>
+				<div className='px-5 pb-3 '>
 					<h5 className=' font-mono flex flex-col normal-case text-start  drop-shadow-xl  text-[1.2rem] sm:text-[1.1rem] tracking-[-0.01em] leading-[1.33] mt-8 font-semibold'>
 						{sneaker.name}
 						{sneaker.id}
@@ -193,7 +193,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 						Retail: {sneaker.price < 10 ? "TBD" : `$${sneaker.price}`}
 					</p>
 
-					<div className='flex bg-gray-600 rounded-xl  justify-between align-middle items-center max-w-sm mx-auto my-7 '>
+					<div className='flex bg-gray-600 rounded-xl  justify-between align-middle items-center max-w-sm  my-7 '>
 						<h2 className='tracking-wide ml-6 text-[0.9rem] title-font text-center font-medium text-white my-1 mr-1 font-mono'>
 							Select one:
 						</h2>
@@ -359,7 +359,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 									className={`absolute top-7 left-1 scale-0  transition-all  w-20 mt-5 text-center rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 ${
 										vote === "3" ? "scale-100" : ""
 									}`}>
-									Hell No! 🤮 
+									Hell No! 🤮
 								</span>
 							</div>
 						</div>

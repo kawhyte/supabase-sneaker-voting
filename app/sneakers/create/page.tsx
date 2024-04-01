@@ -25,14 +25,14 @@ const Create = () => {
 	const handleSubmit = async (e: any) => {
 		e.preventDefault();
 
-		console.log("handleSubmit ", e);
+		//console.log("handleSubmit ", e);
 
 		if (!name || !date || !brand || !price || !style || !main_image) {
 			setFormError("Please fill in all the fields correctly.");
 			//console.log("ERRRRROORRR!!1")
 			return;
 		}
-		const { data, error } = await supabase
+		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
 			.insert([
 				{
@@ -45,14 +45,24 @@ const Create = () => {
 				},
 			])
 			.select();
-
 		if (error) {
 			console.log(error);
 			setFormError("Please fill in all the fields correctly.");
 			//console.log("ERRRRROORRR")
 		}
-		if (data) {
-			console.log(data);
+
+		if (sneaker_data) {
+			const sneakerID = sneaker_data[0]?.id;
+			console.log("sneaker_data", sneakerID);
+
+			const { data, error } = await supabase
+				.from("images")
+				.insert([
+					{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
+				])
+				.select();
+
+			//console.log(sneaker_data);
 			setFormError("");
 			router.push("/sneakers/pending");
 			//navigate("/");
@@ -115,38 +125,6 @@ const Create = () => {
 							htmlFor='grid-password'>
 							Add Images
 						</label>
-						<input
-							value={main_image}
-							onChange={(e) => setImage(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
-							id='grid-password'
-							type='text'
-							placeholder='https://'
-						/>
-						<input
-							value={main_image}
-							onChange={(e) => setImage(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
-							id='grid-password'
-							type='text'
-							placeholder='https://'
-						/>
-						<input
-							value={main_image}
-							onChange={(e) => setImage(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
-							id='grid-password'
-							type='text'
-							placeholder='https://'
-						/>
-						<input
-							value={main_image}
-							onChange={(e) => setImage(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
-							id='grid-password'
-							type='text'
-							placeholder='https://'
-						/>
 						<input
 							value={main_image}
 							onChange={(e) => setImage(e.target.value)}
