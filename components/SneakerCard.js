@@ -31,7 +31,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 	const supabase = createClient();
 
 	const handleDelete = async () => {
-		const { data, error } = await supabase
+		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
 			.delete()
 			.eq("id", sneaker.id)
@@ -40,7 +40,15 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 		if (error) {
 			console.log(error);
 		}
-		if (data) {
+
+		if (sneaker_data) {
+			console.log("DEleted", sneaker_data);
+			toast({
+				title: "Sneaker deleted",
+				description: `${sneaker_data[0].name} was deleted.`,
+				
+			});
+
 			onDelete(sneaker.id);
 		}
 	};
@@ -62,26 +70,6 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 	};
 
 	const handleRating = async (value, e) => {
-		//setVote(value);
-
-		// console.log("Value",value);
-
-		// console.log("sneaker DDDDAAT", sneaker)
-
-		// const { data, error } = await supabase
-		// .from("sneakers")
-		// .insert([
-		// 	{
-		// 		name: name,
-		// 		brand_id: parseInt(brand, 10),
-		// 		release_date: date,
-		// 		price: price,
-		// 		style: style,
-		// 		main_image: main_image,
-		// 	},
-		// ])
-		// .select();
-
 		const { data: rating_data, error } = await supabase
 			.from("rating")
 			.insert([
@@ -94,23 +82,6 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 			.select();
 
 		const sneakerID = rating_data[0].id;
-		// console.log("SetID", sneakerID)
-
-		// console.log("rating updated ", rating_data);
-		//setSneakerId(data[0].id)
-
-		// const { data, error } = await supabase
-		// .from('rating')
-		// .update({ vote: parseInt(value,10) })
-		// .eq("sneaker_details.id", sneaker.sneaker_details.id)
-		// .select()
-
-		// const { data, error } = await supabase
-		// 	.from("sneakers")
-		// 	.update({ vote: parseInt(value, 10) , voted_at })
-		// 	.select(`sneaker_details(*)`)
-		// 	.eq("sneaker_details", sneaker.sneaker_details.id)
-		// 	.order("name", { ascending: true });
 
 		if (error) {
 			console.log(error);
@@ -124,10 +95,10 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 			//.order("name", { ascending: true });
 
 			toast({
-				description: "Horray! You successfully voted ⚡️",
+				description: "Horray! You successfully voted  ⚡️",
 			});
 
-			console.log("New data sneaker_data", data);
+			//console.log("New data sneaker_data", data);
 
 			setVote(value);
 			//setVote(null);
@@ -148,9 +119,9 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 									.sort((a, b) => b.main_image - a.main_image)
 									.map((item) => (
 										<CarouselItem key={item.id}>
-											<div className='w-full h-80 sm:h-96 md:h-80 lg:h-72 flex justify-center items-center align-middle container mx-auto   '>
+											<div className='w-full h-64 sm:h-96 md:h-80 lg:h-72 flex justify-center items-center align-middle container mx-auto   '>
 												<img
-													className=' w-full   h-80 sm:h-96 md:h-80 lg:h-72 items-center  object-cover mx-auto'
+													className=' w-full   h-64 sm:h-96 md:h-80 lg:h-72 items-center  object-cover mx-auto'
 													src={item?.image_link}
 													alt='product image'
 													loading='lazy'
@@ -169,9 +140,9 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 					</p>
 
 					{sneaker.rating_id === null ? (
-						<p className='absolute top-3 left-3 rounded  text-black font-mono leading-[1.2]'>
+						<div className='absolute top-3 left-3 rounded  text-black font-mono leading-[1.2]'>
 							<PendingIcon classname='' />
-						</p>
+						</div>
 					) : (
 						""
 					)}
@@ -198,7 +169,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 							Select one:
 						</h2>
 						<div className=' flex justify-end'>
-							<div className='relative group flex justify-center'>
+							<div className='relative group flex flex-col items-center align-middle justify-center'>
 								<button
 									onClick={(e) => {
 										handleRating("1", e);
@@ -207,14 +178,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 									className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]    border-l  hover:bg-green-500 ${
 										vote === "1" ? " bg-green-500" : " "
 									} `}>
-									{/*<svg
-									xmlns='http://www.w3.org/2000/svg'
-									viewBox='0 0 20 20'
-									fill='currentColor'
-									className='w-4 h-4 mr-2  '>
-									<path d='M1 8.25a1.25 1.25 0 1 1 2.5 0v7.5a1.25 1.25 0 1 1-2.5 0v-7.5ZM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0 1 14 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 0 1-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 0 1-1.341-.317l-2.734-1.366A3 3 0 0 0 6.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 0 1 2.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388Z' />
-							</svg>*/}
-
+						
 									<svg
 										width='800px'
 										height='800px'
@@ -232,13 +196,13 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 									</svg>
 								</button>
 								<span
-									className={`absolute top-8 scale-0 transition-all w-20 mt-5 text-center rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 ${
+									className={`absolute top-8 md:scale-0 transition-all w-20 mt-5 text-center rounded bg-gray-800 p-2 text-xs text-white md:group-hover:scale-100 ${
 										vote === "1" ? "scale-100" : ""
 									}`}>
-									I love it! ❤️
+									I love it!
 								</span>
 							</div>
-							<div className='relative group flex justify-center'>
+							<div className='relative group flex justify-center flex-col items-center align-middle'>
 								<button
 									onClick={(e) => {
 										handleRating("4", e);
@@ -273,13 +237,13 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 									</svg>
 								</button>
 								<span
-									className={`absolute top-8 scale-0 text-center transition-all w-20 mt-5 rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 ${
+									className={`absolute top-8 md:scale-0 text-center transition-all w-20 mt-5 rounded bg-gray-800 p-2 text-xs text-white md:group-hover:scale-100 ${
 										vote === "4" ? "scale-100" : ""
 									}`}>
 									I like it
 								</span>
 							</div>
-							<div className='relative group flex justify-center'>
+							<div className='relative group flex justify-center flex-col items-center align-middle'>
 								<button
 									onClick={(e) => {
 										handleRating("2", e);
@@ -313,14 +277,14 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 									</svg>
 								</button>
 								<span
-									className={`absolute top-8  scale-0 transition-all  w-20 mt-5 text-center rounded bg-gray-800 p-1 text-xs text-white group-hover:scale-100 ${
+									className={`absolute top-9  md:scale-0 transition-all  w-20 mt-5 text-center rounded bg-gray-800 p-1 text-xs text-white md:group-hover:scale-100 ${
 										vote === "2" ? "scale-100" : ""
 									}`}>
 									Meh...
 								</span>
 							</div>
 
-							<div className='relative group flex justify-end '>
+							<div className='relative group flex justify-end flex-col items-center align-middle '>
 								<button
 									onClick={(e) => {
 										handleRating("3", e);
@@ -356,10 +320,10 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 								</button>
 
 								<span
-									className={`absolute top-7 left-1 scale-0  transition-all  w-20 mt-5 text-center rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 ${
+									className={`absolute top-8  md:scale-0  transition-all  w-20 mt-5 text-center rounded bg-gray-800 p-2 text-xs text-white md:group-hover:scale-100 ${
 										vote === "3" ? "scale-100" : ""
 									}`}>
-									Hell No! 🤮
+									Hell No!
 								</span>
 							</div>
 						</div>
@@ -407,29 +371,21 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 				</svg>*/}
 
 				{/*<svg
-							onClick={handleDelete}
-							xmlns='http://www.w3.org/2000/svg'
-							viewBox='0 0 24 24'
-							fill='currentColor'
-							className='w-6 h-6 hover:fill-red-400'>
-							<path
-								fillRule='evenodd'
-								d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z'
-								clipRule='evenodd'
-							/>
-							</svg>*/}
+					onClick={handleDelete}
+					xmlns='http://www.w3.org/2000/svg'
+					viewBox='0 0 24 24'
+					fill='currentColor'
+					className='w-6 h-6 hover:fill-red-400'>
+					<path
+						fillRule='evenodd'
+						d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z'
+						clipRule='evenodd'
+					/>
+				</svg>
+				*/}
 			</div>
 		</div>
 	);
 };
 
 export default SneakerCard;
-
-// <Link href={`/sneakers/detail/${sneaker?.id}`}>
-// <img
-// 	className='rounded-t-lg w-full  h-60 object-cover'
-// 	src={sneaker?.main_image}
-// 	alt='product image'
-// 	loading='lazy'
-// />
-// </Link>

@@ -8,6 +8,7 @@ import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
 
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "@/components/ui/use-toast";
 
 const Edit = ({ params }: { params: any }) => {
 	//const navigate = useNavigate();
@@ -33,8 +34,10 @@ const Edit = ({ params }: { params: any }) => {
 		//console.log("handleSubmit ", e);
 
 		if (!name || !date || !brand || !price || !style || !main_image) {
-			setFormError("Please fill in all the fields correctly.");
-			//console.log("ERRRRROORRR!!1")
+			//setFormError("Please fill in all the fields correctly.-");
+			toast({
+				description: "Please fill in all the fields correctly.",
+			  })
 			return;
 		}
 
@@ -51,7 +54,7 @@ const Edit = ({ params }: { params: any }) => {
 		// 	main_image
 		// );
 
-		const { data, error } = await supabase
+		const { data:sneaker_data, error } = await supabase
 			.from("sneakers")
 			.update({
 				name: name,
@@ -66,13 +69,31 @@ const Edit = ({ params }: { params: any }) => {
 
 		if (error) {
 			console.log(error);
+
+			toast({
+				description: "Please fill in all the fields correctly.",
+			  })
 			setFormError("Please fill in all the fields correctly.");
 			//console.log("ERRRRROORRR")
 		}
-		if (data) {
-			console.log(data);
+		if (sneaker_data) {
+			//console.log(sneaker_data);
+
+
+			const sneakerID = sneaker_data[0]?.id;
+			console.log("sneaker_data", sneakerID);
+
+			const { data, error } = await supabase
+				.from("images")
+				.insert([
+					{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
+				])
+				.select();
+
+
+
 			setFormError("");
-			router.push("/sneakers/pending");
+			router.push("/sneakers/voted");
 			//navigate("/");
 		}
 	};
@@ -108,7 +129,7 @@ const Edit = ({ params }: { params: any }) => {
 
 	return (
 		<div className='page create'>
-			<h2>Edit Page for {id}</h2>
+			<h2>Edit Page for - {id}</h2>
 
 			<form
 				onSubmit={handleSubmit}
@@ -250,9 +271,9 @@ const Edit = ({ params }: { params: any }) => {
 					</svg>
 					Update Sneaker Listing
 				</button>
-				{formError && <p className='error'>{formError}</p>}
+				{/*formError && <p className='error'>{formError}</p>*/}
 
-				{formError && (
+				{/*formError && (
 					<div
 						className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative'
 						role='alert'>
@@ -269,7 +290,7 @@ const Edit = ({ params }: { params: any }) => {
 							</svg>
 						</span>
 					</div>
-				)}
+				)*/}
 			</form>
 		</div>
 	);
