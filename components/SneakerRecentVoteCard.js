@@ -142,7 +142,7 @@ const SneakerRecentVoteCard = ({ sneaker, onDelete, onVote }) => {
 						{databaseDate > todayDate ? "Upcoming" : "Released"}
 					</p>
 
-					<div className=' absolute top-2 left-2 flex flex-row justify-end items-center'>
+					{/*<div className=' absolute top-2 left-2 flex flex-row justify-end items-center'>
 						{vote === "1" && (
 							<div className='relative flex flex-row items-center justify-center'>
 								<div
@@ -257,12 +257,12 @@ const SneakerRecentVoteCard = ({ sneaker, onDelete, onVote }) => {
 								</span>
 							</div>
 						)}
-					</div>
+						</div>*/}
 				</div>
 
 				<div className='px-5 pb-3 '>
 					<h5 className=' font-mono flex flex-col normal-case text-start  drop-shadow-xl  text-[1.1rem] sm:text-[0.89rem] tracking-[-0.01em] leading-[1.33] mt-8 font-semibold'>
-						{sneaker.name}
+						{sneaker.name}{sneaker.id}
 					</h5>
 					<p className='tracking-wide text-[0.75rem] title-font font-medium text-gray-400 mb-1 mt-3 font-mono'>
 						Brand: {sneaker.brand_id?.name}

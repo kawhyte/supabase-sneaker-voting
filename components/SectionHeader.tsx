@@ -4,7 +4,7 @@ import SupabaseLogo from "./SupabaseLogo";
 
 export default function Header({
 	name,
-	total,
+	total=-1,
 	sectiontext,
 }: {
 	name: string;
@@ -35,7 +35,7 @@ export default function Header({
 			
 			<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
 
-			<div className=' flex flex-row gap-x-8 sm:gap-x-8 md:gap-x-20 justify-center items-center mx-auto'>
+			{ total >= 0 && <div className=' flex flex-row gap-x-8 sm:gap-x-8 md:gap-x-20 justify-center items-center mx-auto'>
 				<div className=' flex flex-col justify-center align-middle text-center'>
 					<span className='font-serif flex flex-col mt-10 mb-6  text-[1.25rem] sm:text-[2rem] tracking-[-0.03em] leading-[0.88] font-bold'>{sectiontext}</span>
 					<span className='text-[2.25rem] sm:text-[3rem] tracking-[-0.03em] font-bold border-2 items-center transition ease-in duration-200 py-2 px-1 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] '>
@@ -44,22 +44,9 @@ export default function Header({
 					</span>
 				</div>
 
-				{/* 
-				<Link href={"/sneakers"}>
-					<button
-						type='button'
-						className=' hover:bg-blue-500/80 border-2 items-center transition ease-in duration-200 py-2 px-3 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] text-xs md:text-sm'>
-						Vote Required:
-					</button>
-				</Link>
-				<Link href={"/sneakers"}>
-					<button
-						type='button'
-						className=' hover:bg-green-500/80 border-2 items-center transition ease-in duration-200 py-2 px-3 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] text-xs md:text-sm'>
-						Rank Sneakers
-					</button>
-				</Link> */}
-			</div>
+				
+			 
+			</div>}
 		</div>
 	);
 }
