@@ -142,7 +142,7 @@ const SneakerRecentVoteCard = ({ sneaker, onDelete, onVote }) => {
 						{databaseDate > todayDate ? "Upcoming" : "Released"}
 					</p>
 
-					{/*<div className=' absolute top-2 left-2 flex flex-row justify-end items-center'>
+					<div className=' absolute top-2 left-2 flex flex-row justify-end items-center'>
 						{vote === "1" && (
 							<div className='relative flex flex-row items-center justify-center'>
 								<div
@@ -257,7 +257,7 @@ const SneakerRecentVoteCard = ({ sneaker, onDelete, onVote }) => {
 								</span>
 							</div>
 						)}
-						</div>*/}
+						</div>
 				</div>
 
 				<div className='px-5 pb-3 '>

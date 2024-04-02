@@ -88,7 +88,7 @@ export default function Voted() {
 					</h2>
 					<h1 className='sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-200'>
 						{" "}
-						❤️ We would love to have these in our collection.
+						 We would love to have these in our collection ❤️
 					</h1>
 					
 				</div>
@@ -117,7 +117,7 @@ export default function Voted() {
 					</h2>
 					<h1 className='sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-200'>
 						{" "}
-						👌 Would only purchase on these sale.
+						 Would only purchase on these sale 👌
 					</h1>
 					
 				</div>
@@ -147,7 +147,7 @@ export default function Voted() {
 					</h2>
 					<h1 className='sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-200'>
 						{" "}
-						🫤 Meh or straight-up hot garbage
+						 Meh or straight-up hot garbage 🫤🤮
 					</h1>
 				
 				</div>

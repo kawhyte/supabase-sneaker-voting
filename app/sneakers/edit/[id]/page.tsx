@@ -17,6 +17,7 @@ const Edit = ({ params }: { params: any }) => {
 	const id = params.id;
 
 	const [name, setName] = useState("");
+	const [vote, setVote] = useState("");
 	const [date, setDate] = useState("");
 	const [brand, setBrand] = useState("1");
 	const [price, setPrice] = useState("");
@@ -37,7 +38,7 @@ const Edit = ({ params }: { params: any }) => {
 			//setFormError("Please fill in all the fields correctly.-");
 			toast({
 				description: "Please fill in all the fields correctly.",
-			  })
+			});
 			return;
 		}
 
@@ -54,7 +55,7 @@ const Edit = ({ params }: { params: any }) => {
 		// 	main_image
 		// );
 
-		const { data:sneaker_data, error } = await supabase
+		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
 			.update({
 				name: name,
@@ -72,13 +73,12 @@ const Edit = ({ params }: { params: any }) => {
 
 			toast({
 				description: "Please fill in all the fields correctly.",
-			  })
+			});
 			setFormError("Please fill in all the fields correctly.");
 			//console.log("ERRRRROORRR")
 		}
 		if (sneaker_data) {
 			//console.log(sneaker_data);
-
 
 			const sneakerID = sneaker_data[0]?.id;
 			console.log("sneaker_data", sneakerID);
@@ -90,7 +90,13 @@ const Edit = ({ params }: { params: any }) => {
 				])
 				.select();
 
+			const { data: newVote, error: VoteError } = await supabase
+				.from("rating")
+				.update([{ vote: vote }])
+				.eq("sneaker_id", sneakerID)
+				.select();
 
+			console.log("After vote", newVote);
 
 			setFormError("");
 			router.push("/sneakers/voted");
@@ -118,7 +124,16 @@ const Edit = ({ params }: { params: any }) => {
 				setPrice(data.price);
 				setStyle(data.style);
 
-				console.log(data);
+				const { data: rating, error } = await supabase
+					.from("rating")
+					.select(`*, vote(*)`)
+					.eq("id", data.rating_id)
+					.single();
+
+				setVote(rating.vote.vote_id);
+				console.log("Rating", rating);
+				console.log("Vote", vote);
+				console.log("DATA", data);
 			}
 		};
 		fetchSmoothie();
@@ -190,14 +205,14 @@ const Edit = ({ params }: { params: any }) => {
 						</p>
 					</div>
 				</div>
-				<div className='flex flex-wrap -mx-3 mb-2'>
+				<div className='flex flex-wrap -mx-3 mb-2 gap-4'>
 					<div className='w-full md:w-1/3 px-3 mb-6 md:mb-0'>
 						<label
 							className='block uppercase tracking-wide text-gray-100 text-xs font-bold mb-2'
 							htmlFor='grid-state'>
 							Sneaker Brand
 						</label>
-						<div className='relative'>
+						<div className='relative flex gap-4'>
 							<select
 								value={brand}
 								onChange={(e) => setBrand(e.target.value)}
@@ -213,6 +228,35 @@ const Edit = ({ params }: { params: any }) => {
 								<option value='8'>Puma</option>
 								<option value='9'>Other</option>
 							</select>
+
+							<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
+								<svg
+									className='fill-current h-4 w-4'
+									xmlns='http://www.w3.org/2000/svg'
+									viewBox='0 0 20 20'>
+									<path d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z' />
+								</svg>
+							</div>
+						</div>
+					</div>
+					<div className='w-full md:w-1/3 px-3 mb-6 md:mb-0'>
+						<label
+							className='block uppercase tracking-wide text-gray-100 text-xs font-bold mb-2'
+							htmlFor='grid-state'>
+							Sneaker Vote
+						</label>
+						<div className='relative flex gap-4'>
+							<select
+								value={vote}
+								onChange={(e) => setVote(e.target.value)}
+								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+								id='grid-state'>
+								<option value='1'>I love it ❤️</option>
+								<option value='4'>I like it 👌</option>
+								<option value='2'>Meh... 🫤</option>
+								<option value='3'>Trash 🤮</option>
+							</select>
+
 							<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
 								<svg
 									className='fill-current h-4 w-4'
