@@ -119,9 +119,9 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 									.sort((a, b) => b.main_image - a.main_image)
 									.map((item) => (
 										<CarouselItem key={item.id}>
-											<div className='w-full h-52 sm:h-96 md:h-80 lg:h-72 flex justify-center items-center align-middle container mx-auto   '>
-												<img
-													className=' w-full  h-52 sm:h-96 md:h-80 lg:h-72 items-center  object-cover mx-auto'
+										<div className='w-full h-1/3 sm:h-96 md:h-80 lg:h-96 flex justify-center items-center align-middle container mx-auto  '>
+										<img
+													className=' w-full   h-1\3 pt-6 mt-36 sm:mt-0 sm:h-96 md:h-80 lg:h-auto items-center  object-cover mx-auto'
 													src={item?.image_link}
 													alt='product image'
 													loading='lazy'
@@ -130,8 +130,8 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 										</CarouselItem>
 									))}
 							</CarouselContent>
-							<CarouselPrevious className=' mx-16 my-28' />
-							<CarouselNext className='mx-16 my-28' />
+							<CarouselPrevious className=' mx-16 sm:my-32' />
+							<CarouselNext className='mx-16 sm:my-32' />
 						</Carousel>
 					</div>
 
