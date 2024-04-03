@@ -60,15 +60,15 @@ export default function PendingVote() {
         </div>
 		
       </nav> */}
-			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-8xl px-3'>
+			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3'>
 				<SectionHeader
 					name={"Sneakers Voting"}
 					total={sneakersPending}
 					sectiontext={"Sneakers Pending Vote:"}
 				/>
 
-				<div className='container mx-auto flex flex-col gap-16 items-center '>
-					<div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-8 mx-10 md:mx-0  md:gap-5'>
+				<div className='container mx-auto flex flex-col gap-9 items-center '>
+					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-x-5 gap-y-6'>
 						{sneakers?.map((sneaker) => (
 							<div key={sneaker.id}>
 								<SneakerCard

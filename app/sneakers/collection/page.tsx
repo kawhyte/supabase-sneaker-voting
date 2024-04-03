@@ -53,25 +53,25 @@ export default function Page() {
 
 			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3'>
 				<SectionHeader name={"Our Sneaker Collection"} total={collectionCount} sectiontext={"Collection Count"} />
-				<div className='grid grid-cols-2 sm:grid-cols-4  grid-row-2 gap-y-10  gap-x-12 md:mt-10'>
+				<div className='grid grid-cols-2 sm:grid-cols-4  grid-row-2 gap-y-10  gap-x-12 md:mt-10 justify-items-start'>
 					{sneakers?.map((sneaker) => (
 						<> 
 						<div
 							key={sneaker.id}
-							className='flex flex-col justify-center align-middle text-center items-center'>
+							className='flex flex-col '>
 							<img
 								src={
 									sneaker.collection_image !== null
 										? sneaker.collection_image ||sneaker.collection_image
-										: "https://res.cloudinary.com/babyhulk/image/upload/co_rgb:e7e7e7,e_colorize:100/v1709930979/sneakers/7.png"
+										: "https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png"
 								}
 								alt={`${sneaker.name + "sneaker"}`}
-								className="mb-1  hover:scale-105 img-outline  transition duration-300 ease-in-out cursor-pointer"
+								className="mb-1 hover:scale-105 img-outline  transition duration-300 ease-in-out cursor-pointer"
 							/>
 							{/* <p className='text-[0.8rem] font-mono leading-[1.2] mt-1 mb-2'>{sneaker.brand}</p> */}
 							
 							
-							<p className='text-[0.7rem] md:text-[0.8rem] font-mono leading-[1.2] mt-1  '>
+							<p className='text-[0.7rem] md:text-[0.8rem] font-mono leading-[1.2] mt-1 text-center line-clamp-2  '>
 								{sneaker.name}
 
 							</p>

@@ -111,7 +111,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 	return (
 		<div>
 			<div className='w-full max-w-5xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700 '>
-				<div className='relative bg-white'>
+				<div className='relative bg-white  h-60 sm:h-96'>
 					<div className=''>
 						<Carousel className=' '>
 							<CarouselContent>
@@ -119,9 +119,9 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 									.sort((a, b) => b.main_image - a.main_image)
 									.map((item) => (
 										<CarouselItem key={item.id}>
-										<div className='w-full h-1/3 sm:h-96 md:h-80 lg:h-96 flex justify-center items-center align-middle container mx-auto  '>
-										<img
-													className=' w-full   h-1\3 pt-6 mt-36 sm:mt-0 sm:h-96 md:h-80 lg:h-auto items-center  object-cover mx-auto'
+											<div className='w-full h-1/3 sm:h-96 md:h-80 lg:h-96 flex justify-center items-center align-middle container mx-auto  '>
+												<img
+													className=' w-full   h-1\3 pt-6 mt-24 sm:mt-0 sm:h-96 md:h-80 lg:h-auto items-center  object-cover mx-auto'
 													src={item?.image_link}
 													alt='product image'
 													loading='lazy'
@@ -130,17 +130,21 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 										</CarouselItem>
 									))}
 							</CarouselContent>
-							<CarouselPrevious className=' mx-16 sm:my-32' />
-							<CarouselNext className='mx-16 sm:my-32' />
+							{sneaker.images.length > 2 && (
+								<CarouselPrevious className=' mx-16   sm:my-32' />
+							)}
+							{sneaker.images.length > 2 && (
+								<CarouselNext className='mx-16  sm:my-32' />
+							)}
 						</Carousel>
 					</div>
 
-					<p className='absolute top-3 right-3 rounded-xl border py-1 px-2 text-blue-600  bg-blue-200 font-mono leading-[1.2] text-xs'>
+					<p className='absolute top-2 right-2 rounded-xl border py-1 px-2 text-blue-600  bg-blue-200 font-mono leading-[1.2] text-[.66em]'>
 						{databaseDate > todayDate ? "Upcoming" : "Released"}
 					</p>
 
 					{sneaker.rating_id === null ? (
-						<div className='absolute top-3 left-3 rounded  text-black font-mono leading-[1.2]'>
+						<div className='absolute top-2 left-2 rounded  text-black font-mono leading-[1.2]'>
 							<PendingIcon classname='' />
 						</div>
 					) : (
@@ -148,34 +152,36 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 					)}
 				</div>
 
-				<div className='sm:px-5 mx-2 pb-3 '>
-					<h5 className=' font-mono flex flex-col normal-case text-start  drop-shadow-xl  text-[1.2rem] sm:text-[1.1rem] tracking-[-0.01em] leading-[1.33] mt-8 font-semibold'>
+				<div className='px-5 pb-3 '>
+					<h5 className=' font-mono  flex flex-col normal-case text-start  drop-shadow-xl  text-[0.93rem] sm:text-[1.1rem] tracking-[-0.01em] leading-[1.33] mt-8 font-semibold'>
 						{sneaker.name}
-						
 					</h5>
-					<p className='tracking-wide text-[0.9rem] title-font font-medium text-gray-400 mb-1 mt-3 font-mono'>
-						Brand: {sneaker.brand_id?.name}
-					</p>
 
-					<p className='tracking-wide text-[0.9rem] title-font font-medium text-gray-400 my-1 font-mono'>
-						Release Date: {sneaker.release_date}
-					</p>
-					<p className='tracking-wide text-[0.9rem] title-font font-medium text-gray-400 my-1 font-mono'>
-						Retail: {sneaker.price < 10 ? "TBD" : `$${sneaker.price}`}
-					</p>
+					<div className='tracking-wide text-[0.85rem] sm:text-[0.9rem] title-font font-medium text-gray-400 mb-1 mt-3 font-mono'>
+						<p className=''>Brand: {sneaker.brand_id?.name}</p>
 
-					<div className='flex bg-gray-600 rounded-xl  justify-between align-middle items-center max-w-sm my-4  sm:my-7 '>
-						<h2 className='sm:tracking-wide ml-2  sm:ml-6 text-[0.73rem] sm:text-[0.9rem] title-font text-center font-medium text-white my-1 mr-1 font-mono'>
+						<p className=''>Release Date: {sneaker.release_date}</p>
+						<p className=''>
+							Retail: {sneaker.price < 10 ? "TBD" : `$${sneaker.price}`}
+						</p>
+					</div>
+
+					<h2 className='sm:tracking-wide sm:hidden    text-[0.8rem] sm:text-[0.9rem] title-font font-medium text-white mb-1 mt-5  font-mono grid justify-items-center'>
+						Select one:
+					</h2>
+
+					<div className='flex flex-row justify-evenly sm:justify-between bg-gray-600 rounded-xl  max-w-sm  mb-8  sm:my-7 '>
+						<h2 className='sm:tracking-wide hidden     sm:ml-6 text-[0.73rem] sm:text-[0.9rem] title-font text-start sm:flex align-middle justify-start items-center font-medium text-white my-1  font-mono'>
 							Select one:
 						</h2>
-						<div className=' flex justify-end'>
+						<div className=' flex justify-end  '>
 							<div className='relative group flex flex-col items-center align-middle justify-center'>
 								<button
 									onClick={(e) => {
 										handleRating("1", e);
 									}}
 									type='button'
-									className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]    border-l  hover:bg-green-500 ${
+									className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]    sm:border-l  hover:bg-green-500 ${
 										vote === "1" ? " bg-green-500" : " "
 									} `}>
 									<svg
