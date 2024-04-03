@@ -26,6 +26,8 @@ export default function Hero({ sneakers }: { sneakers: any }) {
 				</div>
 			</div>
 
+			<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8' />
+
 			<div className='grid grid-cols-3 grid-rows-1 sm:grid-cols-6  sm:grid-row-2 gap-y-8  gap-x-7'>
 				{sneakers.map((sneaker: any) => (
 					<div className='flex flex-col justify-center align-middle items-center'>
@@ -44,34 +46,22 @@ export default function Hero({ sneakers }: { sneakers: any }) {
 					</div>
 				))}
 			</div>
-			<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8' />
 
-			<div className=' flex flex-row gap-x-8 sm:gap-x-8 md:gap-x-20 justify-center items-center mx-auto'>
-				<Link href={"/sneakers/collection"}>
+			<div className=" grid justify-items-center mt-8">
+
+
+
+			<Link href={"/sneakers/collection"}>
 					<button
 						type='button'
 						className=' hover:bg-yellow-500/80 border-2 items-center transition ease-in duration-200 py-2 px-3 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] text-xs md:text-sm'>
-						Sneaker collection
-					</button>
-				</Link>
-				<Link href={"/sneakers"}>
-					<button
-						type='button'
-						className=' hover:bg-green-500/80 border-2 items-center transition ease-in duration-200 py-2 px-3 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] text-xs md:text-sm'>
-						Recent Votes
-					</button>
-				</Link>
-				<Link href={"/sneakers"}>
-					<button
-						type='button'
-						className=' hover:bg-blue-500/80 border-2 items-center transition ease-in duration-200 py-2 px-3 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] text-xs md:text-sm'>
-						Sneaker Tracker
+						View full Sneaker collection
 					</button>
 				</Link>
 			</div>
+		
+
+		
 		</div>
 	);
-}
-function getImageBlurSvg() {
-	throw new Error("Function not implemented.");
 }
