@@ -36,7 +36,7 @@ export default function Page() {
 
 			setSneakers(data);
 			setCollectionCount(data?.length)
-			console.log(data);
+			console.log("Collection ",data);
 		};
 		getData();
 	}, []);
@@ -62,7 +62,7 @@ export default function Page() {
 							<img
 								src={
 									sneaker.collection_image !== null
-										? sneaker.collection_image
+										? sneaker.collection_image ||sneaker.collection_image
 										: "https://res.cloudinary.com/babyhulk/image/upload/co_rgb:e7e7e7,e_colorize:100/v1709930979/sneakers/7.png"
 								}
 								alt={`${sneaker.name + "sneaker"}`}
