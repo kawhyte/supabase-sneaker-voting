@@ -2,9 +2,10 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SneakerCard from "@/components/SneakerCard";
+
 import SneakerCardUi from "@/components/SneakerCardUI";
 import SectionHeader from "@/components/SectionHeader";
+import SneakerCard from "@/components/SneakerCard";
 
 export default function PendingVote() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
@@ -66,6 +67,7 @@ export default function PendingVote() {
 					total={sneakersPending}
 					sectiontext={"Sneakers Pending Vote:"}
 				/>
+			
 
 				<div className='container mx-auto flex flex-col gap-9 items-center '>
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-x-5 gap-y-6'>
@@ -76,6 +78,7 @@ export default function PendingVote() {
 									sneaker={sneaker}
 									onVote={handleVote}
 									onDelete={handleDelete}
+									showElement={false}
 								/>
 								{/* <SneakerCardUi 	sneaker={sneaker}/> */}
 							</div>

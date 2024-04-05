@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SneakerRecentVoteCard from "@/components/SneakerRecentVoteCard";
+import SneakerCard from "@/components/SneakerCard";
 import SectionHeader from "@/components/SectionHeader";
 import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
@@ -97,11 +97,12 @@ export default function Voted() {
 						{sneakers
 							?.filter((item) => item.rating_id.vote.vote_id === 1)
 							?.map((sneaker) => (
-								<SneakerRecentVoteCard
+								<SneakerCard
 									key={sneaker.id}
 									sneaker={sneaker}
 									onVote={handleVote}
 									onDelete={handleDelete}
+									showElement ={true}
 								/>
 							))}
 					</div>
@@ -126,11 +127,12 @@ export default function Voted() {
 						{sneakers
 							?.filter((item) => item.rating_id.vote.vote_id === 4)
 							?.map((sneaker) => (
-								<SneakerRecentVoteCard
+								<SneakerCard
 									key={sneaker.id}
 									sneaker={sneaker}
 									onVote={handleVote}
 									onDelete={handleDelete}
+									showElement={true}
 								/>
 							))}
 					</div>
@@ -156,11 +158,12 @@ export default function Voted() {
 						{sneakers
 							?.filter((item) => item.rating_id.vote.vote_id === 2 || item.rating_id.vote.vote_id === 3  )
 							?.map((sneaker) => (
-								<SneakerRecentVoteCard
+								<SneakerCard
 									key={sneaker.id}
 									sneaker={sneaker}
 									onVote={handleVote}
 									onDelete={handleDelete}
+									showElement={true}
 								/>
 							))}
 					</div>
