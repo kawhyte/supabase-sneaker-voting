@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function DeployButton() {
+export default function Logo() {
   return (
     <Link
       className="py-2 px-3 flex rounded-md no-underline hover:bg-btn-background-hover border"

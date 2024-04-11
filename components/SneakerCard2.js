@@ -18,7 +18,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 
 const SneakerCard = ({ sneaker, onDelete, onVote }) => {
-	console.log("Cards Sneakers", sneaker);
+	//console.log("Cards Sneakers", sneaker);
 
 	const todayDate = new Date();
 	const databaseDate = Date.parse(sneaker.release_date);

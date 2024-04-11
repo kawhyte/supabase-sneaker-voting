@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import SmoothieCard from "../../../../components/SneakerRecentVoteCard";
 import Header from "@/components/Header";
-import DeployButton from "@/components/DeployButton";
+import DeployButton from "@/components/Logo";
 import AuthButton from "@/components/AuthButton";
 
 import { useParams, useRouter } from "next/navigation";

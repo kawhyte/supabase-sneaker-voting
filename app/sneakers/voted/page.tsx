@@ -4,9 +4,10 @@ import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import SneakerCard from "@/components/SneakerCard";
 import SectionHeader from "@/components/SectionHeader";
-import DeployButton from "@/components/DeployButton";
+import DeployButton from "@/components/Logo";
 import AuthButton from "@/components/AuthButton";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default function Voted() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
@@ -18,6 +19,14 @@ export default function Voted() {
 	const [fetchError, setFetchError] = useState(null);
 
 	const supabase = createClient();
+
+	// const {
+	// 	data: { user },
+	//   } = await supabase.auth.getUser();
+
+	//   if (!user) {
+	// 	return redirect("/login");
+	//   }
 
 	const handleDelete = (id: any) => {
 		setSneakers((prevSmoothies: any) => {
@@ -88,9 +97,8 @@ export default function Voted() {
 					</h2>
 					<h1 className='sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-200'>
 						{" "}
-						 We would love to have these in our collection ❤️
+						We would love to have these in our collection ❤️
 					</h1>
-					
 				</div>
 				<div className='container mx-auto flex flex-col gap-9 items-center '>
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-x-5 gap-y-6'>
@@ -102,15 +110,11 @@ export default function Voted() {
 									sneaker={sneaker}
 									onVote={handleVote}
 									onDelete={handleDelete}
-									showElement ={true}
+									showElement={true}
 								/>
 							))}
 					</div>
 				</div>
-
-		
-			
-
 
 				<div className='flex flex-col text-center w-full'>
 					<h2 className='text-xs text-indigo-500 tracking-widest font-medium title-font mb-1 uppercase'>
@@ -118,9 +122,8 @@ export default function Voted() {
 					</h2>
 					<h1 className='sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-200'>
 						{" "}
-						 Would only purchase on these sale 👌
+						Would only purchase on these sale 👌
 					</h1>
-					
 				</div>
 				<div className='container mx-auto flex flex-col gap-9 items-center '>
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-x-5 gap-y-6'>
@@ -138,25 +141,23 @@ export default function Voted() {
 					</div>
 				</div>
 
-
-
-
-
-
 				<div className='flex flex-col text-center w-full'>
 					<h2 className='text-xs text-indigo-500 tracking-widest font-medium title-font mb-1 uppercase'>
-						These are not for us 
+						These are not for us
 					</h2>
 					<h1 className='sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-200'>
 						{" "}
-						 Meh or straight-up hot garbage 🫤🤮
+						Meh! Not for me 🫤
 					</h1>
-				
 				</div>
 				<div className='container mx-auto flex flex-col gap-9 items-center '>
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-x-5 gap-y-6'>
 						{sneakers
-							?.filter((item) => item.rating_id.vote.vote_id === 2 || item.rating_id.vote.vote_id === 3  )
+							?.filter(
+								(item) =>
+									item.rating_id.vote.vote_id === 2 ||
+									item.rating_id.vote.vote_id === 3
+							)
 							?.map((sneaker) => (
 								<SneakerCard
 									key={sneaker.id}

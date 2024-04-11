@@ -4,10 +4,10 @@ import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import SmoothieCard from "../../../components/SneakerRecentVoteCard";
 import Header from "@/components/Header";
-import DeployButton from "@/components/DeployButton";
+import DeployButton from "@/components/Logo";
 import AuthButton from "@/components/AuthButton";
 
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 const Create = () => {
 	//const navigate = useNavigate();
@@ -25,7 +25,11 @@ const Create = () => {
 	const handleSubmit = async (e: any) => {
 		e.preventDefault();
 
-		//console.log("handleSubmit ", e);
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		console.log("supabase.auth.getUser ", user);
 
 		if (!name || !date || !brand || !price || !style || !main_image) {
 			setFormError("Please fill in all the fields correctly.");
@@ -47,7 +51,7 @@ const Create = () => {
 			.select();
 		if (error) {
 			console.log(error);
-			setFormError("Please fill in all the fields correctly.");
+			setFormError(error.message);
 			//console.log("ERRRRROORRR")
 		}
 
@@ -64,6 +68,7 @@ const Create = () => {
 
 			//console.log(sneaker_data);
 			setFormError("");
+			//return redirect("/sneakers/pending")
 			router.push("/sneakers/pending");
 			//navigate("/");
 		}

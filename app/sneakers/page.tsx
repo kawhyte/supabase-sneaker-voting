@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
-import DeployButton from "@/components/DeployButton";
+import DeployButton from "@/components/Logo";
 import AuthButton from "@/components/AuthButton";
 import Link from "next/link";
 
@@ -69,17 +69,8 @@ export default function Page() {
 			<div className='animate-in flex-1 flex flex-col opacity-0 max-w-8xl px-3'>
 				<SectionHeader name={"Sneaker Ranking"} total={0} sectiontext={""} />
 
-				<div className='  '>
-			
-						
-							
-							
-					
-				</div>
-
-				
-				</div>
-			
+				<div className='  '></div>
+			</div>
 		</>
 	);
 }

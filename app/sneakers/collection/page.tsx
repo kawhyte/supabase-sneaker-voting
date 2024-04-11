@@ -53,12 +53,12 @@ export default function Page() {
 
 			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3'>
 				<SectionHeader name={"Our Sneaker Collection"} total={collectionCount} sectiontext={"Collection Count"} />
-				<div className='grid grid-cols-2 sm:grid-cols-4  grid-row-2 gap-y-10  gap-x-12 md:mt-10 justify-items-start'>
+				<div className='grid grid-cols-2 sm:grid-cols-2  grid-row-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8  gap-x-4 md:mt-10 justify-items-start'>
 					{sneakers?.map((sneaker) => (
 						<> 
 						<div
 							key={sneaker.id}
-							className='flex flex-col '>
+							className='flex flex-col  bg-gray-800 px-5 py-5 rounded-xl'>
 							<img
 								src={
 									sneaker.collection_image !== null
@@ -71,7 +71,7 @@ export default function Page() {
 							{/* <p className='text-[0.8rem] font-mono leading-[1.2] mt-1 mb-2'>{sneaker.brand}</p> */}
 							
 							
-							<p className='text-[0.7rem] md:text-[0.8rem] font-mono leading-[1.2] mt-1 text-center line-clamp-2  '>
+							<p className='text-[0.75rem] md:text-[0.8rem] font-mono leading-[1.2] mt-1 text-start line-clamp-2  '>
 								{sneaker.name}
 
 							</p>
