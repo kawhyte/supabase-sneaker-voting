@@ -67,9 +67,16 @@ export default function Page() {
 		
       </nav> */}
 			<div className='animate-in flex-1 flex flex-col opacity-0 max-w-8xl px-3'>
-				<SectionHeader name={"Sneaker Ranking"} total={0} sectiontext={""} />
+				<SectionHeader name={"Dashboard"} total={0} sectiontext={""} />
 
-				<div className='  '></div>
+				<div className=' grid grid-cols-4 '>
+
+<Link href={'/sneakers/pending'}> Pending Votes</Link>
+<Link href={'/sneakers/recent'}> Recent Votes</Link>
+<Link href={'/sneakers/collection'}> Collection</Link>
+<Link href={'/'}> Quiz</Link>
+
+				</div>
 			</div>
 		</>
 	);

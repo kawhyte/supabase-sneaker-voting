@@ -84,7 +84,7 @@ export default function PendingVote() {
       </nav> */}
 			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-7xl px-3'>
 				<SectionHeader
-					name={"Sneaker Voting_____"}
+					name={"Voting"}
 					total={sneakersPending}
 					sectiontext={"Sneakers Pending Vote:"}
 				/>
