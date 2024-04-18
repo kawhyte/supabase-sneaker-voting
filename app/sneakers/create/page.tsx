@@ -29,7 +29,7 @@ const Create = () => {
 			data: { user },
 		} = await supabase.auth.getUser();
 
-		console.log("supabase.auth.getUser ", user);
+		//console.log("supabase.auth.getUser ", user);
 
 		if (!name || !date || !brand || !price || !style || !main_image) {
 			setFormError("Please fill in all the fields correctly.");

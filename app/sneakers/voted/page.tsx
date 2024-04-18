@@ -70,7 +70,7 @@ export default function Voted() {
 			// setSneakers(rating);
 			// setSneakersVotes(rating?.length)
 
-			console.log("Sneakers  to fileter", data);
+			//console.log("Sneakers  to fileter", data);
 		};
 		getData();
 	}, []);
