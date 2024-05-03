@@ -10,8 +10,8 @@ export default async function CollectionCard({ sneakers, showtxt }: { sneakers: 
 
 
 
-	const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
-
+	//const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
+let blurDataURL =""
 	//console.log("NEW myBlurDataUrl ####", sneakersWithBlurDataUrl);
 
 	return (
@@ -40,20 +40,22 @@ export default async function CollectionCard({ sneakers, showtxt }: { sneakers: 
 
 			<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8' /> */}
 
-				{sneakersWithBlurDataUrl.map((sneaker: any) => (
-					<div className='flex flex-col justify-start align-middle items-start '>
+				{sneakers.map((sneaker: any) => (
+					<div key={sneaker.id} className={`flex flex-col justify-start align-middle items-start ${showtxt ? "bg-gray-800 px-7 py-5" :""} `}>
 						<div>
 						<Image
 							width={300}
 							height={200}
 							src={sneaker?.collection_image}
 							alt={sneaker?.name}
-							blurDataURL={sneaker?.blurredDataUrl !== undefined ? sneaker?.blurredDataUrl : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='}
+							// blurDataURL={sneaker?.blurredDataUrl !== undefined || sneaker?.blurredDataUrl !== null ? sneaker?.blurredDataUrl : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='}
+							blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
 							placeholder='blur'
+							quality={30}
 							
 						/></div>
 						{showtxt && <p className=' line-clamp-2 text-[0.79rem] mt-2 leading-[1.2] text-start  '>
-							{sneaker.name}
+							{sneaker?.name}
 						</p>}
 					</div>
 				))}

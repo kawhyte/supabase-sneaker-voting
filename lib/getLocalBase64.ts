@@ -19,14 +19,14 @@ async function getBase64(imageUrl: string) {
         return base64
 
     } catch (e) {
-        if (e instanceof Error) console.log(e.stack)
+        if (e instanceof Error) console.log("MY ERROR",e.stack)
     }
 }
 
 
 export default async function addBlurredDataUrls(images:any): Promise<Photo[]> {
     // Make all requests at once instead of awaiting each one - avoiding a waterfall 
-    console.log("Omar ")
+    //console.log("Omar ")
     
     const base64Promises = images.map((item:any) => getBase64(item.collection_image))
 

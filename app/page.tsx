@@ -10,8 +10,8 @@ export default async function Index() {
 		.from("sneakers")
 		.select("id, collection_image, name")
 		.match({ in_collection: true })
-		.order("created_at", { ascending: false })
-		.limit(6);
+		.order("created_at", { ascending: true })
+		.limit(4);
 
 	return (
 		<div className='flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle'>
@@ -26,7 +26,7 @@ export default async function Index() {
 
 				<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent mt-8' />
 				
-				<div className='grid grid-cols-3  grid-rows-1 sm:grid-cols-6  sm:grid-row-2 gap-y-8  gap-x-7'>
+				<div className='grid grid-cols-2  grid-rows-1 sm:grid-cols-4  sm:grid-row-2 gap-y-8  gap-x-7'>
 					<CollectionCard sneakers={sneakers} showtxt={false} />
 				</div>
 			</div>

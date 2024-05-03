@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster"
+import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 
 
 const defaultUrl = process.env.VERCEL_URL
@@ -21,6 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    <ReactQueryClientProvider> 
     <html lang="en" className={GeistSans.className}>
       <body className="  bg-background text-foreground">
         <Header/>
@@ -34,5 +36,6 @@ export default function RootLayout({
       </body>
  
     </html>
+    </ReactQueryClientProvider>
   );
 }
