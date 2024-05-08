@@ -52,39 +52,46 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 		}
 	};
 	const handleAddToCollection = async (value, e) => {
-		//console.log(" handleAddToCollection value", value);
+		console.log(" handleAddToCollection value", value);
 
 		const { data, error } = await supabase
-			.from("sneakers")
+			.from("rating")
 			.update({ in_collection: value })
-			.eq("id", sneaker.id)
+			.eq("sneaker_id", sneaker.id)
 			.select();
 
 		if (error) {
 			console.log(error);
 		}
 		if (data) {
-			onDelete(sneaker.id);
+// console.log("sneaker.id)", sneaker.id)
+// console.log("sneaker.id data)", data)
+		onDelete(sneaker.id);
 		}
 	};
 
 	const handleRating = async (value, e) => {
+
+		console.log("handleRating Value", value)
+
 		const { data: rating_data, error } = await supabase
 			.from("rating")
 			.insert([
 				{
 					vote: value,
-					user_id: "2b7ed0de-da19-441f-acdd-5fc0814f3cb9",
+					//user_id: "",
 					sneaker_id: sneaker.id,
 				},
 			])
 			.select();
 
-		const sneakerID = rating_data[0].id;
+			console.log("RATING DATA ",rating_data)
 
-		if (error) {
-			console.log(error);
-		}
+			
+			if (error) {
+				console.log(error);
+			}
+			const sneakerID = rating_data[0].id;
 		if (rating_data) {
 			const { data, error } = await supabase
 				.from("sneakers")
@@ -192,7 +199,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 				<div className='z-30 bg-gray-800'>
 					<div className='px-5 pb-3 '>
 						<h5 className=' font-mono flex flex-col normal-case text-start  drop-shadow-xl  text-[1.1rem] sm:text-[0.89rem] tracking-[-0.01em] leading-[1.33] mt-8 font-semibold'>
-							{sneaker.name}
+							{sneaker.name} - {sneaker.style} - {sneaker.id}
 						</h5>
 						<p className='tracking-wide text-[0.75rem] title-font font-medium text-gray-400 mb-1 mt-3 font-mono'>
 							Brand: {sneaker.brand_id?.name}

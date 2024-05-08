@@ -35,7 +35,7 @@ export default async function addBlurredDataUrls(images:any): Promise<Photo[]> {
     const base64Results = await Promise.all(base64Promises)
     const photosWithBlur: Photo[] = images.map((item:any, i:number) => {
         item.blurredDataUrl = base64Results[i]
-        console.log("XXX", item)
+       //console.log("XXX", item)
         return item
     })
 

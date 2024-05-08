@@ -57,7 +57,7 @@ export default function Voted() {
 			const { data } = await supabase
 				.from("sneakers")
 				.select(`*, rating_id(*, vote(*)), images(*),brand_id(*)`)
-				.match({ in_collection: false })
+				.filter(`rating_id.in_collection`,'eq', false )
 
 				.not("rating_id", "is", null)
 				.order("created_at", { ascending: false });
@@ -72,7 +72,7 @@ export default function Voted() {
 			// setSneakers(rating);
 			// setSneakersVotes(rating?.length)
 
-			console.log("Sneakers  to filter", data);
+			//console.log("Sneakers  to filter", data);
 		};
 		getData();
 	}, []);
@@ -121,7 +121,7 @@ export default function Voted() {
 					</h1>
 				</div> */}
 				<div className='container mx-auto flex flex-col gap-9 items-center '>
-					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-x-4 gap-y-5'>
+					<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4  gap-x-4 gap-y-5'>
 						{sneakers?.map((sneaker) => (
 							<SneakerCard
 								key={sneaker.id}

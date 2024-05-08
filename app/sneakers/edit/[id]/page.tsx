@@ -81,7 +81,7 @@ const Edit = ({ params }: { params: any }) => {
 			//console.log(sneaker_data);
 
 			const sneakerID = sneaker_data[0]?.id;
-			console.log("sneaker_data", sneakerID);
+			//console.log("sneaker_data", sneakerID);
 
 			const { data, error } = await supabase
 				.from("images")
@@ -96,7 +96,7 @@ const Edit = ({ params }: { params: any }) => {
 				.eq("sneaker_id", sneakerID)
 				.select();
 
-			console.log("After vote", newVote);
+			//console.log("After vote", newVote);
 
 			setFormError("");
 			router.push("/sneakers/voted");
@@ -131,9 +131,9 @@ const Edit = ({ params }: { params: any }) => {
 					.single();
 
 				setVote(rating.vote.vote_id);
-				console.log("Rating", rating);
-				console.log("Vote", vote);
-				console.log("DATA", data);
+				// console.log("Rating", rating);
+				// console.log("Vote", vote);
+				// console.log("DATA", data);
 			}
 		};
 		fetchSmoothie();

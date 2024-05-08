@@ -8,10 +8,12 @@ export default async function Index() {
 
 	const { data: sneakers } = await supabase
 		.from("sneakers")
-		.select("id, collection_image, name")
-		.match({ in_collection: true })
+		.select(`name,collection_image,id, rating_id!inner(in_collection)`)
+		.filter(`rating_id.in_collection`,'eq', true )
 		.order("created_at", { ascending: true })
 		.limit(4);
+		console.log("HeyCoubt1", sneakers?.length);
+		console.log("Data", sneakers);
 
 	return (
 		<div className='flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle'>
@@ -26,7 +28,7 @@ export default async function Index() {
 
 				<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent mt-8' />
 				
-				<div className='grid grid-cols-2  grid-rows-1 sm:grid-cols-4  sm:grid-row-2 gap-y-8  gap-x-7'>
+				<div className='grid grid-cols-4  grid-rows-1 sm:grid-cols-4  sm:grid-row-2 gap-y-8  gap-x-7'>
 					<CollectionCard sneakers={sneakers} showtxt={false} />
 				</div>
 			</div>

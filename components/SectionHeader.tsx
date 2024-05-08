@@ -28,7 +28,7 @@ export default function Header({
 			{/* <h1 className='sr-only'>Supabase and Next.js Starter Template</h1> */}
 
 			<section className='text-gray-600 body-font flex flex-col justify-center items-center align-middle'>
-				<div className='container mx-auto flex px-5 pt-10 md:pt-24 items-center justify-center flex-col'>
+				<div className='container mx-auto flex px-5 md:pt-10 items-center justify-center flex-col'>
 				
 					<div className='text-center w-full flex flex-col justify-center align-middle items-center'>
 						<div className='font-serif flex text-white flex-col -skew-y-3 drop-shadow-xl mt-10  text-[4.25rem] sm:text-[5.5rem] tracking-[-0.03em] leading-[0.88] font-bold'>

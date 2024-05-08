@@ -62,8 +62,9 @@ export default function PendingVote() {
 				.from("sneakers")
 				.select(`*, rating_id(*), images(*),brand_id(*)`)
 
-				.match({ in_collection: false })
+				//.match({ in_collection: false })
 				.is("rating_id", null)
+				
 				.order("created_at", { ascending: false });
 
 			setSneakers(data);

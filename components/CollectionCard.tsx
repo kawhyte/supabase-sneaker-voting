@@ -3,15 +3,18 @@ import Image from "next/image";
 //import getBase64 from "@/lib/getLocalBase64";
 import addBlurredDataUrls from "@/lib/getLocalBase64";
 
-export default async function CollectionCard({ sneakers, showtxt }: { sneakers: any, showtxt:boolean }) {
-
-	//console.log("sneakers from HERO function",sneakers)
+export default async function CollectionCard({
+	sneakers,
+	showtxt,
+}: {
+	sneakers: any;
+	showtxt: boolean;
+}) {
+	 console.log("sneakers from HERO function1",sneakers)
 	//console.log("myBlurDataUrl - sneakers from function",sneakers.collection_image)
 
-
-
 	//const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
-let blurDataURL =""
+	let blurDataURL = "";
 	//console.log("NEW myBlurDataUrl ####", sneakersWithBlurDataUrl);
 
 	return (
@@ -40,26 +43,70 @@ let blurDataURL =""
 
 			<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8' /> */}
 
-				{sneakers.map((sneaker: any) => (
-					<div key={sneaker.id} className={`flex flex-col justify-start align-middle items-start ${showtxt ? "bg-gray-800 px-7 py-5" :""} `}>
-						<div>
+			{sneakers?.map((sneaker: any) => (
+				<div
+					key={sneaker.id}
+					className={`flex flex-col relative justify-center align-middle items-start ${
+						showtxt ? "bg-gray-800 px-1 py-2 md:px-2 md:py-4 w-full" : ""
+					} `}>
+					{showtxt && (
+						<div className=' flex flex-col  items-center  mx-3 my-3 text-end rounded-xl bg-indigo-900 p-1 absolute top-0 right-0'>
+							<div className='px-1 '>
+								<span className='md:text-[1.5rem] leading-[1.2] text-start'>
+									8.8
+								</span>
+								<span className='text-[0.68rem]'>/10</span>
+							</div>
+
+							<p className='text-[0.6rem] md:text-[0.67rem] leading-[1.2] text-start '>
+								Our Score
+							</p>
+						</div>
+					)}
+					<div>
 						<Image
-							width={300}
-							height={200}
-							src={sneaker?.collection_image}
+							width={250}
+							height={150}
+							src={sneaker?.collection_image?sneaker?.collection_image:"https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png" }
 							alt={sneaker?.name}
-							// blurDataURL={sneaker?.blurredDataUrl !== undefined || sneaker?.blurredDataUrl !== null ? sneaker?.blurredDataUrl : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='}
+							className='w-48 mt-6 md:mt-0 md:w-80'
+							// blurDataURL={
+							// 	sneaker?.blurredDataUrl !== undefined ||
+							// 	sneaker?.blurredDataUrl !== null
+							// 		? sneaker?.blurredDataUrl
+							// 		: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=="
+							// }
 							blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
 							placeholder='blur'
 							quality={30}
-							
-						/></div>
-						{showtxt && <p className=' line-clamp-2 text-[0.79rem] mt-2 leading-[1.2] text-start  '>
-							{sneaker?.name}
-						</p>}
+						/>
 					</div>
-				))}
-			
+					<p className=' line-clamp-2 text-[0.7rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>
+						{sneaker?.name}
+					</p>
+
+					{showtxt && (
+						<div className='md:mt-5 mt-3 mb-1 mx-auto'>
+							<Link href={`/sneakers/detail/${sneaker.id}`}>
+							<button className='bg-white text-xs md:text-sm hover:bg-gray-100 text-gray-800 font-semibold py-1 px-2 border border-gray-400 rounded shadow'>
+								View Statistics - {sneaker.id}
+							</button>
+							</Link>
+						</div>
+						// <div className=' flex flex-col  justify-end  items-center  mx-2 my-2 text-end rounded-xl bg-indigo-900 p-1  '>
+						// 	<button>Test</button>
+						// 	<div className="px-1 ">
+						// 	<span className="text-[1.5rem] leading-[1.2] text-start">8.8</span>
+						// 	<span className="text-[0.68rem]">/10</span>
+						// 	</div>
+
+						// 	<p className='text-[0.67rem] leading-[1.2] text-start '>
+						// 		Our Score
+						// 	</p>
+						// </div>
+					)}
+				</div>
+			))}
 
 			{/* <div className=' grid justify-items-center mt-8'>
 				<Link href={"/sneakers/collection"}>

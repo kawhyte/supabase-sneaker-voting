@@ -42,7 +42,7 @@ export default async function SneakerCard ({ sneaker, onDelete, onVote, showElem
 		}
 
 		if (sneaker_data) {
-			console.log("DEleted", sneaker_data);
+			//console.log("DEleted", sneaker_data);
 			toast({
 				title: "Sneaker deleted",
 				description: `${sneaker_data[0].name} was deleted.`,

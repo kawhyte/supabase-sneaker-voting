@@ -49,10 +49,10 @@ export default function Page() {
 			setSneakersPendingVote(data?.filter((test) => test?.vote === null));
 			setSneakersDrip(data?.filter((test) => test?.vote === "Drip"));
 			setSneakersSkip(data?.filter((test) => test?.vote === "Skip"));
-			console.log(
-				"Sneakers Ken",
-				data?.filter((test) => test.vote === null)
-			);
+			// console.log(
+			// 	"Sneakers Ken",
+			// 	data?.filter((test) => test.vote === null)
+			// );
 		};
 		getData();
 	}, []);
