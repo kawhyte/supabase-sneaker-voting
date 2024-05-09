@@ -72,7 +72,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 
 	const handleRating = async (value, e) => {
 
-		console.log("handleRating Value", value)
+		//console.log("handleRating Value", value)
 
 		const { data: rating_data, error } = await supabase
 			.from("rating")
@@ -85,7 +85,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 			])
 			.select();
 
-			console.log("RATING DATA ",rating_data)
+			//console.log("RATING DATA ",rating_data)
 
 			
 			if (error) {

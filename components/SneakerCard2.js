@@ -43,7 +43,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 		}
 
 		if (sneaker_data) {
-			console.log("DEleted", sneaker_data);
+			//console.log("DEleted", sneaker_data);
 			toast({
 				title: "Sneaker deleted",
 				description: `${sneaker_data[0].name} was deleted.`,

@@ -24,11 +24,11 @@ export default function CollectionDetailPage({
 	collectionImage: any;
 	stats: any;
 }) {
-	console.log("Before Price ", price);
-	const sneakerCostPerWear = costPerWear(stats, price);
+	// console.log("Before Price ", price);
+	 const sneakerCostPerWear = costPerWear(stats, price);
 
-	console.log("TTCost7", sneakerCostPerWear);
-	console.log("date", date);
+	// console.log("TTCost7", sneakerCostPerWear);
+	// console.log("date", date);
 
 	let cardElement = [
 		{

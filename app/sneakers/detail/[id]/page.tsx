@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import SectionHeader from "@/components/SectionHeader";
-import CollectionDetailCard from "@/components/CollectionDetailPage";
+import CollectionDetailPage from "@/components/CollectionDetailPage";
 
 export default function SneakerDetail({ params }: { params: any }) {
 	const id = params.id;
@@ -49,7 +49,7 @@ export default function SneakerDetail({ params }: { params: any }) {
 				setCollectionImage(data.collection_image);
 				setStats(data.rating_id.stats);
 				//console.log("MT DATA",stats);
-				console.log("STATs", data.rating_id.stats);
+				//console.log("STATs", data.rating_id.stats);
 			}
 		};
 		fetchSmoothie();
@@ -61,15 +61,9 @@ export default function SneakerDetail({ params }: { params: any }) {
 
 	return (
 		<>
-			{/* <section>
-				<SectionHeader
-					name={"Sneaker Statistics"}
-					total={-1}
-					sectiontext={"Sneaker Vote Count"}
-				/>
-			</section> */}
+		
 - {id}
-<CollectionDetailCard name={name} date={date} brand={brand} price={price} purchasePrice={purchasePrice} style={style} moreImages={moreImages} collectionImage={collectionImage} stats={stats}/>
+<CollectionDetailPage name={name} date={date} brand={brand} price={price} purchasePrice={purchasePrice} style={style} moreImages={moreImages} collectionImage={collectionImage} stats={stats}/>
 			
 		</>
 	);

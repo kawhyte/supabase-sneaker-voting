@@ -14,7 +14,7 @@ const Create = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		console.log ("handleSubmit ", e)
+		//console.log ("handleSubmit ", e)
 
 		if (!name || !brand || !main_image) {
 			setFormError("Please fill in all the fields correctly.");
@@ -33,7 +33,7 @@ const Create = () => {
 			setFormError("Please fill in all the fields correctly.");
 		}
 		if (data) {
-			console.log(data);
+			//console.log(data);
 			setFormError(null);
 			navigate("/");
 		}
