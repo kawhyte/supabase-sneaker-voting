@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import SectionHeader from "@/components/SectionHeader";
-import CollectionDetailCard from "@/components/CollectionDetailCard";
+import CollectionDetailCard from "@/components/CollectionDetailPage";
 
 export default function SneakerDetail({ params }: { params: any }) {
 	const id = params.id;
@@ -12,6 +12,7 @@ export default function SneakerDetail({ params }: { params: any }) {
 	const [date, setDate] = useState("");
 	const [brand, setBrand] = useState("1");
 	const [price, setPrice] = useState("");
+	const [purchasePrice, setPurchasePrice] = useState("");
 	const [style, setStyle] = useState("");
 	const [moreImages, setmoreImages] = useState<any[]>([]);
 	const [formError, setFormError] = useState("");
@@ -42,6 +43,7 @@ export default function SneakerDetail({ params }: { params: any }) {
 				setBrand(data.brand_id.name);
 				setDate(data.release_date);
 				setPrice(data.price);
+				setPurchasePrice(data.purchase_price);
 				setStyle(data.style);
 				setmoreImages(data.images);
 				setCollectionImage(data.collection_image);
@@ -67,7 +69,7 @@ export default function SneakerDetail({ params }: { params: any }) {
 				/>
 			</section> */}
 - {id}
-<CollectionDetailCard name={name} date={undefined} brand={brand} price={price} style={style} moreImages={moreImages} collectionImage={collectionImage} stats={stats}/>
+<CollectionDetailCard name={name} date={date} brand={brand} price={price} purchasePrice={purchasePrice} style={style} moreImages={moreImages} collectionImage={collectionImage} stats={stats}/>
 			
 		</>
 	);

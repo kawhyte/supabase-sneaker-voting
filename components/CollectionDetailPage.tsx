@@ -1,12 +1,14 @@
 import Link from "next/link";
 import NextLogo from "./NextLogo";
 import SupabaseLogo from "./SupabaseLogo";
+import costPerWear from "@/lib/calculation";
 
-export default function CollectionDetailCard({
+export default function CollectionDetailPage({
 	name,
 	date,
 	brand,
 	price,
+	purchasePrice,
 	style,
 	moreImages,
 	collectionImage,
@@ -16,14 +18,23 @@ export default function CollectionDetailCard({
 	date: any;
 	brand: string;
 	price: any;
+	purchasePrice:any
 	style: string;
 	moreImages: any;
 	collectionImage: any;
 	stats: any;
 }) {
+	console.log("Before Price ", price);
+	const sneakerCostPerWear = costPerWear(stats, price);
+
+	console.log("TTCost7", sneakerCostPerWear);
+	console.log("date", date);
+
 	let cardElement = [
 		{
+			id: 1,
 			name: "Comfort",
+
 			svg: (
 				<svg
 					xmlns='http://www.w3.org/2000/svg'
@@ -32,19 +43,21 @@ export default function CollectionDetailCard({
 					viewBox='0 0 24 24'
 					fill='none'
 					stroke='currentColor'
-					stroke-width='2'
+					strokeWidth='2'
 					className='text-gray-300 w-8 h-8 my-1.5 inline-block'
-					stroke-linecap='round'
-					stroke-linejoin='round'>
+					strokeLinecap='round'
+					strokeLinejoin='round'>
 					<path d='M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5zM16 8 2 22m15.5-7H9' />
 				</svg>
 			),
 			data: stats?.comfort,
-			description: "Can can I wear it for an extended period.",
+			description: "Can I wear it for an extended period.",
 		},
 
 		{
+			id: 2,
 			name: "Material",
+
 			svg: (
 				<svg
 					xmlns='http://www.w3.org/2000/svg'
@@ -58,6 +71,7 @@ export default function CollectionDetailCard({
 		},
 
 		{
+			id: 3,
 			name: "Wow factor",
 			svg: (
 				<svg
@@ -66,8 +80,8 @@ export default function CollectionDetailCard({
 					fill='none'
 					xmlns='http://www.w3.org/2000/svg'>
 					<path
-						fill-rule='evenodd'
-						clip-rule='evenodd'
+						fillRule='evenodd'
+						clipRule='evenodd'
 						d='M4 12a8 8 0 1 1 16 0 8 8 0 0 1-16 0m8-10C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2M8.03 15.243A1.012 1.012 0 0 1 9 14h6c.633 0 1.126.617.97 1.24C15.452 16.988 13.785 18 12 18c-1.717 0-3.531-1.001-3.97-2.758m.436-5.775c-.079-.45-1.03-1.433-1.8-1.298-.923.163-1.335.955-1.182 1.822.14.789.74 1.437 1.39 1.938.659.508 1.428.91 2 1.192a.4.4 0 0 0 .458-.08c.442-.461 1.027-1.102 1.473-1.805.438-.693.782-1.508.643-2.296-.153-.868-.815-1.47-1.738-1.307-.768.135-1.32 1.405-1.244 1.834m5.82-1.835c.769.136 1.327 1.386 1.248 1.835.075-.429 1.028-1.434 1.796-1.298.923.163 1.339.955 1.186 1.822-.14.789-.74 1.437-1.39 1.938-.659.508-1.428.91-2 1.192a.4.4 0 0 1-.458-.08c-.442-.461-1.027-1.102-1.473-1.805-.438-.693-.782-1.508-.643-2.296.153-.868.811-1.47 1.734-1.308'
 					/>
 				</svg>
@@ -77,6 +91,7 @@ export default function CollectionDetailCard({
 		},
 
 		{
+			id: 4,
 			name: "# of times worn",
 			svg: (
 				<svg
@@ -87,13 +102,14 @@ export default function CollectionDetailCard({
 				</svg>
 			),
 			data: stats?.times_worn,
-			description: "Esimated times ive worn the shoe.",
+			description: "Esimated amount of times I've worn the shoe.",
 			remove: true,
 		},
 	];
 	return (
 		<>
-			<section className='max-w-7xl'>
+		
+			<section className='max-w-7xl '>
 				<div className=' flex justify-center'>
 					<img src={collectionImage} />
 				</div>
@@ -106,10 +122,10 @@ export default function CollectionDetailCard({
 							<span className='text-gray-400'> Retail Price:</span> ${price}
 						</div>
 						<div className='mb-2 '>
-							<span className='text-gray-400'>Purchase Price:</span>{" "}
+							<span className='text-gray-400'>Purchase Price:</span> ${purchasePrice}
 						</div>
 						<div className='mb-2 '>
-							<span className='text-gray-400'>Cost per Wear:</span>{" "}
+							<span className='text-gray-400'>Cost per Wear:</span> {`${sneakerCostPerWear? "$"+ sneakerCostPerWear: "No data availiable"}`}
 						</div>
 
 						<div className='mb-2'>
@@ -127,16 +143,16 @@ export default function CollectionDetailCard({
 			<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
 
 			{stats && (
-				<div className='  mb-12'>
+				<div className='  my-20'>
 					<div className='grid grid-row-2 gap-4 ml-4 mb-10 md:mb-20'>
 						<div className='font-serif flex text-white    underline decoration-sky-500/30  -skew-y-3   text-[2rem] sm:text-[2.1rem] tracking-[-0.02em] leading-[.99] font-bold'>
-							Our Review
+							Review
 						</div>
 					</div>
 
 					<div className='grid grid-cols-2 md:grid-cols-4 place-items-center font-mono'>
 						{cardElement.map((item) => (
-							<>
+							<div key={item.id}>
 								<div className=' flex flex-col  items-center  mx-3 my-3 text-end rounded-xl border border-indigo-100 p-1 w-40  '>
 									{item.svg}
 									<div className='px-1 '>
@@ -150,13 +166,13 @@ export default function CollectionDetailCard({
 										{item.name}
 									</p>
 								</div>
-							</>
+							</div>
 						))}
 					</div>
 				</div>
 			)}
 			{moreImages.length > 1 ? (
-				<>
+				<div className='mb-20'>
 					<div className='font-serif ml-4 md:mb-20 flex text-white flex-col mb-10 underline decoration-sky-500/30  -skew-y-3   text-[2rem] sm:text-[2.1rem] tracking-[-0.02em] leading-[.99] font-bold'>
 						Sneaker Photos
 					</div>
@@ -169,24 +185,27 @@ export default function CollectionDetailCard({
 							</div>
 						))}
 					</div>
-				</>
+				</div>
 			) : (
 				""
 			)}
 
-			<div className='grid grid-cols-1 max-w-7xl gap-1 mt-12 font-mono '>
+			<div className='grid grid-cols-1 max-w-7xl gap-y-3 mb-16 font-mono '>
+				<div className='font-serif ml-4 md:mb-14 flex text-white flex-col mb-10 underline decoration-sky-500/30 -skew-y-3  text-[2rem] sm:text-[1.6rem] tracking-[-0.02em] leading-[.99] font-bold'>
+					Our Review Metrics Breakdown
+				</div>
 				{cardElement.map((item) => (
-					<>
-						<div className='inline-flex items-center  leading-none ${props.textColor} rounded-full p-2 shadow text-teal text-sm'>
-							<span className='inline-flex bg-gray-700 text-white rounded-full h-6 px-3 justify-center items-center'>
-								{item.svg}
+					<div key={item.name}>
+						<div className='inline-flex items-center align-bottom  leading-none ${props.textColor} rounded-full p-2 shadow text-teal text-sm'>
+							<span className='inline-flex  text-white rounded-full h-6 px-3 justify-center items-center'>
+								<span>{item.svg} </span>
 
-								<span className='inline-flex px-2 text-gray-200'>
+								<span className='inline-flex px-4 leading-4 text-gray-200'>
 									{item.description}
 								</span>
 							</span>
 						</div>
-					</>
+					</div>
 				))}
 			</div>
 		</>
