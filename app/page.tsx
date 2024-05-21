@@ -11,7 +11,7 @@ export default async function Index() {
 		.select(`name,collection_image,id, rating_id!inner(in_collection)`)
 		.filter(`rating_id.in_collection`,'eq', true )
 		.order("created_at", { ascending: true })
-		.limit(8);
+		.limit(4);
 		// console.log("HeyCoubt1", sneakers?.length);
 		// console.log("Data", sneakers);
 

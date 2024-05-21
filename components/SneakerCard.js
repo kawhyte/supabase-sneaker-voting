@@ -189,7 +189,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 					</div>
 
 					{sneaker.rating_id === null ? (
-						<div className='absolute top-2 left-2 rounded  text-black font-mono leading-[1.2]'>
+						<div className='absolute top-3 right-3 rounded  text-black font-mono leading-[1.2]'>
 							<PendingIcon classname='' />
 						</div>
 					) : (

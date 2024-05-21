@@ -79,7 +79,7 @@ export default async function CollectionCard({
 						</Link>
 					</div>
 					{showtxt && (
-						<p className=' line-clamp-2 text-[0.95rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>
+						<p className=' line-clamp-1 text-[0.95rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>
 							{sneaker?.name}
 						</p>
 					)}
