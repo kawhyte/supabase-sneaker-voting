@@ -32,8 +32,8 @@ export default async function Header() {
 
 	return (
 		<div className='  '>
-			<nav className='w-full flex justify-center border-b border-b-foreground/10 h-16'>
-				<div className='w-full max-w-4xl flex justify-between items-center p-3 text-sm'>
+			<nav className='w-full flex justify-center  h-16 my-3 '>
+				<div className='w-full max-w-6xl flex justify-between items-center p-3 text-xs '>
 					<Logo />
 
 					{user ? (
@@ -55,10 +55,16 @@ export default async function Header() {
 							Our Collection
 						</span>
 					</Link>
+					<Link href={"/sneakers"}>
+						<button className=' hidden md:block border rounded-lg hover:bg-green-700/80 bg-green-600 items-center transition ease-in duration-200 py-1 px-2  opacity translate-y-[10px] group font-mono  leading-[1.2] text-xs md:text-sm'>
+							Dashboard
+						</button>
+					</Link>
 
 					{isSupabaseConnected && <AuthButton />}
 				</div>
 			</nav>
+			<div className="border-b border-b-foreground/10"></div>
 		</div>
 	);
 }
