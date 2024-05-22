@@ -26,10 +26,11 @@ export default function RootLayout({
     <html lang="en" className={GeistSans.className}>
       <body className="  bg-background text-foreground">
         <Header/>
-        <main className=" flex flex-col justify-center items-center align-middle ">
-          <div  className=""> 
+        {/* <main className=" flex flex-col justify-center items-center align-middle "> */}
+        <main className=" ">
+         
           {children}
-          </div>
+        
           <Toaster />
         </main>
         <Footer/>

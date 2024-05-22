@@ -23,7 +23,7 @@ export default function DashboardDataCard({
 		<Card className=''>
 			<CardHeader>
 				<CardTitle className='text-xl'>{cardTitle}</CardTitle>
-				<CardDescription className='text-base text-gray-400 '>
+				<CardDescription className='text-sm text-gray-400 '>
 					{cardDescription}
 				</CardDescription>
 			</CardHeader>

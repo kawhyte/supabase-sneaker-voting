@@ -114,7 +114,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 
 	return (
 		<div>
-			<div className='w-full max-w-5xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700 '>
+			<div className='w-full  max-w-5xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700 '>
 				<div className='relative bg-white h-96'>
 					<div className=''>
 						<Carousel className=' '>
@@ -123,7 +123,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 									.sort((a, b) => b.main_image - a.main_image)
 									.map((item) => (
 										<CarouselItem key={item.id}>
-											<div className='w-full h-1/3 sm:h-96 md:h-80 lg:h-96 flex justify-center items-center align-middle container mx-auto  '>
+											<div className='w-full h-1/3 sm:h-96 md:h-80 lg:h-96 flex justify-center items-center align-middle container mx-auto   '>
 												<img
 													className=' w-full   h-1\3 pt-6 mt-36 sm:mt-0 sm:h-96 md:h-80 lg:h-auto items-center  object-cover mx-auto'
 													src={item?.image_link}
