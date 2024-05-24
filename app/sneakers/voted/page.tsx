@@ -93,13 +93,13 @@ export default function Voted() {
 					sectiontext={"Sneaker Vote Count"}
 				/>
 
-				<div className='flex flex-col text-center w-full'>
+				{/* <div className='flex flex-col text-center w-full'>
 					<h2 className='text-xs text-indigo-500 pb-5 tracking-widest font-medium title-font mb-1 uppercase'>
 						Filter
 					</h2>
 
 					<div className='sm:text-sm flex items-center justify-center gap-x-3 text-xl font-medium title-font mb-4 text-gray-200'>
-						{/* add filter buttons */}
+					
 						<button className='px-6 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80'>
 							Love
 						</button>
@@ -110,7 +110,8 @@ export default function Voted() {
 							Not for me
 						</button>
 					</div>
-				</div>
+				</div> */}
+
 				{/* <div className='flex flex-col text-center w-full'>
 					<h2 className='text-xs text-indigo-500 tracking-widest font-medium title-font mb-1 uppercase'>
 						Most Wanted Sneakers
@@ -120,8 +121,8 @@ export default function Voted() {
 						We would love to have these in our collection ❤️
 					</h1>
 				</div> */}
-				<div className='container mx-auto flex flex-col gap-9 items-center '>
-					<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4  gap-x-4 gap-y-5'>
+				<div className='flex flex-col gap-10 mx-4 items-center '>
+					<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-x-4 gap-y-5'>
 						{sneakers?.map((sneaker) => (
 							<SneakerCard
 								key={sneaker.id}

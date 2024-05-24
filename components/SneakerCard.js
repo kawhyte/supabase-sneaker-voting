@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
+import RatingCard from "./RatingCard";
 
 const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 	//console.log("Cards Sneakers Voted", sneaker);
@@ -31,14 +32,19 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 	const supabase = createClient();
 
 	const handleDelete = async () => {
+
+		console.log("Test sneaker.id", sneaker);
+
 		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
 			.delete()
 			.eq("id", sneaker.id)
 			.select();
 
+			console.log("Test DElete", sneaker_data);
+
 		if (error) {
-			console.log(error);
+			console.log("Sneaker Delete Error - ",error);
 		}
 
 		if (sneaker_data) {
@@ -115,7 +121,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 	return (
 		<div>
 			<div className='w-full  max-w-5xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700 '>
-				<div className='relative bg-white h-96'>
+				<div className='relative bg-white lg:h-96'>
 					<div className=''>
 						<Carousel className=' '>
 							<CarouselContent>
@@ -123,22 +129,43 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 									.sort((a, b) => b.main_image - a.main_image)
 									.map((item) => (
 										<CarouselItem key={item.id}>
-											<div className='w-full h-1/3 sm:h-96 md:h-80 lg:h-96 flex justify-center items-center align-middle container mx-auto   '>
+										<div className="p-1">
+										<Card>
+										  <CardContent className="flex aspect-square items-center justify-center p-6 ">
+											<span className="text-4xl font-semibold max-w-lg">
+											
+											<img
+													// className=' w-full   h-1\3 pt-6 mt-36 sm:mt-0 sm:h-96 md:h-80 lg:h-auto items-center  object-cover mx-auto'
+													src={item?.image_link}
+													alt='product image'
+													loading='lazy'
+												/>
+											
+											
+											</span>
+										  </CardContent>
+										</Card>
+										</div>
+						  
+
+											{/*<div className='w-full h-1/3 sm:h-96 md:h-80 lg:h-96 flex justify-center items-center align-middle container mx-auto   '>
 												<img
 													className=' w-full   h-1\3 pt-6 mt-36 sm:mt-0 sm:h-96 md:h-80 lg:h-auto items-center  object-cover mx-auto'
 													src={item?.image_link}
 													alt='product image'
 													loading='lazy'
 												/>
-											</div>
+									</div>*/}
+
+
 										</CarouselItem>
 									))}
 							</CarouselContent>
 							{sneaker.images.length > 2 && (
-								<CarouselPrevious className=' mx-16   sm:my-32' />
+								<CarouselPrevious className=' mx-16   sm:my-3' />
 							)}
 							{sneaker.images.length > 2 && (
-								<CarouselNext className='mx-16  sm:my-32' />
+								<CarouselNext className='mx-16  sm:my-3' />
 							)}
 						</Carousel>
 					</div>
@@ -146,45 +173,25 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 					{/* <p className='absolute top-2 right-2 rounded-xl border py-1 px-2 text-blue-600  bg-blue-200 font-mono leading-[1.2] text-[.66em]'>
 					 	{databaseDate > todayDate ? "Upcoming" : "Released"}
 						</p>*/}
-					<div className='absolute top-2 left-3 rounded-xl border  font-mono leading-[1.2] text-[.66em]'>
+					<div className='absolute top-2 left-3 rounded-xl border bg-gray-100/50 p-1 font-mono leading-[1.2] text-[.66em]'>
 						<img src={sneaker.brand_id?.brand_logo} />
 					</div>
 
-					<div className=' absolute top-3 right-3 flex flex-row justify-end items-center'>
+					<div className=' absolute top-3 right-3 flex flex-row justify-end items-center text-base'>
 						{vote === "1" && (
-							<div className='relative flex flex-row items-center justify-center'>
-								<span
-									className={` ml-1 scale-100   py-1 px-2 w-20 bg-gray-200 rounded-xl    text-xs text-gray-800`}>
-									I love it! ❤️
-								</span>
-							</div>
+							<RatingCard text={"I love it! 😍"} bg={"bg-green-200"} />
 						)}
 
 						{vote === "4" && (
-							<div className='relative flex flex-row items-center justify-center'>
-								<span
-									className={` ml-1 scale-100  py-1 px-2  bg-gray-200 rounded-xl    text-xs text-gray-800`}>
-									I like it 👌
-								</span>
-							</div>
+							<RatingCard text={"I like it ❤️"} bg={"bg-indigo-200"} />
 						)}
 
 						{vote === "2" && (
-							<div className='relative flex flex-row items-center justify-center'>
-								<span
-									className={` ml-1 scale-100  py-1 px-2  bg-gray-200 rounded-xl    text-xs text-gray-800`}>
-									Meh... 🫤
-								</span>
-							</div>
+							<RatingCard text={"Meh... 🫤"} bg={"bg-gray-200"} />
 						)}
 
 						{vote === "3" && (
-							<div className='relative flex flex-row items-center justify-center'>
-								<span
-									className={` ml-1 scale-100 py-1 px-2  bg-gray-200 rounded-xl  text-xs text-gray-900`}>
-									Not for Me 🤮
-								</span>
-							</div>
+							<RatingCard text={"Not for Me 🤮"} bg={"bg-red-200"} />
 						)}
 					</div>
 
@@ -207,8 +214,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 						</p>
 
 						<div className='tracking-wide text-[0.75rem] title-font font-medium text-gray-400 my-1 font-mono'>
-							<div className="">
-							
+							<div className=''>
 								<span>Release Date:{sneaker.release_date}</span>
 								<span className=' rounded-xl border py-1 px-2 text-blue-600  bg-blue-200 font-mono leading-[1.2] text-[.78em] ml-2 mb-2'>
 									{databaseDate > todayDate ? "Upcoming" : "Released"}
@@ -412,7 +418,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 				</svg>
 				{/**/}
 
-				{/*<svg
+				<svg
 					onClick={handleDelete}
 					xmlns='http://www.w3.org/2000/svg'
 					viewBox='0 0 24 24'
@@ -424,7 +430,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 						clipRule='evenodd'
 					/>
 				</svg>
-				*/}
+				{/**/}
 			</div>
 		</div>
 	);

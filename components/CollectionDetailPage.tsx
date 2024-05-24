@@ -109,7 +109,7 @@ export default function CollectionDetailPage({
 	return (
 		<>
 		
-			<section className='max-w-7xl '>
+			<section className='max-w-7xl bg-red-200 '>
 				<div className=' flex justify-center'>
 					<img src={collectionImage} />
 				</div>
@@ -191,7 +191,7 @@ export default function CollectionDetailPage({
 			)}
 
 			<div className='grid grid-cols-1 max-w-7xl gap-y-3 mb-16 font-mono '>
-				<div className='font-serif ml-4 md:mb-14 flex text-white flex-col mb-10 underline decoration-sky-500/30 -skew-y-3  text-[2rem] sm:text-[1.6rem] tracking-[-0.02em] leading-[.99] font-bold'>
+				<div className='font-serif ml-4 md:mb-4 flex text-white flex-col mb-2 underline decoration-sky-500/30  text-[2rem] sm:text-[1.6rem] tracking-[-0.02em] leading-[.99] font-bold'>
 					Our Review Metrics Breakdown
 				</div>
 				{cardElement.map((item) => (

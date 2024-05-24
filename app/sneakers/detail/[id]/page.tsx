@@ -61,10 +61,20 @@ export default function SneakerDetail({ params }: { params: any }) {
 
 	return (
 		<>
-		
-- {id}
-<CollectionDetailPage name={name} date={date} brand={brand} price={price} purchasePrice={purchasePrice} style={style} moreImages={moreImages} collectionImage={collectionImage} stats={stats}/>
-			
+			- {id}
+			<div className='flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle'>
+				<CollectionDetailPage
+					name={name}
+					date={date}
+					brand={brand}
+					price={price}
+					purchasePrice={purchasePrice}
+					style={style}
+					moreImages={moreImages}
+					collectionImage={collectionImage}
+					stats={stats}
+				/>
+			</div>
 		</>
 	);
 }

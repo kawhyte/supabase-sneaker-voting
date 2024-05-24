@@ -91,8 +91,8 @@ export default function PendingVote() {
 				/>
 			
 
-				<div className='container mx-auto flex flex-col gap-9 items-center '>
-					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-x-5 gap-y-6'>
+			<div className='flex flex-col gap-10 mx-4 items-center '>
+			<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-x-4 gap-y-5'>
 						{sneakers?.map((sneaker) => (
 							<div key={sneaker.id}>
 								<SneakerCard
