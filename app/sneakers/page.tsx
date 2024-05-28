@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import DashboardDataCard from "@/components/DashboardDataCard";
 import DashboardImageDataCard from "@/components/DashboardImageDataCard";
+import CollectionCard from "@/components/CollectionCard";
 
 export default function Page() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
@@ -117,7 +118,13 @@ export default function Page() {
 			
 				</div>
 
+
+			
+
 				<div className='grid grid-cols-3 gap-2 mt-8'>
+
+
+
 
 <DashboardImageDataCard cardTitle={'Latest Sneaker pickups'} cardDescription={"Last 4 Sneakers added to collection"} cardContent={collection} />
 <DashboardImageDataCard cardTitle={'Most worn sneakers'} cardDescription={"Most worn sneakers collection"} cardContent={collection} />

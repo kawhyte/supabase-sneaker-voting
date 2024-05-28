@@ -2,6 +2,7 @@ import Link from "next/link";
 import NextLogo from "./NextLogo";
 import SupabaseLogo from "./SupabaseLogo";
 import costPerWear from "@/lib/calculation";
+import { format } from "date-fns";
 
 export default function CollectionDetailPage({
 	name,
@@ -28,7 +29,9 @@ export default function CollectionDetailPage({
 	 const sneakerCostPerWear = costPerWear(stats, price);
 
 	// console.log("TTCost7", sneakerCostPerWear);
-	// console.log("date", date);
+	//console.log("date", new Date(date).toString());
+	//{format(new Date(date),'MMMM dd,yyyy')}
+	//{format(new Date(date),'MMMM dd,yyyy')}
 
 	let cardElement = [
 		{

@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import RatingCard from "./RatingCard";
+import { format } from "date-fns";
+
 
 const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 	//console.log("Cards Sneakers Voted", sneaker);
@@ -149,7 +151,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 														</p>
 														<div className='tracking-wide text-[0.75rem] title-font font-medium text-gray-400 my-1 font-mono'>
 															<div className=''>
-																<span>Release Date:{sneaker.release_date}</span>
+																<span>Release Date: {format(new Date(sneaker.release_date),'MMMM dd,yyyy')}</span>
 																<span className=' rounded-xl border py-1 px-2 text-blue-600  bg-blue-200 font-mono leading-[1.2] text-[.78em] ml-2 mb-2'>
 																	{databaseDate > todayDate
 																		? "Upcoming"
@@ -317,10 +319,10 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 									))}
 							</CarouselContent>
 							{sneaker.images.length > 2 && (
-								<CarouselPrevious className=' mx-16   sm:my-3' />
+								<CarouselPrevious className=' mx-16   -my-16' />
 							)}
 							{sneaker.images.length > 2 && (
-								<CarouselNext className='mx-16  sm:my-3' />
+								<CarouselNext className='mx-16  -mt-16' />
 							)}
 						</Carousel>
 					</div>

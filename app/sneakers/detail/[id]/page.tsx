@@ -22,7 +22,7 @@ export default function SneakerDetail({ params }: { params: any }) {
 	const supabase = createClient();
 
 	useEffect(() => {
-		const fetchSmoothie = async () => {
+		const fetchSneakers = async () => {
 			const { data, error } = await supabase
 				.from("sneakers")
 				.select(
@@ -52,7 +52,7 @@ export default function SneakerDetail({ params }: { params: any }) {
 				//console.log("STATs", data.rating_id.stats);
 			}
 		};
-		fetchSmoothie();
+		fetchSneakers();
 
 		// return () => {
 		//   second

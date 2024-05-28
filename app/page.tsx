@@ -17,13 +17,18 @@ export default async function Index() {
 
 	return (
 		<div className='flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle'>
-			<div className='animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-4xl px-3'>
+			<div className='animate-in flex-1 flex flex-col gap-x-20 opacity-0 max-w-4xl px-3'>
 				<div className='text-2xl lg:text-3xl !leading-tight mx-auto max-w-4xl text-center mt-20 '>
 					<div className='font-serif flex flex-col -skew-y-3 drop-shadow-xl  text-[4.25rem] sm:text-[8rem] tracking-[-0.03em] leading-[0.88] font-bold'>
 						<span className='underline decoration-sky-500/30   '>MTW's</span>
 						<span className=''> Ultimate Sneaker</span>
 						<span className=''>Collection</span>
 					</div>
+				</div>
+
+				<div className=" z-30 ml-28   -mt-56 mr-28">
+
+					<img className=" " src="https://images.soleretriever.com/sb/product-images/17996/8ef38cfb-d87b-4289-8347-7f2d6d443983.png?width=1200&quality=70&resize=contain" alt="sneaker" />
 				</div>
 
 				<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent' />
