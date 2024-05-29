@@ -30,7 +30,7 @@ export default async function CollectionCard({
 						<>
 							<div className=' flex flex-col  items-center  mx-3 my-3 text-end rounded-xl bg-indigo-900/50 p-1 absolute top-0 right-0'>
 								<div className='px-1 '>
-									<span className=' text-[1.35rem] md:text-[1.5rem] leading-[1.2] text-start'>
+									<span className=' text-[1.35rem] md:text-[1.3rem] leading-[1.2] text-start'>
 										8.8
 									</span>
 									<span className='text-[0.68rem]'>/10</span>
@@ -44,7 +44,7 @@ export default async function CollectionCard({
 							<div className=' flex flex-col  items-center  mx-3 my-3 text-end rounded-full bg-gray-500/50 p-1 absolute top-0 left-0'>
 								<span className='  '>
 									<img
-										className='text-gray-300 w-8 h-8 m-1 fill-gray-300'
+										className='text-gray-300 w-7 h-7 m-0 fill-gray-300'
 										src={sneaker.brand_id.brand_logo}
 									/>
 								</span>
@@ -79,7 +79,7 @@ export default async function CollectionCard({
 						</Link>
 					</div>
 					{showtxt && (
-						<p className=' line-clamp-1 text-[0.95rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>
+						<p className=' line-clamp-2 text-[0.95rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>
 							{sneaker?.name}-{sneaker.id}
 						</p>
 					)}

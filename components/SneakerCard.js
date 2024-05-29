@@ -142,7 +142,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 			<div className=''>
 				<div className='relative    '>
 					<div className=''>
-						<Card className='flex flex-col justify-between bg-gray-800'>
+						<Card className='flex flex-col justify-between '>
 							<Carousel className=' bg-white'>
 								<CarouselContent className=' '>
 									{sneaker.images
@@ -203,7 +203,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 								<CardFooter>
 									{!showElement && (
 										<div className=' '>
-											<div className='flex flex-col justify-between   xl:justify-between  rounded-xl  max-w-xl    '>
+											<div className='flex flex-col justify-between   xl:justify-between  rounded-xl  max-w-xl'>
 												<h2 className='text-sm tracking-wide  title-font font-medium text-gray-400 font-mono'>
 													Select one:
 												</h2>
@@ -214,7 +214,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 																handleRating("1", e);
 															}}
 															type='button'
-															className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]   rounded-l-xl  border hover:bg-green-500 ${
+															className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs   text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]   rounded-l-xl hover:bg-green-500 ${
 																vote === "1" ? " bg-green-500" : " "
 															} `}>
 															<svg
@@ -246,7 +246,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 																handleRating("4", e);
 															}}
 															type='button'
-															className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2] border-b border-t border-r  hover:bg-indigo-500 ${
+															className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]   hover:bg-indigo-500 ${
 																vote === "4" ? " bg-indigo-500" : " "
 															} `}>
 															<svg
@@ -279,7 +279,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 																handleRating("2", e);
 															}}
 															type='button'
-															className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]       border-t border-b  hover:bg-yellow-500 ${
+															className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 font-mono uppercase leading-[1.2]   hover:bg-yellow-500 ${
 																vote === "2" ? " bg-yellow-500" : " "
 															} `}>
 															<svg
@@ -313,7 +313,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 																handleRating("3", e);
 															}}
 															type='button'
-															className={`flex items-center justify-end align-middle w-full px-3 py-2 text-xs text-white transition ease-in duration-200 font-mono uppercase leading-[1.2]   border  rounded-r-xl hover:bg-red-500  ${
+															className={`flex items-center justify-end align-middle w-full px-3 py-2 text-xs text-white transition ease-in duration-200 font-mono uppercase leading-[1.2]   rounded-r-xl hover:bg-red-500  ${
 																vote === "3" ? "bg-red-500" : ""
 															} `}>
 															<svg
@@ -335,7 +335,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 														</button>
 
 														<span
-															className={`absolute top-8  transition-all mt-3 text-center rounded bg-gray-800  text-[0.69rem] sm:text-xs text-white md:group-hover:scale-100 ${
+															className={`absolute top-8  transition-all mt-3 md:mt-5 w-20 text-center rounded   text-[0.69rem] sm:text-xs text-white md:group-hover:scale-100 ${
 																vote === "3" ? "scale-100" : ""
 															}`}>
 															Not for me.
@@ -355,13 +355,13 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 					
 						{/* Create listing button*/}
 						<Link className='mb-2' href={"/sneakers/create/"}>
-							<Button variant='outline' className='hover:bg-gray-800'>
+							<Button  className='hover:bg-gray-800'>
 								<MdOutlineCreate className='mr-2 h-5 w-5' /> Create
 							</Button>
 						</Link>
 						{/* Edit listing button*/}
 						<Link className='' href={"/sneakers/edit/" + sneaker.id}>
-							<Button variant='outline' className='hover:bg-gray-800'>
+							<Button variant='secondary' className='hover:bg-gray-800'>
 								<FaRegEdit className='mr-2 h-5 w-5' /> Edit
 							</Button>
 						</Link>
@@ -370,7 +370,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 						{showElement && (
 							<Button
 								className='hover:bg-gray-800'
-								variant='outline'
+								variant='secondary'
 								onClick={(e) => {
 									handleAddToCollection("true", e);
 								}}>
@@ -382,7 +382,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 						{/* Delete listing button*/}
 
 						<Button
-							variant='outline'
+						variant="destructive"
 							className='hover:bg-gray-800'
 							onClick={handleDelete}>
 							<MdOutlineDeleteForever className='mr-2 h-5 w-5' /> Delete
