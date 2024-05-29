@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <ReactQueryClientProvider> 
     <html lang="en" className={GeistSans.className}>
-      <body className="  bg-background text-foreground">
+      <body className=" dark  bg-background text-foreground">
         <Header/>
         {/* <main className=" flex flex-col justify-center items-center align-middle "> */}
         <main className=" ">
