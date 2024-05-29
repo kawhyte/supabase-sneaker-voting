@@ -10,8 +10,6 @@ import AuthButton from "@/components/AuthButton";
 import { redirect, useRouter } from "next/navigation";
 
 const Create = () => {
-	//const navigate = useNavigate();
-
 	const [name, setName] = useState("");
 	const [date, setDate] = useState("");
 	const [brand, setBrand] = useState("2");
@@ -29,11 +27,9 @@ const Create = () => {
 			data: { user },
 		} = await supabase.auth.getUser();
 
-		//console.log("supabase.auth.getUser ", user);
-
 		if (!name || !date || !brand || !price || !style || !main_image) {
 			setFormError("Please fill in all the fields correctly.");
-			//console.log("ERRRRROORRR!!1")
+
 			return;
 		}
 		const { data: sneaker_data, error } = await supabase
@@ -52,7 +48,6 @@ const Create = () => {
 		if (error) {
 			console.log(error);
 			setFormError(error.message);
-			//console.log("ERRRRROORRR")
 		}
 
 		if (sneaker_data) {
@@ -66,11 +61,9 @@ const Create = () => {
 				])
 				.select();
 
-			//console.log(sneaker_data);
 			setFormError("");
-			//return redirect("/sneakers/pending")
+
 			router.push("/sneakers/pending");
-			//navigate("/");
 		}
 	};
 

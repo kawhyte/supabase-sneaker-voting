@@ -2,13 +2,10 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import { redirect } from "next/navigation";
-import SneakerCardUi from "@/components/SneakerCardUI";
 import SectionHeader from "@/components/SectionHeader";
 import SneakerCard from "@/components/SneakerCard";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
-
 
 export default function PendingVote() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
@@ -41,30 +38,22 @@ export default function PendingVote() {
 
 	useEffect(() => {
 		const getData = async () => {
-
-
-			const { 
+			const {
 				data: { user },
-			  } = await supabase.auth.getUser();
-			
-			  if (!user) {
+			} = await supabase.auth.getUser();
+
+			if (!user) {
 				router.push("/login");
+			} else {
+				setSupabaseUser(user);
+			}
 
-				//return redirect("/login");
-			  } else{
-
-				setSupabaseUser(user)
-			  }
-
-
-			
 			const { data } = await supabase
 				.from("sneakers")
 				.select(`*, rating_id(*), images(*),brand_id(*)`)
 
-				//.match({ in_collection: false })
 				.is("rating_id", null)
-				
+
 				.order("created_at", { ascending: false });
 
 			setSneakers(data);
@@ -76,23 +65,15 @@ export default function PendingVote() {
 
 	return supabaseUser ? (
 		<>
-			{/* <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-          <DeployButton />
-    
-        </div>
-		
-      </nav> */}
-		<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
+			<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
 				<SectionHeader
 					name={"Pending Votes"}
 					total={sneakersPending}
 					sectiontext={"Pending Vote count:"}
 				/>
-			
 
-			<div className='flex flex-col gap-10 mx-4 items-center '>
-			<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4  gap-x-4 gap-y-5'>
+				<div className='flex flex-col gap-10 mx-4 items-center '>
+					<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4  gap-x-4 gap-y-5'>
 						{sneakers?.map((sneaker) => (
 							<div key={sneaker.id}>
 								<SneakerCard
@@ -102,16 +83,13 @@ export default function PendingVote() {
 									onDelete={handleDelete}
 									showElement={false}
 								/>
-								{/* <SneakerCardUi 	sneaker={sneaker}/> */}
 							</div>
 						))}
 					</div>
 				</div>
 			</div>
 		</>
-	): (
-		<>
-		  
-		</>
-	  );;
+	) : (
+		<></>
+	);
 }

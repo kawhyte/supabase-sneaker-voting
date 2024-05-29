@@ -22,13 +22,6 @@ export default function Voted() {
 
 	const supabase = createClient();
 
-	// const {
-	// 	data: { user },
-	//   } = await supabase.auth.getUser();
-
-	//   if (!user) {
-	// 	return redirect("/login");
-	//   }
 
 	const handleDelete = (id: any) => {
 		setSneakers((prevSmoothies: any) => {
@@ -65,27 +58,14 @@ export default function Voted() {
 			setSneakers(data);
 			setSneakersVotes(data?.length);
 
-			// const { data: rating, error } = await supabase.from("rating").select(`
-			//   *,
-			//   vote (*),sneaker_details!inner(*, brand_id(name))
-			// `).eq( 'sneaker_details.in_collection', false  ).not( 'vote', 'is', null )
-			// setSneakers(rating);
-			// setSneakersVotes(rating?.length)
-
-			//console.log("Sneakers  to filter", data);
+		
 		};
 		getData();
 	}, []);
 
 	return (
 		<>
-			{/* <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-          <DeployButton />
-    
-        </div>
-		
-      </nav> */}
+	
 		<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
 				<SectionHeader
 					name={"Recent Votes"}

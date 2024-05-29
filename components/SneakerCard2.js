@@ -2,7 +2,6 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
 import PendingIcon from "./PendingIcon";
-import VotingButtons from "./VotingButtons";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {

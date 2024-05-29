@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import SectionHeader from "@/components/SectionHeader";
 import CollectionDetailPage from "@/components/CollectionDetailPage";
 
 export default function SneakerDetail({ params }: { params: any }) {
@@ -36,10 +35,10 @@ export default function SneakerDetail({ params }: { params: any }) {
 			}
 
 			if (data) {
-				//console.log("DETAIL", data);
+				
 				setName(data.name);
 				setImage(data.main_image);
-				//setBrand(data.brand);
+				
 				setBrand(data.brand_id.name);
 				setDate(data.release_date);
 				setPrice(data.price);
@@ -48,15 +47,10 @@ export default function SneakerDetail({ params }: { params: any }) {
 				setmoreImages(data.images);
 				setCollectionImage(data.collection_image);
 				setStats(data.rating_id.stats);
-				//console.log("MT DATA",stats);
-				//console.log("STATs", data.rating_id.stats);
+			
 			}
 		};
 		fetchSneakers();
-
-		// return () => {
-		//   second
-		// }
 	}, [id]);
 
 	return (

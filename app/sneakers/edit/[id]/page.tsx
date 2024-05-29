@@ -27,12 +27,10 @@ const Edit = ({ params }: { params: any }) => {
 	const supabase = createClient();
 	const router = useRouter();
 
-	//console.log("useParams ", id);
+
 
 	const handleSubmit = async (e: any) => {
 		e.preventDefault();
-
-		//console.log("handleSubmit ", e);
 
 		if (!name || !date || !brand || !price || !style || !main_image) {
 			//setFormError("Please fill in all the fields correctly.-");
@@ -42,18 +40,7 @@ const Edit = ({ params }: { params: any }) => {
 			return;
 		}
 
-		// console.log(
-		// 	"Name:",
-		// 	name,
-		// 	"date:",
-		// 	date,
-		// 	"Brand:",
-		// 	brand,
-		// 	"Price:",
-		// 	price,
-		// 	"main Image:",
-		// 	main_image
-		// );
+	
 
 		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
@@ -75,13 +62,13 @@ const Edit = ({ params }: { params: any }) => {
 				description: "Please fill in all the fields correctly.",
 			});
 			setFormError("Please fill in all the fields correctly.");
-			//console.log("ERRRRROORRR")
+		
 		}
 		if (sneaker_data) {
-			//console.log(sneaker_data);
+		
 
 			const sneakerID = sneaker_data[0]?.id;
-			//console.log("sneaker_data", sneakerID);
+			
 
 			const { data, error } = await supabase
 				.from("images")
@@ -96,11 +83,11 @@ const Edit = ({ params }: { params: any }) => {
 				.eq("sneaker_id", sneakerID)
 				.select();
 
-			//console.log("After vote", newVote);
+		
 
 			setFormError("");
 			router.push("/sneakers/voted");
-			//navigate("/");
+			
 		}
 	};
 
@@ -131,15 +118,10 @@ const Edit = ({ params }: { params: any }) => {
 					.single();
 
 				setVote(rating.vote.vote_id);
-				// console.log("Rating", rating);
-				// console.log("Vote", vote);
-				// console.log("DATA", data);
+			
 			}
 		};
 		fetchSmoothie();
-		// return () => {
-		//   second
-		// }
 	}, [id, router]);
 
 	return (
