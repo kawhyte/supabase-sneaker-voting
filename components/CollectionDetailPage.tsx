@@ -155,7 +155,7 @@ export default function CollectionDetailPage({
 							<span className='text-gray-400'> Retail Price:</span> ${price}
 						</div>
 						<div className='mb-2 '>
-							<span className='text-gray-400'>Purchase Price:</span> ${purchasePrice}
+							<span className='text-gray-400'>Purchase Price:</span>{purchasePrice ?  `${purchasePrice}`: " Unavailable"}
 						</div>
 						<div className='mb-2 '>
 							<span className='text-gray-400'>Cost per Wear:</span> {`${sneakerCostPerWear? "$"+ sneakerCostPerWear: "No data availiable"}`}

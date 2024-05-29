@@ -265,7 +265,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 															className={`absolute top-8 md:scale-0 transition-all mt-6 text-center rounded bg-gray-800  text-[0.69rem] sm:text-xs text-white md:group-hover:scale-100 ${
 																vote === "4" ? "scale-100" : ""
 															}`}>
-															Like it
+															Like it.
 														</span>
 													</div>
 													<div className='relative group flex justify-center flex-col items-center align-middle'>
@@ -333,7 +333,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 															className={`absolute top-8 md:scale-0 transition-all mt-6 text-center rounded bg-gray-800  text-[0.69rem] sm:text-xs text-white md:group-hover:scale-100 ${
 																vote === "3" ? "scale-100" : ""
 															}`}>
-															Hell No!
+															Not for me.
 														</span>
 													</div>
 												</div>

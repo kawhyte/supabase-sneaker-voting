@@ -1,3 +1,5 @@
+
+
 import Link from "next/link";
 import NextLogo from "./NextLogo";
 import SupabaseLogo from "./SupabaseLogo";
@@ -5,6 +7,18 @@ import Logo from "./Logo";
 import AuthButton from "./AuthButton";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import {
+	NavigationMenu,
+	NavigationMenuContent,
+	NavigationMenuIndicator,
+	NavigationMenuItem,
+	NavigationMenuLink,
+	NavigationMenuList,
+	NavigationMenuTrigger,
+	NavigationMenuViewport,
+  } from "@/components/ui/navigation-menu"
+  import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
+
 
 export default async function Header() {
 	const supabase = createClient();
@@ -32,6 +46,9 @@ export default async function Header() {
 
 	return (
 		<div className='  '>
+			<> 
+		
+
 			<nav className='w-full flex justify-center  h-16 my-3 '>
 				<div className='w-full max-w-6xl flex justify-between items-center p-3 text-xs '>
 					<Logo />
@@ -65,6 +82,7 @@ export default async function Header() {
 				</div>
 			</nav>
 			<div className="border-b border-b-foreground/10"></div>
+			</>
 		</div>
 	);
 }

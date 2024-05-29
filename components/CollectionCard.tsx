@@ -80,11 +80,11 @@ export default async function CollectionCard({
 					</div>
 					{showtxt && (
 						<p className=' line-clamp-1 text-[0.95rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>
-							{sneaker?.name}
+							{sneaker?.name}-{sneaker.id}
 						</p>
 					)}
 
-					{showtxt && (
+					{/*showtxt && (
 						<div className='md:mt-5 mt-3 mb-1 mx-auto'>
 							<Link href={`/sneakers/detail/${sneaker.id}`}>
 								<button className='bg-white text-xs md:text-sm hover:bg-gray-100 text-gray-800 font-semibold py-1 px-2 border border-gray-400 rounded shadow'>
@@ -92,30 +92,12 @@ export default async function CollectionCard({
 								</button>
 							</Link>
 						</div>
-						// <div className=' flex flex-col  justify-end  items-center  mx-2 my-2 text-end rounded-xl bg-indigo-900 p-1  '>
-						// 	<button>Test</button>
-						// 	<div className="px-1 ">
-						// 	<span className="text-[1.5rem] leading-[1.2] text-start">8.8</span>
-						// 	<span className="text-[0.68rem]">/10</span>
-						// 	</div>
-
-						// 	<p className='text-[0.67rem] leading-[1.2] text-start '>
-						// 		Our Score
-						// 	</p>
-						// </div>
-					)}
+						
+					)*/}
 				</div>
 			))}
 
-			{/* <div className=' grid justify-items-center mt-8'>
-				<Link href={"/sneakers/collection"}>
-					<button
-						type='button'
-						className=' hover:bg-yellow-500/80 border-2 items-center transition ease-in duration-200 py-2 px-3 rounded-full opacity translate-y-[10px] group font-mono uppercase leading-[1.2] text-xs md:text-sm'>
-						View full Sneaker collection
-					</button>
-				</Link>
-			</div> */}
+			
 		</>
 	);
 }
