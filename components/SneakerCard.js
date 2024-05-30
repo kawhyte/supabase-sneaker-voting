@@ -176,8 +176,9 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 							</Carousel>
 
 							<CardTitle>
-								{" "}
-								<div className='text-xl mt-3 ml-4'>{sneaker.name}</div>{" "}
+								<h1 className='scroll-m-20 text-xl mt-4 ml-4 font-extrabold tracking-tight lg:text-2xl'>
+									{sneaker.name}
+								</h1>
 							</CardTitle>
 
 							{/*Card text area*/}
@@ -202,7 +203,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 
 								<CardFooter>
 									{!showElement && (
-										<div className=' '>
+										<div className='mb-4 '>
 											<div className='flex flex-col justify-between   xl:justify-between  rounded-xl  max-w-xl'>
 												<h2 className='text-sm tracking-wide  title-font font-medium text-gray-400 font-mono'>
 													Select one:
@@ -352,17 +353,16 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 
 					{/* Admin buttons */}
 					<div className=' flex justify-between align-middle mt-3 flex-wrap '>
-					
 						{/* Create listing button*/}
 						<Link className='mb-2' href={"/sneakers/create/"}>
-							<Button  className='hover:bg-gray-800'>
-								<MdOutlineCreate className='mr-2 h-5 w-5' /> Create
+							<Button variant={'secondary'} className='hover:bg-gray-800'>
+								<MdOutlineCreate className=' h-5 w-5' /> 
 							</Button>
 						</Link>
 						{/* Edit listing button*/}
 						<Link className='' href={"/sneakers/edit/" + sneaker.id}>
 							<Button variant='secondary' className='hover:bg-gray-800'>
-								<FaRegEdit className='mr-2 h-5 w-5' /> Edit
+								<FaRegEdit className=' h-5 w-5' /> 
 							</Button>
 						</Link>
 
@@ -375,17 +375,17 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 									handleAddToCollection("true", e);
 								}}>
 								<IoMdAdd className=' h-5 w-5' />
-								Collection
+								
 							</Button>
 						)}
 
 						{/* Delete listing button*/}
 
 						<Button
-						variant="destructive"
+							variant='destructive'
 							className='hover:bg-gray-800'
 							onClick={handleDelete}>
-							<MdOutlineDeleteForever className='mr-2 h-5 w-5' /> Delete
+							<MdOutlineDeleteForever className=' h-5 w-5' /> 
 						</Button>
 					</div>
 
@@ -415,28 +415,19 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 					</div>
 
 					<div className=' absolute top-8 right-2 '>
-					 
 						{vote === "1" && (
-
-							<Badge className="bg-green-200">I love it! 🔥</Badge>
+							<Badge className='bg-green-200'>I love it! 🔥</Badge>
 						)}
 
 						{vote === "4" && (
-							<Badge className="bg-blue-200">I like it 😀</Badge>
-							
+							<Badge className='bg-blue-200'>I like it 😀</Badge>
 						)}
 
-						{vote === "2" && (
-							<Badge className="bg-gray-200">Meh... 🫤</Badge>
-
-							
-						)}
+						{vote === "2" && <Badge className='bg-gray-200'>Meh... 🫤</Badge>}
 
 						{vote === "3" && (
-							<Badge className="bg-red-200">Not for Me 🤐</Badge>
-							
+							<Badge className='bg-red-200'>Not for Me 🤐</Badge>
 						)}
-						
 					</div>
 				</div>
 			</div>

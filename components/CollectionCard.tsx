@@ -21,9 +21,10 @@ export default async function CollectionCard({
 	return (
 		<>
 			{sneakers?.map((sneaker: any) => (
+				<Link href={`/sneakers/detail/${sneaker.id}`}>
 				<div
 					key={sneaker.id}
-					className={`flex flex-col max-w-sm relative justify-center align-middle items-start ${
+					className={`flex flex-col max-w-sm relative justify-center align-middle items-start img-outline hover:bg-gray-800 ${
 						showtxt ? "bg-gray-800/50 px-1 py-2 md:px-2 md:py-4 w-full" : ""
 					} `}>
 					{showtxt && (
@@ -94,7 +95,7 @@ export default async function CollectionCard({
 						</div>
 						
 					)*/}
-				</div>
+				</div></Link>
 			))}
 
 			

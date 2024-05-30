@@ -18,6 +18,7 @@ import {
 	NavigationMenuViewport,
   } from "@/components/ui/navigation-menu"
   import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
+import { Button } from "./ui/button";
 
 
 export default async function Header() {
@@ -49,7 +50,7 @@ export default async function Header() {
 			<> 
 		
 
-			<nav className='w-full flex justify-center  h-16 my-3 '>
+			<nav className='w-full flex justify-center align-bottom items-baseline  h-16 my-3  '>
 				<div className='w-full max-w-6xl flex justify-between items-center p-3 text-xs '>
 					<Logo />
 
@@ -73,9 +74,9 @@ export default async function Header() {
 						</span>
 					</Link>
 					<Link href={"/sneakers"}>
-						<button className=' hidden md:block border rounded-lg hover:bg-green-700/80 bg-green-600 items-center transition ease-in duration-200 py-1 px-2  opacity translate-y-[10px] group font-mono  leading-[1.2] text-xs md:text-sm'>
-							Dashboard
-						</button>
+					
+
+						<Button className="border-white border-1.5 font-mono h-8"> 	Dashboard</Button>
 					</Link>
 
 					{isSupabaseConnected && <AuthButton />}
