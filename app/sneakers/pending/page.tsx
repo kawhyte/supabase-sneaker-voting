@@ -65,15 +65,15 @@ export default function PendingVote() {
 
 	return supabaseUser ? (
 		<>
-			<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
+			<div className='animate-in flex-1 w-full flex flex-col gap-y-20 items-center  justify-center align-middle '>
 				<SectionHeader
 					name={"Pending Votes"}
 					total={sneakersPending}
 					sectiontext={"Pending Vote count:"}
 				/>
 
-				<div className='flex flex-col gap-10 mx-4 items-center '>
-					<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3  gap-x-8 gap-y-5'>
+				
+					<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2  gap-x-8 gap-y-5'>
 						{sneakers?.map((sneaker) => (
 							<div key={sneaker.id}>
 								<SneakerCard
@@ -86,7 +86,7 @@ export default function PendingVote() {
 							</div>
 						))}
 					</div>
-				</div>
+			
 			</div>
 		</>
 	) : (

@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+
 import {
 	Card,
 	CardContent,
@@ -36,6 +38,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import RatingCard from "./RatingCard";
 import { format } from "date-fns";
+import Image from "next/image";
 
 const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 	//console.log("Cards Sneakers Voted", sneaker);
@@ -149,12 +152,21 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 										.sort((a, b) => b.main_image - a.main_image)
 										.map((item) => (
 											<CarouselItem key={item.id}>
-												<div className='p-1'>
+												<div className='w-[1000px] '>
+													<AspectRatio ratio={16 / 10}>
+														<Image
+															src={item?.image_link}
+															alt='Image'
+															fill
+															className='rounded-md object-cover'
+														/>
+													</AspectRatio>
+												</div>
+												{/*<div className='p-1'>
 													<div>
 														<div className='bg-white'>
 															<span className=' font-semibold max-w-xl flex aspect-square items-center justify-center '>
 																<img
-																	//className=' w-full   h-1\3 pt-6 mt-36 sm:mt-0 sm:h-96 md:h-80 lg:h-auto items-center  object-cover mx-auto'
 																	className=' w-full   h-auto pt-6  lg:mt-36 sm:mt-0 sm:h-80 md:h-80 lg:h-auto lg:pt-0  items-center  object-cover mx-auto '
 																	src={item?.image_link}
 																	alt='product image'
@@ -163,7 +175,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 															</span>
 														</div>
 													</div>
-												</div>
+										</div>*/}
 											</CarouselItem>
 										))}
 								</CarouselContent>
@@ -354,37 +366,38 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 					{/* Admin buttons */}
 					<div className=' flex gap-6 justify-around align-middle mt-3 flex-wrap '>
 						{/* Create listing button*/}
-						
-							<TooltipProvider>
-								<Tooltip>
-									<TooltipTrigger asChild>
+
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
 									<Link className='mb-2' href={"/sneakers/create/"}>
 										<Button variant={"secondary"} className='hover:bg-gray-800'>
 											<MdOutlineCreate className=' h-5 w-5' />
 										</Button>
-										</Link>
-									</TooltipTrigger>
-									<TooltipContent>
-										<p>Create New</p>
-									</TooltipContent>
-								</Tooltip>
-							</TooltipProvider>
-						
+									</Link>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Create New</p>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+
 						{/* Edit listing button*/}
-						
-							<TooltipProvider>
-								<Tooltip>
-									<TooltipTrigger asChild><Link className='' href={"/sneakers/edit/" + sneaker.id}>
+
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Link className='' href={"/sneakers/edit/" + sneaker.id}>
 										<Button variant='secondary' className='hover:bg-gray-800'>
 											<FaRegEdit className=' h-5 w-5' />
-										</Button></Link>
-									</TooltipTrigger>
-									<TooltipContent>
-										<p>Edit Listing</p>
-									</TooltipContent>
-								</Tooltip>
-							</TooltipProvider>
-						
+										</Button>
+									</Link>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Edit Listing</p>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
 
 						{/* Add to Collection button*/}
 						{showElement && (
@@ -424,8 +437,6 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 							</Tooltip>
 						</TooltipProvider>
 					</div>
-
-				
 
 					<Avatar className='absolute top-2 left-2'>
 						<AvatarImage src={sneaker.brand_id?.brand_logo} />
