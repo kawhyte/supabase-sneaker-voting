@@ -104,35 +104,42 @@ export default function Page() {
 
 	return (
 		<>
-		
-		<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
+			<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
 				<SectionHeader name={"Dashboard"} sectiontext={""} total={undefined} />
 				<div className='grid grid-cols-3 mx-auto container mt-10 xl:grid-cols-3 gap-6'>
-					
-					
-					<DashboardDataCard cardTitle={"Collection Count"} cardDescription={"Total amount of sneakers in our collection."} cardContent={collection}/>
-					<DashboardDataCard cardTitle={"Pending Vote"} cardDescription={"Total amount of sneakers waiting for a vote."} cardContent={pendingSneakerVote}/>
-					<DashboardDataCard cardTitle={"Vote Counts"} cardDescription={`Total amount of sneakers votes.`} cardContent={sneakersVoted}/>
-					
-					
-			
+					<DashboardDataCard
+						cardTitle={"Collection Count"}
+						cardDescription={"Total amount of sneakers in our collection."}
+						cardContent={collection}
+					/>
+					<DashboardDataCard
+						cardTitle={"Pending Vote"}
+						cardDescription={"Total amount of sneakers waiting for a vote."}
+						cardContent={pendingSneakerVote}
+					/>
+					<DashboardDataCard
+						cardTitle={"Vote Counts"}
+						cardDescription={`Total amount of sneakers votes.`}
+						cardContent={sneakersVoted}
+					/>
 				</div>
 
-
-			
-
 				<div className='grid grid-cols-3 gap-2 mt-8'>
-
-
-
-
-<DashboardImageDataCard cardTitle={'Latest Sneaker pickups'} cardDescription={"Last 4 Sneakers added to collection"} cardContent={collection} />
-<DashboardImageDataCard cardTitle={'Most worn sneakers'} cardDescription={"Most worn sneakers collection"} cardContent={collection} />
-<DashboardImageDataCard cardTitle={'Sneakers you need to wear'} cardDescription={"Sneakers you need to wear"} cardContent={collection} />
-
-					
-
-					
+					<DashboardImageDataCard
+						cardTitle={"Latest Sneaker pickups"}
+						cardDescription={"Last 4 Sneakers added to collection"}
+						cardContent={collection}
+					/>
+					<DashboardImageDataCard
+						cardTitle={"Most worn sneakers"}
+						cardDescription={"Most worn sneakers collection"}
+						cardContent={collection}
+					/>
+					<DashboardImageDataCard
+						cardTitle={"Sneakers you need to wear"}
+						cardDescription={"Sneakers you need to wear"}
+						cardContent={collection}
+					/>
 				</div>
 				<div className=' grid grid-cols-4 '>
 					<Link href={"/sneakers/pending"}> Pending Votes</Link>

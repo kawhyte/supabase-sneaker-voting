@@ -352,49 +352,80 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 					</div>
 
 					{/* Admin buttons */}
-					<div className=' flex justify-between align-middle mt-3 flex-wrap '>
+					<div className=' flex gap-6 justify-around align-middle mt-3 flex-wrap '>
 						{/* Create listing button*/}
-						<Link className='mb-2' href={"/sneakers/create/"}>
-							<Button variant={'secondary'} className='hover:bg-gray-800'>
-								<MdOutlineCreate className=' h-5 w-5' /> 
-							</Button>
-						</Link>
+						
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+									<Link className='mb-2' href={"/sneakers/create/"}>
+										<Button variant={"secondary"} className='hover:bg-gray-800'>
+											<MdOutlineCreate className=' h-5 w-5' />
+										</Button>
+										</Link>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Create New</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						
 						{/* Edit listing button*/}
-						<Link className='' href={"/sneakers/edit/" + sneaker.id}>
-							<Button variant='secondary' className='hover:bg-gray-800'>
-								<FaRegEdit className=' h-5 w-5' /> 
-							</Button>
-						</Link>
+						
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild><Link className='' href={"/sneakers/edit/" + sneaker.id}>
+										<Button variant='secondary' className='hover:bg-gray-800'>
+											<FaRegEdit className=' h-5 w-5' />
+										</Button></Link>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Edit Listing</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						
 
 						{/* Add to Collection button*/}
 						{showElement && (
-							<Button
-								className='hover:bg-gray-800'
-								variant='secondary'
-								onClick={(e) => {
-									handleAddToCollection("true", e);
-								}}>
-								<IoMdAdd className=' h-5 w-5' />
-								
-							</Button>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											className='hover:bg-gray-800'
+											variant='secondary'
+											onClick={(e) => {
+												handleAddToCollection("true", e);
+											}}>
+											<IoMdAdd className=' h-5 w-5' />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Add to Collection</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
 						)}
 
 						{/* Delete listing button*/}
-
-						<Button
-							variant='destructive'
-							className='hover:bg-gray-800'
-							onClick={handleDelete}>
-							<MdOutlineDeleteForever className=' h-5 w-5' /> 
-						</Button>
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										variant='destructive'
+										className='hover:bg-gray-800'
+										onClick={handleDelete}>
+										<MdOutlineDeleteForever className=' h-5 w-5' />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Delete Sneaker</p>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
 					</div>
 
-					{/* <p className='absolute top-2 right-2 rounded-xl border py-1 px-2 text-blue-600  bg-blue-200 font-mono leading-[1.2] text-[.66em]'>
-					 	{databaseDate > todayDate ? "Upcoming" : "Released"}
-						</p>
-					<div className='absolute top-0 left-2  bg-gray-100/50 font-mono leading-[1.2] text-[.66em]'>
-						<img src={sneaker.brand_id?.brand_logo} />
-					</div>*/}
+				
 
 					<Avatar className='absolute top-2 left-2'>
 						<AvatarImage src={sneaker.brand_id?.brand_logo} />
