@@ -74,10 +74,10 @@ export default async function Header() {
 					<div className=' flex justify-end gap-3 align-bottom items-baseline w-2/5'>
 						<Link className='' href={"/sneakers"}>
 							<Button
-								className='hover:border-gray-300 border-2  h-8'
+								className='hover:border-gray-300 rounded-xl border-2  h-9'
 								variant='default'>
 								{" "}
-								Sneaker Dashboard
+								Dashboard
 							</Button>
 						</Link>
 
