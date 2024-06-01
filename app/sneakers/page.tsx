@@ -106,6 +106,10 @@ export default function Page() {
 		<>
 			<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
 				<SectionHeader name={"Dashboard"} sectiontext={""} total={undefined} />
+				
+				
+				
+				
 				<div className='grid grid-cols-3 mx-auto container mt-10 xl:grid-cols-3 gap-6'>
 					<DashboardDataCard
 						cardTitle={"Collection Count"}

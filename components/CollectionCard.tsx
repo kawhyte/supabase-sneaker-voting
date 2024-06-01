@@ -14,13 +14,13 @@ export default async function CollectionCard({
 	//console.log("sneakers from HERO function1", sneakers);
 	//console.log("myBlurDataUrl - sneakers from function",sneakers.collection_image)
 
-	//const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
+	const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
 	let blurDataURL = "";
 	//console.log("NEW myBlurDataUrl ####", sneakersWithBlurDataUrl);
 	//const sneakerCostPerWear = costPerWear ()
 	return (
 		<>
-			{sneakers?.map((sneaker: any) => (
+			{sneakersWithBlurDataUrl?.map((sneaker: any) => (
 				<Link href={`/sneakers/detail/${sneaker.id}`}>
 				<div
 					key={sneaker.id}
@@ -56,7 +56,7 @@ export default async function CollectionCard({
 						className={`${
 							showtxt ? "mx-12 my-6 sm:mt-14  md:mt-16 lg:mt-20" : ""
 						} `}>
-						<Link href={`/sneakers/detail/${sneaker.id}`}>
+						{/* <Link href={`/sneakers/detail/${sneaker.id}`}> */}
 							<Image
 								width={250}
 								height={150}
@@ -73,11 +73,11 @@ export default async function CollectionCard({
 								// 		? sneaker?.blurredDataUrl
 								// 		: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=="
 								// }
-								blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
+								 blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
 								placeholder='blur'
 								quality={30}
 							/>
-						</Link>
+						{/* </Link> */}
 					</div>
 					{showtxt && (
 						<p className=' line-clamp-2 text-[0.95rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>

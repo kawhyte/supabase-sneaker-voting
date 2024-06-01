@@ -143,7 +143,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 	return (
 		<div>
 			<div className=''>
-				<div className='relative    '>
+				<div className='relative'>
 					<div className=''>
 						<Card className='flex flex-col justify-between '>
 							<Carousel className=' bg-white'>
@@ -152,13 +152,16 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 										.sort((a, b) => b.main_image - a.main_image)
 										.map((item) => (
 											<CarouselItem key={item.id}>
-												<div className='w-[1000px] '>
+												<div className='w-[450px] '>
 													<AspectRatio ratio={16 / 10}>
 														<Image
 															src={item?.image_link}
 															alt='Image'
 															fill
 															className='rounded-md object-cover'
+															blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
+															placeholder='blur'
+															quality={30}
 														/>
 													</AspectRatio>
 												</div>
@@ -188,33 +191,33 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 							</Carousel>
 
 							<CardTitle>
-								<h1 className='scroll-m-20 text-xl mt-4 ml-4 font-extrabold tracking-tight lg:text-2xl'>
+								<h1 className='scroll-m-20 text-base font-mono md:text-xl mt-4 ml-4  tracking-tight lg:text-2xl'>
 									{sneaker.name}
 								</h1>
 							</CardTitle>
-
 							{/*Card text area*/}
-							<div>
-								<CardContent className='flex flex-col justify-between   text-sm tracking-wide  title-font font-medium text-gray-400 font-mono '>
-									<div>
-										<p className=''>Brand: {sneaker.brand_id?.name}</p>
-									</div>
 
-									<div className=''>
-										<p>
-											Release Date:{" "}
-											{format(new Date(sneaker.release_date), "MMM dd,yyyy")}
+							{!showElement && (
+								<div>
+									<CardContent className='flex flex-col justify-between   text-sm tracking-wide  title-font font-medium text-gray-400 font-mono '>
+										<div>
+											<p className=''>Brand: {sneaker.brand_id?.name}</p>
+										</div>
+
+										<div className=''>
+											<p>
+												Release Date:{" "}
+												{format(new Date(sneaker.release_date), "MMM dd,yyyy")}
+											</p>
+										</div>
+
+										<p className=' '>
+											Retail: {sneaker.price < 10 ? "TBD" : `$${sneaker.price}`}
+											- {sneaker.style} - {sneaker.id}
 										</p>
-									</div>
+									</CardContent>
 
-									<p className=' '>
-										Retail: {sneaker.price < 10 ? "TBD" : `$${sneaker.price}`}-{" "}
-										{sneaker.style} - {sneaker.id}
-									</p>
-								</CardContent>
-
-								<CardFooter>
-									{!showElement && (
+									<CardFooter>
 										<div className='mb-4 '>
 											<div className='flex flex-col justify-between   xl:justify-between  rounded-xl  max-w-xl'>
 												<h2 className='text-sm tracking-wide  title-font font-medium text-gray-400 font-mono'>
@@ -357,9 +360,9 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 												</div>
 											</div>
 										</div>
-									)}
-								</CardFooter>
-							</div>
+									</CardFooter>
+								</div>
+							)}
 						</Card>
 					</div>
 
@@ -367,12 +370,15 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 					<div className=' flex gap-6 justify-around align-middle mt-3 flex-wrap '>
 						{/* Create listing button*/}
 
-						<TooltipProvider>
+						<TooltipProvider delayDuration={50}>
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<Link className='mb-2' href={"/sneakers/create/"}>
-										<Button variant={"secondary"} className='hover:bg-gray-800'>
-											<MdOutlineCreate className=' h-5 w-5' />
+										<Button
+											variant='defaul'
+											size={"sm"}
+											className='hover:bg-gray-800'>
+											<MdOutlineCreate className=' h-4 w-4' />
 										</Button>
 									</Link>
 								</TooltipTrigger>
@@ -384,12 +390,15 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 
 						{/* Edit listing button*/}
 
-						<TooltipProvider>
+						<TooltipProvider delayDuration={50}>
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<Link className='' href={"/sneakers/edit/" + sneaker.id}>
-										<Button variant='secondary' className='hover:bg-gray-800'>
-											<FaRegEdit className=' h-5 w-5' />
+										<Button
+											variant='defaul'
+											size={"sm"}
+											className='hover:bg-gray-800'>
+											<FaRegEdit className=' h-4 w-4' />
 										</Button>
 									</Link>
 								</TooltipTrigger>
@@ -401,16 +410,17 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 
 						{/* Add to Collection button*/}
 						{showElement && (
-							<TooltipProvider>
+							<TooltipProvider delayDuration={50}>
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<Button
 											className='hover:bg-gray-800'
-											variant='secondary'
+											variant='defaul'
+											size={"sm"}
 											onClick={(e) => {
 												handleAddToCollection("true", e);
 											}}>
-											<IoMdAdd className=' h-5 w-5' />
+											<IoMdAdd className=' h-4 w-4' />
 										</Button>
 									</TooltipTrigger>
 									<TooltipContent>
@@ -421,14 +431,15 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 						)}
 
 						{/* Delete listing button*/}
-						<TooltipProvider>
+						<TooltipProvider delayDuration={50}>
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<Button
+										size={"sm"}
 										variant='destructive'
 										className='hover:bg-gray-800'
 										onClick={handleDelete}>
-										<MdOutlineDeleteForever className=' h-5 w-5' />
+										<MdOutlineDeleteForever className=' h-4 w-4' />
 									</Button>
 								</TooltipTrigger>
 								<TooltipContent>
