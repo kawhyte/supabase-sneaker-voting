@@ -1,5 +1,3 @@
-
-
 import Link from "next/link";
 import NextLogo from "./NextLogo";
 import SupabaseLogo from "./SupabaseLogo";
@@ -16,10 +14,9 @@ import {
 	NavigationMenuList,
 	NavigationMenuTrigger,
 	NavigationMenuViewport,
-  } from "@/components/ui/navigation-menu"
-  import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu";
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { Button } from "./ui/button";
-
 
 export default async function Header() {
 	const supabase = createClient();
@@ -47,42 +44,48 @@ export default async function Header() {
 
 	return (
 		<div className='  '>
-			<> 
-		
+			<>
+				{/* <nav className='w-full flex justify-center align-bottom items-baseline  h-16 my-3  '> */}
+				<div className='w-full px-16  flex justify-between items-center p-3 text-xs '>
+					<div className='flex justify-start w-3/5 font-semibold text-base gap-x-3 '>
+						<Logo />
 
-			<nav className='w-full flex justify-center align-bottom items-baseline  h-16 my-3  '>
-				<div className='w-full max-w-6xl flex justify-between items-center p-3 text-xs '>
-					<Logo />
-
-					{user ? (
-						<Link href={"/sneakers/pending"}>
-							<span className=' hidden md:block hover:text-green-500/80 items-center transition ease-in duration-200 py-2 px-3 opacity translate-y-[10px] group font-mono leading-[1.2] text-xs md:text-sm'>
-								Pending Vote
+						{user ? (
+							<Link href={"/sneakers/pending"}>
+								<span className=' hidden md:block hover:border-b-4  border-b-green-600 hover:text-green-500/80 items-center transition ease-in duration-200 py-2 px-3 opacity translate-y-[10px]   leading-[1.2]  '>
+									Pending Vote
+								</span>
+							</Link>
+						) : (
+							<></>
+						)}
+						<Link href={"/sneakers/voted"}>
+							<span className='hidden md:block hover:border-b-4  border-b-blue-600 hover:text-blue-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px]   leading-[1.2] '>
+								Recent Votes
 							</span>
 						</Link>
-					) : (
-						<></>
-					)}
-					<Link href={"/sneakers/voted"}>
-						<span className='hidden md:block hover:text-blue-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px] group font-mono leading-[1.2] text-xs md:text-sm'>
-							Recent Votes
-						</span>
-					</Link>
-					<Link href={"/sneakers/collection"}>
-						<span className=' hidden md:block hover:text-yellow-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px] group font-mono  leading-[1.2] text-xs md:text-sm'>
-							Our Collection
-						</span>
-					</Link>
-					<Link href={"/sneakers"}>
-					
+						<Link href={"/sneakers/collection"}>
+							<span className=' hidden md:block hover:border-b-4  border-b-yellow-600 hover:text-yellow-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px]  leading-[1.2] '>
+								Our Collection
+							</span>
+						</Link>
+					</div>
 
-						<Button className="border-white border-1.5 font-mono h-8"> 	Dashboard</Button>
-					</Link>
+					<div className=' flex justify-end gap-3 align-bottom items-baseline w-2/5'>
+						<Link className='' href={"/sneakers"}>
+							<Button
+								className='border-gray-500 border-1  h-8'
+								variant='default'>
+								{" "}
+								Dashboard
+							</Button>
+						</Link>
 
-					{isSupabaseConnected && <AuthButton />}
+						{isSupabaseConnected && <AuthButton />}
+					</div>
 				</div>
-			</nav>
-			<div className="border-b border-b-foreground/10"></div>
+				{/* </nav> */}
+				<div className='border-b border-b-foreground/10'></div>
 			</>
 		</div>
 	);
