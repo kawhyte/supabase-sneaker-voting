@@ -141,7 +141,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 	};
 
 	return (
-		<div>
+		<div className="max-w-xl">
 			<div className=''>
 				<div className='relative'>
 					<div className=''>
@@ -152,7 +152,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 										.sort((a, b) => b.main_image - a.main_image)
 										.map((item) => (
 											<CarouselItem key={item.id}>
-												<div className='w-[450px] '>
+												<div className='  '>
 													<AspectRatio ratio={16 / 10}>
 														<Image
 															src={item?.image_link}
@@ -183,10 +183,10 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 										))}
 								</CarouselContent>
 								{sneaker.images.length > 2 && (
-									<CarouselPrevious className=' mx-16   -my-16' />
+									<CarouselPrevious className=' mx-16   -my-20' />
 								)}
 								{sneaker.images.length > 2 && (
-									<CarouselNext className='mx-16  -mt-16' />
+									<CarouselNext className='mx-16 ' />
 								)}
 							</Carousel>
 
@@ -454,20 +454,23 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 						<AvatarFallback>LG</AvatarFallback>
 					</Avatar>
 
-					<div className='absolute top-2 right-2 '>
+
+					<div className=" flex absolute top-2 right-2 gap-x-3">
+					<div className=' '>
 						<Badge className='bg-green-200 '>
 							{databaseDate > todayDate ? "Upcoming" : "Released"}
 						</Badge>
 					</div>
-					<div className='absolute top-8 right-2  '>
+					<div className=' '>
 						{sneaker.rating_id === null ? (
 							<Badge className='bg-blue-200 '>Pending Vote</Badge>
 						) : (
 							""
 						)}
 					</div>
+					
 
-					<div className=' absolute top-8 right-2 '>
+					<div className='  '>
 						{vote === "1" && (
 							<Badge className='bg-green-200'>I love it! 🔥</Badge>
 						)}
@@ -482,6 +485,8 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 							<Badge className='bg-red-200'>Not for Me 🤐</Badge>
 						)}
 					</div>
+					</div>
+
 				</div>
 			</div>
 		</div>
