@@ -17,6 +17,8 @@ import {
 import DashboardDataCard from "@/components/DashboardDataCard";
 import DashboardImageDataCard from "@/components/DashboardImageDataCard";
 import CollectionCard from "@/components/CollectionCard";
+import { cn } from "@/lib/utils";
+import SideNavBar from "@/components/SideNavBar";
 
 export default function Page() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
@@ -103,8 +105,16 @@ export default function Page() {
 	}, []);
 
 	return (
-		<>
-			<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
+		<div className={cn("min-h-screen w-full flex")}>
+			{/* side bar */}
+
+			<SideNavBar />
+
+			{/* main page */}
+
+			<div className='p-8 w-full'>Home Page</div>
+
+			{/* <div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
 				<SectionHeader name={"Dashboard"} sectiontext={""} total={undefined} />
 				
 				
@@ -151,7 +161,7 @@ export default function Page() {
 					<Link href={"/sneakers/collection"}> Collection</Link>
 					<Link href={"/"}> Quiz</Link>
 				</div>
-			</div>
-		</>
+			</div> */}
+		</div>
 	);
 }
