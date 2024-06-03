@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster"
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
+import { cn } from "@/lib/utils";
 
 
 const defaultUrl = process.env.VERCEL_URL
@@ -23,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <ReactQueryClientProvider> 
-    <html lang="en" className={GeistSans.className}>
+    <html lang="en" className={cn(GeistSans.className,{'debug-screens':process.env.NODE_ENV==='development'})}>
       <body className=" dark  bg-background text-foreground">
         <Header/>
         {/* <main className=" flex flex-col justify-center items-center align-middle "> */}

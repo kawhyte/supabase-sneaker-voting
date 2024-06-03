@@ -6,6 +6,7 @@ import SectionHeader from "@/components/SectionHeader";
 import SneakerCard from "@/components/SneakerCard";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
+import Loading from "@/components/Loading";
 
 export default function PendingVote() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
@@ -65,15 +66,16 @@ export default function PendingVote() {
 
 	return supabaseUser ? (
 		<>
+		
 			<div className='animate-in flex-1 w-full flex flex-col gap-y-20 items-center  justify-center align-middle '>
 				<SectionHeader
 					name={"Pending Votes"}
-					total={sneakersPending}
+					total={ sneakersPending}
 					sectiontext={"Pending Vote count:"}
 				/>
 
-				
-					<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2  gap-x-8 gap-y-5'>
+			{/* <Loading />	 */}
+					{sneakers === null ? <Loading /> : <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2  gap-x-8 gap-y-5'>
 						{sneakers?.map((sneaker) => (
 							<div key={sneaker.id}>
 								<SneakerCard
@@ -85,7 +87,7 @@ export default function PendingVote() {
 								/>
 							</div>
 						))}
-					</div>
+					</div>}
 			
 			</div>
 		</>

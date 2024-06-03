@@ -455,7 +455,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 					</Avatar>
 
 
-					<div className=" flex absolute top-2 right-2 gap-x-3">
+					<div className=" flex  absolute top-2 right-2 gap-x-3">
 					<div className=' '>
 						<Badge className='bg-green-200 '>
 							{databaseDate > todayDate ? "Upcoming" : "Released"}
