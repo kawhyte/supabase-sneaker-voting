@@ -2,10 +2,8 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
 import PendingIcon from "./PendingIcon";
-import { FaRegEdit } from "react-icons/fa";
-import { MdOutlineCreate } from "react-icons/md";
-import { IoMdAdd } from "react-icons/io";
-import { MdOutlineDeleteForever } from "react-icons/md";
+
+import { Plus, Pencil, CirclePlus, Trash2 } from "lucide-react";
 
 import {
 	Tooltip,
@@ -141,7 +139,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 	};
 
 	return (
-		<div className="max-w-xl">
+		<div className='max-w-xl'>
 			<div className=''>
 				<div className='relative'>
 					<div className=''>
@@ -378,7 +376,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 											variant='defaul'
 											size={"sm"}
 											className='hover:bg-gray-800'>
-											<MdOutlineCreate className=' h-4 w-4' />
+											<CirclePlus />
 										</Button>
 									</Link>
 								</TooltipTrigger>
@@ -398,7 +396,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 											variant='defaul'
 											size={"sm"}
 											className='hover:bg-gray-800'>
-											<FaRegEdit className=' h-4 w-4' />
+											<Pencil />
 										</Button>
 									</Link>
 								</TooltipTrigger>
@@ -420,7 +418,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 											onClick={(e) => {
 												handleAddToCollection("true", e);
 											}}>
-											<IoMdAdd className=' h-4 w-4' />
+											<Plus />
 										</Button>
 									</TooltipTrigger>
 									<TooltipContent>
@@ -439,7 +437,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 										variant='destructive'
 										className='hover:bg-gray-800'
 										onClick={handleDelete}>
-										<MdOutlineDeleteForever className=' h-4 w-4' />
+										<Trash2 />{" "}
 									</Button>
 								</TooltipTrigger>
 								<TooltipContent>
@@ -454,39 +452,36 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 						<AvatarFallback>LG</AvatarFallback>
 					</Avatar>
 
+					<div className=' flex  absolute top-2 right-2 gap-x-3'>
+						<div className=' '>
+							<Badge className='bg-green-200 '>
+								{databaseDate > todayDate ? "Upcoming" : "Released"}
+							</Badge>
+						</div>
+						<div className=' '>
+							{sneaker.rating_id === null ? (
+								<Badge className='bg-blue-200 '>Pending Vote</Badge>
+							) : (
+								""
+							)}
+						</div>
 
-					<div className=" flex  absolute top-2 right-2 gap-x-3">
-					<div className=' '>
-						<Badge className='bg-green-200 '>
-							{databaseDate > todayDate ? "Upcoming" : "Released"}
-						</Badge>
+						<div className='  '>
+							{vote === "1" && (
+								<Badge className='bg-green-200'>I love it! 🔥</Badge>
+							)}
+
+							{vote === "4" && (
+								<Badge className='bg-blue-200'>I like it 😀</Badge>
+							)}
+
+							{vote === "2" && <Badge className='bg-gray-200'>Meh... 🫤</Badge>}
+
+							{vote === "3" && (
+								<Badge className='bg-red-200'>Not for Me 🤐</Badge>
+							)}
+						</div>
 					</div>
-					<div className=' '>
-						{sneaker.rating_id === null ? (
-							<Badge className='bg-blue-200 '>Pending Vote</Badge>
-						) : (
-							""
-						)}
-					</div>
-					
-
-					<div className='  '>
-						{vote === "1" && (
-							<Badge className='bg-green-200'>I love it! 🔥</Badge>
-						)}
-
-						{vote === "4" && (
-							<Badge className='bg-blue-200'>I like it 😀</Badge>
-						)}
-
-						{vote === "2" && <Badge className='bg-gray-200'>Meh... 🫤</Badge>}
-
-						{vote === "3" && (
-							<Badge className='bg-red-200'>Not for Me 🤐</Badge>
-						)}
-					</div>
-					</div>
-
 				</div>
 			</div>
 		</div>

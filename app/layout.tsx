@@ -2,42 +2,49 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { cn } from "@/lib/utils";
-
+import SideNavBar from "@/components/SideNavBar";
+import MainPageLayout from "@/components/MainPageLayout";
 
 const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+	? `https://${process.env.VERCEL_URL}`
+	: "http://localhost:3000";
 
 export const metadata = {
-  metadataBase: new URL(defaultUrl),
-  title: "MTW Sneaker Collection",
-  description: "MTW Sneaker Collection & Tracking",
+	metadataBase: new URL(defaultUrl),
+	title: "MTW Sneaker Collection",
+	description: "MTW Sneaker Collection & Tracking",
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return (
-    <ReactQueryClientProvider> 
-    <html lang="en" className={cn(GeistSans.className,{'debug-screens':process.env.NODE_ENV==='development'})}>
-      <body className=" dark  bg-background text-foreground">
-        <Header/>
-        {/* <main className=" flex flex-col justify-center items-center align-middle "> */}
-        <main className=" ">
-         
-          {children}
-        
-          <Toaster />
-        </main>
-        <Footer/>
-      </body>
- 
-    </html>
-    </ReactQueryClientProvider>
-  );
+	return (
+		<html
+			lang='en'
+			className={cn(
+				"min-h-screen w-full dark mx-auto container bg-background text-foreground  bg-red-200",
+				GeistSans.className,
+				{ "debug-screens": process.env.NODE_ENV === "development" }
+			)}>
+			<body className='w-full '>
+				<Header />
+				{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
+				<main className='flex justify-between w-full  m-0'>
+					{/* side bar */}
+
+					<MainPageLayout>
+						{/* main page */}
+						{children}
+					</MainPageLayout>
+					<Toaster />
+				</main>
+				<Footer />
+			</body>
+		</html>
+	);
 }
