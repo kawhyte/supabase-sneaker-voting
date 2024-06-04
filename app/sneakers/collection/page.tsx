@@ -13,11 +13,11 @@ export default async function Index() {
 
 	return (
 		<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
-			<div>{sneakers?.length}</div>
+
 			
 			<SectionHeader
 				name={"Our Sneaker Collection"}
-				total={-1}
+				total={sneakers?.length}
 				sectiontext={"Sneaker Vote Count"}
 			/>
 				<div className='flex flex-col gap-10 mx-4 items-center '>

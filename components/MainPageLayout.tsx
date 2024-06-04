@@ -1,18 +1,16 @@
-'use client'
-import SideNavBar from "./SideNavBar"
+"use client";
+import SideNavBar from "./SideNavBar";
 
- 
 export default function ExampleClientComponent({
-  children,
+	children,
 }: {
-  children: React.ReactNode
+	children: React.ReactNode;
 }) {
-  return (
-   
-    <>
-             <SideNavBar />
+	return (
+		<>
+			<SideNavBar />
 
-      {children}
-    </>
-  )
+			{children}
+		</>
+	);
 }

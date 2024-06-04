@@ -4,6 +4,7 @@ import {
 	Archive,
 	ArchiveX,
 	ChevronRight,
+	ChevronLeft,
 	File,
 	LayoutDashboard,
 	Trash2,
@@ -22,57 +23,57 @@ export default function SideNavBar({}: Props) {
 	const [isCollapsed, seIsCollapsed] = useState(false);
 
 	const onlyWidth = useWindowWidth();
-const mobileWidth = onlyWidth < 768
+	const mobileWidth = onlyWidth < 768;
 
 	function toggleSideBar() {
 		seIsCollapsed(!isCollapsed);
 	}
 	return (
-		<div className=' relative min-w-[80px] border-r px-3 pb-10 pt-24  '>
-			
-      {!mobileWidth && (
-      <div className='absolute right-[-20px] top-7'>
-				<Button
-					onClick={toggleSideBar}
-					variant={"secondary"}
-					className=' rounded-full p-2'>
-					<ChevronRight />
-				</Button>
-			</div>)}
+		<div className=' relative min-w-[80px] border-r px-3 pb-10 pt-10 '>
+			{!mobileWidth && (
+				<div className='absolute right-[-20px] top-7'>
+					<Button
+						onClick={toggleSideBar}
+						variant={"secondary"}
+						className=' rounded-full p-2 '>
+						{isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+					</Button>
+				</div>
+			)}
 			<Nav
-				isCollapsed={mobileWidth ? true: isCollapsed}
+				isCollapsed={mobileWidth ? true : isCollapsed}
 				links={[
 					{
-						title: "Dashboard",
-						href: "/test",
+						title: "Sneaker Statistics",
+						href: "/sneakers",
 						// label: "128",
 						icon: LayoutDashboard,
-						variant: "default",
+						variant: "ghost",
 					},
 					{
-						title: "Users",
-						href: "/users",
+						title: "Pending Votes",
+						href: "/sneakers/pending",
 						// label: "9",
 						icon: File,
 						variant: "ghost",
 					},
 
 					{
-						title: "Junk",
-						href: "/users",
+						title: "Recent Votes",
+						href: "/sneakers/voted",
 						label: "23",
 						icon: ArchiveX,
 						variant: "ghost",
 					},
 					{
-						title: "Trash",
+						title: "Our Collection",
 						label: "",
-						href: "/users",
+						href: "/sneakers/collection",
 						icon: Trash2,
 						variant: "ghost",
 					},
 					{
-						title: "Archive",
+						title: "Archived",
 						href: "/users",
 						label: "",
 						icon: Archive,

@@ -27,14 +27,14 @@ export default function RootLayout({
 		<html
 			lang='en'
 			className={cn(
-				"min-h-screen w-full dark mx-auto container bg-background text-foreground  bg-red-200",
+				"min-h-screen w-full dark bg-background text-foreground",
 				GeistSans.className,
 				{ "debug-screens": process.env.NODE_ENV === "development" }
 			)}>
 			<body className='w-full '>
 				<Header />
 				{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
-				<main className='flex justify-between w-full  m-0'>
+				<div className='flex  w-full  m-0'>
 					{/* side bar */}
 
 					<MainPageLayout>
@@ -42,7 +42,7 @@ export default function RootLayout({
 						{children}
 					</MainPageLayout>
 					<Toaster />
-				</main>
+				</div>
 				<Footer />
 			</body>
 		</html>

@@ -105,32 +105,26 @@ export default function Page() {
 	}, []);
 
 	return (
-		<div className={cn("min-h-screen w-full flex")}>
+		<div className='animate-in flex-1 w-full flex flex-col gap-x-20 items-center  justify-center align-middle '>
 			{/* side bar */}
-
-			
 
 			{/* main page */}
 
-			<div className='p-8 w-full'> Stats Page</div>
-
-			{/* <div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
-				<SectionHeader name={"Dashboard"} sectiontext={""} total={undefined} />
-				
-				
-				
-				
+			<SectionHeader name={"Sneaker Statsitics"} sectiontext={""} total={undefined} />
+			<div className='p-8 w-full'>
 				<div className='grid grid-cols-3 mx-auto container mt-10 xl:grid-cols-3 gap-6'>
 					<DashboardDataCard
 						cardTitle={"Collection Count"}
 						cardDescription={"Total amount of sneakers in our collection."}
 						cardContent={collection}
 					/>
+
 					<DashboardDataCard
 						cardTitle={"Pending Vote"}
 						cardDescription={"Total amount of sneakers waiting for a vote."}
 						cardContent={pendingSneakerVote}
 					/>
+
 					<DashboardDataCard
 						cardTitle={"Vote Counts"}
 						cardDescription={`Total amount of sneakers votes.`}
@@ -155,13 +149,9 @@ export default function Page() {
 						cardContent={collection}
 					/>
 				</div>
-				<div className=' grid grid-cols-4 '>
-					<Link href={"/sneakers/pending"}> Pending Votes</Link>
-					<Link href={"/sneakers/recent"}> Recent Votes</Link>
-					<Link href={"/sneakers/collection"}> Collection</Link>
-					<Link href={"/"}> Quiz</Link>
-				</div>
-			</div> */}
+
+			
+			</div>
 		</div>
 	);
 }
