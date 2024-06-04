@@ -51,7 +51,7 @@ export function Nav({ links, isCollapsed }: NavProps) {
                       "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white  "
                   )}
                 >
-                  <link.icon className="h-4 w-4" />
+                  <link.icon className="h-6 w-6" />
                   <span className="sr-only">{link.title}</span>
                 </Link>
               </TooltipTrigger>
@@ -75,14 +75,14 @@ export function Nav({ links, isCollapsed }: NavProps) {
                 "justify-start"
               )}
             >
-              <link.icon className="mr-2 h-4 w-4" />
+              <link.icon className="mr-2 h-4 w-4 " />
               {link.title}
               {link.label && (
                 <span
                   className={cn(
-                    "ml-auto",
+                    "ml-auto ",
                     link.variant === "default" &&
-                      "text-background dark:text-white"
+                      "text-background dark:text-white "
                   )}
                 >
                   {link.label}
