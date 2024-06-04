@@ -53,7 +53,7 @@ export default function Login({
 
 	return (
 		<>
-			<div className='py-16  w-full bg-red-200 '>
+			<div className='py-16  w-full '>
 				<div className='flex bg-white rounded-lg shadow-lg overflow-hidden mx-auto max-w-sm lg:max-w-6xl'>
 					<div
 						className='hidden lg:block lg:w-1/2 bg-cover'
@@ -68,17 +68,11 @@ export default function Login({
 						}}></div>
 					<div className='w-full p-8 lg:w-1/2'>
 						<p className='text-base text-gray-600 text-center font-mono mb-6'>
-							Welcome back to
+							Welcome back
 						</p>
-						<h2 className='font-serif mb-3 flex text-gray-800 flex-col -skew-y-3 drop-shadow-xl   text-[3.25rem] sm:text-[2.5rem] tracking-[-0.03em] leading-[0.88] font-bold'>
-							MTW's Sneaker Collection
-						</h2>
+						
 
-						<div className='mt-4 flex items-center justify-between'>
-							<span className='border-b w-1/5 lg:w-1/4'></span>
-
-							<span className='border-b w-1/5 lg:w-1/4'></span>
-						</div>
+						
 						<form className='animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground'>
 							<div className='mt-4'>
 								<label className='block text-gray-700 text-sm font-bold mb-2'>

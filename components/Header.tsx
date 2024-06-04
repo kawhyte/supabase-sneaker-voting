@@ -72,16 +72,18 @@ export default async function Header() {
 					</div>
 
 					<div className='flex justify-end gap-3 align-bottom items-baseline '>
-						<Link className='hidden md:block' href={"/sneakers"}>
-							<Button
-								className=''
-								variant='default'>
-								{" "}
+					<div>	<Link className='hidden md:block' href={"/sneakers"}>
+						<Button variant={'default'} className="hover:border-gray-300 rounded-xl border-2  h-9">
+
+						
 								Dashboard
 							</Button>
-						</Link>
+						</Link></div>
+<div>
+{isSupabaseConnected && <AuthButton />}
 
-						{isSupabaseConnected && <AuthButton />}
+
+</div>
 					</div>
 				</div>
 				{/* </nav> */}
