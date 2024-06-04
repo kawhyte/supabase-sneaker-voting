@@ -44,7 +44,7 @@ export default function SideNavBar({}: Props) {
 				isCollapsed={mobileWidth ? true : isCollapsed}
 				links={[
 					{
-						title: "Sneaker Statistics",
+						title: "Sneaker by the numbers",
 						href: "/sneakers",
 						// label: "128",
 						icon: LayoutDashboard,
