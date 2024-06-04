@@ -36,11 +36,9 @@ export default function RootLayout({
 				{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
 				<div className='flex  w-full  m-0'>
 					{/* side bar */}
-
-					<MainPageLayout>
-						{/* main page */}
-						{children}
-					</MainPageLayout>
+					<MainPageLayout children={undefined}></MainPageLayout>
+					{/* main page */}
+					{children}
 					<Toaster />
 				</div>
 				<Footer />
