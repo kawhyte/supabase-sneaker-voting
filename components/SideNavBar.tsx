@@ -61,7 +61,7 @@ export default function SideNavBar({}: Props) {
 					},
 
 					{
-						title: "Sneakers I May Purchase",
+						title: "Potential Sneaker Purchases",
 						href: "/sneakers/dashboard/voted",
 						label: "23",
 						icon: Heart,

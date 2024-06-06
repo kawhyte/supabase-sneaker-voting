@@ -9,28 +9,28 @@ import {
 	CardTitle,
 } from "./ui/card";
 import Link from "next/link";
+import { LucideIcon } from "lucide-react";
 
-export default function DashboardDataCard({
-	cardTitle,
-	cardDescription,
-	cardContent,
-}: {
-	cardTitle: any;
-	cardDescription: any;
-	cardContent: any;
-}) {
+export type CardProps = {
+	title: string;
+	icon: LucideIcon;
+	amount: number | undefined;
+	description: string;
+};
+
+export default function DashboardDataCard(props: CardProps) {
 	return (
-		<Card className=''>
-			<CardHeader>
-				<CardTitle className='text-xl'>{cardTitle}</CardTitle>
-				<CardDescription className='text-sm text-gray-400 '>
-					{cardDescription}
-				</CardDescription>
+		<Card className=' min-w-60'>
+			<CardHeader className='flex'>
+				<section className='flex justify-between'>
+					<h1 className='text-base  font-mono'>{props.title}</h1>
+					<props.icon className=' h-6 w-6 text-gray-400' />
+				</section>
 			</CardHeader>
 			<CardContent>
 				<Link href={"/sneakers/collection"}>
 					<h1 className='text-blue-200 font-mono w-24 text-[4rem]'>
-						{cardContent == null ? (
+						{props.amount == null ? (
 							<div role='status'>
 								<svg
 									aria-hidden='true'
@@ -50,10 +50,13 @@ export default function DashboardDataCard({
 								<span className='sr-only'>Loading...</span>
 							</div>
 						) : (
-							cardContent?.length
+							props.amount
 						)}
 					</h1>
 				</Link>
+				<CardDescription className='text-sm text-gray-400 '>
+					{props.description}
+				</CardDescription>
 			</CardContent>
 		</Card>
 	);

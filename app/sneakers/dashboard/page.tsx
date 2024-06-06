@@ -14,6 +14,11 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+
+import {
+	Award
+	
+} from "lucide-react";
 import DashboardDataCard from "@/components/DashboardDataCard";
 import DashboardImageDataCard from "@/components/DashboardImageDataCard";
 import CollectionCard from "@/components/CollectionCard";
@@ -113,13 +118,12 @@ export default function Page() {
 			<SectionHeader name={"Sneaker Overview"} sectiontext={""} total={undefined} />
 			<div className='p-8 w-full'>
 				<div className='grid grid-cols-3 mx-auto container mt-10 xl:grid-cols-3 gap-6'>
-					<DashboardDataCard
-						cardTitle={"Collection Count"}
-						cardDescription={"Total amount of sneakers in our collection."}
-						cardContent={collection}
+					<DashboardDataCard title={"Sneakers Collection Count"} icon={Award} amount={collection?.length} description={"sneakers in our collection."}						// cardTitle={"Collection Count"}
+						// cardDescription={"Total amount of sneakers in our collection."}
+						// cardContent={collection}
 					/>
 
-					<DashboardDataCard
+					{/* <DashboardDataCard
 						cardTitle={"Pending Vote"}
 						cardDescription={"Total amount of sneakers waiting for a vote."}
 						cardContent={pendingSneakerVote}
@@ -129,7 +133,7 @@ export default function Page() {
 						cardTitle={"Vote Counts"}
 						cardDescription={`Total amount of sneakers votes.`}
 						cardContent={sneakersVoted}
-					/>
+					/> */}
 				</div>
 
 				<div className='grid grid-cols-3 gap-2 mt-8'>

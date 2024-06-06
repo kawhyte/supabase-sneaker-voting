@@ -69,7 +69,7 @@ export default function Voted() {
 	
 		<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
 				<SectionHeader
-					name={"Loved or Liked Sneakers"}
+					name={"Potential Sneaker Purchases"}
 					total={sneakers?.length}
 					sectiontext={"Sneaker Vote Count"}
 				/>
