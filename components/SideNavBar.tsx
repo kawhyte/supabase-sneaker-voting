@@ -7,7 +7,9 @@ import {
 	ChevronLeft,
 	File,
 	LayoutDashboard,
-	Trash2,
+	Heart,
+	Clock
+	
 } from "lucide-react";
 import { Button } from "./ui/button";
 
@@ -44,27 +46,28 @@ export default function SideNavBar({}: Props) {
 				isCollapsed={mobileWidth ? true : isCollapsed}
 				links={[
 					{
-						title: "Sneaker Overview",
-						href: "neakers/dashboard",
+						title: "Sneakers Overview",
+						href: "/sneakers/dashboard",
 						// label: "128",
 						icon: LayoutDashboard,
 						variant: "ghost",
 					},
 					{
 						title: "Sneakers Awaiting Vote",
-						href: "/sneakers/pending",
+						href: "/sneakers/dashboard/pending",
 						// label: "9",
-						icon: File,
+						icon: Clock,
 						variant: "ghost",
 					},
 
 					{
-						title: "Sneakers We Like",
-						href: "/sneakers/voted",
+						title: "Sneakers I May Purchase",
+						href: "/sneakers/dashboard/voted",
 						label: "23",
-						icon: ArchiveX,
+						icon: Heart,
 						variant: "ghost",
 					},
+				
 					// {
 					// 	title: "Our Collection",
 					// 	label: "",
@@ -74,7 +77,7 @@ export default function SideNavBar({}: Props) {
 					// },
 					{
 						title: "Archived Sneakers",
-						href: "/users",
+						href: "/sneakers/dashboard/archived",
 						label: "",
 						icon: Archive,
 						variant: "ghost",

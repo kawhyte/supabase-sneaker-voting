@@ -51,6 +51,9 @@ export default function Voted() {
 				.from("sneakers")
 				.select(`*, rating_id(*, vote(*)), images(*),brand_id(*)`)
 				.filter(`rating_id.in_collection`,'eq', false )
+                .filter(`rating_id.vote`, "eq", 3)
+               
+                
 
 				.not("rating_id", "is", null)
 				.order("created_at", { ascending: false });
@@ -68,7 +71,7 @@ export default function Voted() {
 	
 		<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
 				<SectionHeader
-					name={"Recent Votes"}
+					name={"Archived Sneakers"}
 					total={sneakers?.length}
 					sectiontext={"Sneaker Vote Count"}
 				/>
