@@ -23,7 +23,7 @@ export default function DashboardDataCard(props: CardProps) {
 		<Card className=' min-w-60'>
 			<CardHeader className='flex'>
 				<section className='flex justify-between'>
-					<h1 className='text-base  font-mono'>{props.title}</h1>
+					<h1 className='text-sm  font-mono'>{props.title}</h1>
 					<props.icon className=' h-6 w-6 text-gray-400' />
 				</section>
 			</CardHeader>

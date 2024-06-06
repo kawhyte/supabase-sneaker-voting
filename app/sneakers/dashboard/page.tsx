@@ -15,11 +15,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-import {
-	Award
-	
-} from "lucide-react";
-import DashboardDataCard from "@/components/DashboardDataCard";
+import { Award, Clock, Heart, ArchiveX } from "lucide-react";
+import DashboardDataCard, { CardProps } from "@/components/DashboardDataCard";
 import DashboardImageDataCard from "@/components/DashboardImageDataCard";
 import CollectionCard from "@/components/CollectionCard";
 import { cn } from "@/lib/utils";
@@ -29,6 +26,9 @@ export default function Page() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
 	const [collection, setCollection] = useState<any[] | null>(null);
 	const [sneakersVoted, setSneakersVoted] = useState<any[] | null>(null);
+	const [potentialSneakers, setPotentialSneakers] = useState<any[] | null>(
+		null
+	);
 	const [pendingSneakerVote, setPendingSneakerVote] = useState<any[] | null>(
 		null
 	);
@@ -92,11 +92,21 @@ export default function Page() {
 				.not("rating_id", "is", null)
 				.order("created_at", { ascending: false });
 
+			const { data: potentialSneakers } = await supabase
+				.from("sneakers")
+				.select(`*, rating_id(*, vote(*)), images(*),brand_id(*)`)
+				.filter(`rating_id.in_collection`, "eq", false)
+				.neq(`rating_id.vote`, 3)
+
+				.not("rating_id", "is", null)
+				.order("created_at", { ascending: false });
+
 			setPendingSneakerVote(pendingSneakerVote);
 			setSneakersVoted(sneakersVoted);
 			setCollection(collectionSneakers);
+			setPotentialSneakers(potentialSneakers);
 
-			console.log("collection", collectionSneakers);
+			//console.log("collection", collectionSneakers);
 
 			setSneakersPendingVote(data?.filter((test) => test?.vote === null));
 			setSneakersDrip(data?.filter((test) => test?.vote === "Drip"));
@@ -109,40 +119,68 @@ export default function Page() {
 		getData();
 	}, []);
 
+	const CardData: CardProps[] = [
+		{
+			title: "Sneakers Collection Count",
+			icon: Award,
+			amount: collection?.length,
+			description: "sneakers in collection",
+		},
+		{
+			title: "Sneakers Awaiting Vote",
+			icon: Clock,
+			amount: pendingSneakerVote?.length,
+			description: "sneakers waiting for a vote",
+		},
+		{
+			title: "Potential Sneaker Purchases",
+			icon: Heart,
+			amount: potentialSneakers?.length,
+			description: "sneakers I want to purchase",
+		},
+		{
+			title: "Sneakers I didnt like",
+			icon: ArchiveX,
+			amount: pendingSneakerVote?.length,
+			description: "sneakers did not fit my style right now",
+		},
+	];
+
 	return (
 		<div className='animate-in flex-1 w-full flex flex-col gap-x-20 items-center  justify-center align-middle '>
 			{/* side bar */}
 
 			{/* main page */}
 
-			<SectionHeader name={"Sneaker Overview"} sectiontext={""} total={undefined} />
-			<div className='p-8 w-full'>
-				<div className='grid grid-cols-3 mx-auto container mt-10 xl:grid-cols-3 gap-6'>
-					<DashboardDataCard title={"Sneakers Collection Count"} icon={Award} amount={collection?.length} description={"sneakers in our collection."}						// cardTitle={"Collection Count"}
-						// cardDescription={"Total amount of sneakers in our collection."}
-						// cardContent={collection}
-					/>
-
-					{/* <DashboardDataCard
-						cardTitle={"Pending Vote"}
-						cardDescription={"Total amount of sneakers waiting for a vote."}
-						cardContent={pendingSneakerVote}
-					/>
-
-					<DashboardDataCard
-						cardTitle={"Vote Counts"}
-						cardDescription={`Total amount of sneakers votes.`}
-						cardContent={sneakersVoted}
-					/> */}
+			<SectionHeader
+				name={"Sneaker Overview"}
+				sectiontext={""}
+				total={undefined}
+			/>
+			<div className='p-8'>
+				<div className='grid w-full  grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2   mt-10 xl:grid-cols-4 '>
+					{CardData.map((card, i) => (
+						<DashboardDataCard key={i}
+							title={card.title}
+							icon={card.icon}
+							amount={card.amount}
+							description={card.description}
+						/>
+					))}
 				</div>
 
 				<div className='grid grid-cols-3 gap-2 mt-8'>
 					<DashboardImageDataCard
-						cardTitle={"Latest Sneaker pickups"}
-						cardDescription={"Last 4 Sneakers added to collection"}
-						cardContent={collection}
+						title={" This is the title"}
+						icon={ArchiveX}
+						amount={111}
+						description={"This is just a test"}
+						images={collection}
+						// cardTitle={"Latest Sneaker pickups"}
+						// cardDescription={"Last 4 Sneakers added to collection"}
+						// cardContent={collection}
 					/>
-					<DashboardImageDataCard
+					{/* <DashboardImageDataCard
 						cardTitle={"Most worn sneakers"}
 						cardDescription={"Most worn sneakers collection"}
 						cardContent={collection}
@@ -151,10 +189,8 @@ export default function Page() {
 						cardTitle={"Sneakers you need to wear"}
 						cardDescription={"Sneakers you need to wear"}
 						cardContent={collection}
-					/>
+					/> */}
 				</div>
-
-			
 			</div>
 		</div>
 	);
