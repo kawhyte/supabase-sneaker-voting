@@ -44,14 +44,14 @@ export default function SideNavBar({}: Props) {
 				isCollapsed={mobileWidth ? true : isCollapsed}
 				links={[
 					{
-						title: "Sneaker by the numbers",
-						href: "/sneakers",
+						title: "Sneaker Overview",
+						href: "neakers/dashboard",
 						// label: "128",
 						icon: LayoutDashboard,
 						variant: "ghost",
 					},
 					{
-						title: "Pending Votes",
+						title: "Sneakers Awaiting Vote",
 						href: "/sneakers/pending",
 						// label: "9",
 						icon: File,
@@ -59,21 +59,21 @@ export default function SideNavBar({}: Props) {
 					},
 
 					{
-						title: "Recent Votes",
+						title: "Sneakers We Like",
 						href: "/sneakers/voted",
 						label: "23",
 						icon: ArchiveX,
 						variant: "ghost",
 					},
+					// {
+					// 	title: "Our Collection",
+					// 	label: "",
+					// 	href: "/sneakers/collection",
+					// 	icon: Trash2,
+					// 	variant: "ghost",
+					// },
 					{
-						title: "Our Collection",
-						label: "",
-						href: "/sneakers/collection",
-						icon: Trash2,
-						variant: "ghost",
-					},
-					{
-						title: "Archived",
+						title: "Archived Sneakers",
 						href: "/users",
 						label: "",
 						icon: Archive,

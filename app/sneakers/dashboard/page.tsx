@@ -110,7 +110,7 @@ export default function Page() {
 
 			{/* main page */}
 
-			<SectionHeader name={"Sneaker Statsitics"} sectiontext={""} total={undefined} />
+			<SectionHeader name={"Sneaker Overview"} sectiontext={""} total={undefined} />
 			<div className='p-8 w-full'>
 				<div className='grid grid-cols-3 mx-auto container mt-10 xl:grid-cols-3 gap-6'>
 					<DashboardDataCard

@@ -50,7 +50,7 @@ export default async function Header() {
 					<div className='flex justify-start font-semibold text-base gap-x-3 '>
 						<Logo />
 
-						{/*user ? (
+						{user ? (
 							<Link href={"/sneakers/pending"}>
 								<span className=' hidden md:block hover:border-b-4  border-b-green-600 hover:text-green-500/80 items-center transition ease-in duration-200 py-2 px-3 opacity translate-y-[10px]   leading-[1.2]  '>
 									Pending Vote
@@ -58,8 +58,8 @@ export default async function Header() {
 							</Link>
 						) : (
 							<></>
-						)*/}
-						{/* <Link href={"/sneakers/voted"}>
+						)}
+						 <Link href={"/sneakers/voted"}>
 							<span className='hidden md:block hover:border-b-4  border-b-blue-600 hover:text-blue-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px]   leading-[1.2] '>
 								Recent Votes
 							</span>
@@ -68,11 +68,11 @@ export default async function Header() {
 							<span className=' hidden md:block hover:border-b-4  border-b-yellow-600 hover:text-yellow-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px]  leading-[1.2] '>
 								Our Collection
 							</span>
-						</Link> */}
+						</Link>
 					</div>
 
 					<div className='flex justify-end gap-3 align-bottom items-baseline '>
-					<div>	<Link className='hidden md:block' href={"/sneakers"}>
+					<div>	<Link className='hidden md:block' href={"/sneakers/dashboard"}>
 						<Button variant={'default'} className="hover:border-gray-300 rounded-xl border-2  h-9">
 
 						

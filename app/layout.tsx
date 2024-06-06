@@ -34,9 +34,9 @@ export default function RootLayout({
 			<body className='w-full '>
 				<Header />
 				{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
-				<div className='flex  w-full  m-0'>
+				<div className='flex dark  w-full  m-0'>
 					{/* side bar */}
-					<MainPageLayout children={undefined}></MainPageLayout>
+					{/* <MainPageLayout children={undefined}></MainPageLayout> */}
 					{/* main page */}
 					{children}
 					<Toaster />
