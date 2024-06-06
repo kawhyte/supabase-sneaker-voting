@@ -149,16 +149,12 @@ export default function Page() {
 
 	return (
 		<div className='animate-in flex-1 w-full flex flex-col gap-x-20 items-center  justify-center align-middle '>
-			{/* side bar */}
-
-			{/* main page */}
-
 			<SectionHeader
 				name={"Sneaker Overview"}
 				sectiontext={""}
 				total={undefined}
 			/>
-			<div className='p-8'>
+			<div className='p-8 flex flex-col justify-between gap-8 '>
 				<section className='grid w-full  grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2   mt-10 xl:grid-cols-4 '>
 					{CardData.map((card, i) => (
 						<DashboardDataCard
@@ -170,26 +166,24 @@ export default function Page() {
 						/>
 					))}
 				</section>
-				<section className='grid grid-cols-1 gap-4 transition-all lg:grid-cols-2  mt-8'>
+
+				<section>
 					<Card>
 						<CardHeader>
 							<h1 className='text-sm font-semibold  font-mono'>Overview</h1>
 						</CardHeader>
 
 						<CardContent>
-
-<BarGraph/>
-
+							<BarGraph />
 						</CardContent>
 					</Card>
 				</section>
 
-				<section className='grid grid-cols-1 gap-4 transition-all lg:grid-cols-2  mt-8'>
+				<section className='grid grid-cols-1 gap-4 transition-all lg:grid-cols-2  mt-8 w-full '>
 					<DashboardImageDataCard
-						title={" This is the title"}
+						title={"Latest Sneaker pickups"}
 						icon={ArchiveX}
-						amount={111}
-						description={"This is just a test"}
+						description={"Last 6 Sneakers added to collection"}
 						images={collection}
 						// cardTitle={"Latest Sneaker pickups"}
 						// cardDescription={"Last 4 Sneakers added to collection"}
