@@ -25,6 +25,7 @@ import BarGraph from "@/components/BarGraph";
 
 export default function Page() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
+	const [count, setCount] = useState(0);
 	const [collection, setCollection] = useState<any[] | null>(null);
 	const [sneakersVoted, setSneakersVoted] = useState<any[] | null>(null);
 	const [potentialSneakers, setPotentialSneakers] = useState<any[] | null>(
@@ -116,6 +117,21 @@ export default function Page() {
 			// 	"Sneakers Ken",
 			// 	data?.filter((test) => test.vote === null)
 			// );
+
+			//console.log("Collection ", collectionSneakers[0])
+
+			let count = collectionSneakers?.reduce(function (value, value2) {
+				return (
+					value[value2.brand_id.name]
+						? ++value[value2.brand_id.name]
+						: (value[value2.brand_id.name] = 1),
+					value
+				);
+			}, {});
+
+			setCount(count);
+
+			console.log("COunt ", count);
 		};
 		getData();
 	}, []);
@@ -147,6 +163,7 @@ export default function Page() {
 		},
 	];
 
+	console.log(count);
 	return (
 		<div className='animate-in flex-1 w-full flex flex-col gap-x-20 items-center  justify-center align-middle '>
 			<SectionHeader
@@ -167,19 +184,21 @@ export default function Page() {
 					))}
 				</section>
 
-				<section>
+				<section></section>
+
+				<section className='grid grid-cols-1 gap-4 transition-all lg:grid-cols-2   w-full '>
 					<Card>
 						<CardHeader>
-							<h1 className='text-sm font-semibold  font-mono'>Overview</h1>
+							<h1 className='text-sm font-semibold  font-mono'>
+								Sneakers Collection Brand Count{" "}
+							</h1>
 						</CardHeader>
 
 						<CardContent>
-							<BarGraph />
+							<BarGraph count={count} />
 						</CardContent>
 					</Card>
-				</section>
 
-				<section className='grid grid-cols-1 gap-4 transition-all lg:grid-cols-2  mt-8 w-full '>
 					<DashboardImageDataCard
 						title={"Latest Sneaker pickups"}
 						icon={ArchiveX}

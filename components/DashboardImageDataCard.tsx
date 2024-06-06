@@ -12,6 +12,8 @@ import {
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 
+import {format} from 'date-fns'
+
 export type CardProps = {
 	title: string;
 	icon: LucideIcon;
@@ -40,9 +42,10 @@ export default function DashboardImageDataCard(props: CardProps) {
 								alt='sneaker'
 							/>
 
-							<p className='text-sm  '>{item.name}</p>
-							<p className='text-ellipsis overflow-hidden whitespace-nowrap w-[120px] text-sm '>
-								{item.created_at}
+							<p className='text-[0.9rem] text-ellipsis  line-clamp-1  '>{item.name}</p>
+							<p className=' text-[0.8rem] text-gray-400 '>
+								
+							Purcahsed on {format(new Date(item.created_at), "MMM dd,yyyy")}
 							</p>
 						</div>
 					))}

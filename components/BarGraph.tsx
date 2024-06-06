@@ -2,78 +2,38 @@
 
 import React from "react";
 
-import { BarChart, ResponsiveContainer, XAxis, YAxis,Bar } from "recharts";
-type Props = {};
+import {
+	BarChart,
+	ResponsiveContainer,
+	XAxis,
+	YAxis,
+	Bar,
+} from "recharts";
+type Props = {
+	count: any;
+};
 
-const data = [
-	{
-		name: "Jan",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Feb",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Mar",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Apr",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "May",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Jun",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Jul",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Aug",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Sep",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Oct",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Nov",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-	{
-		name: "Dec",
-		total: Math.floor(Math.random() * 5000) + 1000,
-	},
-];
-
-export default function BarGraph({}: Props) {
+export default function BarGraph({ count }: Props) {
+	let sneakerData = Object.entries(count);
 	return (
 		<ResponsiveContainer width={"100%"} height={350}>
-			<BarChart data={data}>
+			<BarChart data={sneakerData}>
 				<XAxis
-					dataKey={"name"}
+					dataKey={"0"}
+					tickLine={false}
+					axisLine={false}
+					stroke='#888888'
+					fill='#8884d8'
+					fontSize={12}
+				/>
+				<YAxis
 					tickLine={false}
 					axisLine={false}
 					stroke='#888888'
 					fontSize={12}
 				/>
-				<YAxis 	
-       
-					tickLine={false}
-					axisLine={false}
-					stroke='#888888'
-					fontSize={12} />
-          <Bar dataKey={'total'} radius={[4,4,0,0]}/>
+
+				<Bar dataKey={"1"} fill='#16a34a' radius={[4, 4, 0, 0]} />
 			</BarChart>
 		</ResponsiveContainer>
 	);
