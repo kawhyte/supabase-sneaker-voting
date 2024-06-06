@@ -21,6 +21,7 @@ import DashboardImageDataCard from "@/components/DashboardImageDataCard";
 import CollectionCard from "@/components/CollectionCard";
 import { cn } from "@/lib/utils";
 import SideNavBar from "@/components/SideNavBar";
+import BarGraph from "@/components/BarGraph";
 
 export default function Page() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
@@ -158,18 +159,32 @@ export default function Page() {
 				total={undefined}
 			/>
 			<div className='p-8'>
-				<div className='grid w-full  grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2   mt-10 xl:grid-cols-4 '>
+				<section className='grid w-full  grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2   mt-10 xl:grid-cols-4 '>
 					{CardData.map((card, i) => (
-						<DashboardDataCard key={i}
+						<DashboardDataCard
+							key={i}
 							title={card.title}
 							icon={card.icon}
 							amount={card.amount}
 							description={card.description}
 						/>
 					))}
-				</div>
+				</section>
+				<section className='grid grid-cols-1 gap-4 transition-all lg:grid-cols-2  mt-8'>
+					<Card>
+						<CardHeader>
+							<h1 className='text-sm font-semibold  font-mono'>Overview</h1>
+						</CardHeader>
 
-				<div className='grid grid-cols-3 gap-2 mt-8'>
+						<CardContent>
+
+<BarGraph/>
+
+						</CardContent>
+					</Card>
+				</section>
+
+				<section className='grid grid-cols-1 gap-4 transition-all lg:grid-cols-2  mt-8'>
 					<DashboardImageDataCard
 						title={" This is the title"}
 						icon={ArchiveX}
@@ -190,7 +205,7 @@ export default function Page() {
 						cardDescription={"Sneakers you need to wear"}
 						cardContent={collection}
 					/> */}
-				</div>
+				</section>
 			</div>
 		</div>
 	);
