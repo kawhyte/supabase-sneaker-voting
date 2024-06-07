@@ -77,7 +77,7 @@ export default function Page() {
 					`*, rating_id!inner(*, in_collection, vote(*), stats(*)), images(*),brand_id(*)`
 				)
 				.eq(`rating_id.in_collection`, true)
-				.order("created_at", { ascending: false });
+				.order("purchase_date", { ascending: false });
 
 			const { data: pendingSneakerVote } = await supabase
 				.from("sneakers")
@@ -108,7 +108,7 @@ export default function Page() {
 			setCollection(collectionSneakers);
 			setPotentialSneakers(potentialSneakers);
 
-			//console.log("collection", collectionSneakers);
+			console.log("collection", collectionSneakers);
 
 			setSneakersPendingVote(data?.filter((test) => test?.vote === null));
 			setSneakersDrip(data?.filter((test) => test?.vote === "Drip"));
@@ -131,7 +131,7 @@ export default function Page() {
 
 			setCount(count);
 
-			console.log("COunt ", count);
+			//console.log("COunt ", count);
 		};
 		getData();
 	}, []);
@@ -163,7 +163,7 @@ export default function Page() {
 		},
 	];
 
-	console.log(count);
+	//console.log(count);
 	return (
 		<div className='animate-in flex-1 w-full flex flex-col gap-x-20 items-center  justify-center align-middle '>
 			<SectionHeader
@@ -184,7 +184,7 @@ export default function Page() {
 					))}
 				</section>
 
-				<section></section>
+				
 
 				<section className='grid grid-cols-1 gap-4 transition-all lg:grid-cols-2   w-full '>
 					<Card>

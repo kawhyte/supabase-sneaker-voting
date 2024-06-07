@@ -9,7 +9,7 @@ export default async function Index() {
 		.from("sneakers")
 		.select(`*, rating_id!inner(*, in_collection, vote(*), stats(*)), images(*),brand_id(*)`)
 		.eq(`rating_id.in_collection`, true )
-		.order("created_at", { ascending: true });
+		.order("purchase_date", { ascending: false });
 
 	return (
 		<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>

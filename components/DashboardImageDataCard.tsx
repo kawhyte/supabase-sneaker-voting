@@ -12,17 +12,20 @@ import {
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 
-import {format} from 'date-fns'
+import { format } from "date-fns";
 
 export type CardProps = {
 	title: string;
 	icon: LucideIcon;
-	
+
 	description: string;
 	images: Array<any> | null;
 };
 
 export default function DashboardImageDataCard(props: CardProps) {
+ "2023-08-26T16:53:23"
+
+
 	return (
 		<Card className=' '>
 			<CardHeader>
@@ -42,10 +45,12 @@ export default function DashboardImageDataCard(props: CardProps) {
 								alt='sneaker'
 							/>
 
-							<p className='text-[0.9rem] text-ellipsis  line-clamp-1  '>{item.name}</p>
+							<p className='text-[0.9rem] text-ellipsis  line-clamp-1  '>
+								{item.name}
+							</p>
 							<p className=' text-[0.8rem] text-gray-400 '>
-								
-							Purcahsed on {format(new Date(item.created_at), "MMM dd,yyyy")}
+							
+								{item?.purchase_date !== null ? "Purchased on " + format(new Date(item?.purchase_date), "MMM dd,yyyy"):""}
 							</p>
 						</div>
 					))}
