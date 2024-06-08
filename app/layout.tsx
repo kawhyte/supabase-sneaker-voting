@@ -25,7 +25,7 @@ export default function RootLayout({
 }) {
 	return (
 		<html
-			lang='en'
+			
 			className={cn(
 				"min-h-screen w-full dark bg-background text-foreground",
 				GeistSans.className,

@@ -8,6 +8,12 @@ import DeployButton from "@/components/Logo";
 import AuthButton from "@/components/AuthButton";
 
 import { redirect, useRouter } from "next/navigation";
+interface history {
+	name: string;
+	index?: string | number;
+	po?: string | number;
+	event?: any;
+}
 
 const Create = () => {
 	const [name, setName] = useState("");
@@ -17,11 +23,22 @@ const Create = () => {
 	const [style, setStyle] = useState("");
 	const [formError, setFormError] = useState("");
 	const [main_image, setImage] = useState("");
+
+	const [inputFields, setInputFields] = useState([{ image_link: "",  sneaker_id:"", main_image:false }]);
+
 	const supabase = createClient();
 	const router = useRouter();
 
 	const handleSubmit = async (e: any) => {
 		e.preventDefault();
+
+		// const myID = '4'
+
+		// console.log("INPUT Fields ", inputFields);
+
+		// inputFields.map(a => a.sneaker_id=myID)
+		// console.log("INPUT Fields After  ", inputFields);
+
 
 		const {
 			data: { user },
@@ -53,18 +70,55 @@ const Create = () => {
 		if (sneaker_data) {
 			const sneakerID = sneaker_data[0]?.id;
 			console.log("sneaker_data", sneakerID);
-
+			inputFields.map(a => a.sneaker_id=sneakerID)
+			// const { data, error } = await supabase
+			// 	.from("images")
+			// 	.insert([
+			// 		{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
+			// 	])
+			// 	.select();
 			const { data, error } = await supabase
 				.from("images")
-				.insert([
-					{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
-				])
+				.insert(
+					
+						inputFields,
+				
+			)
 				.select();
 
-			setFormError("");
+				if (error) {
+					console.log("sneakerID ERROR",error);
+					setFormError(error.message);
+				}
 
-			router.push("/sneakers/pending");
+				console.log("sneakerID data ", data)
+			//setFormError("");
+
+			//router.push("/sneakers/dashboard/pending");
 		}
+	};
+
+	const handleFormChange = (event:React.ChangeEvent<HTMLInputElement>, index: number ) => {
+	
+
+		//console.log("handleFormChange ", index, event.target.name);
+	
+		let data = [...inputFields] as any;
+		data[index][event.target.name] = event.target.value;
+		//console.log("handleFormChange 2 ", data);
+		setInputFields(data);
+	};
+
+	const addFields = () => {
+	
+		let newfield = { image_link: " ",  sneaker_id:" ", main_image:false };
+		setInputFields([...inputFields, newfield]);
+	};
+
+	const removeFields = (index: any) => {
+		let data = [...inputFields];
+		data.splice(index, 1);
+		setInputFields(data);
 	};
 
 	return (
@@ -115,6 +169,24 @@ const Create = () => {
 							placeholder='02-10-24'
 						/>
 					</div>
+				</div>
+
+				<div>
+					{inputFields.map((input, index) => {
+						return (
+							<div className='flex' key={index}>
+								<input
+									name='image_link'
+									placeholder='Name'
+									className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+									value={input.image_link}
+									onChange={event => handleFormChange(event,index )}
+								/>
+
+								<button onClick={() => removeFields(index)}>Remove</button>
+							</div>
+						);
+					})}
 				</div>
 				<div className='flex flex-wrap -mx-3 mb-6'>
 					<div className='w-full px-3'>
@@ -214,6 +286,9 @@ const Create = () => {
 				</button>
 				{formError && <p className='error'>{formError}</p>}
 			</form>
+
+			<button onClick={addFields}>Add More..</button>
+
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Nav } from "./ui/nav";
 import {
 	Archive,
@@ -19,16 +19,30 @@ import {
 	useWindowHeight,
 } from "@react-hook/window-size";
 
+
 type Props = {};
 
 export default function SideNavBar({}: Props) {
-	const [isCollapsed, seIsCollapsed] = useState(false);
-
+	const [isCollapsed, setIsCollapsed] = useState(false);
+const [windowWidth, setWindowWidth] = useState(0);
 	const onlyWidth = useWindowWidth();
-	const mobileWidth = onlyWidth < 768;
+
+
+
+	useEffect(() => {
+		window.addEventListener("resize", () => {
+		  setWindowWidth(window.innerWidth);
+		  
+		});
+	  }, []);
+
+
+
+	const mobileWidth = windowWidth < 768;
+
 
 	function toggleSideBar() {
-		seIsCollapsed(!isCollapsed);
+		setIsCollapsed(!isCollapsed);
 	}
 	return (
 		<div className=' relative min-w-[80px] border-r px-3 pb-10 pt-10 '>

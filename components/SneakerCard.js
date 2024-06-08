@@ -187,12 +187,13 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 									<CarouselNext className='mx-16 ' />
 								)}
 							</Carousel>
-
-							<CardTitle>
-								<h1 className='scroll-m-20 text-base font-mono md:text-xl mt-4 ml-4  tracking-tight lg:text-2xl'>
+							<CardHeader>
+							<CardTitle className = "className='scroll-m-20 text-base font-mono md:text-xl mt-4 ml-4  tracking-tight lg:text-2xl'">
+								
 									{sneaker.name}
-								</h1>
+								
 							</CardTitle>
+							</CardHeader>
 							{/*Card text area*/}
 
 							{!showElement && (
