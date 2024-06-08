@@ -8,12 +8,6 @@ import DeployButton from "@/components/Logo";
 import AuthButton from "@/components/AuthButton";
 
 import { redirect, useRouter } from "next/navigation";
-interface history {
-	name: string;
-	index?: string | number;
-	po?: string | number;
-	event?: any;
-}
 
 const Create = () => {
 	const [name, setName] = useState("");
@@ -24,7 +18,9 @@ const Create = () => {
 	const [formError, setFormError] = useState("");
 	const [main_image, setImage] = useState("");
 
-	const [inputFields, setInputFields] = useState([{ image_link: "",  sneaker_id:"", main_image:false }]);
+	const [inputFields, setInputFields] = useState([
+		{ image_link: "", sneaker_id: "", main_image: false },
+	]);
 
 	const supabase = createClient();
 	const router = useRouter();
@@ -38,7 +34,6 @@ const Create = () => {
 
 		// inputFields.map(a => a.sneaker_id=myID)
 		// console.log("INPUT Fields After  ", inputFields);
-
 
 		const {
 			data: { user },
@@ -70,7 +65,7 @@ const Create = () => {
 		if (sneaker_data) {
 			const sneakerID = sneaker_data[0]?.id;
 			console.log("sneaker_data", sneakerID);
-			inputFields.map(a => a.sneaker_id=sneakerID)
+			inputFields.map((a) => (a.sneaker_id = sneakerID));
 			// const { data, error } = await supabase
 			// 	.from("images")
 			// 	.insert([
@@ -79,30 +74,27 @@ const Create = () => {
 			// 	.select();
 			const { data, error } = await supabase
 				.from("images")
-				.insert(
-					
-						inputFields,
-				
-			)
+				.insert(inputFields)
 				.select();
 
-				if (error) {
-					console.log("sneakerID ERROR",error);
-					setFormError(error.message);
-				}
+			if (error) {
+				console.log("sneakerID ERROR", error);
+				setFormError(error.message);
+			}
 
-				console.log("sneakerID data ", data)
+			console.log("sneakerID data ", data);
 			//setFormError("");
 
 			//router.push("/sneakers/dashboard/pending");
 		}
 	};
 
-	const handleFormChange = (event:React.ChangeEvent<HTMLInputElement>, index: number ) => {
-	
-
+	const handleFormChange = (
+		event: React.ChangeEvent<HTMLInputElement>,
+		index: number
+	) => {
 		//console.log("handleFormChange ", index, event.target.name);
-	
+
 		let data = [...inputFields] as any;
 		data[index][event.target.name] = event.target.value;
 		//console.log("handleFormChange 2 ", data);
@@ -110,8 +102,7 @@ const Create = () => {
 	};
 
 	const addFields = () => {
-	
-		let newfield = { image_link: " ",  sneaker_id:" ", main_image:false };
+		let newfield = { image_link: " ", sneaker_id: " ", main_image: false };
 		setInputFields([...inputFields, newfield]);
 	};
 
@@ -180,7 +171,7 @@ const Create = () => {
 									placeholder='Name'
 									className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 									value={input.image_link}
-									onChange={event => handleFormChange(event,index )}
+									onChange={(event) => handleFormChange(event, index)}
 								/>
 
 								<button onClick={() => removeFields(index)}>Remove</button>
@@ -288,7 +279,6 @@ const Create = () => {
 			</form>
 
 			<button onClick={addFields}>Add More..</button>
-
 		</div>
 	);
 };

@@ -77,7 +77,7 @@ const [windowWidth, setWindowWidth] = useState(0);
 					{
 						title: "Potential Sneaker Purchases",
 						href: "/sneakers/dashboard/voted",
-						label: "23",
+						label: "",
 						icon: Heart,
 						variant: "ghost",
 					},
