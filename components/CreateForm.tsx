@@ -56,7 +56,7 @@ const formSchema = z.object({
 		message: "At least 1 sneaker link is required.",
 	}),
 	sneakerSKU: z.string().min(2, {
-		message: "Sneaker SKU must be at least 2 characters.",
+		message: "SKU must be at least 2 characters.",
 	}),
 	sneakerBrand: z.string({
 		required_error: "Please select a sneaker brand.",
@@ -83,16 +83,6 @@ const formSchema = z.object({
 			z.number(),
 		])
 		.pipe(z.coerce.number().min(0.0001).max(999999999)),
-
-	//   sneakerPrice: z.object({
-	//   type1: z.string(),
-	//   type2: z.string(),
-	//   type4: z.string().transform((val) => {
-	//     if (val.length !== 5) throw new Error('Type4 must have 5 digits')
-	//     return parseInt(val, 10)
-	//   }),
-	//   type5: z.number()
-	// }),
 });
 
 export function CreateForm() {
@@ -105,10 +95,7 @@ export function CreateForm() {
 			sneakerSKU: "",
 			sneakerPrice: 0,
 			mainSneakerImageLink: "",
-			sneakerImageLink: [
-				
-			],
-			
+			sneakerImageLink: [],
 		},
 	});
 
@@ -139,46 +126,55 @@ export function CreateForm() {
 					<img
 						src={
 							main_image === ""
-								? "https://placehold.co/600x290?text=Sneaker+Image"
+								? "https://placehold.co/600x290?text=Main+Sneaker+Image"
 								: main_image
 						}
 						alt='Sneaker'
 					/>
 				</div>
 
-				<FormField
-					control={form.control}
-					name='sneakerName'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Sneaker Name</FormLabel>
-							<FormControl>
-								<Input placeholder='Air Jordan 1 ' {...field} />
-							</FormControl>
-							{/* <FormDescription>
+				
+					<FormField
+						control={form.control}
+						name='sneakerName'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Sneaker Name</FormLabel>
+								<FormControl>
+									<Input
+										
+										placeholder='Air Jordan 1 '
+										{...field}
+									/>
+								</FormControl>
+								{/* <FormDescription>
                 The display name of the Sneaker.
               </FormDescription> */}
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-				<FormField
-					control={form.control}
-					name='sneakerSKU'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Sneaker SKU/STYLE</FormLabel>
-							<FormControl>
-								<Input placeholder='AQ9129 500 ' {...field} />
-							</FormControl>
-							{/* <FormDescription>
+				
+			<div className='flex justify-between'> 
+	<FormField
+						control={form.control}
+						name='sneakerSKU'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Sneaker SKU/STYLE</FormLabel>
+								<FormControl>
+									<Input className={cn("w-[230px] pl-3 text-left font-normal")} placeholder='AQ9129 500 ' {...field} />
+								</FormControl>
+								{/* <FormDescription>
                 The display name of the Sneaker.
               </FormDescription> */}
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+        
 				<FormField
 					control={form.control}
 					name='sneakerPrice'
@@ -186,7 +182,7 @@ export function CreateForm() {
 						<FormItem>
 							<FormLabel>Retail Price</FormLabel>
 							<FormControl>
-								<Input placeholder='210 ' {...field} />
+								<Input className={cn("w-[320px] pl-3 text-left font-normal")} placeholder='210 ' {...field} />
 							</FormControl>
 							{/* <FormDescription>
                 The display name of the Sneaker.
@@ -196,7 +192,12 @@ export function CreateForm() {
 					)}
 				/>
 
-				<FormField
+			
+        
+        </div>
+
+        <div className='flex justify-between'> 
+        <FormField
 					control={form.control}
 					name='sneakerBrand'
 					render={({ field }) => (
@@ -209,7 +210,7 @@ export function CreateForm() {
 											variant='outline'
 											role='combobox'
 											className={cn(
-												"w-[200px] justify-between",
+												"w-[230px] justify-between",
 												!field.value && "text-muted-foreground"
 											)}>
 											{field.value
@@ -258,19 +259,21 @@ export function CreateForm() {
 					)}
 				/>
 
+
+
 				<FormField
 					control={form.control}
 					name='sneakerReleaseDate'
 					render={({ field }) => (
 						<FormItem className='flex flex-col'>
-							<FormLabel>Date of birth</FormLabel>
+							<FormLabel>Release Date </FormLabel>
 							<Popover>
 								<PopoverTrigger asChild>
 									<FormControl>
 										<Button
 											variant={"outline"}
 											className={cn(
-												"w-[240px] pl-3 text-left font-normal",
+												"w-[320px] pl-3 text-left font-normal",
 												!field.value && "text-muted-foreground"
 											)}>
 											{field.value ? (
@@ -287,9 +290,9 @@ export function CreateForm() {
 										mode='single'
 										selected={field.value}
 										onSelect={field.onChange}
-										disabled={(date) =>
-											date > new Date() || date < new Date("1900-01-01")
-										}
+										// disabled={(date) =>
+										// 	date > new Date() || date < new Date("1900-01-01")
+										// }
 										initialFocus
 									/>
 								</PopoverContent>
@@ -300,25 +303,25 @@ export function CreateForm() {
 							<FormMessage />
 						</FormItem>
 					)}
-				/>
+				/></div>
 
 				<div>
 					<FormField
 						control={form.control}
 						name='mainSneakerImageLink'
 						render={({ field }) => (
-<> 
-							<FormItem>
-								<FormLabel>Main Image URL</FormLabel>
-								<FormControl onBlur={() => setImage(field.value)}>
-									<Input placeholder='https:// ' {...field} />
-								</FormControl>
-								{/* <FormDescription>
+							<>
+								<FormItem>
+									<FormLabel>Main Image URL</FormLabel>
+									<FormControl onBlur={() => setImage(field.value)}>
+										<Input placeholder='https:// ' {...field} />
+									</FormControl>
+									{/* <FormDescription>
                 The display name of the Sneaker.
               </FormDescription> */}
-								<FormMessage />
-							</FormItem>
-              </>
+									<FormMessage />
+								</FormItem>
+							</>
 						)}
 					/>
 					{fields.map((field, index) => (
