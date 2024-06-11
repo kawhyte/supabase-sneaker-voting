@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { Check, ChevronsUpDown, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "./ui/use-toast";
+import { useState } from "react";
 
 const languages = [
 	{ label: "Jordan", value: "1" },
@@ -51,15 +52,26 @@ const formSchema = z.object({
 	sneakerName: z.string().min(2, {
 		message: "Sneaker name must be at least 2 characters.",
 	}),
+	mainSneakerImageLink: z.string().url({
+		message: "At least 1 sneaker link is required.",
+	}),
 	sneakerSKU: z.string().min(2, {
 		message: "Sneaker SKU must be at least 2 characters.",
 	}),
 	sneakerBrand: z.string({
 		required_error: "Please select a sneaker brand.",
 	}),
-	sneakerImageLink: z.string().url({
-		message: "Sneaker link is required.",
-	}),
+	// sneakerImageLink: z.string().url({
+	// 	message: "Sneaker link is required.",
+	// }),
+
+	sneakerImageLink: z
+		.array(
+			z.object({
+				value: z.string().url({ message: "Please enter a valid URL." }),
+			})
+		)
+		.optional(),
 
 	sneakerReleaseDate: z.date({
 		required_error: "A sneaker release date is required.",
@@ -84,6 +96,7 @@ const formSchema = z.object({
 });
 
 export function CreateForm() {
+	const [main_image, setImage] = useState("");
 	// 1. Define your form.
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -91,11 +104,18 @@ export function CreateForm() {
 			sneakerName: "",
 			sneakerSKU: "",
 			sneakerPrice: 0,
-			//sneakerBrand:"1"
-			//language:"",
+			mainSneakerImageLink: "",
+			sneakerImageLink: [
+				
+			],
+			
 		},
 	});
 
+	const { fields, append, remove } = useFieldArray({
+		name: "sneakerImageLink",
+		control: form.control,
+	});
 	// 2. Define a submit handler.
 	function onSubmit(values: z.infer<typeof formSchema>) {
 		// Do something with the form values.
@@ -115,6 +135,17 @@ export function CreateForm() {
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+				<div className='mb-6'>
+					<img
+						src={
+							main_image === ""
+								? "https://placehold.co/600x290?text=Sneaker+Image"
+								: main_image
+						}
+						alt='Sneaker'
+					/>
+				</div>
+
 				<FormField
 					control={form.control}
 					name='sneakerName'
@@ -131,22 +162,7 @@ export function CreateForm() {
 						</FormItem>
 					)}
 				/>
-				<FormField
-					control={form.control}
-					name='sneakerImageLink'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Add Image</FormLabel>
-							<FormControl>
-								<Input placeholder='https://' {...field} />
-							</FormControl>
-							<FormDescription>
-                At least one image is required.
-              </FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+
 				<FormField
 					control={form.control}
 					name='sneakerSKU'
@@ -286,6 +302,65 @@ export function CreateForm() {
 					)}
 				/>
 
+				<div>
+					<FormField
+						control={form.control}
+						name='mainSneakerImageLink'
+						render={({ field }) => (
+<> 
+							<FormItem>
+								<FormLabel>Main Image URL</FormLabel>
+								<FormControl onBlur={() => setImage(field.value)}>
+									<Input placeholder='https:// ' {...field} />
+								</FormControl>
+								{/* <FormDescription>
+                The display name of the Sneaker.
+              </FormDescription> */}
+								<FormMessage />
+							</FormItem>
+              </>
+						)}
+					/>
+					{fields.map((field, index) => (
+						<FormField
+							control={form.control}
+							key={field.id}
+							name={`sneakerImageLink.${index}.value`}
+							render={({ field }) => (
+								<FormItem>
+									{/* <FormLabel className={cn(index !== 0 && "sr-only")}>
+										Additional URLs
+									</FormLabel> */}
+									<FormDescription className={cn(index !== 0 && "sr-only")}>
+										Additional links for the sneaker.
+									</FormDescription>
+									<FormControl>
+										<div className='flex justify-between items-center'>
+											<Input {...field} />
+											<Button
+												type='button'
+												variant='outline'
+												size='sm'
+												className='ml-2'
+												onClick={() => remove(index)}>
+												Remove
+											</Button>
+										</div>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					))}
+					<Button
+						type='button'
+						variant='outline'
+						size='sm'
+						className='mt-2'
+						onClick={() => append({ value: "" })}>
+						Add more Sneaker URLs
+					</Button>
+				</div>
 				<Button type='submit'>Submit</Button>
 			</form>
 		</Form>
