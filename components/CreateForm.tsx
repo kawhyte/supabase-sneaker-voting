@@ -70,8 +70,10 @@ const formSchema = z.object({
 	sneakerImageLink: z
 		.array(
 			z.object({
-				image_link: z.string().url({ message: "Please enter a valid URL." } , ),
-      sneaker_id:z.string(), main_image:z.boolean()})
+				image_link: z.string().url({ message: "Please enter a valid URL." }),
+				sneaker_id: z.string(),
+				main_image: z.boolean(),
+			})
 		)
 		.optional(),
 
@@ -87,16 +89,14 @@ const formSchema = z.object({
 		.pipe(z.coerce.number().min(0.0001).max(999999999)),
 });
 
-const  CreateForm = () => {
-
-  const [name, setName] = useState("");
+const CreateForm = () => {
+	const [name, setName] = useState("");
 	const [date, setDate] = useState("");
 	const [brand, setBrand] = useState("2");
 	const [price, setPrice] = useState("");
 	const [style, setStyle] = useState("");
 	const [formError, setFormError] = useState("");
 	const [main_image, setImage] = useState("");
-
 
 	// 1. Defining the form.
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -116,14 +116,13 @@ const  CreateForm = () => {
 		control: form.control,
 	});
 	// 2. Define a submit handler.
-async	function  onSubmit(values: z.infer<typeof formSchema>) {
-
-  console.log("Before",values);
+	async function onSubmit(values: z.infer<typeof formSchema>) {
+		console.log("Before", values);
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
-    const supabase = createClient();
-    
-    // const {
+		const supabase = createClient();
+
+		// const {
 		// 	data: { user },
 		// } = await supabase.auth.getUser();
 
@@ -133,14 +132,12 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 		// 	return;
 		// }
 
-    
-
-    const { data: sneaker_data, error } = await supabase
+		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
 			.insert([
 				{
 					name: values.sneakerName,
-					brand_id: parseInt(values.sneakerBrand,10) ,// parseInt(brand, 10),
+					brand_id: parseInt(values.sneakerBrand, 10), // parseInt(brand, 10),
 					release_date: values.sneakerReleaseDate,
 					price: values.sneakerPrice,
 					style: values.sneakerSKU,
@@ -153,13 +150,17 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 			setFormError(error.message);
 		}
 
-    console.log("here")
+		console.log("here");
 
-    if (sneaker_data) {
+		if (sneaker_data) {
 			const sneakerID = sneaker_data[0]?.id;
 			console.log("sneaker_data", sneakerID);
 
-      values?.sneakerImageLink?.push({image_link:values.mainSneakerImageLink, sneaker_id:"",main_image:true })
+			values?.sneakerImageLink?.push({
+				image_link: values.mainSneakerImageLink,
+				sneaker_id: "",
+				main_image: true,
+			});
 			values?.sneakerImageLink?.map((a) => (a.sneaker_id = sneakerID));
 			// const { data, error } = await supabase
 			// 	.from("images")
@@ -182,28 +183,24 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 
 			//router.push("/sneakers/dashboard/pending");
 
-
-		toast({
-			title: `${values.sneakerName} was successfully added 🚀`,
-			action: (
-				<ToastAction altText='Try again'>
-					<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
-						View Listing{" "}
-					</Link>
-				</ToastAction>
-			),
-		});
-		console.log("After",values);
+			toast({
+				title: `${values.sneakerName} was successfully added 🚀`,
+				action: (
+					<ToastAction altText='Try again'>
+						<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
+							View Listing{" "}
+						</Link>
+					</ToastAction>
+				),
+			});
+			console.log("After", values);
 		}
-
-
-
 	}
 
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-				<div className='mb-6'>
+				<div className='my-10'>
 					<img
 						src={
 							main_image === ""
@@ -219,7 +216,7 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 					name='sneakerName'
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="uppercase">Sneaker Name</FormLabel>
+							<FormLabel className='uppercase'>Sneaker Name</FormLabel>
 							<FormControl>
 								<Input placeholder='Air Jordan 1 ' {...field} />
 							</FormControl>
@@ -237,7 +234,7 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 						name='sneakerSKU'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="uppercase">Sneaker SKU/STYLE</FormLabel>
+								<FormLabel className='uppercase'>Sneaker SKU/STYLE</FormLabel>
 								<FormControl>
 									<Input
 										className={cn("w-[230px] pl-3 text-left font-normal")}
@@ -258,7 +255,7 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 						name='sneakerPrice'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="uppercase">Retail Price</FormLabel>
+								<FormLabel className='uppercase'>Retail Price</FormLabel>
 								<FormControl>
 									<Input
 										className={cn("w-[320px] pl-3 text-left font-normal")}
@@ -281,7 +278,7 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 						name='sneakerBrand'
 						render={({ field }) => (
 							<FormItem className='flex flex-col'>
-								<FormLabel className="uppercase">Sneaker Brand</FormLabel>
+								<FormLabel className='uppercase'>Sneaker Brand</FormLabel>
 								<Popover>
 									<PopoverTrigger asChild>
 										<FormControl>
@@ -343,7 +340,7 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 						name='sneakerReleaseDate'
 						render={({ field }) => (
 							<FormItem className='flex flex-col'>
-								<FormLabel className="uppercase">Release Date </FormLabel>
+								<FormLabel className='uppercase'>Release Date </FormLabel>
 								<Popover>
 									<PopoverTrigger asChild>
 										<FormControl>
@@ -390,7 +387,7 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 						render={({ field }) => (
 							<>
 								<FormItem>
-									<FormLabel className="uppercase">Main Image URL</FormLabel>
+									<FormLabel className='uppercase'>Main Image URL</FormLabel>
 									<FormControl onBlur={() => setImage(field.value)}>
 										<Input placeholder='https:// ' {...field} />
 									</FormControl>
@@ -435,10 +432,12 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 					))}
 					<Button
 						type='button'
-						variant="secondary"
+						variant='secondary'
 						size='sm'
 						className='mt-2'
-						onClick={() => append({ image_link: "", sneaker_id:"", main_image:false })}>
+						onClick={() =>
+							append({ image_link: "", sneaker_id: "", main_image: false })
+						}>
 						Add more Sneaker URLs
 					</Button>
 				</div>
@@ -446,6 +445,6 @@ async	function  onSubmit(values: z.infer<typeof formSchema>) {
 			</form>
 		</Form>
 	);
-}
+};
 
-export default CreateForm
+export default CreateForm;

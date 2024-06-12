@@ -3,7 +3,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { CirclePlus } from "lucide-react";
 
 export default async function AuthButton() {
   const supabase = createClient();
@@ -32,6 +38,26 @@ export default async function AuthButton() {
           Logout
         </Button>
       </form>
+
+      <TooltipProvider delayDuration={50}>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Link className='' href={"/sneakers/create/"}>
+										<Button
+											
+											size={"sm"}
+											variant={"ghost"} className="hover:border-gray-300 rounded-xl border-2  h-9">
+											<CirclePlus size={20} /> 
+											<p className="text-sm ml-2 mb-2">Create </p>
+										</Button>
+									</Link>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Create New Listing </p>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+						
     </div>
   ) : (
     <Link

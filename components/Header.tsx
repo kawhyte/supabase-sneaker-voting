@@ -18,6 +18,7 @@ import {
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { Button } from "./ui/button";
 
+
 export default async function Header() {
 	const supabase = createClient();
 
@@ -80,10 +81,26 @@ export default async function Header() {
 									Our Collection
 								</Button>
 							</Link>
+							{/* <Link href={"/sneakers/create/"}>
+								<Button
+									variant={"secondary"}
+									className='hover:border-gray-300 rounded-xl border-2  h-9 '>
+									<CirclePlus  />
+									<p className="ml-2 mb-2 text-sm"> Create New Listing </p>
+								</Button>
+							</Link> */}
+
+
+
+
+
+
 						</div>
 					</div>
+					
 
 					<div className='flex justify-end gap-3 align-bottom items-baseline '>
+
 						<div>{isSupabaseConnected && <AuthButton />}</div>
 					</div>
 				</div>

@@ -369,7 +369,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 					<div className=' flex gap-6 justify-around align-middle mt-3 flex-wrap '>
 						{/* Create listing button*/}
 
-						<TooltipProvider delayDuration={50}>
+						{/*<TooltipProvider delayDuration={50}>
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<Link className='mb-2' href={"/sneakers/create/"}>
@@ -385,7 +385,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 									<p>Create New</p>
 								</TooltipContent>
 							</Tooltip>
-						</TooltipProvider>
+						</TooltipProvider>*/}
 
 						{/* Edit listing button*/}
 
