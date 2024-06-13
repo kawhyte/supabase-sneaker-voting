@@ -34,11 +34,22 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "./ui/use-toast";
-import { useState } from "react";
+import { Key, useState } from "react";
 import { ToastAction } from "@radix-ui/react-toast";
 import Link from "next/link";
+import { Sneaker } from "@/app/types/Sneaker";
+import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+	CarouselNext,
+	CarouselPrevious,
+} from "./ui/carousel";
+import { AspectRatio } from "@radix-ui/react-aspect-ratio";
+import Image from "next/image";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
 
-const languages = [
+const brands = [
 	{ label: "Jordan", value: "1" },
 	{ label: "Nike", value: "2" },
 	{ label: "Adidas", value: "3" },
@@ -51,23 +62,23 @@ const languages = [
 ] as const;
 
 const formSchema = z.object({
-	sneakerName: z.string().min(2, {
+	name: z.string().min(2, {
 		message: "Sneaker name must be at least 2 characters.",
 	}),
-	mainSneakerImageLink: z.string().url({
-		message: "At least 1 sneaker link is required.",
-	}),
-	sneakerSKU: z.string().min(2, {
+	// main_image: z.string().url({
+	// 	message: "At least 1 sneaker link is required.",
+	// }),
+	SKU: z.string().min(2, {
 		message: "SKU must be at least 2 characters.",
 	}),
-	sneakerBrand: z.string({
+	brand: z.string({
 		required_error: "Please select a sneaker brand.",
 	}),
 	// sneakerImageLink: z.string().url({
 	// 	message: "Sneaker link is required.",
 	// }),
 
-	sneakerImageLink: z
+	images: z
 		.array(
 			z.object({
 				image_link: z.string().url({ message: "Please enter a valid URL." }),
@@ -77,11 +88,11 @@ const formSchema = z.object({
 		)
 		.optional(),
 
-	sneakerReleaseDate: z.date({
+	release_date: z.date({
 		required_error: "A sneaker release date is required.",
 	}),
 
-	sneakerPrice: z
+	retailPrice: z
 		.union([
 			z.string().transform((x) => x.replace(/[^0-9.-]+/g, "")),
 			z.number(),
@@ -89,38 +100,202 @@ const formSchema = z.object({
 		.pipe(z.coerce.number().min(0.0001).max(999999999)),
 });
 
-const CreateForm = () => {
-	const [name, setName] = useState("");
-	const [date, setDate] = useState("");
-	const [brand, setBrand] = useState("2");
-	const [price, setPrice] = useState("");
-	const [style, setStyle] = useState("");
+type SneakerFormProps = {
+	sneaker?: Sneaker;
+	main: any;
+};
+
+const CreateForm = ({
+	sneaker,
+	main,
+	id,
+	all_images,
+}: {
+	sneaker: any;
+	main: any;
+	id: number;
+	all_images: any;
+}) => {
 	const [formError, setFormError] = useState("");
-	const [main_image, setImage] = useState("");
+	const [main_image, setImage] = useState(main);
+	//const [sneaker_images, setAllImage] = useState(all_images);
+
+	//console.log("Snealers ", sneaker);
+	//console.log("all_image 1 ", sneaker_images);
+	//console.log("Snealers Parse ", Date.parse(sneaker?.release_date));
+	//console.log("Snealers new date ", new Date (sneaker?.release_date).toISOString());
+	//console.log("Snealers new date with parse ", new Date (Date.parse(sneaker?.release_date)));
+	// console.log("main_image ", main);
 
 	// 1. Defining the form.
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
+
 		defaultValues: {
-			sneakerName: "",
-			sneakerSKU: "",
-			sneakerPrice: 0,
-			sneakerBrand: "2",
-			mainSneakerImageLink: "",
-			sneakerImageLink: [],
+			name: "",
+			SKU: "",
+			retailPrice: 0,
+			brand: "", //sneaker?.brand_id?.id?.toString(),
+
+			images: [
+				{
+					image_link: "",
+					main_image: true,
+					sneaker_id: " ",
+				},
+			],
+			//release_date: new Date("1995, 6, 2"),
 		},
+
+		values: sneaker
+			? {
+					name: sneaker.name,
+					SKU: sneaker.style,
+					retailPrice: sneaker.price,
+					brand: sneaker?.brand_id?.id?.toString(),
+					//main_image: sneaker.main_image, //sneaker.images[0].image_link,
+					release_date: new Date(sneaker.release_date),
+					// images: sneaker.images,
+					images: sneaker.images,
+			  }
+			: undefined,
 	});
 
 	const { fields, append, remove } = useFieldArray({
-		name: "sneakerImageLink",
+		name: "images",
 		control: form.control,
 	});
-	// 2. Define a submit handler.
+
+	// 2. Submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		console.log("Before", values);
+		//console.log("Before", values);
+		const supabase = createClient();
+
+		// Check if there us exsisting sneaker to be updated.
+		// If no sneaker is available, then create a new listing
+		if (sneaker) {
+			console.log("I am EDIT - sneaker");
+			console.log("Brand ", values.brand);
+			const { data: sneaker_data, error } = await supabase
+				.from("sneakers")
+				.update({
+					name: values.name,
+					brand_id: values.brand,
+					release_date: values.release_date,
+					price: values.retailPrice,
+					style: values.SKU,
+					//main_image: values.main_image,
+				})
+				.eq("id", id)
+				.select();
+
+			if (error) {
+				console.log(error);
+
+				toast({
+					description: "Please fill in all the fields correctly.",
+				});
+				setFormError("Please fill in all the fields correctly.");
+			}
+
+			// if (sneaker_data) {
+			// 	const sneakerID = sneaker_data[0]?.id;
+
+			// 	const { data, error } = await supabase
+			// 		.from("images")
+			// 		.insert([
+			// 			{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
+			// 		])
+			// 		.select();
+
+			// 	const { data: newVote, error: VoteError } = await supabase
+			// 		.from("rating")
+			// 		.update([{ vote: vote }])
+			// 		.eq("sneaker_id", sneakerID)
+			// 		.select();
+
+			// 	setFormError("");
+			// 	router.push("/sneakers/voted");
+			// }
+
+			toast({
+				title: `${values.name} was successfully updated 🚀`,
+				action: (
+					<ToastAction altText='Try again'>
+						<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
+							View Listing{" "}
+						</Link>
+					</ToastAction>
+				),
+			});
+		} else {
+			console.log("I am NEW - sneaker");
+			const { data: sneaker_data, error } = await supabase
+				.from("sneakers")
+				.insert([
+					{
+						name: values.name,
+						brand_id: parseInt(values.brand, 10), // parseInt(brand, 10),
+						release_date: values.release_date,
+						price: values.retailPrice,
+						style: values.SKU,
+						//main_image: values.main_image,
+					},
+				])
+				.select();
+			if (error) {
+				console.log(error);
+				setFormError(error.message);
+			}
+
+			console.log("here");
+
+			if (sneaker_data) {
+				const sneakerID = sneaker_data[0]?.id;
+				console.log("sneaker_data", sneakerID);
+
+				// values?.images?.push({
+				// 	image_link: values.main_image,
+				// 	sneaker_id: "",
+				// 	main_image: true,
+				// });
+				values?.images?.map((a) => (a.sneaker_id = sneakerID));
+				// const { data, error } = await supabase
+				// 	.from("images")
+				// 	.insert([
+				// 		{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
+				// 	])
+				// 	.select();
+				const { data, error } = await supabase
+					.from("images")
+					.insert(values?.images)
+					.select();
+
+				if (error) {
+					console.log("sneakerID ERROR", error);
+					setFormError(error.message);
+				}
+
+				console.log("sneakerID data ", data);
+				//setFormError("");
+
+				//router.push("/sneakers/dashboard/pending");
+
+				toast({
+					title: `${values.name} was successfully added 🚀`,
+					action: (
+						<ToastAction altText='Try again'>
+							<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
+								View Listing{" "}
+							</Link>
+						</ToastAction>
+					),
+				});
+				console.log("After", values);
+			}
+		}
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
-		const supabase = createClient();
 
 		// const {
 		// 	data: { user },
@@ -131,89 +306,76 @@ const CreateForm = () => {
 
 		// 	return;
 		// }
-
-		const { data: sneaker_data, error } = await supabase
-			.from("sneakers")
-			.insert([
-				{
-					name: values.sneakerName,
-					brand_id: parseInt(values.sneakerBrand, 10), // parseInt(brand, 10),
-					release_date: values.sneakerReleaseDate,
-					price: values.sneakerPrice,
-					style: values.sneakerSKU,
-					main_image: values.mainSneakerImageLink,
-				},
-			])
-			.select();
-		if (error) {
-			console.log(error);
-			setFormError(error.message);
-		}
-
-		console.log("here");
-
-		if (sneaker_data) {
-			const sneakerID = sneaker_data[0]?.id;
-			console.log("sneaker_data", sneakerID);
-
-			values?.sneakerImageLink?.push({
-				image_link: values.mainSneakerImageLink,
-				sneaker_id: "",
-				main_image: true,
-			});
-			values?.sneakerImageLink?.map((a) => (a.sneaker_id = sneakerID));
-			// const { data, error } = await supabase
-			// 	.from("images")
-			// 	.insert([
-			// 		{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
-			// 	])
-			// 	.select();
-			const { data, error } = await supabase
-				.from("images")
-				.insert(values?.sneakerImageLink)
-				.select();
-
-			if (error) {
-				console.log("sneakerID ERROR", error);
-				setFormError(error.message);
-			}
-
-			console.log("sneakerID data ", data);
-			//setFormError("");
-
-			//router.push("/sneakers/dashboard/pending");
-
-			toast({
-				title: `${values.sneakerName} was successfully added 🚀`,
-				action: (
-					<ToastAction altText='Try again'>
-						<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
-							View Listing{" "}
-						</Link>
-					</ToastAction>
-				),
-			});
-			console.log("After", values);
-		}
 	}
+	const onInvalid = (errors: any) => console.error(errors);
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-				<div className='my-10'>
+			<form
+				noValidate
+				onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+				className='space-y-8'>
+				{/* <div className='my-10'>
 					<img
 						src={
-							main_image === ""
-								? "https://placehold.co/688x412?text=Main+Sneaker+Image"
-								: main_image
+							main_image
+								? main_image
+								: "https://placehold.co/688x412?text=Main+Sneaker+Image"
 						}
 						alt='Sneaker'
 					/>
+				</div> */}
+				<div className='my-10'>
+					<>
+						{sneaker?.images ? (
+							<Carousel className=' bg-white'>
+								<CarouselContent className=' '>
+									{sneaker?.images
+										//.sort((a, b) => b.main_image - a.main_image)
+										?.map(
+											(item: {
+												id: Key | null | undefined;
+												image_link: string | StaticImport;
+											}) => (
+												<CarouselItem key={item.id}>
+													<div className=' w-[668px] h-[412px] '>
+														<AspectRatio ratio={16 / 10}>
+															<Image
+																src={item?.image_link}
+																alt='Image'
+																fill
+																className='rounded-md object-cover'
+																blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
+																placeholder='blur'
+																quality={30}
+															/>
+														</AspectRatio>
+													</div>
+												</CarouselItem>
+											)
+										)}
+								</CarouselContent>
+								{sneaker?.images.length > 1 && (
+									<CarouselPrevious className=' mx-16   -my-20' />
+								)}
+								{sneaker?.images.length > 1 && (
+									<CarouselNext className='mx-16  -my-20' />
+								)}
+							</Carousel>
+						) : (
+							<div className='my-10'>
+								<img
+									src={"https://placehold.co/688x412?text=Main+Sneaker+Image"}
+									alt='Sneaker'
+								/>
+							</div>
+						)}
+					</>
 				</div>
 
 				<FormField
 					control={form.control}
-					name='sneakerName'
+					name='name'
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel className='uppercase'>Sneaker Name</FormLabel>
@@ -231,7 +393,7 @@ const CreateForm = () => {
 				<div className='flex flex-col md:flex-row  gap-y-8 md:gap-y-0 justify-between'>
 					<FormField
 						control={form.control}
-						name='sneakerSKU'
+						name='SKU'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel className='uppercase'>Sneaker SKU/STYLE</FormLabel>
@@ -252,7 +414,7 @@ const CreateForm = () => {
 
 					<FormField
 						control={form.control}
-						name='sneakerPrice'
+						name='retailPrice'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel className='uppercase'>Retail Price</FormLabel>
@@ -275,7 +437,7 @@ const CreateForm = () => {
 				<div className='flex flex-col md:flex-row  gap-y-8 md:gap-y-0 justify-between'>
 					<FormField
 						control={form.control}
-						name='sneakerBrand'
+						name='brand'
 						render={({ field }) => (
 							<FormItem className='flex flex-col'>
 								<FormLabel className='uppercase'>Sneaker Brand</FormLabel>
@@ -290,9 +452,8 @@ const CreateForm = () => {
 													!field.value && "text-muted-foreground"
 												)}>
 												{field.value
-													? languages.find(
-															(language) => language.value === field.value
-													  )?.label
+													? brands.find((brand) => brand.value === field.value)
+															?.label
 													: "Select Brand"}
 												<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
 											</Button>
@@ -304,22 +465,22 @@ const CreateForm = () => {
 											<CommandEmpty>No brand found.</CommandEmpty>
 											<CommandGroup>
 												<CommandList>
-													{languages.map((language) => (
+													{brands.map((brand) => (
 														<CommandItem
-															value={language.label}
-															key={language.value}
+															value={brand.label}
+															key={brand.value}
 															onSelect={() => {
-																form.setValue("sneakerBrand", language.value);
+																form.setValue("brand", brand.value);
 															}}>
 															<Check
 																className={cn(
 																	"mr-2 h-4 w-4",
-																	language.value === field.value
+																	brand.value === field.value
 																		? "opacity-100"
 																		: "opacity-0"
 																)}
 															/>
-															{language.label}
+															{brand.label}
 														</CommandItem>
 													))}
 												</CommandList>
@@ -337,7 +498,7 @@ const CreateForm = () => {
 
 					<FormField
 						control={form.control}
-						name='sneakerReleaseDate'
+						name='release_date'
 						render={({ field }) => (
 							<FormItem className='flex flex-col'>
 								<FormLabel className='uppercase'>Release Date </FormLabel>
@@ -381,48 +542,51 @@ const CreateForm = () => {
 				</div>
 
 				<div>
-					<FormField
+					{/* <FormField
 						control={form.control}
-						name='mainSneakerImageLink'
+						name='main_image'
 						render={({ field }) => (
 							<>
+						
 								<FormItem>
 									<FormLabel className='uppercase'>Main Image URL</FormLabel>
 									<FormControl onBlur={() => setImage(field.value)}>
 										<Input placeholder='https:// ' {...field} />
 									</FormControl>
-									{/* <FormDescription>
-                The display name of the Sneaker.
-              </FormDescription> */}
+				
 									<FormMessage />
 								</FormItem>
 							</>
 						)}
-					/>
+					/> */}
 					{fields.map((field, index) => (
 						<FormField
 							control={form.control}
 							key={field.id}
-							name={`sneakerImageLink.${index}.image_link`}
+							name={`images.${index}.image_link`}
 							render={({ field }) => (
 								<FormItem>
 									{/* <FormLabel className={cn(index !== 0 && "sr-only")}>
 										Additional URLs
 									</FormLabel> */}
 									<FormDescription className={cn(index !== 0 && "sr-only")}>
-										Additional links for the sneaker.
+										Sneaker Image Link(s).
 									</FormDescription>
 									<FormControl>
 										<div className='flex justify-between items-center'>
 											<Input {...field} />
-											<Button
-												type='button'
-												variant='outline'
-												size='sm'
-												className='ml-2'
-												onClick={() => remove(index)}>
-												Remove
-											</Button>
+											{index > 0 ? (
+												<Button
+													type='button'
+													variant='outline'
+													size='sm'
+													className='ml-2'
+													onClick={() => remove(index)}>
+													Remove
+												</Button>
+											) : (
+												" "
+											)}
 										</div>
 									</FormControl>
 									<FormMessage />

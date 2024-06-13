@@ -5,6 +5,9 @@ import React from "react";
 type Props = {};
 
 export default function Create({}: Props) {
+	
+	
+	
 	return (
 		<div className='max-w-3xl mx-auto p-10'>
 			<SectionHeader
@@ -13,7 +16,7 @@ export default function Create({}: Props) {
 				sectiontext={"Sneaker Vote Count"}
 			/>
 
-			<CreateForm />
+			<CreateForm sneaker={undefined} main={undefined} id={0} all_images={undefined} />
 		</div>
 	);
 }

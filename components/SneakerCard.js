@@ -39,7 +39,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 
 const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
-	console.log("Cards Sneakers CARD", sneaker);
+	//console.log("Cards Sneakers CARD", sneaker);
 
 	const todayDate = new Date();
 	const databaseDate = Date.parse(sneaker.release_date);
@@ -181,7 +181,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 										))}
 								</CarouselContent>
 								{sneaker.images.length > 1 && (
-									<CarouselPrevious className=' mx-16   -my-20' />
+									<CarouselPrevious className=' mx-16   ' />
 								)}
 								{sneaker.images.length > 1 && (
 									<CarouselNext className='mx-16 ' />
