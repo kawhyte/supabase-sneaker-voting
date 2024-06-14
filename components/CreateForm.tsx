@@ -81,13 +81,14 @@ const formSchema = z.object({
 	// sneakerImageLink: z.string().url({
 	// 	message: "Sneaker link is required.",
 	// }),
-
+	//imageId: z.number(),
 	images: z
 		.array(
 			z.object({
 				image_link: z.string().url({ message: "Please enter a valid URL." }),
 				sneaker_id: z.number(),
 				main_image: z.boolean(),
+				id:z.number(),
 			})
 		)
 		.optional(),
@@ -172,6 +173,7 @@ const CreateForm = ({
 					image_link: "",
 					main_image: true,
 					sneaker_id: 0,
+					id:0,
 				},
 				//{
 
@@ -206,6 +208,7 @@ const CreateForm = ({
 					//main_image: sneaker.main_image, //sneaker.images[0].image_link,
 					release_date: new Date(sneaker.release_date),
 					// images: sneaker.images,
+					//imageId: sneaker.images.id,
 					images: sneaker.images,
 			  }
 			: undefined,
@@ -218,7 +221,7 @@ const CreateForm = ({
 
 	// Submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		//console.log("Before", values);
+		console.log("Before VALUES	", values);
 		const supabase = createClient();
 
 		// Check if there us exsisting sneaker to be updated.
@@ -248,6 +251,51 @@ const CreateForm = ({
 				setFormError("Please fill in all the fields correctly.");
 			}
 
+			if (sneaker_data) {
+				const sneakerID = sneaker_data[0]?.id;
+				console.log("sneaker_data", sneakerID);
+				console.log("HEY HEY HEY", values?.images);
+
+				// values?.images?.push({
+				// 	image_link: values.main_image,
+				// 	sneaker_id: "",
+				// 	main_image: true,
+				// });
+				values?.images?.map((a) => (a.sneaker_id = sneakerID));
+				// const { data, error } = await supabase
+				// 	.from("images")
+				// 	.insert([
+				// 		{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
+				// 	])
+				// 	.select();
+				const { data, error } = await supabase
+					.from("images")
+					.upsert(values?.images, {onConflict: "id"})
+					.select();
+
+				if (error) {
+					console.log("sneakerID ERROR", error);
+					setFormError(error.message);
+				}
+
+				console.log("sneakerID data ", data);
+				//setFormError("");
+
+				//router.push("/sneakers/dashboard/pending");
+
+				toast({
+					title: `${values.name} was successfully updated 🚀`,
+					action: (
+						<ToastAction altText='Try again'>
+							<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
+								View Listing{" "}
+							</Link>
+						</ToastAction>
+					),
+				});
+				console.log("After", values);
+			}
+
 			// if (sneaker_data) {
 			// 	const sneakerID = sneaker_data[0]?.id;
 
@@ -268,16 +316,16 @@ const CreateForm = ({
 			// 	router.push("/sneakers/voted");
 			// }
 
-			toast({
-				title: `${values.name} was successfully updated 🚀`,
-				action: (
-					<ToastAction altText='Try again'>
-						<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
-							View Listing{" "}
-						</Link>
-					</ToastAction>
-				),
-			});
+			// toast({
+			// 	title: `${values.name} was successfully updated 🚀`,
+			// 	action: (
+			// 		<ToastAction altText='Try again'>
+			// 			<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
+			// 				View Listing{" "}
+			// 			</Link>
+			// 		</ToastAction>
+			// 	),
+			// });
 		} else {
 			console.log("I am NEW - sneaker");
 			const { data: sneaker_data, error } = await supabase
@@ -349,19 +397,7 @@ const CreateForm = ({
 	}
 	const onInvalid = (errors: any) => console.error(errors);
 
-	/* The handleChange() function to set a new state for input */
-	// const handleImageUpdate = (event: any) => {
-	// 	console.log("event ", event);
-
-	// 	event.name ? setName(event.value) : "";
-	// 	console.log("Name inside ", name);
-	// 	//  console.log("HandleUPdate Preview", preview)
-
-	// 	// //preview.push(event.value)
-	// 	// console.log("Link after ", link)
-
-	// 	//setPreview(event?.target.value);
-	// };
+	
 
 	return (
 		<Form {...form}>
@@ -402,7 +438,7 @@ const CreateForm = ({
 										//.sort((a, b) => b.main_image - a.main_image)
 										?.map((item: any, index: any) => {
 											return (
-												<CarouselItem key={item.image_link}>
+												<CarouselItem key={item.id}>
 													<div className=' w-[668px] h-[412px] '>
 														<AspectRatio ratio={16 / 10}>
 															<Image
@@ -420,12 +456,13 @@ const CreateForm = ({
 											);
 										})}
 								</CarouselContent>
+								<div> 
 								{sneaker?.images.length > 1 && (
-									<CarouselPrevious className=' mx-16   -my-20' />
+									<CarouselPrevious type="button" className=' mx-16   -my-20' />
 								)}
 								{sneaker?.images.length > 1 && (
-									<CarouselNext className='mx-16  -my-20' />
-								)}
+									<CarouselNext type="button" className='mx-16  -my-20' />
+								)}</div>
 							</Carousel>
 						) : (
 							<></>
@@ -680,7 +717,7 @@ const CreateForm = ({
 						size='sm'
 						className='mt-2'
 						onClick={() =>
-							append({ image_link: "", sneaker_id: 0, main_image: false })
+							append({ image_link: "", sneaker_id: 0, id:0, main_image: false })
 						}>
 						Add more Sneaker URLs
 					</Button>
