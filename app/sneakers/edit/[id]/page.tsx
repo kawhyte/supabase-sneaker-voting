@@ -42,9 +42,11 @@ const Edit = ({ params }: { params: any }) => {
 				setPrice(data.price);
 				setStyle(data.style);
 
+				//data.images.map((a: { sneaker_id: { toString: () => any; }; }) => (a.sneaker_id.toString() ));
+				//data.images.forEach(v => v.sneaker.id += '');
                 setData(data)
 
-                //console.log("DATA ",data)
+                //console.log("data.images ",data.images)
 
 				// const { data: rating, error } = await supabase
 				// 	.from("rating")

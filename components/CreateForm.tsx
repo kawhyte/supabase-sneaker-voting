@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "./ui/use-toast";
-import { Key, useState } from "react";
+import { Key, SetStateAction, useEffect, useState } from "react";
 import { ToastAction } from "@radix-ui/react-toast";
 import Link from "next/link";
 import { Sneaker } from "@/app/types/Sneaker";
@@ -48,6 +48,7 @@ import {
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 const brands = [
 	{ label: "Jordan", value: "1" },
@@ -61,10 +62,13 @@ const brands = [
 	{ label: "Other", value: "9" },
 ] as const;
 
+let nextId = 0;
+
 const formSchema = z.object({
 	name: z.string().min(2, {
 		message: "Sneaker name must be at least 2 characters.",
 	}),
+
 	// main_image: z.string().url({
 	// 	message: "At least 1 sneaker link is required.",
 	// }),
@@ -82,7 +86,7 @@ const formSchema = z.object({
 		.array(
 			z.object({
 				image_link: z.string().url({ message: "Please enter a valid URL." }),
-				sneaker_id: z.string(),
+				sneaker_id: z.number(),
 				main_image: z.boolean(),
 			})
 		)
@@ -100,10 +104,16 @@ const formSchema = z.object({
 		.pipe(z.coerce.number().min(0.0001).max(999999999)),
 });
 
-type SneakerFormProps = {
-	sneaker?: Sneaker;
-	main: any;
-};
+// type SneakerFormProps = {
+// 	sneaker?: Sneaker;
+// 	main: any;
+// };
+
+// type Test = {
+// 	sneaker_id: string;
+// 	image_link: string;
+// 	main_image: false;
+// };
 
 const CreateForm = ({
 	sneaker,
@@ -117,17 +127,37 @@ const CreateForm = ({
 	all_images: any;
 }) => {
 	const [formError, setFormError] = useState("");
-	const [main_image, setImage] = useState(main);
-	//const [sneaker_images, setAllImage] = useState(all_images);
 
-	//console.log("Snealers ", sneaker);
-	//console.log("all_image 1 ", sneaker_images);
-	//console.log("Snealers Parse ", Date.parse(sneaker?.release_date));
-	//console.log("Snealers new date ", new Date (sneaker?.release_date).toISOString());
-	//console.log("Snealers new date with parse ", new Date (Date.parse(sneaker?.release_date)));
-	// console.log("main_image ", main);
 
-	// 1. Defining the form.
+
+
+
+
+
+	// const [name, setName] = useState([
+	// 	{
+	// 		image_link: "https://placehold.co/688x422?text=Sneaker+Image+here",
+	// 		main_image: true,
+	// 		sneaker_id: "193",
+	// 	},
+		// {
+
+		// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148542_1000.jpg",
+		// 	main_image: false,
+		// 	sneaker_id: "193"
+		// },
+		// {
+
+		// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148548_1000.jpg",
+		// 	main_image: false,
+		// 	sneaker_id: "193"
+		// }
+	//]);
+	// const [artists, setArtists] = useState<Test[]>([]);
+
+	console.log("Snealers ", sneaker);
+
+	//Defining the form.
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 
@@ -141,9 +171,29 @@ const CreateForm = ({
 				{
 					image_link: "",
 					main_image: true,
-					sneaker_id: " ",
+					sneaker_id: 0,
 				},
+				//{
+
+				// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148542_1000.jpg",
+				// 	main_image: false,
+				// 	sneaker_id: "193"
+				// },
+				// {
+
+				// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148548_1000.jpg",
+				// 	main_image: false,
+				// 	sneaker_id: "193"
+				// },
 			],
+
+			// [
+			// 	{
+			// 		image_link: "",
+			// 		main_image: true,
+			// 		sneaker_id: " ",
+			// 	},
+			// ],
 			//release_date: new Date("1995, 6, 2"),
 		},
 
@@ -166,7 +216,7 @@ const CreateForm = ({
 		control: form.control,
 	});
 
-	// 2. Submit handler.
+	// Submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		//console.log("Before", values);
 		const supabase = createClient();
@@ -296,18 +346,22 @@ const CreateForm = ({
 		}
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
-
-		// const {
-		// 	data: { user },
-		// } = await supabase.auth.getUser();
-
-		// if (!values.sneakerName || !values.sneakerReleaseDate || !values.sneakerBrand || !values.sneakerPrice || !values.sneakerSKU || !values.mainSneakerImageLink) {
-		// 	setFormError("Please fill in all the fields correctly.");
-
-		// 	return;
-		// }
 	}
 	const onInvalid = (errors: any) => console.error(errors);
+
+	/* The handleChange() function to set a new state for input */
+	// const handleImageUpdate = (event: any) => {
+	// 	console.log("event ", event);
+
+	// 	event.name ? setName(event.value) : "";
+	// 	console.log("Name inside ", name);
+	// 	//  console.log("HandleUPdate Preview", preview)
+
+	// 	// //preview.push(event.value)
+	// 	// console.log("Link after ", link)
+
+	// 	//setPreview(event?.target.value);
+	// };
 
 	return (
 		<Form {...form}>
@@ -316,32 +370,43 @@ const CreateForm = ({
 				onSubmit={form.handleSubmit(onSubmit, onInvalid)}
 				className='space-y-8'>
 				{/* <div className='my-10'>
-					<img
-						src={
-							main_image
-								? main_image
-								: "https://placehold.co/688x412?text=Main+Sneaker+Image"
-						}
-						alt='Sneaker'
-					/>
-				</div> */}
+						<img
+							src={
+								artists?.length > 0
+									? artists[0]?.name
+									: "https://placehold.co/688x412?text=Preview"
+							}
+							alt='Sneaker'
+						/>
+						<p>{artists[0]?.name}</p>
+
+						<Button
+							type='button'
+							variant='secondary'
+							size='sm'
+							className='mt-2'
+							onClick={() =>
+							name ? 	setArtists([...artists, { id: nextId++, name: name }]) :""
+							}>
+							Refresh Preview
+						</Button>
+					</div> */}
+
 				<div className='my-10'>
 					<>
+						{/* {sneaker?.images ? ( */}
 						{sneaker?.images ? (
 							<Carousel className=' bg-white'>
 								<CarouselContent className=' '>
 									{sneaker?.images
 										//.sort((a, b) => b.main_image - a.main_image)
-										?.map(
-											(item: {
-												id: Key | null | undefined;
-												image_link: string | StaticImport;
-											}) => (
-												<CarouselItem key={item.id}>
+										?.map((item: any, index: any) => {
+											return (
+												<CarouselItem key={item.image_link}>
 													<div className=' w-[668px] h-[412px] '>
 														<AspectRatio ratio={16 / 10}>
 															<Image
-																src={item?.image_link}
+																src={item.image_link}
 																alt='Image'
 																fill
 																className='rounded-md object-cover'
@@ -352,8 +417,8 @@ const CreateForm = ({
 														</AspectRatio>
 													</div>
 												</CarouselItem>
-											)
-										)}
+											);
+										})}
 								</CarouselContent>
 								{sneaker?.images.length > 1 && (
 									<CarouselPrevious className=' mx-16   -my-20' />
@@ -363,16 +428,16 @@ const CreateForm = ({
 								)}
 							</Carousel>
 						) : (
-							<div className='my-10'>
+							<></>
+						)}
+					</>
+				</div>
+				{/*<div className='my-10'>
 								<img
 									src={"https://placehold.co/688x412?text=Main+Sneaker+Image"}
 									alt='Sneaker'
 								/>
-							</div>
-						)}
-					</>
-				</div>
-
+							</div>*/}
 				<FormField
 					control={form.control}
 					name='name'
@@ -565,32 +630,47 @@ const CreateForm = ({
 							key={field.id}
 							name={`images.${index}.image_link`}
 							render={({ field }) => (
-								<FormItem>
-									{/* <FormLabel className={cn(index !== 0 && "sr-only")}>
+								<>
+									<FormItem>
+										{/* <FormLabel className={cn(index !== 0 && "sr-only")}>
 										Additional URLs
 									</FormLabel> */}
-									<FormDescription className={cn(index !== 0 && "sr-only")}>
-										Sneaker Image Link(s).
-									</FormDescription>
-									<FormControl>
-										<div className='flex justify-between items-center'>
-											<Input {...field} />
-											{index > 0 ? (
-												<Button
-													type='button'
-													variant='outline'
-													size='sm'
-													className='ml-2'
-													onClick={() => remove(index)}>
-													Remove
-												</Button>
-											) : (
-												" "
-											)}
-										</div>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
+										<FormDescription className={cn(index !== 0 && "sr-only")}>
+											Sneaker Image Link(s).
+										</FormDescription>
+										{/* <FormControl onChange={() => handleImageUpdate(field.value)} > */}
+										<FormControl
+
+										// onBlur={() =>
+										// 	setName([
+
+										// 		{
+										// 		sneaker_id: nextId++,
+										// 		image_link:field.value
+										// 			,
+										// 		main_image: false,
+										// 	}])
+										// }
+										>
+											<div className='flex justify-between items-center'>
+												<Input {...field} />
+												{index > 0 ? (
+													<Button
+														type='button'
+														variant='outline'
+														size='sm'
+														className='ml-2'
+														onClick={() => remove(index)}>
+														Remove
+													</Button>
+												) : (
+													" "
+												)}
+											</div>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								</>
 							)}
 						/>
 					))}
@@ -600,7 +680,7 @@ const CreateForm = ({
 						size='sm'
 						className='mt-2'
 						onClick={() =>
-							append({ image_link: "", sneaker_id: "", main_image: false })
+							append({ image_link: "", sneaker_id: 0, main_image: false })
 						}>
 						Add more Sneaker URLs
 					</Button>
