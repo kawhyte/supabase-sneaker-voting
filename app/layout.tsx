@@ -25,22 +25,25 @@ export default function RootLayout({
 }) {
 	return (
 		<html
-			
 			className={cn(
-				"min-h-screen w-full dark bg-background text-foreground",
+				" dark bg-background text-foreground",
 				GeistSans.className,
 				{ "debug-screens": process.env.NODE_ENV === "development" }
 			)}>
-			<body className='w-full '>
+			<body className='    '>
 				<Header />
-				{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
-				<div className='flex dark  w-full  m-0'>
+				<div className='h-screen  flex-col mx-auto size-full flex items-center'>
+					
+
+					{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
+
 					{/* side bar */}
 					{/* <MainPageLayout children={undefined}></MainPageLayout> */}
 					{/* main page */}
 					{children}
 					<Toaster />
 				</div>
+
 				<Footer />
 			</body>
 		</html>

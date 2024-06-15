@@ -45,13 +45,13 @@ const [windowWidth, setWindowWidth] = useState(0);
 		setIsCollapsed(!isCollapsed);
 	}
 	return (
-		<div className=' relative min-w-[80px] border-r px-3 pb-10 pt-10 '>
+		<div className=' relative min-w-[100px] border-r px-3 pb-10 pt-10 '>
 			{!mobileWidth && (
-				<div className='absolute right-[-20px] top-7'>
+				<div  className='absolute right-[-20px] top-7'>
 					<Button
-						onClick={toggleSideBar}
+					onClick={toggleSideBar}
 						variant={"secondary"}
-						className=' rounded-full p-2 '>
+						className=' rounded-full p-3 '>
 						{isCollapsed ? <ChevronRight /> : <ChevronLeft />}
 					</Button>
 				</div>

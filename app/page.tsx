@@ -18,17 +18,17 @@ export default async function Index() {
 	// console.log("Data", sneakers);
 
 	return (
-		<div className='flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle'>
+		<div className=''>
 			<div className='animate-in flex-1 flex flex-col gap-x-20 opacity-0 max-w-4xl px-3'>
 				<div className='text-2xl lg:text-3xl !leading-tight mx-auto max-w-4xl text-center md:mt-20 '>
-					<div className='font-serif flex flex-col -skew-y-3 drop-shadow-xl  text-[4.25rem] sm:text-[8rem] tracking-[-0.03em] leading-[0.88] font-bold'>
+					<div className='font-serif flex flex-col -skew-y-3 drop-shadow-xl  text-[4.50rem] sm:text-[8rem] tracking-[-0.03em] leading-[0.88] font-bold'>
 						<span className='underline decoration-sky-500/30   '>MTW's</span>
 						<span className=''>Sneaker</span>
 						<span className=''>Collection</span>
 					</div>
 				</div>
 
-				<div className='hidden md:block w-[350px] md:w-[850px] z-30 ml-1 -mt-16   md:-mt-32 md:mr-20'>
+				<div className=' w-[390px] md:w-[850px] z-30 ml-1 -mt-16   md:-mt-32 md:mr-20'>
 					<AspectRatio ratio={16 / 9}>
 						<Image
 							className='rounded-md object-cover'

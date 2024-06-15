@@ -404,7 +404,7 @@ const CreateForm = ({
 			<form
 				noValidate
 				onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-				className='space-y-8'>
+				className='space-y-8 '>
 				{/* <div className='my-10'>
 						<img
 							src={
@@ -501,7 +501,7 @@ const CreateForm = ({
 								<FormLabel className='uppercase'>Sneaker SKU/STYLE</FormLabel>
 								<FormControl>
 									<Input
-										className={cn("w-[230px] pl-3 text-left font-normal")}
+										className={cn("md:w-[180px] pl-3 text-left font-normal")}
 										placeholder='AQ9129 500 '
 										{...field}
 									/>
@@ -522,7 +522,7 @@ const CreateForm = ({
 								<FormLabel className='uppercase'>Retail Price</FormLabel>
 								<FormControl>
 									<Input
-										className={cn("w-[320px] pl-3 text-left font-normal")}
+										className={cn("md:w-[220px] pl-3 text-left font-normal")}
 										placeholder='210'
 										{...field}
 									/>
@@ -550,7 +550,7 @@ const CreateForm = ({
 												variant='outline'
 												role='combobox'
 												className={cn(
-													"w-[230px] justify-between",
+													"md:w-[180px] justify-between",
 													!field.value && "text-muted-foreground"
 												)}>
 												{field.value
@@ -602,7 +602,7 @@ const CreateForm = ({
 						control={form.control}
 						name='release_date'
 						render={({ field }) => (
-							<FormItem className='flex flex-col'>
+							<FormItem className='flex flex-col md:ml-16'>
 								<FormLabel className='uppercase'>Release Date </FormLabel>
 								<Popover>
 									<PopoverTrigger asChild>
@@ -610,7 +610,7 @@ const CreateForm = ({
 											<Button
 												variant={"outline"}
 												className={cn(
-													"w-[320px] pl-3 text-left font-normal",
+													" w-[400px] md:w-[220px] pl-3  text-left font-normal",
 													!field.value && "text-muted-foreground"
 												)}>
 												{field.value ? (

@@ -42,7 +42,7 @@ export default async function AuthButton() {
       <TooltipProvider delayDuration={50}>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<Link className='' href={"/sneakers/create/"}>
+									<Link className='hidden md:block' href={"/sneakers/create/"}>
 										<Button
 											
 											size={"sm"}

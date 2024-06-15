@@ -47,27 +47,14 @@ export default async function Header() {
 		<div className='  '>
 			<>
 				{/* <nav className='w-full flex justify-center align-bottom items-baseline  h-16 my-3  '> */}
-				<div className='w-full px-16  flex justify-between items-center p-3 text-xs '>
+				<div className='w-full  flex justify-between items-center p-3 text-xs '>
 					<div className='flex justify-start items-center font-semibold text-base gap-x-3 '>
 						<Logo />
 
-						{/* {user ? (
-							<Link href={"/sneakers/pending"}>
-								<span className=' hidden md:block hover:border-b-4  border-b-green-600 hover:text-green-500/80 items-center transition ease-in duration-200 py-2 px-3 opacity translate-y-[10px]   leading-[1.2]  '>
-									Pending Vote
-								</span>
-							</Link>
-						) : (
-							<></>
-						)} */}
-						{/* <Link href={"/sneakers/voted"}>
-							<span className='hidden md:block hover:border-b-4  border-b-blue-600 hover:text-blue-500/80 items-center transition ease-in duration-200 py-2 px-3  opacity translate-y-[10px]   leading-[1.2] '>
-								Recent Votes
-							</span>
-						</Link> */}
+				
 						<div className='flex justify-between gap-x-6'>
-							{" "}
-							<Link className='hidden md:block' href={"/sneakers/dashboard"}>
+						
+							<Link className='' href={"/sneakers/dashboard"}>
 								<Button
 									variant={"default"}
 									className='hover:border-gray-300 rounded-xl border-2  h-9'>
@@ -77,19 +64,11 @@ export default async function Header() {
 							<Link href={"/sneakers/collection"}>
 								<Button
 									variant={"ghost"}
-									className='hover:border-gray-300 rounded-xl border-2  h-9'>
+									className='hover:border-gray-300 hidden md:block rounded-xl border-2  h-9'>
 									Our Collection
 								</Button>
 							</Link>
-							{/* <Link href={"/sneakers/create/"}>
-								<Button
-									variant={"secondary"}
-									className='hover:border-gray-300 rounded-xl border-2  h-9 '>
-									<CirclePlus  />
-									<p className="ml-2 mb-2 text-sm"> Create New Listing </p>
-								</Button>
-							</Link> */}
-
+		
 
 
 
@@ -102,7 +81,7 @@ export default async function Header() {
 					<div className='flex justify-end gap-3 align-bottom items-baseline '>
 
 						<div>{isSupabaseConnected && <AuthButton />}</div>
-					</div>
+					</div> 
 				</div>
 				{/* </nav> */}
 				<div className='border-b border-b-foreground/10'></div>
