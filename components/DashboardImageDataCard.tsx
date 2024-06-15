@@ -23,7 +23,7 @@ export type CardProps = {
 };
 
 export default function DashboardImageDataCard(props: CardProps) {
- "2023-08-26T16:53:23"
+ 
 
 
 	return (
@@ -35,10 +35,10 @@ export default function DashboardImageDataCard(props: CardProps) {
 
 			<CardContent>
 				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  max-w-xl'>
-					{props.images?.slice(0, 6).map((item: any) => (
+					{  props.images?.slice(0, 6).map((item: any) => (
 						<div key={item.id}>
 							<Image
-								src={item.collection_image}
+								src={item?.collection_image}
 								width={0}
 								height={0}
 								style={{ width: "120px", height: "auto" }}
