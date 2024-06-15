@@ -20,7 +20,7 @@ export type CardProps = {
 
 export default function DashboardDataCard(props: CardProps) {
 	return (
-		<Card className=' min-w-60'>
+		<Card className=''>
 			<CardHeader className='flex'>
 				<section className='flex justify-between'>
 					<h1 className='text-sm  font-mono'>{props.title}</h1>
