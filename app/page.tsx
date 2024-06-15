@@ -28,7 +28,7 @@ export default async function Index() {
 					</div>
 				</div>
 
-				<div className=' w-[390px] md:w-[850px] z-30 ml-1 -mt-16   md:-mt-32 md:mr-20'>
+				<div className=' w-[490px] sm:w-[690px] md:w-[850px] z-30 ml-1 -mt-16   md:-mt-32 md:mr-20'>
 					<AspectRatio ratio={16 / 9}>
 						<Image
 							className='rounded-md object-cover'
