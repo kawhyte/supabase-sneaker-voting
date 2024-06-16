@@ -18,7 +18,6 @@ import {
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { Button } from "./ui/button";
 
-
 export default async function Header() {
 	const supabase = createClient();
 
@@ -51,9 +50,7 @@ export default async function Header() {
 					<div className='flex justify-start items-center font-semibold text-base gap-x-3 '>
 						<Logo />
 
-				
 						<div className='flex justify-between gap-x-6'>
-						
 							<Link className='' href={"/sneakers/dashboard"}>
 								<Button
 									variant={"default"}
@@ -68,20 +65,12 @@ export default async function Header() {
 									Our Collection
 								</Button>
 							</Link>
-		
-
-
-
-
-
 						</div>
 					</div>
-					
 
 					<div className='flex justify-end gap-3 align-bottom items-baseline '>
-
 						<div>{isSupabaseConnected && <AuthButton />}</div>
-					</div> 
+					</div>
 				</div>
 				{/* </nav> */}
 				<div className='border-b border-b-foreground/10'></div>
@@ -89,3 +78,5 @@ export default async function Header() {
 		</div>
 	);
 }
+
+

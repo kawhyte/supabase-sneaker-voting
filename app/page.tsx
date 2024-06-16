@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import CollectionCard from "@/components/CollectionCard";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import Test from "@/components/Test";
 
 export default async function Index() {
 	const supabase = createClient();
@@ -58,6 +59,8 @@ export default async function Index() {
 					</button>
 				</Link>
 			</div> */}
+
+		
 		</div>
 	);
 }

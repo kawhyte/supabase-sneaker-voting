@@ -88,7 +88,7 @@ const formSchema = z.object({
 				image_link: z.string().url({ message: "Please enter a valid URL." }),
 				sneaker_id: z.number(),
 				main_image: z.boolean(),
-				id:z.number(),
+				id: z.number(),
 			})
 		)
 		.optional(),
@@ -129,30 +129,24 @@ const CreateForm = ({
 }) => {
 	const [formError, setFormError] = useState("");
 
-
-
-
-
-
-
 	// const [name, setName] = useState([
 	// 	{
 	// 		image_link: "https://placehold.co/688x422?text=Sneaker+Image+here",
 	// 		main_image: true,
 	// 		sneaker_id: "193",
 	// 	},
-		// {
+	// {
 
-		// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148542_1000.jpg",
-		// 	main_image: false,
-		// 	sneaker_id: "193"
-		// },
-		// {
+	// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148542_1000.jpg",
+	// 	main_image: false,
+	// 	sneaker_id: "193"
+	// },
+	// {
 
-		// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148548_1000.jpg",
-		// 	main_image: false,
-		// 	sneaker_id: "193"
-		// }
+	// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148548_1000.jpg",
+	// 	main_image: false,
+	// 	sneaker_id: "193"
+	// }
 	//]);
 	// const [artists, setArtists] = useState<Test[]>([]);
 
@@ -173,7 +167,7 @@ const CreateForm = ({
 					image_link: "",
 					main_image: true,
 					sneaker_id: 0,
-					id:0,
+					id: 0,
 				},
 				//{
 
@@ -270,7 +264,7 @@ const CreateForm = ({
 				// 	.select();
 				const { data, error } = await supabase
 					.from("images")
-					.upsert(values?.images, {onConflict: "id"})
+					.upsert(values?.images, { onConflict: "id" })
 					.select();
 
 				if (error) {
@@ -397,15 +391,15 @@ const CreateForm = ({
 	}
 	const onInvalid = (errors: any) => console.error(errors);
 
-	
-
 	return (
-		<Form {...form}>
-			<form
-				noValidate
-				onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-				className='space-y-8 '>
-				{/* <div className='my-10'>
+		<>
+			<div className=''>
+				<Form {...form}>
+					<form
+						noValidate
+						onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+						className=' flex flex-col justify-start items-start space-y-8   '>
+						{/* <div className='my-10'>
 						<img
 							src={
 								artists?.length > 0
@@ -428,223 +422,225 @@ const CreateForm = ({
 						</Button>
 					</div> */}
 
-				<div className='my-10'>
-					<>
-						{/* {sneaker?.images ? ( */}
-						{sneaker?.images ? (
-							<Carousel className=' bg-white'>
-								<CarouselContent className=' '>
-									{sneaker?.images
-										//.sort((a, b) => b.main_image - a.main_image)
-										?.map((item: any, index: any) => {
-											return (
-												<CarouselItem key={item.id}>
-													<div className=' w-[668px] h-[412px] '>
-														<AspectRatio ratio={16 / 10}>
-															<Image
-																src={item.image_link}
-																alt='Image'
-																fill
-																className='rounded-md object-cover'
-																blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
-																placeholder='blur'
-																quality={30}
-															/>
-														</AspectRatio>
-													</div>
-												</CarouselItem>
-											);
-										})}
-								</CarouselContent>
-								<div> 
-								{sneaker?.images.length > 1 && (
-									<CarouselPrevious type="button" className=' mx-16   -my-20' />
+						<div className='my-10  '>
+							<>
+								{sneaker?.images ? (
+									<Carousel className=' bg-white w-[408px] md:w-[708px]'>
+										<CarouselContent className=' '>
+											{sneaker?.images
+												//.sort((a, b) => b.main_image - a.main_image)
+												?.map((item: any, index: any) => {
+													return (
+														<CarouselItem key={item.id}>
+															<div className=' w-[358px] h-[212px] md:w-[698px] md:h-[412px] '>
+																<AspectRatio ratio={16 / 10}>
+																	<Image
+																		src={item.image_link}
+																		alt='Image'
+																		fill
+																		className='rounded-md object-cover'
+																		blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
+																		placeholder='blur'
+																		quality={30}
+																	/>
+																</AspectRatio>
+															</div>
+														</CarouselItem>
+													);
+												})}
+										</CarouselContent>
+										<div>
+											{sneaker?.images.length > 1 && (
+												<CarouselPrevious
+													type='button'
+													className=' mx-16   -my-20'
+												/>
+											)}
+											{sneaker?.images.length > 1 && (
+												<CarouselNext type='button' className='mx-16  -my-20' />
+											)}
+										</div>
+									</Carousel>
+								) : (
+									<></>
 								)}
-								{sneaker?.images.length > 1 && (
-									<CarouselNext type="button" className='mx-16  -my-20' />
-								)}</div>
-							</Carousel>
-						) : (
-							<></>
-						)}
-					</>
-				</div>
-				{/*<div className='my-10'>
+							</>
+						</div>
+						{/*<div className='my-10'>
 								<img
 									src={"https://placehold.co/688x412?text=Main+Sneaker+Image"}
 									alt='Sneaker'
 								/>
 							</div>*/}
-				<FormField
-					control={form.control}
-					name='name'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className='uppercase'>Sneaker Name</FormLabel>
-							<FormControl>
-								<Input placeholder='Air Jordan 1 ' {...field} />
-							</FormControl>
-							{/* <FormDescription>
-                The display name of the Sneaker.
-              </FormDescription> */}
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<div className='flex flex-col md:flex-row  gap-y-8 md:gap-y-0 justify-between'>
-					<FormField
-						control={form.control}
-						name='SKU'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel className='uppercase'>Sneaker SKU/STYLE</FormLabel>
-								<FormControl>
-									<Input
-										className={cn("md:w-[180px] pl-3 text-left font-normal")}
-										placeholder='AQ9129 500 '
-										{...field}
-									/>
-								</FormControl>
-								{/* <FormDescription>
-                The display name of the Sneaker.
-              </FormDescription> */}
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name='retailPrice'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel className='uppercase'>Retail Price</FormLabel>
-								<FormControl>
-									<Input
-										className={cn("md:w-[220px] pl-3 text-left font-normal")}
-										placeholder='210'
-										{...field}
-									/>
-								</FormControl>
-								{/* <FormDescription>
-                The display name of the Sneaker.
-              </FormDescription> */}
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-
-				<div className='flex flex-col md:flex-row  gap-y-8 md:gap-y-0 justify-between'>
-					<FormField
-						control={form.control}
-						name='brand'
-						render={({ field }) => (
-							<FormItem className='flex flex-col'>
-								<FormLabel className='uppercase'>Sneaker Brand</FormLabel>
-								<Popover>
-									<PopoverTrigger asChild>
-										<FormControl>
-											<Button
-												variant='outline'
-												role='combobox'
-												className={cn(
-													"md:w-[180px] justify-between",
-													!field.value && "text-muted-foreground"
-												)}>
-												{field.value
-													? brands.find((brand) => brand.value === field.value)
-															?.label
-													: "Select Brand"}
-												<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-											</Button>
-										</FormControl>
-									</PopoverTrigger>
-									<PopoverContent className='w-[200px] p-0'>
-										<Command>
-											<CommandInput placeholder='Search brand...' />
-											<CommandEmpty>No brand found.</CommandEmpty>
-											<CommandGroup>
-												<CommandList>
-													{brands.map((brand) => (
-														<CommandItem
-															value={brand.label}
-															key={brand.value}
-															onSelect={() => {
-																form.setValue("brand", brand.value);
-															}}>
-															<Check
-																className={cn(
-																	"mr-2 h-4 w-4",
-																	brand.value === field.value
-																		? "opacity-100"
-																		: "opacity-0"
-																)}
-															/>
-															{brand.label}
-														</CommandItem>
-													))}
-												</CommandList>
-											</CommandGroup>
-										</Command>
-									</PopoverContent>
-								</Popover>
-								{/* <FormDescription>
-                This is the language that will be used in the dashboard.
-              </FormDescription> */}
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name='release_date'
-						render={({ field }) => (
-							<FormItem className='flex flex-col md:ml-16'>
-								<FormLabel className='uppercase'>Release Date </FormLabel>
-								<Popover>
-									<PopoverTrigger asChild>
-										<FormControl>
-											<Button
-												variant={"outline"}
-												className={cn(
-													" w-[400px] md:w-[220px] pl-3  text-left font-normal",
-													!field.value && "text-muted-foreground"
-												)}>
-												{field.value ? (
-													format(field.value, "PPP")
-												) : (
-													<span>Pick a date</span>
-												)}
-												<CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-											</Button>
-										</FormControl>
-									</PopoverTrigger>
-									<PopoverContent className='w-auto p-0' align='start'>
-										<Calendar
-											mode='single'
-											selected={field.value}
-											onSelect={field.onChange}
-											// disabled={(date) =>
-											// 	date > new Date() || date < new Date("1900-01-01")
-											// }
-											initialFocus
+						<FormField
+							control={form.control}
+							name='name'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className='uppercase'>Sneaker Name</FormLabel>
+									<FormControl>
+										<Input
+											className={cn(
+												"w-[405px] md:w-[705px]  text-left font-normal"
+											)}
+											placeholder='Air Jordan 1 '
+											{...field}
 										/>
-									</PopoverContent>
-								</Popover>
-								{/* <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription> */}
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
+									</FormControl>
 
-				<div>
-					{/* <FormField
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<div className=' grid grid-cols-2 gap-6 items-center md:place-items-start'>
+							<FormField
+								control={form.control}
+								name='SKU'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className='uppercase'>
+											Sneaker SKU/STYLE
+										</FormLabel>
+										<FormControl>
+											<Input
+												className={cn("w-[200px]   md:w-[270px]  text-left font-normal")}
+												placeholder='AQ9129 500 '
+												{...field}
+											/>
+										</FormControl>
+
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name='retailPrice'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className='uppercase'>Retail Price</FormLabel>
+										<FormControl>
+											<Input
+												className={cn("w-[200px] pl-3 text-left font-normal")}
+												placeholder='210'
+												{...field}
+											/>
+										</FormControl>
+
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name='brand'
+								render={({ field }) => (
+									<FormItem className='flex flex-col'>
+										<FormLabel className='uppercase'>Sneaker Brand</FormLabel>
+										<Popover>
+											<PopoverTrigger asChild>
+												<FormControl>
+													<Button
+														variant='outline'
+														role='combobox'
+														className={cn(
+															"w-[200px] justify-between",
+															!field.value && "text-muted-foreground"
+														)}>
+														{field.value
+															? brands.find(
+																	(brand) => brand.value === field.value
+															  )?.label
+															: "Select Brand"}
+														<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+													</Button>
+												</FormControl>
+											</PopoverTrigger>
+											<PopoverContent className='w-[200px] p-0'>
+												<Command>
+													<CommandInput placeholder='Search brand...' />
+													<CommandEmpty>No brand found.</CommandEmpty>
+													<CommandGroup>
+														<CommandList>
+															{brands.map((brand) => (
+																<CommandItem
+																	value={brand.label}
+																	key={brand.value}
+																	onSelect={() => {
+																		form.setValue("brand", brand.value);
+																	}}>
+																	<Check
+																		className={cn(
+																			"mr-2 h-4 w-4",
+																			brand.value === field.value
+																				? "opacity-100"
+																				: "opacity-0"
+																		)}
+																	/>
+																	{brand.label}
+																</CommandItem>
+															))}
+														</CommandList>
+													</CommandGroup>
+												</Command>
+											</PopoverContent>
+										</Popover>
+
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name='release_date'
+								render={({ field }) => (
+									<FormItem className='flex flex-col '>
+										<FormLabel className='uppercase'>Release Date </FormLabel>
+										<Popover>
+											<PopoverTrigger asChild>
+												<FormControl>
+													<Button
+														variant={"outline"}
+														className={cn(
+															" w-[200px] md:w-[220px]  text-left font-normal",
+															!field.value && "text-muted-foreground"
+														)}>
+														{field.value ? (
+															format(field.value, "PPP")
+														) : (
+															<span>Pick a date</span>
+														)}
+														<CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+													</Button>
+												</FormControl>
+											</PopoverTrigger>
+											<PopoverContent className='w-auto p-0' align='start'>
+												<Calendar
+													mode='single'
+													selected={field.value}
+													onSelect={field.onChange}
+													// disabled={(date) =>
+													// 	date > new Date() || date < new Date("1900-01-01")
+													// }
+													initialFocus
+												/>
+											</PopoverContent>
+										</Popover>
+
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+
+						<div className='flex flex-col md:flex-row  gap-y-8 md:gap-y-0 justify-between'></div>
+
+						<div>
+							{/* <FormField
 						control={form.control}
 						name='main_image'
 						render={({ field }) => (
@@ -661,70 +657,79 @@ const CreateForm = ({
 							</>
 						)}
 					/> */}
-					{fields.map((field, index) => (
-						<FormField
-							control={form.control}
-							key={field.id}
-							name={`images.${index}.image_link`}
-							render={({ field }) => (
-								<>
-									<FormItem>
-										{/* <FormLabel className={cn(index !== 0 && "sr-only")}>
+							{fields.map((field, index) => (
+								<FormField
+									control={form.control}
+									key={field.id}
+									name={`images.${index}.image_link`}
+									render={({ field }) => (
+										<>
+											<FormItem>
+												{/* <FormLabel className={cn(index !== 0 && "sr-only")}>
 										Additional URLs
 									</FormLabel> */}
-										<FormDescription className={cn(index !== 0 && "sr-only")}>
-											Sneaker Image Link(s).
-										</FormDescription>
-										{/* <FormControl onChange={() => handleImageUpdate(field.value)} > */}
-										<FormControl
+									
+												<FormDescription
+													className={cn(index !== 0 && "sr-only")}>
+													Sneaker Image Link(s).
+												</FormDescription>
+												{/* <FormControl onChange={() => handleImageUpdate(field.value)} > */}
+												<FormControl
 
-										// onBlur={() =>
-										// 	setName([
+												// onBlur={() =>
+												// 	setName([
 
-										// 		{
-										// 		sneaker_id: nextId++,
-										// 		image_link:field.value
-										// 			,
-										// 		main_image: false,
-										// 	}])
-										// }
-										>
-											<div className='flex justify-between items-center'>
-												<Input {...field} />
-												{index > 0 ? (
-													<Button
-														type='button'
-														variant='outline'
-														size='sm'
-														className='ml-2'
-														onClick={() => remove(index)}>
-														Remove
-													</Button>
-												) : (
-													" "
-												)}
-											</div>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								</>
-							)}
-						/>
-					))}
-					<Button
-						type='button'
-						variant='secondary'
-						size='sm'
-						className='mt-2'
-						onClick={() =>
-							append({ image_link: "", sneaker_id: 0, id:0, main_image: false })
-						}>
-						Add more Sneaker URLs
-					</Button>
-				</div>
-				<Button type='submit'>Submit</Button>
-			</form>
-		</Form>
+												// 		{
+												// 		sneaker_id: nextId++,
+												// 		image_link:field.value
+												// 			,
+												// 		main_image: false,
+												// 	}])
+												// }
+												>
+													<div className='flex justify-between items-center'>
+														<Input {...field} className='w-[320px] md:w-[650px]  ' />
+														{index > 0 ? (
+															<Button
+																type='button'
+																variant='outline'
+																size='sm'
+																className='ml-2'
+																onClick={() => remove(index)}>
+																Remove
+															</Button>
+														) : (
+															" "
+														)}
+													</div>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										</>
+									)}
+								/>
+							))}
+							<Button
+								type='button'
+								variant='secondary'
+								size='sm'
+								className='mt-2'
+								onClick={() =>
+									append({
+										image_link: "",
+										sneaker_id: 0,
+										id: 0,
+										main_image: false,
+									})
+								}>
+								Add more Sneaker URLs
+							</Button>
+						</div>
+						<Button type='submit'>Submit</Button>
+					</form>
+				</Form>
+			</div>
+		</>
 	);
 };
 
