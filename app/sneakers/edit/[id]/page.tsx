@@ -69,7 +69,7 @@ const Edit = ({ params }: { params: any }) => {
 	return (
 		<div className='max-w-3xl mx-auto p-10'>
 			<SectionHeader
-				name={"Edit Page"}
+				name={`Editing ${name}`}
 				total={undefined}
 				sectiontext={"Sneaker Vote Count"}
 			/>

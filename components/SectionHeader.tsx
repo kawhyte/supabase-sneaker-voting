@@ -18,7 +18,7 @@ export default function Header({ name, total = -1, sectiontext }: Props) {
 				<div className='container mx-auto flex px-5 md:pt-10 items-center justify-center flex-row'>
 					<div className='text-center w-full flex flex-col justify-center align-middle items-center'>
 						<div className='font-serif flex text-white flex-col drop-shadow-xl mt-10  text-[1.25rem] sm:text-[2.5rem] tracking-[-0.03em] leading-[0.88] font-bold'>
-							<span className='underline decoration-green-500/50 '>{name}</span>
+							<span className='underline decoration-green-500/50 line-clamp-1 '>{name}</span>
 						</div>
 					</div>
 

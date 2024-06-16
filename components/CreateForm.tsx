@@ -696,7 +696,7 @@ const CreateForm = ({
 																size='sm'
 																className='ml-2'
 																onClick={() => remove(index)}>
-																Remove
+																Remove row
 															</Button>
 														) : (
 															" "
