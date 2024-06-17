@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { createClient } from "@/utils/supabase/client";
 import CreateForm from "@/components/CreateForm";
@@ -7,13 +7,11 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Sneaker } from "@/app/types/Sneaker";
 
-
-
 const Edit = ({ params }: { params: any }) => {
-    const id = params.id;
+	const id = params.id;
 
-    const [name, setName] = useState("");
-    const [data, setData] = useState<Sneaker | undefined>(undefined);
+	const [name, setName] = useState("");
+	const [data, setData] = useState<Sneaker | undefined>(undefined);
 	const [vote, setVote] = useState("");
 	const [date, setDate] = useState("");
 	const [brand, setBrand] = useState("1");
@@ -23,11 +21,12 @@ const Edit = ({ params }: { params: any }) => {
 	const supabase = createClient();
 	const router = useRouter();
 
-    useEffect(() => {
+	useEffect(() => {
 		const fetchSneakers = async () => {
 			const { data, error } = await supabase
 				.from("sneakers")
-                .select(`*, rating_id(*, vote(*)), images(*),brand_id(*)`).eq("id", id)
+				.select(`*, rating_id(*, vote(*)), images(*),brand_id(*)`)
+				.eq("id", id)
 				.single();
 
 			if (error) {
@@ -44,9 +43,9 @@ const Edit = ({ params }: { params: any }) => {
 
 				//data.images.map((a: { sneaker_id: { toString: () => any; }; }) => (a.sneaker_id.toString() ));
 				//data.images.forEach(v => v.sneaker.id += '');
-                setData(data)
+				setData(data);
 
-                //console.log("data.images ",data.images)
+				//console.log("data.images ",data.images)
 
 				// const { data: rating, error } = await supabase
 				// 	.from("rating")
@@ -60,23 +59,22 @@ const Edit = ({ params }: { params: any }) => {
 		fetchSneakers();
 	}, [id, router]);
 
+	//console.log("DATA2 ",data)
 
-   //console.log("DATA2 ",data)
-
-
-	
-	
 	return (
 		<div className='max-w-3xl mx-auto p-10'>
-			<SectionHeader
-				name={`Editing ${name}`}
-				total={undefined}
-				sectiontext={"Sneaker Vote Count"}
-			/>
+			<h2 className='scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0'>
+				{`Editing ${name}`}
+			</h2>
 
-			<CreateForm sneaker={data} main={data?.main_image} id={id} all_images={data?.images}  />
+			<CreateForm
+				sneaker={data}
+				main={data?.main_image}
+				id={id}
+				all_images={data?.images}
+			/>
 		</div>
 	);
-}
+};
 
 export default Edit;

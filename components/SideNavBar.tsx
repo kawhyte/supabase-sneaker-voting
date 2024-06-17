@@ -51,7 +51,7 @@ const [windowWidth, setWindowWidth] = useState(0);
 					<Button
 					onClick={toggleSideBar}
 						variant={"secondary"}
-						className=' rounded-full p-3 '>
+						className=' rounded-full p-2 '>
 						{isCollapsed ? <ChevronRight /> : <ChevronLeft />}
 					</Button>
 				</div>
