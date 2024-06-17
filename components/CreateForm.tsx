@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "./ui/use-toast";
-import { Key, SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import { ToastAction } from "@radix-ui/react-toast";
 import Link from "next/link";
 
@@ -75,16 +75,14 @@ const ratings = [
 	{ label: "Not for me ", value: "3", icon: ThumbsDown, color: "red" },
 ] as const;
 
-let nextId = 0;
-
 const formSchema = z.object({
 	name: z.string().min(2, {
 		message: "Sneaker name must be at least 2 characters.",
 	}),
 
-	// main_image: z.string().url({
-	// 	message: "At least 1 sneaker link is required.",
-	// }),
+	// collection_image: z.union([z.string().url().nullish(), z.literal("")]),
+	collection_image: z.union([z.literal(""), z.string().url().trim().url().nullable()]).optional(),
+
 	SKU: z.string().min(2, {
 		message: "SKU must be at least 2 characters.",
 	}),
@@ -150,6 +148,7 @@ const CreateForm = ({
 			retailPrice: 0,
 			brand: "",
 			rating: "",
+			collection_image: "",
 
 			images: [
 				{
@@ -168,7 +167,7 @@ const CreateForm = ({
 					retailPrice: sneaker.price,
 					brand: sneaker?.brand_id?.id?.toString(),
 					rating: sneaker?.rating_id?.vote?.vote_id?.toString(),
-					//main_image: sneaker.main_image, //sneaker.images[0].image_link,
+					collection_image: sneaker.collection_image , //sneaker.images[0].image_link,
 					release_date: new Date(sneaker.release_date),
 					images: sneaker.images,
 			  }
@@ -639,23 +638,29 @@ const CreateForm = ({
 						</div>
 
 						<div>
-							{/* <FormField
-						control={form.control}
-						name='main_image'
-						render={({ field }) => (
-							<>
-						
-								<FormItem>
-									<FormLabel className='uppercase'>Main Image URL</FormLabel>
-									<FormControl onBlur={() => setImage(field.value)}>
-										<Input placeholder='https:// ' {...field} />
-									</FormControl>
-				
-									<FormMessage />
-								</FormItem>
-							</>
-						)}
-					/> */}
+							<FormField
+								control={form.control}
+								name='collection_image'
+								render={({ field }) => (
+									<>
+										<FormItem>
+											<FormLabel className='uppercase'>
+												Collection Image URL
+											</FormLabel>
+											{/* onBlur={() => setImage(field.value)} */}
+											<FormControl>
+												<Input
+													className='w-[650px]'
+													placeholder='https:// '
+													{...field}
+												/>
+											</FormControl>
+
+											<FormMessage />
+										</FormItem>
+									</>
+								)}
+							/>
 							{fields.map((field, index) => (
 								<FormField
 									control={form.control}
