@@ -3,7 +3,7 @@ import Image from "next/image";
 //import getBase64 from "@/lib/getLocalBase64";
 import addBlurredDataUrls from "@/lib/getLocalBase64";
 import costPerWear from "@/lib/calculation";
-
+import { format } from "date-fns";
 export default async function CollectionCard({
 	sneakers,
 	showtxt,
@@ -11,20 +11,20 @@ export default async function CollectionCard({
 	sneakers: any;
 	showtxt: boolean;
 }) {
-	//console.log("sneakers from HERO function1", sneakers);
+	console.log("sneakers from Collection", sneakers);
 	//console.log("myBlurDataUrl - sneakers from function",sneakers.collection_image)
 
-	const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
+	//const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
 	let blurDataURL = "";
 	//console.log("NEW myBlurDataUrl ####", sneakersWithBlurDataUrl);
 	//const sneakerCostPerWear = costPerWear ()
 	return (
 		<>
-			{sneakersWithBlurDataUrl?.map((sneaker: any) => (
-				<Link href={`/sneakers/detail/${sneaker.id}`}>
+			{sneakers?.map((sneaker: any) => (
+			
 					<div
 						key={sneaker.id}
-						className={`flex flex-col max-w-sm relative justify-center align-middle items-start  hover:bg-gray-800 ${
+						className={`flex flex-col max-w-sm relative justify-center align-middle items-start  hover:bg-gray-900 ${
 							showtxt ? "bg-gray-800/50 px-1 py-2 md:px-2 md:py-4 w-full" : ""
 						} `}>
 						{showtxt && (
@@ -56,6 +56,7 @@ export default async function CollectionCard({
 							className={`${
 								showtxt ? "mx-12 my-6 sm:mt-14  md:mt-16 lg:mt-20" : ""
 							} `}>
+									<Link href={`/sneakers/detail/${sneaker.id}`}>
 							{/* <Link href={`/sneakers/detail/${sneaker.id}`}> */}
 							<Image
 								width={250}
@@ -77,7 +78,7 @@ export default async function CollectionCard({
 								placeholder='blur'
 								quality={30}
 							/>
-							{/* </Link> */}
+							</Link>
 						</div>
 						{showtxt && (
 							<p className=' line-clamp-2 text-[0.95rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>
@@ -85,10 +86,10 @@ export default async function CollectionCard({
 							</p>
 						)}
 
-						<div className='border-t-2 border-b-2 h-10 w-full grid grid-cols-3 mt-6 gap-y-6'>
-							<div className="">Rating</div>
-							<div>Rating 2</div>
-							<div>Rating 3</div>
+						<div className='border-t-2 border-b-2 h-10 w-full grid grid-cols-2 mt-6 gap-y-6 text-[0.75rem] place-items-center'>
+							<div className="">Added on {format(new Date(sneaker.release_date),'PP')}</div>
+						
+							<div>${sneaker.price}</div>
 						</div>
 
 						{/*showtxt && (
@@ -102,7 +103,7 @@ export default async function CollectionCard({
 						
 					)*/}
 					</div>
-				</Link>
+			
 			))}
 		</>
 	);
