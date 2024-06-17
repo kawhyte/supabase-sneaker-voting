@@ -6,7 +6,15 @@ import { format } from "date-fns";
 import { createClient } from "@/utils/supabase/client";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
-import { Check, ChevronsUpDown, CalendarIcon } from "lucide-react";
+import {
+	Check,
+	ChevronsUpDown,
+	CalendarIcon,
+	Smile,
+	ThumbsUp,
+	Meh,
+	ThumbsDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	Form,
@@ -62,6 +70,13 @@ const brands = [
 	{ label: "Other", value: "9" },
 ] as const;
 
+const ratings = [
+	{ label: "Love it ", value: "1", icon: ThumbsUp, color: "green" },
+	{ label: "I like it ", value: "4", icon: Smile, color: "blue" },
+	{ label: "Meh ", value: "2", icon: Meh, color: "yellow" },
+	{ label: "Not for me ", value: "3", icon: ThumbsDown, color: "red" },
+] as const;
+
 let nextId = 0;
 
 const formSchema = z.object({
@@ -78,6 +93,13 @@ const formSchema = z.object({
 	brand: z.string({
 		required_error: "Please select a sneaker brand.",
 	}),
+
+	rating: z
+		.string({
+			required_error: "Please select a sneaker brand.",
+		})
+		.optional()
+		.or(z.literal("")),
 	// sneakerImageLink: z.string().url({
 	// 	message: "Sneaker link is required.",
 	// }),
@@ -160,7 +182,9 @@ const CreateForm = ({
 			name: "",
 			SKU: "",
 			retailPrice: 0,
-			brand: "", //sneaker?.brand_id?.id?.toString(),
+			brand: "",
+			rating: "",
+			//sneaker?.brand_id?.id?.toString(),
 
 			images: [
 				{
@@ -199,6 +223,7 @@ const CreateForm = ({
 					SKU: sneaker.style,
 					retailPrice: sneaker.price,
 					brand: sneaker?.brand_id?.id?.toString(),
+					rating: sneaker?.rating_id?.vote?.vote_id?.toString(),
 					//main_image: sneaker.main_image, //sneaker.images[0].image_link,
 					release_date: new Date(sneaker.release_date),
 					// images: sneaker.images,
@@ -247,8 +272,9 @@ const CreateForm = ({
 
 			if (sneaker_data) {
 				const sneakerID = sneaker_data[0]?.id;
-				console.log("sneaker_data", sneakerID);
-				console.log("HEY HEY HEY", values?.images);
+				// console.log("sneaker_data", sneakerID);
+				// console.log("HEY HEY HEY", values?.images);
+				console.log("HEY HEY HEY", values);
 
 				// values?.images?.push({
 				// 	image_link: values.main_image,
@@ -273,6 +299,20 @@ const CreateForm = ({
 				}
 
 				console.log("sneakerID data ", data);
+				
+				
+				const { data: newVote, error: VoteError } = await supabase
+				.from("rating")
+				.update([{ vote: values?.rating }])
+				.eq("sneaker_id", sneakerID)
+				.select();
+
+
+
+				console.log("KENNY sneaker newVote ", newVote);
+				console.log("KENNY sneaker VoteError ", newVote);
+				//setFormError("");
+				
 				//setFormError("");
 
 				//router.push("/sneakers/dashboard/pending");
@@ -368,8 +408,8 @@ const CreateForm = ({
 					setFormError(error.message);
 				}
 
-				console.log("sneakerID data ", data);
-				//setFormError("");
+
+				
 
 				//router.push("/sneakers/dashboard/pending");
 
@@ -398,7 +438,7 @@ const CreateForm = ({
 					<form
 						noValidate
 						onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-						className=' flex flex-col justify-start items-start space-y-8   '>
+						className=' flex flex-col justify-start items-start space-y-10   '>
 						{/* <div className='my-10'>
 						<img
 							src={
@@ -493,7 +533,7 @@ const CreateForm = ({
 							)}
 						/>
 
-						<div className=' grid grid-cols-2 gap-6 items-center md:place-items-start'>
+						<div className=' grid md:grid-cols-3 gap-6 items-center md:place-items-start pl'>
 							<FormField
 								control={form.control}
 								name='SKU'
@@ -504,7 +544,9 @@ const CreateForm = ({
 										</FormLabel>
 										<FormControl>
 											<Input
-												className={cn("w-[200px]   md:w-[270px]  text-left font-normal")}
+												className={cn(
+													"w-[200px]   md:w-[200px]  text-left font-normal"
+												)}
 												placeholder='AQ9129 500 '
 												{...field}
 											/>
@@ -523,11 +565,53 @@ const CreateForm = ({
 										<FormLabel className='uppercase'>Retail Price</FormLabel>
 										<FormControl>
 											<Input
-												className={cn("w-[200px] pl-3 text-left font-normal")}
+												className={cn("w-[170px] pl-3 text-left font-normal")}
 												placeholder='210'
 												{...field}
 											/>
 										</FormControl>
+
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name='release_date'
+								render={({ field }) => (
+									<FormItem className='flex flex-col '>
+										<FormLabel className='uppercase'>Release Date </FormLabel>
+										<Popover>
+											<PopoverTrigger asChild>
+												<FormControl>
+													<Button
+														variant={"outline"}
+														className={cn(
+															" w-[200px] md:w-[220px]  text-left font-normal",
+															!field.value && "text-muted-foreground"
+														)}>
+														{field.value ? (
+															format(field.value, "PPP")
+														) : (
+															<span>Pick a date</span>
+														)}
+														<CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+													</Button>
+												</FormControl>
+											</PopoverTrigger>
+											<PopoverContent className='w-auto p-0' align='start'>
+												<Calendar
+													mode='single'
+													selected={field.value}
+													onSelect={field.onChange}
+													// disabled={(date) =>
+													// 	date > new Date() || date < new Date("1900-01-01")
+													// }
+													initialFocus
+												/>
+											</PopoverContent>
+										</Popover>
 
 										<FormMessage />
 									</FormItem>
@@ -594,50 +678,79 @@ const CreateForm = ({
 								)}
 							/>
 
-							<FormField
-								control={form.control}
-								name='release_date'
-								render={({ field }) => (
-									<FormItem className='flex flex-col '>
-										<FormLabel className='uppercase'>Release Date </FormLabel>
-										<Popover>
-											<PopoverTrigger asChild>
-												<FormControl>
-													<Button
-														variant={"outline"}
-														className={cn(
-															" w-[200px] md:w-[220px]  text-left font-normal",
-															!field.value && "text-muted-foreground"
-														)}>
-														{field.value ? (
-															format(field.value, "PPP")
-														) : (
-															<span>Pick a date</span>
-														)}
-														<CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-													</Button>
-												</FormControl>
-											</PopoverTrigger>
-											<PopoverContent className='w-auto p-0' align='start'>
-												<Calendar
-													mode='single'
-													selected={field.value}
-													onSelect={field.onChange}
-													// disabled={(date) =>
-													// 	date > new Date() || date < new Date("1900-01-01")
-													// }
-													initialFocus
-												/>
-											</PopoverContent>
-										</Popover>
+							{sneaker && (
+								<FormField
+									control={form.control}
+									name='rating'
+									render={({ field }) => (
+										<FormItem className='flex flex-col'>
+											<FormLabel className='uppercase'>
+												Sneaker Rating
+											</FormLabel>
+											<Popover>
+												<PopoverTrigger asChild>
+													<FormControl>
+														<Button
+															variant='outline'
+															role='combobox'
+															className={cn(
+																"w-[200px] justify-between",
+																!field.value && "text-muted-foreground"
+															)}>
+															{field.value
+																? ratings.find(
+																		(rating) => rating.value === field.value
+																  )?.label
+																: "Select Rating"}
+																
+																
+															<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+														</Button>
+													</FormControl>
+												</PopoverTrigger>
+												<PopoverContent className='w-[200px] p-0'>
+													<Command>
+														<CommandInput placeholder='Search rating...' />
+														<CommandEmpty>No vote.</CommandEmpty>
+														<CommandGroup>
+															<CommandList>
+																{ratings.map((rating) => (
+																	<CommandItem
+																		value={rating.label}
+																		key={rating.value}
+																		onSelect={() => {
+																			form.setValue("rating", rating.value);
+																		}}>
+																		<Check
+																			className={cn(
+																				"mr-2 h-4 w-4",
+																				rating.value === field.value
+																					? "opacity-100"
+																					: "opacity-0"
+																			)}
+																		/>
 
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
+																		<div className='flex items-center gap-x-2'>
+																			{rating.label}
+																			<rating.icon
+																				color={rating.color}
+																				className='mr-2 h-4 w-4 '
+																			/>
+																		</div>
+																	</CommandItem>
+																))}
+															</CommandList>
+														</CommandGroup>
+													</Command>
+												</PopoverContent>
+											</Popover>
+
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							)}
 						</div>
-
-						<div className='flex flex-col md:flex-row  gap-y-8 md:gap-y-0 justify-between'></div>
 
 						<div>
 							{/* <FormField
@@ -668,7 +781,7 @@ const CreateForm = ({
 												{/* <FormLabel className={cn(index !== 0 && "sr-only")}>
 										Additional URLs
 									</FormLabel> */}
-									
+
 												<FormDescription
 													className={cn(index !== 0 && "sr-only")}>
 													Sneaker Image Link(s).
@@ -688,7 +801,10 @@ const CreateForm = ({
 												// }
 												>
 													<div className='flex justify-between items-center'>
-														<Input {...field} className='w-[320px] md:w-[650px]  ' />
+														<Input
+															{...field}
+															className='w-[320px] md:w-[650px]  '
+														/>
 														{index > 0 ? (
 															<Button
 																type='button'

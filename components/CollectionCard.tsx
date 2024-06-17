@@ -11,7 +11,7 @@ export default async function CollectionCard({
 	sneakers: any;
 	showtxt: boolean;
 }) {
-	console.log("sneakers from Collection", sneakers);
+	// console.log("sneakers from Collection", sneakers);
 	//console.log("myBlurDataUrl - sneakers from function",sneakers.collection_image)
 
 	//const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
