@@ -45,7 +45,7 @@ import { toast } from "./ui/use-toast";
 import { Key, SetStateAction, useEffect, useState } from "react";
 import { ToastAction } from "@radix-ui/react-toast";
 import Link from "next/link";
-import { Sneaker } from "@/app/types/Sneaker";
+
 import {
 	Carousel,
 	CarouselContent,
@@ -55,8 +55,6 @@ import {
 } from "./ui/carousel";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import Image from "next/image";
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 const brands = [
 	{ label: "Jordan", value: "1" },
@@ -127,17 +125,6 @@ const formSchema = z.object({
 		.pipe(z.coerce.number().min(0.0001).max(999999999)),
 });
 
-// type SneakerFormProps = {
-// 	sneaker?: Sneaker;
-// 	main: any;
-// };
-
-// type Test = {
-// 	sneaker_id: string;
-// 	image_link: string;
-// 	main_image: false;
-// };
-
 const CreateForm = ({
 	sneaker,
 	main,
@@ -151,27 +138,6 @@ const CreateForm = ({
 }) => {
 	const [formError, setFormError] = useState("");
 
-	// const [name, setName] = useState([
-	// 	{
-	// 		image_link: "https://placehold.co/688x422?text=Sneaker+Image+here",
-	// 		main_image: true,
-	// 		sneaker_id: "193",
-	// 	},
-	// {
-
-	// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148542_1000.jpg",
-	// 	main_image: false,
-	// 	sneaker_id: "193"
-	// },
-	// {
-
-	// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148548_1000.jpg",
-	// 	main_image: false,
-	// 	sneaker_id: "193"
-	// }
-	//]);
-	// const [artists, setArtists] = useState<Test[]>([]);
-
 	console.log("Snealers ", sneaker);
 
 	//Defining the form.
@@ -184,7 +150,6 @@ const CreateForm = ({
 			retailPrice: 0,
 			brand: "",
 			rating: "",
-			//sneaker?.brand_id?.id?.toString(),
 
 			images: [
 				{
@@ -193,28 +158,7 @@ const CreateForm = ({
 					sneaker_id: 0,
 					id: 0,
 				},
-				//{
-
-				// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148542_1000.jpg",
-				// 	main_image: false,
-				// 	sneaker_id: "193"
-				// },
-				// {
-
-				// 	image_link: "https://img.stadiumgoods.com/jordan-air-jordan-3-j-balvin-rio_22465623_49148548_1000.jpg",
-				// 	main_image: false,
-				// 	sneaker_id: "193"
-				// },
 			],
-
-			// [
-			// 	{
-			// 		image_link: "",
-			// 		main_image: true,
-			// 		sneaker_id: " ",
-			// 	},
-			// ],
-			//release_date: new Date("1995, 6, 2"),
 		},
 
 		values: sneaker
@@ -226,8 +170,6 @@ const CreateForm = ({
 					rating: sneaker?.rating_id?.vote?.vote_id?.toString(),
 					//main_image: sneaker.main_image, //sneaker.images[0].image_link,
 					release_date: new Date(sneaker.release_date),
-					// images: sneaker.images,
-					//imageId: sneaker.images.id,
 					images: sneaker.images,
 			  }
 			: undefined,
@@ -272,8 +214,7 @@ const CreateForm = ({
 
 			if (sneaker_data) {
 				const sneakerID = sneaker_data[0]?.id;
-				// console.log("sneaker_data", sneakerID);
-				// console.log("HEY HEY HEY", values?.images);
+
 				console.log("HEY HEY HEY", values);
 
 				// values?.images?.push({
@@ -282,12 +223,7 @@ const CreateForm = ({
 				// 	main_image: true,
 				// });
 				values?.images?.map((a) => (a.sneaker_id = sneakerID));
-				// const { data, error } = await supabase
-				// 	.from("images")
-				// 	.insert([
-				// 		{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
-				// 	])
-				// 	.select();
+
 				const { data, error } = await supabase
 					.from("images")
 					.upsert(values?.images, { onConflict: "id" })
@@ -299,20 +235,17 @@ const CreateForm = ({
 				}
 
 				console.log("sneakerID data ", data);
-				
-				
+
 				const { data: newVote, error: VoteError } = await supabase
-				.from("rating")
-				.update([{ vote: values?.rating }])
-				.eq("sneaker_id", sneakerID)
-				.select();
-
-
+					.from("rating")
+					.update([{ vote: values?.rating }])
+					.eq("sneaker_id", sneakerID)
+					.select();
 
 				console.log("KENNY sneaker newVote ", newVote);
 				console.log("KENNY sneaker VoteError ", newVote);
 				//setFormError("");
-				
+
 				//setFormError("");
 
 				//router.push("/sneakers/dashboard/pending");
@@ -329,37 +262,6 @@ const CreateForm = ({
 				});
 				console.log("After", values);
 			}
-
-			// if (sneaker_data) {
-			// 	const sneakerID = sneaker_data[0]?.id;
-
-			// 	const { data, error } = await supabase
-			// 		.from("images")
-			// 		.insert([
-			// 			{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
-			// 		])
-			// 		.select();
-
-			// 	const { data: newVote, error: VoteError } = await supabase
-			// 		.from("rating")
-			// 		.update([{ vote: vote }])
-			// 		.eq("sneaker_id", sneakerID)
-			// 		.select();
-
-			// 	setFormError("");
-			// 	router.push("/sneakers/voted");
-			// }
-
-			// toast({
-			// 	title: `${values.name} was successfully updated 🚀`,
-			// 	action: (
-			// 		<ToastAction altText='Try again'>
-			// 			<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
-			// 				View Listing{" "}
-			// 			</Link>
-			// 		</ToastAction>
-			// 	),
-			// });
 		} else {
 			console.log("I am NEW - sneaker");
 			const { data: sneaker_data, error } = await supabase
@@ -380,24 +282,12 @@ const CreateForm = ({
 				setFormError(error.message);
 			}
 
-			console.log("here");
-
 			if (sneaker_data) {
 				const sneakerID = sneaker_data[0]?.id;
 				console.log("sneaker_data", sneakerID);
 
-				// values?.images?.push({
-				// 	image_link: values.main_image,
-				// 	sneaker_id: "",
-				// 	main_image: true,
-				// });
 				values?.images?.map((a) => (a.sneaker_id = sneakerID));
-				// const { data, error } = await supabase
-				// 	.from("images")
-				// 	.insert([
-				// 		{ sneaker_id: sneakerID, image_link: main_image, main_image: true },
-				// 	])
-				// 	.select();
+
 				const { data, error } = await supabase
 					.from("images")
 					.insert(values?.images)
@@ -407,9 +297,6 @@ const CreateForm = ({
 					console.log("sneakerID ERROR", error);
 					setFormError(error.message);
 				}
-
-
-				
 
 				//router.push("/sneakers/dashboard/pending");
 
@@ -702,8 +589,7 @@ const CreateForm = ({
 																		(rating) => rating.value === field.value
 																  )?.label
 																: "Select Rating"}
-																
-																
+
 															<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
 														</Button>
 													</FormControl>
