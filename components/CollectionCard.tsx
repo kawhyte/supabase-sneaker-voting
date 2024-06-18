@@ -4,12 +4,15 @@ import Image from "next/image";
 import addBlurredDataUrls from "@/lib/getLocalBase64";
 import costPerWear from "@/lib/calculation";
 import { format } from "date-fns";
+import AdminButtons from "./AdminButtons";
 export default async function CollectionCard({
-	sneakers,
+	sneaker,
 	showtxt,
+	
 }: {
-	sneakers: any;
+	sneaker: any;
 	showtxt: boolean;
+	
 }) {
 	// console.log("sneakers from Collection", sneakers);
 	//console.log("myBlurDataUrl - sneakers from function",sneakers.collection_image)
@@ -20,8 +23,8 @@ export default async function CollectionCard({
 	//const sneakerCostPerWear = costPerWear ()
 	return (
 		<>
-			{sneakers?.map((sneaker: any) => (
-			
+			{/* {sneakers?.map((sneaker: any) => ( */}
+			<div>
 					<div
 						key={sneaker.id}
 						className={`flex flex-col max-w-sm relative justify-center align-middle items-start  hover:bg-gray-900 ${
@@ -103,8 +106,11 @@ export default async function CollectionCard({
 						
 					)*/}
 					</div>
-			
-			))}
+
+
+<AdminButtons sneaker={sneaker} id={sneaker.id} showAddToCollectionButton={false} showEditButton={false} showDeleteButton={false} showElement={false} collectionPage={true}  />
+</div>
+			{/* ))} */}
 		</>
 	);
 }

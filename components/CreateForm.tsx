@@ -81,7 +81,7 @@ const formSchema = z.object({
 	}),
 
 	// collection_image: z.union([z.string().url().nullish(), z.literal("")]),
-	collection_image: z.union([z.literal(""), z.string().url().trim().url().nullable()]).optional(),
+	collection_image: z.union([z.literal(""), z.string().url().trim().url()]).optional(),
 
 	SKU: z.string().min(2, {
 		message: "SKU must be at least 2 characters.",
@@ -148,7 +148,7 @@ const CreateForm = ({
 			retailPrice: 0,
 			brand: "",
 			rating: "",
-			collection_image: "",
+			collection_image: "https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png",
 
 			images: [
 				{
