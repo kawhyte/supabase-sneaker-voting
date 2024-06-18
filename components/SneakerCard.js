@@ -490,3 +490,6 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 };
 
 export default SneakerCard;
+
+
+

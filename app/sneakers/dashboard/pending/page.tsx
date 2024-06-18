@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
-import SneakerCard from "@/components/SneakerCard";
+import SneakerCard from "@/components/SneakerCard1";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import Loading from "@/components/Loading";
@@ -80,10 +80,9 @@ export default function PendingVote() {
 							<div key={sneaker.id}>
 								<SneakerCard
 									key={sneaker.id}
-									sneaker={sneaker}
-									onVote={handleVote}
-									onDelete={handleDelete}
-									showElement={false}
+									sneaker={sneaker} showtxt={false} //onVote={handleVote}
+									onDelete={handleDelete}									//onDelete={handleDelete}
+									//showElement={false}
 								/>
 							</div>
 						))}

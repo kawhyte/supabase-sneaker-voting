@@ -96,7 +96,7 @@ function AdminButtons({
 			</TooltipProvider>
 
 			{/* Add to Collection button  */}
-			<TooltipProvider delayDuration={50}>
+			{showAddToCollectionButton && <TooltipProvider delayDuration={50}>
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button
@@ -117,7 +117,7 @@ function AdminButtons({
 						)}
 					</TooltipContent>
 				</Tooltip>
-			</TooltipProvider>
+			</TooltipProvider>}
 			{/* Delete listing button*/}
 			<TooltipProvider delayDuration={50}>
 				<Tooltip>
