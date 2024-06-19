@@ -28,7 +28,7 @@ type Props = {
 	showDeleteButton: boolean;
 	showElement: boolean;
 	collectionPage: boolean;
-	onDelete:any;
+	refeshPage:any;
 };
 
 function AdminButtons({
@@ -39,11 +39,11 @@ function AdminButtons({
 	showAddToCollectionButton,
 	showDeleteButton,
 	showEditButton,
-	onDelete
+	refeshPage
 }: Props) {
 	const supabase = createClient();
 
- console.log(typeof(onDelete))
+
 
 
 	const handleAddToCollection = async (value: any, e: any) => {
@@ -65,10 +65,7 @@ function AdminButtons({
 		}
 	};
 	const handleDelete = async () => {
-		//("Test sneaker.id from handleDelete", sneaker);
 
-		console.log("handleDelete 2",id)
-		//console.log("handleDelete", sneaker.id)
 
 		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
@@ -91,8 +88,8 @@ function AdminButtons({
 
 
 			
-
-			onDelete(id);
+refeshPage(id)
+			//onDelete(id);
 		}
 	};
 

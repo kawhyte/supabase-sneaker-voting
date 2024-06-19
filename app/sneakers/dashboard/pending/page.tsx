@@ -7,10 +7,11 @@ import SneakerCard from "@/components/SneakerCard1";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import Loading from "@/components/Loading";
+import { UpdateData } from "@/lib/sneakerUtils";
 
 export default function PendingVote() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
-	const [sneakersPending, setSneakersPending] = useState<number | undefined>(
+	const [sneakerCount, setSneakerCount] = useState<number | undefined>(
 		undefined
 	);
 
@@ -20,14 +21,11 @@ export default function PendingVote() {
 	const router = useRouter();
 	const supabase = createClient();
 
-	const handleDelete = (id: any) => {
-		setSneakers((prevSmoothies: any) => {
-			const updatedSneakers = prevSmoothies?.filter((sm: any) => sm.id !== id);
-			setSneakersPending(updatedSneakers?.length);
 
-			return updatedSneakers;
-		});
-	};
+
+	const handleDataUpdate = UpdateData(setSneakers, setSneakerCount);
+
+
 	const handleVote = async () => {
 		const { data } = await supabase
 			.from("sneakers")
@@ -59,7 +57,7 @@ export default function PendingVote() {
 
 			setSneakers(data);
 
-			setSneakersPending(data?.length);
+			setSneakerCount(data?.length);
 		};
 		getData();
 	}, []);
@@ -70,7 +68,7 @@ export default function PendingVote() {
 			<div className='animate-in flex-1 w-full flex flex-col gap-y-20 items-center  justify-center align-middle '>
 				<SectionHeader
 					name={"Sneakers Awaiting Vote"}
-					total={ sneakersPending}
+					total={ sneakerCount}
 					sectiontext={"Pending Vote count:"}
 				/>
 
@@ -81,7 +79,7 @@ export default function PendingVote() {
 								<SneakerCard
 									key={sneaker.id}
 									sneaker={sneaker} showtxt={false} //onVote={handleVote}
-									onDelete={handleDelete}									//onDelete={handleDelete}
+									refeshPage={handleDataUpdate}									//onDelete={handleDelete}
 									showElement={true}
 								/>
 							</div>
@@ -94,3 +92,5 @@ export default function PendingVote() {
 		<></>
 	);
 }
+
+

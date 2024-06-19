@@ -31,13 +31,13 @@ import SizeTracker from "./SizeTracker";
 export default function SneakerCard({
 	sneaker,
 	showtxt,
-	onDelete,
+	refeshPage,
 	showElement,
 
 }: {
 	sneaker: any;
 	showtxt: boolean;
-	onDelete: any;
+	refeshPage: any;
 	showElement: boolean;
 }) {
 	//console.log("sneakers from Sneaker", sneaker);
@@ -108,7 +108,7 @@ export default function SneakerCard({
 			setVote(value);
 			//setVote(null);
 			//refreshData()
-			onDelete(sneaker.id);
+			refeshPage(sneaker.id);
 			//onVote(sneaker);
 		}
 	};
@@ -167,7 +167,7 @@ export default function SneakerCard({
 							notes={""}
 							links={undefined}
 							show_element={showElement} 
-							onDelete={onDelete}						/>
+							refeshPage={refeshPage}						/>
 
 						{/* {!showElement && 	} */}
 

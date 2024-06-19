@@ -2,16 +2,13 @@ import React from 'react'
 
 type Props = {}
 
-function sneakerUtils() {
+export function UpdateData(setSneakers:any, setSneakerCount:any) {
+	return (id: any) => {
+		setSneakers((prevSmoothies: any) => {
+			const updatedSneakers = prevSmoothies?.filter((sm: any) => sm.id !== id);
+			setSneakerCount(updatedSneakers?.length);
 
-    // const handleDelete = (id: any) => {
-	// 	setSneakers((prevSmoothies: any) => {
-	// 		return prevSmoothies?.filter((sm: any) => sm.id !== id);
-	// 	});
-	// };
-
-
-  return 
+			return updatedSneakers;
+		});
+	};
 }
-
-export default sneakerUtils

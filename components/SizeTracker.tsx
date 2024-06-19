@@ -45,7 +45,7 @@ type Props = {
 	brand: number;
 	show_element: boolean;
 	release_date: any;
-    onDelete:any;
+	refeshPage: any;
 };
 
 export default function Component({
@@ -59,16 +59,10 @@ export default function Component({
 	cost,
 	release_date,
 	brand,
-    onDelete,
+	refeshPage,
 	notes,
 	links,
 }: Props) {
-
-
-
-
-
-
 	return (
 		<Card className='overflow-hidden'>
 			<CardHeader className='flex flex-row items-start bg-muted/50'>
@@ -87,13 +81,15 @@ export default function Component({
 				</div>
 				<div className='ml-auto flex items-center gap-1'>
 					<AdminButtons
-                        sneaker={undefined}
-                        id={sneaker_id}
-                        showAddToCollectionButton={false}
-                        showEditButton={false}
-                        showDeleteButton={false}
-                        showElement={false}
-                        collectionPage={false} onDelete={onDelete}					/>
+						sneaker={undefined}
+						id={sneaker_id}
+						showAddToCollectionButton={false}
+						showEditButton={false}
+						showDeleteButton={false}
+						showElement={false}
+						collectionPage={false}
+						refeshPage={refeshPage}
+					/>
 
 					{/* <Link className='' href={"/sneakers/edit/" + sneaker_id}>
             <Button size="sm" variant="outline" className="h-8 gap-1">
