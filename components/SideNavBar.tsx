@@ -46,7 +46,7 @@ const [windowWidth, setWindowWidth] = useState(0);
 		setIsCollapsed(!isCollapsed);
 	}
 	return (
-		<div className=' relative min-w-[100px] border-r px-3 pb-10 pt-10 '>
+		<div className=' relative min-w-[100px] border-r px-3 pb-10 pt-10  '>
 			{!mobileWidth && (
 				<div  className='absolute right-[-20px] top-7'>
 					<Button
@@ -57,7 +57,7 @@ const [windowWidth, setWindowWidth] = useState(0);
 					</Button>
 				</div>
 			)}
-			<Nav
+			<Nav 
 				isCollapsed={mobileWidth ? true : isCollapsed}
 				links={[
 					{

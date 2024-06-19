@@ -144,9 +144,9 @@ export default function SneakerCard({
 									))}
 							</CarouselContent>
 							{sneaker.images.length > 1 && (
-								<CarouselPrevious className=' mx-16   ' />
+								<CarouselPrevious className=' mx-80 my-28    ' />
 							)}
-							{sneaker.images.length > 1 && <CarouselNext className='mx-16 ' />}
+							{sneaker.images.length > 1 && <CarouselNext className='  mx-24 my-28 ' />}
 						</Carousel>
 						{/* {showElement && <CardHeader>
 							<CardTitle className="className='scroll-m-20 text-base font-mono md:text-xl mt-4 ml-4  tracking-tight lg:text-2xl'">
@@ -207,8 +207,8 @@ export default function SneakerCard({
 																		handleRating("1", e);
 																	}}
 																	type='button'
-																	className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs   text-white  transition ease-in duration-200  uppercase leading-[1.2]  hover:bg-green-500 ${
-																		vote === "1" ? " bg-green-500" : " "
+																	className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs   text-white  transition ease-in duration-200  uppercase leading-[1.2]  hover:bg-gray-700 rounded-lg ${
+																		vote === "1" ? " bg-gray-500" : " "
 																	} `}>
 																	<svg
 																		width='800px'
@@ -239,8 +239,8 @@ export default function SneakerCard({
 																		handleRating("4", e);
 																	}}
 																	type='button'
-																	className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 uppercase leading-[1.2]   hover:bg-indigo-500 ${
-																		vote === "4" ? " bg-indigo-500" : " "
+																	className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 uppercase leading-[1.2]   hover:bg-gray-700 rounded-lg ${
+																		vote === "4" ? " hover:bg-gray-700 " : " "
 																	} `}>
 																	<svg
 																		className='w-8 h-8   fill-white  '
@@ -272,8 +272,8 @@ export default function SneakerCard({
 																		handleRating("2", e);
 																	}}
 																	type='button'
-																	className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 uppercase leading-[1.2]   hover:bg-yellow-500 ${
-																		vote === "2" ? " bg-yellow-500" : " "
+																	className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 uppercase leading-[1.2]   hover:bg-gray-700 rounded-lg ${
+																		vote === "2" ? " hover:bg-gray-700 " : " "
 																	} `}>
 																	<svg
 																		className='w-8 h-8   fill-white  '
@@ -306,8 +306,8 @@ export default function SneakerCard({
 																		handleRating("3", e);
 																	}}
 																	type='button'
-																	className={`flex items-center justify-end align-middle w-full px-3 py-2 text-xs text-white transition ease-in duration-200 uppercase leading-[1.2] hover:bg-red-500  ${
-																		vote === "3" ? "bg-red-500" : ""
+																	className={`flex items-center justify-end align-middle w-full px-3 py-2 text-xs text-white transition ease-in duration-200 uppercase leading-[1.2] hover:bg-gray-700 rounded-lg ${
+																		vote === "3" ? "hover:bg-gray-700 " : ""
 																	} `}>
 																	<svg
 																		className='w-8 h-8   fill-white  '
@@ -344,7 +344,7 @@ export default function SneakerCard({
 							</div>
 						)}
 					</Card>
-					<Avatar className='absolute top-2 left-2'>
+					<Avatar className='absolute top-2 left-5'>
 						<AvatarImage src={sneaker.brand_id?.brand_logo} />
 						<AvatarFallback>LG</AvatarFallback>
 					</Avatar>
