@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import SneakerCard from "@/components/SneakerCard";
+import SneakerCard from "@/components/SneakerCard1";
 import SectionHeader from "@/components/SectionHeader";
 import DeployButton from "@/components/Logo";
 import AuthButton from "@/components/AuthButton";
@@ -108,10 +108,10 @@ export default function Voted() {
 							<SneakerCard
 								key={sneaker.id}
 								sneaker={sneaker}
-								onVote={handleVote}
+								//onVote={handleVote}
 								onDelete={handleDelete}
-								showElement={true}
-							/>
+								showElement={false} 
+								showtxt={false}							/>
 						))}
 					</div>
 				</div>

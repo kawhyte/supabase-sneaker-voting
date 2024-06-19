@@ -39,24 +39,7 @@ export default async function AuthButton() {
         </Button>
       </form>
 
-      <TooltipProvider delayDuration={50}>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<Link className='hidden md:block' href={"/sneakers/create/"}>
-										<Button
-											
-											size={"sm"}
-											variant={"ghost"} className="hover:border-gray-300 rounded-xl border-2  h-9">
-											<CirclePlus size={20} /> 
-											<p className="text-sm ml-2 mb-2">Create </p>
-										</Button>
-									</Link>
-								</TooltipTrigger>
-								<TooltipContent>
-									<p>Create New Listing </p>
-								</TooltipContent>
-							</Tooltip>
-						</TooltipProvider>
+   
 						
     </div>
   ) : (

@@ -8,7 +8,8 @@ import {
 	File,
 	LayoutDashboard,
 	Heart,
-	Clock
+	Clock,
+	CirclePlus
 	
 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -94,6 +95,14 @@ const [windowWidth, setWindowWidth] = useState(0);
 						href: "/sneakers/dashboard/archived",
 						label: "",
 						icon: Archive,
+						variant: "ghost",
+					},
+
+						{
+						title: "Create New Listing",
+						label: "",
+						href: "/sneakers/create",
+						icon: CirclePlus,
 						variant: "ghost",
 					},
 				]}
