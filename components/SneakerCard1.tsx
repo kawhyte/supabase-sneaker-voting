@@ -27,6 +27,7 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import SizeTracker from "./SizeTracker";
+import { sneakerVote } from "@/lib/sneakerUtils";
 
 export default function SneakerCard({
 	sneaker,
@@ -49,8 +50,7 @@ export default function SneakerCard({
 		undefined
 	);
 
-	 console.log("1", sneakers)
-
+	
 
 	const result = compareAsc(new Date(), new Date(sneaker?.release_date));
 
@@ -70,48 +70,7 @@ export default function SneakerCard({
 	// 	});
 	// };
 
-	const handleRating = async (value: any, e: any) => {
-		//console.log("handleRating Value", value)
-
-		const { data: rating_data, error } = await supabase
-			.from("rating")
-			.insert([
-				{
-					vote: value,
-					//user_id: "",
-					sneaker_id: sneaker.id,
-				},
-			])
-			.select();
-
-		//console.log("RATING DATA ",rating_data)
-
-		if (error) {
-			console.log(error);
-		}
-
-		if (rating_data) {
-			const sneakerID = rating_data[0]?.id;
-			const { data, error } = await supabase
-				.from("sneakers")
-				.update({ rating_id: sneakerID })
-				.eq("id", sneaker.id)
-				.select();
-			//.order("name", { ascending: true });
-
-			toast({
-				description: "Horray! You successfully voted  ⚡️",
-			});
-
-			//console.log("New data sneaker_data", data);
-
-			setVote(value);
-			//setVote(null);
-			//refreshData()
-			refeshPage(sneaker.id);
-			//onVote(sneaker);
-		}
-	};
+	const handleSneakerVote = sneakerVote(supabase, sneaker, toast, setVote, refeshPage);
 	//console.log("myBlurDataUrl - sneakers from function",sneakers.collection_image)
 
 	//const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
@@ -188,7 +147,7 @@ export default function SneakerCard({
 															<div className='relative group flex flex-col items-center align-middle justify-center'>
 																<button
 																	onClick={(e) => {
-																		handleRating("1", e);
+																		handleSneakerVote("1", e);
 																	}}
 																	type='button'
 																	className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs   text-white  transition ease-in duration-200  uppercase leading-[1.2]  hover:bg-gray-700 rounded-lg ${
@@ -220,7 +179,7 @@ export default function SneakerCard({
 															<div className='relative group flex justify-center flex-col items-center align-middle'>
 																<button
 																	onClick={(e) => {
-																		handleRating("4", e);
+																		handleSneakerVote("4", e);
 																	}}
 																	type='button'
 																	className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 uppercase leading-[1.2]   hover:bg-gray-700 rounded-lg ${
@@ -253,7 +212,7 @@ export default function SneakerCard({
 															<div className='relative group flex justify-center flex-col items-center align-middle'>
 																<button
 																	onClick={(e) => {
-																		handleRating("2", e);
+																		handleSneakerVote("2", e);
 																	}}
 																	type='button'
 																	className={`flex flex-col items-center align-middle justify-center w-full px-3 py-2 text-xs  text-white  transition ease-in duration-200 uppercase leading-[1.2]   hover:bg-gray-700 rounded-lg ${
@@ -287,7 +246,7 @@ export default function SneakerCard({
 															<div className='relative group flex justify-end flex-col items-center align-middle '>
 																<button
 																	onClick={(e) => {
-																		handleRating("3", e);
+																		handleSneakerVote("3", e);
 																	}}
 																	type='button'
 																	className={`flex items-center justify-end align-middle w-full px-3 py-2 text-xs text-white transition ease-in duration-200 uppercase leading-[1.2] hover:bg-gray-700 rounded-lg ${
@@ -368,3 +327,5 @@ export default function SneakerCard({
 		</>
 	);
 }
+
+

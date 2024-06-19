@@ -21,10 +21,7 @@ export default function PendingVote() {
 	const router = useRouter();
 	const supabase = createClient();
 
-
-
 	const handleDataUpdate = UpdateData(setSneakers, setSneakerCount);
-
 
 	const handleVote = async () => {
 		const { data } = await supabase
@@ -64,33 +61,33 @@ export default function PendingVote() {
 
 	return supabaseUser ? (
 		<>
-		
 			<div className='animate-in flex-1 w-full flex flex-col gap-y-20 items-center  justify-center align-middle '>
 				<SectionHeader
 					name={"Sneakers Awaiting Vote"}
-					total={ sneakerCount}
+					total={sneakerCount}
 					sectiontext={"Pending Vote count:"}
 				/>
 
-			{/* <Loading />	 */}
-					{sneakers === null ? <Loading /> : <div className='grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 px-8  gap-x-8 gap-y-8'>
+				{sneakers === null ? (
+					<Loading />
+				) : (
+					<div className='grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 px-8  gap-x-8 gap-y-8'>
 						{sneakers?.map((sneaker) => (
 							<div key={sneaker.id}>
 								<SneakerCard
 									key={sneaker.id}
-									sneaker={sneaker} showtxt={false} //onVote={handleVote}
-									refeshPage={handleDataUpdate}									//onDelete={handleDelete}
+									sneaker={sneaker}
+									showtxt={false} //onVote={handleVote}
+									refeshPage={handleDataUpdate} //onDelete={handleDelete}
 									showElement={true}
 								/>
 							</div>
 						))}
-					</div>}
-			
+					</div>
+				)}
 			</div>
 		</>
 	) : (
 		<></>
 	);
 }
-
-
