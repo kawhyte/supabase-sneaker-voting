@@ -108,7 +108,7 @@ export default function Page() {
 			setCollection(collectionSneakers);
 			setPotentialSneakers(potentialSneakers);
 
-			console.log("collection", collectionSneakers);
+			//console.log("collection", collectionSneakers);
 
 			setSneakersPendingVote(data?.filter((test) => test?.vote === null));
 			setSneakersDrip(data?.filter((test) => test?.vote === "Drip"));

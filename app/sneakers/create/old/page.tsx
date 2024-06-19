@@ -60,7 +60,7 @@ const Create = () => {
 
 		if (sneaker_data) {
 			const sneakerID = sneaker_data[0]?.id;
-			console.log("sneaker_data", sneakerID);
+			//console.log("sneaker_data", sneakerID);
 			inputFields.map((a) => (a.sneaker_id = sneakerID));
 			// const { data, error } = await supabase
 			// 	.from("images")
@@ -74,11 +74,11 @@ const Create = () => {
 				.select();
 
 			if (error) {
-				console.log("sneakerID ERROR", error);
+				//console.log("sneakerID ERROR", error);
 				setFormError(error.message);
 			}
 
-			console.log("sneakerID data ", data);
+			//console.log("sneakerID data ", data);
 			//setFormError("");
 
 			//router.push("/sneakers/dashboard/pending");

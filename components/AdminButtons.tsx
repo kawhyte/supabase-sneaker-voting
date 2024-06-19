@@ -28,6 +28,7 @@ type Props = {
 	showDeleteButton: boolean;
 	showElement: boolean;
 	collectionPage: boolean;
+	onDelete:any;
 };
 
 function AdminButtons({
@@ -38,10 +39,15 @@ function AdminButtons({
 	showAddToCollectionButton,
 	showDeleteButton,
 	showEditButton,
+	onDelete
 }: Props) {
 	const supabase = createClient();
+
+ console.log(typeof(onDelete))
+
+
 	const handleAddToCollection = async (value: any, e: any) => {
-		console.log(" handleAddToCollection value", value);
+		//console.log(" handleAddToCollection value", value);
 
 		const { data, error } = await supabase
 			.from("rating")
@@ -59,12 +65,15 @@ function AdminButtons({
 		}
 	};
 	const handleDelete = async () => {
-		console.log("Test sneaker.id", sneaker);
+		//("Test sneaker.id from handleDelete", sneaker);
+
+		console.log("handleDelete 2",id)
+		//console.log("handleDelete", sneaker.id)
 
 		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
 			.delete()
-			.eq("id", sneaker.id)
+			.eq("id", id)
 			.select();
 
 		console.log("Test DElete", sneaker_data);
@@ -74,17 +83,20 @@ function AdminButtons({
 		}
 
 		if (sneaker_data) {
-			console.log("DEleted", sneaker_data);
+			//console.log("DEleted", sneaker_data);
 			toast({
 				title: "Sneaker deleted",
 				description: `${sneaker_data[0].name} was deleted.`,
 			});
 
-			//onDelete(sneaker.id);
+
+			
+
+			onDelete(id);
 		}
 	};
 
-	console.log("ADMIN BUTTON", id);
+	//console.log("ADMIN BUTTON", id);
 	return (
 		<>
 			<Link className='' href={"/sneakers/edit/" + id}>
@@ -115,7 +127,7 @@ function AdminButtons({
 					</span>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem className='bg-red-600'>
+					<DropdownMenuItem onClick={handleDelete} className='bg-red-600'>
 						{" "}
 						<Trash2 className='h-3.5 w-3.5 mr-2' />
 						

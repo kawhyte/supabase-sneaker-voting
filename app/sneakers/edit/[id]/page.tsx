@@ -10,7 +10,7 @@ import { Sneaker } from "@/app/types/Sneaker";
 const Edit = ({ params }: { params: any }) => {
 	const id = params.id;
 
-	console.log("IDDDD",id)
+	//console.log("IDDDD",id)
 
 	const [name, setName] = useState("");
 	const [data, setData] = useState<Sneaker | undefined>(undefined);

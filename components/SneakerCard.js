@@ -53,7 +53,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 	const supabase = createClient();
 
 	const handleDelete = async () => {
-		console.log("Test sneaker.id", sneaker);
+		//console.log("Test sneaker.id", sneaker);
 
 		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
@@ -61,14 +61,14 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 			.eq("id", sneaker.id)
 			.select();
 
-		console.log("Test DElete", sneaker_data);
+		//console.log("Test DElete", sneaker_data);
 
 		if (error) {
 			console.log("Sneaker Delete Error - ", error);
 		}
 
 		if (sneaker_data) {
-			console.log("DEleted", sneaker_data);
+			//console.log("DEleted", sneaker_data);
 			toast({
 				title: "Sneaker deleted",
 				description: `${sneaker_data[0].name} was deleted.`,
@@ -78,7 +78,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote, showElement }) => {
 		}
 	};
 	const handleAddToCollection = async (value, e) => {
-		console.log(" handleAddToCollection value", value);
+		//console.log(" handleAddToCollection value", value);
 
 		const { data, error } = await supabase
 			.from("rating")

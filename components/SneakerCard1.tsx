@@ -33,24 +33,42 @@ export default function SneakerCard({
 	showtxt,
 	onDelete,
 	showElement,
+
 }: {
 	sneaker: any;
 	showtxt: boolean;
 	onDelete: any;
 	showElement: boolean;
 }) {
-	console.log("sneakers from Sneaker", sneaker);
+	//console.log("sneakers from Sneaker", sneaker);
 	const supabase = createClient();
-	const todayDate = new Date();
-	const databaseDate = Date.parse(sneaker.release_date);
+	//const todayDate = new Date();
+	//const databaseDate = Date.parse(sneaker.release_date);
+	const [sneakers, setSneakers] = useState<any[] | null>(sneaker);
+	const [sneakersPending, setSneakersPending] = useState<number | undefined>(
+		undefined
+	);
 
-	const result = compareAsc(new Date(), new Date(sneaker.release_date));
+	 console.log("1", sneakers)
+
+
+	const result = compareAsc(new Date(), new Date(sneaker?.release_date));
 
 	const { toast } = useToast();
 
 	const [vote, setVote] = useState(
 		sneaker?.rating_id?.vote?.vote_id?.toString()
 	);
+
+
+	// const handleDelete = (id: any) => {
+	// 	setSneakers((prevSmoothies: any) => {
+	// 		const updatedSneakers = prevSmoothies?.filter((sm: any) => sm.id !== id);
+	// 		setSneakersPending(updatedSneakers?.length);
+
+	// 		return updatedSneakers;
+	// 	});
+	// };
 
 	const handleRating = async (value: any, e: any) => {
 		//console.log("handleRating Value", value)
@@ -116,9 +134,8 @@ export default function SneakerCard({
 													<Image
 														src={item?.image_link}
 														alt='Image'
-														// fill
-														width={500}
-														height={450}
+														fill
+													
 														className='rounded-md object-cover '
 														blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
 														placeholder='blur'
@@ -126,38 +143,16 @@ export default function SneakerCard({
 													/>
 												</AspectRatio>
 											</div>
-											{/*<div className='p-1'>
-													<div>
-														<div className='bg-white'>
-															<span className=' font-semibold max-w-xl flex aspect-square items-center justify-center '>
-																<img
-																	className=' w-full   h-auto pt-6  lg:mt-36 sm:mt-0 sm:h-80 md:h-80 lg:h-auto lg:pt-0  items-center  object-cover mx-auto '
-																	src={item?.image_link}
-																	alt='product image'
-																	loading='lazy'
-																/>
-															</span>
-														</div>
-													</div>
-										</div>*/}
 										</CarouselItem>
 									))}
 							</CarouselContent>
-							<div className="bg-red-300 flex flex-col absolute bottom-5 right-20 ">
-							{sneaker.images.length > 1 && (
-								<CarouselPrevious className='    ' />
-							)}
-							{sneaker.images.length > 1 && <CarouselNext className='   ' />} 
-							
+							<div className='bg-red-300 flex flex-col absolute bottom-5 right-20 '>
+								{sneaker.images.length > 1 && (
+									<CarouselPrevious className='    ' />
+								)}
+								{sneaker.images.length > 1 && <CarouselNext className='   ' />}
 							</div>
 						</Carousel>
-
-
-						{/* {showElement && <CardHeader>
-							<CardTitle className="className='scroll-m-20 text-base font-mono md:text-xl mt-4 ml-4  tracking-tight lg:text-2xl'">
-								{sneaker.name}
-							</CardTitle>
-						</CardHeader>} */}
 
 						<SizeTracker
 							brand={sneaker.brand_id?.name}
@@ -171,30 +166,14 @@ export default function SneakerCard({
 							ideal_cost={50}
 							notes={""}
 							links={undefined}
-							show_element={showElement}
-						/>
+							show_element={showElement} 
+							onDelete={onDelete}						/>
 
 						{/* {!showElement && 	} */}
 
 						{showElement && (
 							<div className='border-b-2'>
-								<CardContent className='flex flex-col justify-between   text-sm tracking-wide  title-font font-medium text-gray-400 '>
-									{/* <div className='flex flex-row justify-start gap-x-6   text-sm   title-font font-medium text-gray-400 font-mono '>
-										<p className=''>Brand: {sneaker.brand_id?.name}</p>
-										</div> */}
-
-									{/* <div className=''>
-										<p>
-											Release Date:{" "}
-											{format(new Date(sneaker.release_date), "MMM dd,yyyy")}
-										</p>
-									</div>
-
-									<p className=' '>
-										Retail: {sneaker.price < 10 ? "TBD" : `$${sneaker.price}`}-{" "}
-										{sneaker.style} - {sneaker.id}
-									</p> */}
-								</CardContent>
+								<CardContent className='flex flex-col justify-between   text-sm tracking-wide  title-font font-medium text-gray-400 '></CardContent>
 
 								{showElement && (
 									<div className='flex flex-row items-center border-t bg-muted/50 px-6 py-3'>
@@ -384,8 +363,6 @@ export default function SneakerCard({
 							)}
 						</div>
 					</div>
-
-			
 				</div>
 			</div>
 		</>

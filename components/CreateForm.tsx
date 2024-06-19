@@ -136,7 +136,7 @@ const CreateForm = ({
 }) => {
 	const [formError, setFormError] = useState("");
 
-	console.log("Snealers ", sneaker);
+	//console.log("Snealers ", sneaker);
 
 	//Defining the form.
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -181,14 +181,14 @@ const CreateForm = ({
 
 	// Submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		console.log("Before VALUES	", values);
+		//console.log("Before VALUES	", values);
 		const supabase = createClient();
 
 		// Check if there us exsisting sneaker to be updated.
 		// If no sneaker is available, then create a new listing
 		if (sneaker) {
-			console.log("I am EDIT - sneaker");
-			console.log("Brand ", values.brand);
+			//console.log("I am EDIT - sneaker");
+			//console.log("Brand ", values.brand);
 			const { data: sneaker_data, error } = await supabase
 				.from("sneakers")
 				.update({
@@ -214,7 +214,7 @@ const CreateForm = ({
 			if (sneaker_data) {
 				const sneakerID = sneaker_data[0]?.id;
 
-				console.log("HEY HEY HEY", values);
+				//console.log("HEY HEY HEY", values);
 
 				// values?.images?.push({
 				// 	image_link: values.main_image,
@@ -229,11 +229,11 @@ const CreateForm = ({
 					.select();
 
 				if (error) {
-					console.log("sneakerID ERROR", error);
+					//console.log("sneakerID ERROR", error);
 					setFormError(error.message);
 				}
 
-				console.log("sneakerID data ", data);
+				//console.log("sneakerID data ", data);
 
 				const { data: newVote, error: VoteError } = await supabase
 					.from("rating")
@@ -241,8 +241,8 @@ const CreateForm = ({
 					.eq("sneaker_id", sneakerID)
 					.select();
 
-				console.log("KENNY sneaker newVote ", newVote);
-				console.log("KENNY sneaker VoteError ", newVote);
+				//console.log("KENNY sneaker newVote ", newVote);
+				//console.log("KENNY sneaker VoteError ", newVote);
 				//setFormError("");
 
 				//setFormError("");
@@ -259,10 +259,10 @@ const CreateForm = ({
 						</ToastAction>
 					),
 				});
-				console.log("After", values);
+				//console.log("After", values);
 			}
 		} else {
-			console.log("I am NEW - sneaker");
+			//console.log("I am NEW - sneaker");
 			const { data: sneaker_data, error } = await supabase
 				.from("sneakers")
 				.insert([
@@ -283,7 +283,7 @@ const CreateForm = ({
 
 			if (sneaker_data) {
 				const sneakerID = sneaker_data[0]?.id;
-				console.log("sneaker_data", sneakerID);
+				//console.log("sneaker_data", sneakerID);
 
 				values?.images?.map((a) => (a.sneaker_id = sneakerID));
 
@@ -293,7 +293,7 @@ const CreateForm = ({
 					.select();
 
 				if (error) {
-					console.log("sneakerID ERROR", error);
+					//console.log("sneakerID ERROR", error);
 					setFormError(error.message);
 				}
 
@@ -309,7 +309,7 @@ const CreateForm = ({
 						</ToastAction>
 					),
 				});
-				console.log("After", values);
+				//console.log("After", values);
 			}
 		}
 		// Do something with the form values.
