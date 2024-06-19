@@ -75,7 +75,7 @@ export default function PendingVote() {
 				/>
 
 			{/* <Loading />	 */}
-					{sneakers === null ? <Loading /> : <div className='grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3  gap-x-8 gap-y-5'>
+					{sneakers === null ? <Loading /> : <div className='grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 px-8  gap-x-8 gap-y-8'>
 						{sneakers?.map((sneaker) => (
 							<div key={sneaker.id}>
 								<SneakerCard

@@ -143,11 +143,16 @@ export default function SneakerCard({
 										</CarouselItem>
 									))}
 							</CarouselContent>
+							<div className="bg-red-300 flex flex-col absolute bottom-5 right-20 ">
 							{sneaker.images.length > 1 && (
-								<CarouselPrevious className=' mx-80 my-28    ' />
+								<CarouselPrevious className='    ' />
 							)}
-							{sneaker.images.length > 1 && <CarouselNext className='  mx-24 my-28 ' />}
+							{sneaker.images.length > 1 && <CarouselNext className='   ' />} 
+							
+							</div>
 						</Carousel>
+
+
 						{/* {showElement && <CardHeader>
 							<CardTitle className="className='scroll-m-20 text-base font-mono md:text-xl mt-4 ml-4  tracking-tight lg:text-2xl'">
 								{sneaker.name}
@@ -349,7 +354,7 @@ export default function SneakerCard({
 						<AvatarFallback>LG</AvatarFallback>
 					</Avatar>
 
-					<div className=' flex  absolute top-2 right-2 gap-x-3'>
+					<div className=' hidden sm:flex  absolute top-2 right-2 gap-x-3'>
 						<div className=' '>
 							<Badge className='bg-green-200 '>
 								{result < 0 ? "Upcoming" : "Released"}
