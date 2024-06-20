@@ -54,7 +54,12 @@ export default function Voted() {
 								//onVote={handleVote}
 								refeshPage={handleDataUpdate}
 								showElement={false}
-								showtxt={false} showVotingSection={false}							/>
+								showtxt={false}
+								showVotingSection={false}
+								showCardDetails={false}
+								showCardNote={false}
+								showCardImages={false}
+							/>
 						))}
 					</div>
 				</div>

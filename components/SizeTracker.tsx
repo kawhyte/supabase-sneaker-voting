@@ -11,7 +11,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-
 import {
 	Card,
 	CardContent,
@@ -44,11 +43,14 @@ type Props = {
 	notes: string;
 	links: any;
 	sneaker_id: number;
-	vote_date:any;
+	vote_date: any;
 	brand: number;
 	show_element: boolean;
 	release_date: any;
 	refeshPage: any;
+	showCardDetails: boolean;
+	showCardNote: boolean;
+	showCardImages: boolean;
 };
 
 export default function Component({
@@ -66,19 +68,23 @@ export default function Component({
 	refeshPage,
 	notes,
 	links,
+	showCardDetails,
+	showCardNote,
+	showCardImages,
 }: Props) {
 	return (
 		<Card className='overflow-hidden'>
 			<CardHeader className='flex flex-row items-start bg-muted/50'>
 				<div className='grid gap-0.5'>
-					<CardTitle className='group flex items-center gap-2 text-base lg:text-lg'>
+					<CardTitle className='group flex line-clamp-2 items-center gap-2 text-sm md:text-base lg:text-lg'>
 						{sneaker_name} - {sneaker_id}
-						
-							
-							<span className='sr-only'>{sneaker_name}</span>
-						
+						<span className='sr-only'>{sneaker_name}</span>
 					</CardTitle>
-					{vote_date &&  show_element && <CardDescription>Vote Date:  {format(vote_date, "PPP")}</CardDescription>}
+					{vote_date && show_element && (
+						<CardDescription>
+							Vote Date: {format(vote_date, "PPP")}
+						</CardDescription>
+					)}
 				</div>
 				<div className='ml-auto flex items-center gap-1'>
 					<AdminButtons
@@ -116,19 +122,20 @@ export default function Component({
 			</DropdownMenu> */}
 				</div>
 			</CardHeader>
-		
-			<CardContent className='p-6 text-sm'>
-				<div className='grid gap-3'>
-					<ul className='grid gap-3'>
-						{/* <li className="flex items-center justify-between">
+
+			{showCardDetails && (
+				<CardContent className='p-6 text-sm'>
+					<div className='grid gap-3'>
+						<ul className='grid gap-3'>
+							{/* <li className="flex items-center justify-between">
                 <span className="text-muted-foreground">Name</span>
                 <span>{sneaker_name}</span>
               </li> */}
-						{/* <li className="flex items-center justify-between">
+							{/* <li className="flex items-center justify-between">
                 <span className="text-muted-foreground">Owner</span>
                 <span>Kenny</span>
               </li> */}
-						{show_element && (
+
 							<>
 								<li className='flex items-center justify-between'>
 									<span className='text-muted-foreground'>Ideal Size</span>
@@ -140,49 +147,57 @@ export default function Component({
 										{tried_on ? "Yes" : "No"}
 									</Badge>
 								</li>
-							</>
-						)}
-						{show_element && (
-							<> 
-							<li className='flex items-center justify-between font-semibold'>
-							<span className='text-muted-foreground'>Retail Cost</span>
-							<span>{brand}</span>
-						</li>
-						<li className='flex items-center justify-between font-semibold'>
-							<span className='text-muted-foreground'>Retail Cost</span>
-							<span>${cost}</span>
-						</li>
-						<li className='flex items-center justify-between font-semibold'>
-							<span className='text-muted-foreground'>Release Date</span>
-							<span>{format(new Date(release_date), "MMM dd,yyyy")}</span>
-						</li></>)}
-						{show_element && (
-							<li className='flex items-center justify-between font-semibold'>
-								<span className='text-muted-foreground'>
-									Ideal Purchase Price
-								</span>
-								<span>${ideal_cost}</span>
-							</li>
-						)}
-					</ul>
-				</div>
 
-				{show_element && (
+								<li className='flex items-center justify-between font-semibold'>
+									<span className='text-muted-foreground'>Retail Cost</span>
+									<span>{brand}</span>
+								</li>
+								<li className='flex items-center justify-between font-semibold'>
+									<span className='text-muted-foreground'>Retail Cost</span>
+									<span>${cost}</span>
+								</li>
+								<li className='flex items-center justify-between font-semibold'>
+									<span className='text-muted-foreground'>Release Date</span>
+									<span>{format(new Date(release_date), "MMM dd,yyyy")}</span>
+								</li>
+
+								<li className='flex items-center justify-between font-semibold'>
+									<span className='text-muted-foreground'>
+										Ideal Purchase Price
+									</span>
+									<span>${ideal_cost}</span>
+								</li>
+							</>
+						</ul>
+					</div>
+				</CardContent>
+			)}
+			{showCardNote && (
+				<div className='p-6 text-sm'>
+				<div className='grid gap-3'>
 					<>
-						
-						<div className=' gap-4'>
+					<Separator className='my-4' />
+					<div className='grid gap-3'>
+						<div className='font-semibold'>Notes</div>
+					</div>
+				</>
+				</div>
+				</div>
+				
+			)}
+
+			{showCardImages && (
+				<div className='p-6 text-sm'>
+					<div className='grid gap-3'>
+						<>
 							<Separator className='my-4' />
 							<div className='grid gap-3'>
-								<div className='font-semibold'>Notes</div>
+								<div className='font-semibold'>Image Links</div>
 							</div>
-						</div>
-						<Separator className='my-4' />
-						<div className='grid gap-3'>
-							<div className='font-semibold'>Image Links</div>
-						</div>
-					</>
-				)}
-			</CardContent>
+						</>
+					</div>
+				</div>
+			)}
 		</Card>
 	);
 }

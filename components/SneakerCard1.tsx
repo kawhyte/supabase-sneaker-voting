@@ -34,7 +34,10 @@ export default function SneakerCard({
 	showtxt,
 	refeshPage,
 	showElement,
-	showVotingSection
+	showVotingSection,
+	showCardDetails,
+showCardNote,
+showCardImages
 
 }: {
 	sneaker: any;
@@ -42,6 +45,9 @@ export default function SneakerCard({
 	refeshPage: any;
 	showElement: boolean;
 	showVotingSection:boolean;
+	showCardDetails:boolean
+showCardNote:boolean
+showCardImages:boolean
 }) {
 	//console.log("sneakers from Sneaker", sneaker);
 	const supabase = createClient();
@@ -129,7 +135,14 @@ export default function SneakerCard({
 							links={undefined}
 							show_element={showElement} 
 							refeshPage={refeshPage}
-							vote_date={sneaker?.rating_id?.vote?.created_at}						/>
+							vote_date={sneaker?.rating_id?.vote?.created_at}
+
+showCardDetails={showCardDetails}
+showCardNote={showCardNote}
+showCardImages={showCardImages}
+
+
+													/>
 
 						{/* {!showElement && 	} */}
 

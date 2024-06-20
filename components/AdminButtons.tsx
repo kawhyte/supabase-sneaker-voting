@@ -56,8 +56,7 @@ function AdminButtons({
 			console.log(error);
 		}
 		if (data) {
-			// console.log("sneaker.id)", sneaker.id)
-			// console.log("sneaker.id data)", data)
+		
 			//onDelete(sneaker.id);
 		}
 	};
