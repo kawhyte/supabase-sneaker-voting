@@ -34,12 +34,14 @@ export default function SneakerCard({
 	showtxt,
 	refeshPage,
 	showElement,
+	showVotingSection
 
 }: {
 	sneaker: any;
 	showtxt: boolean;
 	refeshPage: any;
 	showElement: boolean;
+	showVotingSection:boolean;
 }) {
 	//console.log("sneakers from Sneaker", sneaker);
 	const supabase = createClient();
@@ -130,7 +132,7 @@ export default function SneakerCard({
 
 						{/* {!showElement && 	} */}
 
-						{showElement && (
+						{showVotingSection && (
 							<div className='border-b-2'>
 								<CardContent className='flex flex-col justify-between   text-sm tracking-wide  title-font font-medium text-gray-400 '></CardContent>
 

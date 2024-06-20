@@ -28,7 +28,7 @@ type Props = {
 	showDeleteButton: boolean;
 	showElement: boolean;
 	collectionPage: boolean;
-	refeshPage:any;
+	refeshPage: any;
 };
 
 function AdminButtons({
@@ -39,15 +39,12 @@ function AdminButtons({
 	showAddToCollectionButton,
 	showDeleteButton,
 	showEditButton,
-	refeshPage
+	refeshPage,
 }: Props) {
 	const supabase = createClient();
 
-
-
-
 	const handleAddToCollection = async (value: any, e: any) => {
-		//console.log(" handleAddToCollection value", value);
+		
 
 		const { data, error } = await supabase
 			.from("rating")
@@ -65,8 +62,6 @@ function AdminButtons({
 		}
 	};
 	const handleDelete = async () => {
-
-
 		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")
 			.delete()
@@ -86,9 +81,7 @@ function AdminButtons({
 				description: `${sneaker_data[0].name} was deleted.`,
 			});
 
-
-			
-refeshPage(id)
+			refeshPage(id);
 			//onDelete(id);
 		}
 	};
@@ -100,7 +93,7 @@ refeshPage(id)
 				<Button size='sm' variant='outline' className='h-8 gap-1'>
 					<Pen className='h-3.5 w-3.5' />
 					<span className='lg:sr-only xl:not-sr-only xl:whitespace-nowrap'>
-						Edit
+						Modify
 					</span>
 				</Button>
 			</Link>
@@ -117,21 +110,23 @@ refeshPage(id)
 						onClick={(e) => {
 							handleAddToCollection(!collectionPage, e);
 						}}>
-							{collectionPage ? <Minus className='h-3.5 w-3.5 mr-2' /> : <Plus className='h-3.5 w-3.5 mr-2' />}
-					
+						{collectionPage ? (
+							<Minus className='h-3.5 w-3.5 mr-2' />
+						) : (
+							<Plus className='h-3.5 w-3.5 mr-2' />
+						)}
+
 						<span className='lg:sr-only xl:not-sr-only xl:whitespace-nowrap'>
-						Add to Collection
-					</span>
+							Add to Collection
+						</span>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={handleDelete} className='bg-red-600'>
 						{" "}
 						<Trash2 className='h-3.5 w-3.5 mr-2' />
-						
 						<span className='lg:sr-only xl:not-sr-only xl:whitespace-nowrap'>
-						Delete
-					</span>
-						
+							Delete
+						</span>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
@@ -141,62 +136,4 @@ refeshPage(id)
 
 export default AdminButtons;
 
-{
-	/* <div className=' flex gap-6 justify-around align-middle mt-3 flex-wrap '>
-<TooltipProvider delayDuration={50}>
-	<Tooltip>
-		<TooltipTrigger asChild>
-			<Link className='' href={"/sneakers/edit/" + sneaker.id}>
-				<Button variant={"ghost"} size={"sm"} className=''>
-					<Pencil />
-				</Button>
-			</Link>
-		</TooltipTrigger>
-		<TooltipContent>
-			<p>Edit Listing</p>
-		</TooltipContent>
-	</Tooltip>
-</TooltipProvider>
 
-
-{showAddToCollectionButton && <TooltipProvider delayDuration={50}>
-	<Tooltip>
-		<TooltipTrigger asChild>
-			<Button
-				className='hover:bg-gray-800'
-				variant={"ghost"}
-				size={"sm"}
-				onClick={(e) => {
-					handleAddToCollection(!collectionPage, e);
-				}}>
-				{collectionPage ? <Minus /> : <Plus />}
-			</Button>
-		</TooltipTrigger>
-		<TooltipContent>
-			{collectionPage ? (
-				<p>Remove from Collection</p>
-			) : (
-				<p>Add to Collection</p>
-			)}
-		</TooltipContent>
-	</Tooltip>
-</TooltipProvider>}
-
-<TooltipProvider delayDuration={50}>
-	<Tooltip>
-		<TooltipTrigger asChild>
-			<Button
-				size={"sm"}
-				variant='destructive'
-				className='hover:bg-gray-800'
-				onClick={handleDelete}>
-				<Trash2 />{" "}
-			</Button>
-		</TooltipTrigger>
-		<TooltipContent>
-			<p>Delete Sneaker</p>
-		</TooltipContent>
-	</Tooltip>
-</TooltipProvider>
-</div> */
-}

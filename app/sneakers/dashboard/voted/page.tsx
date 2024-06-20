@@ -60,9 +60,8 @@ export default function Voted() {
 								sneaker={sneaker}
 								//onVote={handleVote}
 								refeshPage={handleDataUpdate}
-								showElement={false}
-								showtxt={false}
-							/>
+								showElement={true}
+								showtxt={false} showVotingSection={false}							/>
 						))}
 					</div>
 				</div>

@@ -67,17 +67,14 @@ export default function Component({
 		<Card className='overflow-hidden'>
 			<CardHeader className='flex flex-row items-start bg-muted/50'>
 				<div className='grid gap-0.5'>
-					<CardTitle className='group flex items-center gap-2 text-lg'>
+					<CardTitle className='group flex items-center gap-2 text-base lg:text-lg'>
 						{sneaker_name} - {sneaker_id}
-						<Button
-							size='icon'
-							variant='outline'
-							className='h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100'>
-							<Copy className='h-3 w-3' />
+						
+							
 							<span className='sr-only'>{sneaker_name}</span>
-						</Button>
+						
 					</CardTitle>
-					{/* <CardDescription>Date: November 23, 2023</CardDescription> */}
+					<CardDescription>Date: November 23, 2023</CardDescription>
 				</div>
 				<div className='ml-auto flex items-center gap-1'>
 					<AdminButtons
@@ -115,6 +112,7 @@ export default function Component({
 			</DropdownMenu> */}
 				</div>
 			</CardHeader>
+		
 			<CardContent className='p-6 text-sm'>
 				<div className='grid gap-3'>
 					<ul className='grid gap-3'>
@@ -126,7 +124,7 @@ export default function Component({
                 <span className="text-muted-foreground">Owner</span>
                 <span>Kenny</span>
               </li> */}
-						{!show_element && (
+						{show_element && (
 							<>
 								<li className='flex items-center justify-between'>
 									<span className='text-muted-foreground'>Ideal Size</span>
@@ -140,7 +138,9 @@ export default function Component({
 								</li>
 							</>
 						)}
-						<li className='flex items-center justify-between font-semibold'>
+						{show_element && (
+							<> 
+							<li className='flex items-center justify-between font-semibold'>
 							<span className='text-muted-foreground'>Retail Cost</span>
 							<span>{brand}</span>
 						</li>
@@ -151,8 +151,8 @@ export default function Component({
 						<li className='flex items-center justify-between font-semibold'>
 							<span className='text-muted-foreground'>Release Date</span>
 							<span>{format(new Date(release_date), "MMM dd,yyyy")}</span>
-						</li>
-						{!show_element && (
+						</li></>)}
+						{show_element && (
 							<li className='flex items-center justify-between font-semibold'>
 								<span className='text-muted-foreground'>
 									Ideal Purchase Price
@@ -163,9 +163,9 @@ export default function Component({
 					</ul>
 				</div>
 
-				{!show_element && (
+				{show_element && (
 					<>
-						{" "}
+						
 						<div className=' gap-4'>
 							<Separator className='my-4' />
 							<div className='grid gap-3'>

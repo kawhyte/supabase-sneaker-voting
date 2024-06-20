@@ -79,8 +79,7 @@ export default function PendingVote() {
 									sneaker={sneaker}
 									showtxt={false} //onVote={handleVote}
 									refeshPage={handleDataUpdate} //onDelete={handleDelete}
-									showElement={true}
-								/>
+									showElement={true} showVotingSection={true}								/>
 							</div>
 						))}
 					</div>
