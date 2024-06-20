@@ -128,7 +128,8 @@ export default function SneakerCard({
 							notes={""}
 							links={undefined}
 							show_element={showElement} 
-							refeshPage={refeshPage}						/>
+							refeshPage={refeshPage}
+							vote_date={sneaker?.rating_id?.vote?.created_at}						/>
 
 						{/* {!showElement && 	} */}
 

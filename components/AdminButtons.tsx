@@ -68,7 +68,7 @@ function AdminButtons({
 			.eq("id", id)
 			.select();
 
-		console.log("Test DElete", sneaker_data);
+		//console.log("Test DElete", sneaker_data);
 
 		if (error) {
 			console.log("Sneaker Delete Error - ", error);

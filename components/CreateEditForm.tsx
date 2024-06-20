@@ -141,7 +141,7 @@ const CreateEditForm = ({
 	const [formError, setFormError] = useState("");
 	const [data, setData] = useState("");
 
-	console.log("Snealers ", sneaker);
+	//console.log("Snealers ", sneaker);
 
 	//Defining the form.
 	const form = useForm<z.infer<typeof formSchema>>({

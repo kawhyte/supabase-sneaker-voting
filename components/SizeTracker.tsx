@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+
+
 import {
 	Card,
 	CardContent,
@@ -42,6 +44,7 @@ type Props = {
 	notes: string;
 	links: any;
 	sneaker_id: number;
+	vote_date:any;
 	brand: number;
 	show_element: boolean;
 	release_date: any;
@@ -51,6 +54,7 @@ type Props = {
 export default function Component({
 	sneaker_name,
 	sneaker_id,
+	vote_date,
 	owner,
 	ideal_cost,
 	ideal_size,
@@ -74,7 +78,7 @@ export default function Component({
 							<span className='sr-only'>{sneaker_name}</span>
 						
 					</CardTitle>
-					<CardDescription>Date: November 23, 2023</CardDescription>
+					{vote_date &&  show_element && <CardDescription>Vote Date:  {format(vote_date, "PPP")}</CardDescription>}
 				</div>
 				<div className='ml-auto flex items-center gap-1'>
 					<AdminButtons
