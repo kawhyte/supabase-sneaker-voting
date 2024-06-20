@@ -1,4 +1,4 @@
-import CreateForm from "@/components/CreateForm";
+import CreateEditForm from "@/components/CreateEditForm";
 import SectionHeader from "@/components/SectionHeader";
 import React from "react";
 
@@ -16,7 +16,7 @@ export default function Create({}: Props) {
 				sectiontext={"Sneaker Vote Count"}
 			/>
 
-			<CreateForm sneaker={undefined} main={undefined} id={0} all_images={undefined} />
+			<CreateEditForm sneaker={undefined} main={undefined} id={0} all_images={undefined} />
 		</div>
 	);
 }

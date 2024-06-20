@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/router";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { createClient } from "@/utils/supabase/client";
@@ -55,6 +56,7 @@ import {
 } from "./ui/carousel";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import Image from "next/image";
+import { Badge } from "./ui/badge";
 
 const brands = [
 	{ label: "Jordan", value: "1" },
@@ -81,7 +83,9 @@ const formSchema = z.object({
 	}),
 
 	// collection_image: z.union([z.string().url().nullish(), z.literal("")]),
-	collection_image: z.union([z.literal(""), z.string().url().trim().url()]).optional(),
+	collection_image: z
+		.union([z.literal(""), z.string().url().trim().url()])
+		.optional(),
 
 	SKU: z.string().min(2, {
 		message: "SKU must be at least 2 characters.",
@@ -106,7 +110,7 @@ const formSchema = z.object({
 				image_link: z.string().url({ message: "Please enter a valid URL." }),
 				sneaker_id: z.number(),
 				main_image: z.boolean(),
-				id: z.number(),
+				//id: z.number(),
 			})
 		)
 		.optional(),
@@ -123,7 +127,7 @@ const formSchema = z.object({
 		.pipe(z.coerce.number().min(0.0001).max(999999999)),
 });
 
-const CreateForm = ({
+const CreateEditForm = ({
 	sneaker,
 	main,
 	id,
@@ -135,8 +139,9 @@ const CreateForm = ({
 	all_images: any;
 }) => {
 	const [formError, setFormError] = useState("");
+	const [data, setData] = useState("");
 
-	//console.log("Snealers ", sneaker);
+	console.log("Snealers ", sneaker);
 
 	//Defining the form.
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -148,14 +153,15 @@ const CreateForm = ({
 			retailPrice: 0,
 			brand: "",
 			rating: "",
-			collection_image: "https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png",
+			// collection_image: "https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png",
+			collection_image: "",
 
 			images: [
 				{
 					image_link: "",
 					main_image: true,
 					sneaker_id: 0,
-					id: 0,
+					//id: 0,
 				},
 			],
 		},
@@ -167,7 +173,7 @@ const CreateForm = ({
 					retailPrice: sneaker.price,
 					brand: sneaker?.brand_id?.id?.toString(),
 					rating: sneaker?.rating_id?.vote?.vote_id?.toString(),
-					collection_image: sneaker.collection_image , //sneaker.images[0].image_link,
+					collection_image: sneaker.collection_image || "", //sneaker.images[0].image_link,
 					release_date: new Date(sneaker.release_date),
 					images: sneaker.images,
 			  }
@@ -181,7 +187,9 @@ const CreateForm = ({
 
 	// Submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		//console.log("Before VALUES	", values);
+		// Do something with the form values.
+		// ✅ This will be type-safe and validated.
+
 		const supabase = createClient();
 
 		// Check if there us exsisting sneaker to be updated.
@@ -214,61 +222,41 @@ const CreateForm = ({
 			if (sneaker_data) {
 				const sneakerID = sneaker_data[0]?.id;
 
-				//console.log("HEY HEY HEY", values);
+				const { data: sneaker_image_data, error: sneaker_image_error } =
+					await supabase.from("images").delete().eq("sneaker_id", id).select();
 
-				// values?.images?.push({
-				// 	image_link: values.main_image,
-				// 	sneaker_id: "",
-				// 	main_image: true,
-				// });
-				values?.images?.map((a) => (a.sneaker_id = sneakerID));
+				if (sneaker_image_data) {
+					values?.images?.map((a) => (a.sneaker_id = sneakerID));
 
-				const { data, error } = await supabase
-					.from("images")
-					.upsert(values?.images, { onConflict: "id" })
-					.select();
-
-				if (error) {
-					//console.log("sneakerID ERROR", error);
-					setFormError(error.message);
+					const { data, error } = await supabase
+						.from("images")
+						.upsert(values?.images, { onConflict: "id" })
+						.select();
+					if (error) {
+						console.log("sneakerID ERROR", error);
+						//setFormError(error.message);
+					}
 				}
-
-				//console.log("sneakerID data ", data);
 
 				const { data: newVote, error: VoteError } = await supabase
 					.from("rating")
-					.update([{ vote: values?.rating }])
+					.update({ vote: values?.rating })
 					.eq("sneaker_id", sneakerID)
 					.select();
 
-				//console.log("KENNY sneaker newVote ", newVote);
-				//console.log("KENNY sneaker VoteError ", newVote);
-				//setFormError("");
-
-				//setFormError("");
-
-				//router.push("/sneakers/dashboard/pending");
-
 				toast({
 					title: `${values.name} was successfully updated 🚀`,
-					action: (
-						<ToastAction altText='Try again'>
-							<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
-								View Listing{" "}
-							</Link>
-						</ToastAction>
-					),
 				});
-				//console.log("After", values);
+
+				//router.push("/sneakers/dashboard/pending");
 			}
 		} else {
-			//console.log("I am NEW - sneaker");
 			const { data: sneaker_data, error } = await supabase
 				.from("sneakers")
 				.insert([
 					{
 						name: values.name,
-						brand_id: parseInt(values.brand, 10), // parseInt(brand, 10),
+						brand_id: parseInt(values.brand, 10),
 						release_date: values.release_date,
 						price: values.retailPrice,
 						style: values.SKU,
@@ -293,11 +281,8 @@ const CreateForm = ({
 					.select();
 
 				if (error) {
-					//console.log("sneakerID ERROR", error);
 					setFormError(error.message);
 				}
-
-				//router.push("/sneakers/dashboard/pending");
 
 				toast({
 					title: `${values.name} was successfully added 🚀`,
@@ -309,11 +294,8 @@ const CreateForm = ({
 						</ToastAction>
 					),
 				});
-				//console.log("After", values);
 			}
 		}
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
 	}
 	const onInvalid = (errors: any) => console.error(errors);
 
@@ -325,36 +307,13 @@ const CreateForm = ({
 						noValidate
 						onSubmit={form.handleSubmit(onSubmit, onInvalid)}
 						className=' flex flex-col justify-start items-start space-y-10   '>
-						{/* <div className='my-10'>
-						<img
-							src={
-								artists?.length > 0
-									? artists[0]?.name
-									: "https://placehold.co/688x412?text=Preview"
-							}
-							alt='Sneaker'
-						/>
-						<p>{artists[0]?.name}</p>
-
-						<Button
-							type='button'
-							variant='secondary'
-							size='sm'
-							className='mt-2'
-							onClick={() =>
-							name ? 	setArtists([...artists, { id: nextId++, name: name }]) :""
-							}>
-							Refresh Preview
-						</Button>
-					</div> */}
-
 						<div className='my-10  '>
 							<>
 								{sneaker?.images ? (
 									<Carousel className=' bg-white w-[408px] md:w-[708px]'>
 										<CarouselContent className=' '>
 											{sneaker?.images
-												//.sort((a, b) => b.main_image - a.main_image)
+												.sort((a: any, b: any) => b.main_image - a.main_image)
 												?.map((item: any, index: any) => {
 													return (
 														<CarouselItem key={item.id}>
@@ -375,15 +334,12 @@ const CreateForm = ({
 													);
 												})}
 										</CarouselContent>
-										<div>
-											{sneaker?.images.length > 1 && (
-												<CarouselPrevious
-													type='button'
-													className=' mx-16   -my-20'
-												/>
+										<div className='bg-red-300 flex flex-col absolute bottom-5 right-20 '>
+											{sneaker.images.length > 1 && (
+												<CarouselPrevious type='button' className='    ' />
 											)}
-											{sneaker?.images.length > 1 && (
-												<CarouselNext type='button' className='mx-16  -my-20' />
+											{sneaker.images.length > 1 && (
+												<CarouselNext type='button' className='   ' />
 											)}
 										</div>
 									</Carousel>
@@ -392,12 +348,7 @@ const CreateForm = ({
 								)}
 							</>
 						</div>
-						{/*<div className='my-10'>
-								<img
-									src={"https://placehold.co/688x412?text=Main+Sneaker+Image"}
-									alt='Sneaker'
-								/>
-							</div>*/}
+
 						<FormField
 							control={form.control}
 							name='name'
@@ -564,7 +515,7 @@ const CreateForm = ({
 								)}
 							/>
 
-							{sneaker && (
+							{sneaker?.rating_id.vote.vote_id && (
 								<FormField
 									control={form.control}
 									name='rating'
@@ -678,19 +629,7 @@ const CreateForm = ({
 													Sneaker Image Link(s).
 												</FormDescription>
 												{/* <FormControl onChange={() => handleImageUpdate(field.value)} > */}
-												<FormControl
-
-												// onBlur={() =>
-												// 	setName([
-
-												// 		{
-												// 		sneaker_id: nextId++,
-												// 		image_link:field.value
-												// 			,
-												// 		main_image: false,
-												// 	}])
-												// }
-												>
+												<FormControl>
 													<div className='flex justify-between items-center'>
 														<Input
 															{...field}
@@ -706,7 +645,7 @@ const CreateForm = ({
 																Remove row
 															</Button>
 														) : (
-															" "
+															""
 														)}
 													</div>
 												</FormControl>
@@ -725,7 +664,7 @@ const CreateForm = ({
 									append({
 										image_link: "",
 										sneaker_id: 0,
-										id: 0,
+										//id: 0,
 										main_image: false,
 									})
 								}>
@@ -740,4 +679,4 @@ const CreateForm = ({
 	);
 };
 
-export default CreateForm;
+export default CreateEditForm;

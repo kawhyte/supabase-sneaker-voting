@@ -1,11 +1,11 @@
 "use client";
 
 import { createClient } from "@/utils/supabase/client";
-import CreateForm from "@/components/CreateForm";
 import SectionHeader from "@/components/SectionHeader";
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Sneaker } from "@/app/types/Sneaker";
+import CreateEditForm from "@/components/CreateEditForm";
 
 const Edit = ({ params }: { params: any }) => {
 	const id = params.id;
@@ -69,7 +69,7 @@ const Edit = ({ params }: { params: any }) => {
 				{`Editing ${name}`}
 			</h2>
 
-			<CreateForm
+			<CreateEditForm
 				sneaker={data}
 				main={data?.main_image}
 				id={id}

@@ -98,7 +98,7 @@ export default function SneakerCard({
 														className='rounded-md object-cover '
 														blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
 														placeholder='blur'
-														quality={30}
+														quality={80}
 													/>
 												</AspectRatio>
 											</div>
@@ -107,9 +107,9 @@ export default function SneakerCard({
 							</CarouselContent>
 							<div className='bg-red-300 flex flex-col absolute bottom-5 right-20 '>
 								{sneaker.images.length > 1 && (
-									<CarouselPrevious className='    ' />
+									<CarouselPrevious type="button"  className='    ' />
 								)}
-								{sneaker.images.length > 1 && <CarouselNext className='   ' />}
+								{sneaker.images.length > 1 && <CarouselNext type="button"  className='   ' />}
 							</div>
 						</Carousel>
 
