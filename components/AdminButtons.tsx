@@ -49,17 +49,18 @@ function AdminButtons({
 		const { data, error } = await supabase
 			.from("rating")
 			.update({ in_collection: value })
-			.eq("sneaker_id", sneaker.id)
+			.eq("sneaker_id", id)
 			.select();
 
 		if (error) {
 			console.log(error);
 		}
 		if (data) {
-		
+			refeshPage(id);
 			//onDelete(sneaker.id);
 		}
 	};
+	
 	const handleDelete = async () => {
 		const { data: sneaker_data, error } = await supabase
 			.from("sneakers")

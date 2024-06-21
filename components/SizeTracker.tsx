@@ -148,20 +148,20 @@ export default function Component({
 									</Badge>
 								</li>
 
-								<li className='flex items-center justify-between font-semibold'>
+								<li className='flex items-center justify-between '>
 									<span className='text-muted-foreground'>Retail Cost</span>
 									<span>{brand}</span>
 								</li>
-								<li className='flex items-center justify-between font-semibold'>
+								<li className='flex items-center justify-between'>
 									<span className='text-muted-foreground'>Retail Cost</span>
 									<span>${cost}</span>
 								</li>
-								<li className='flex items-center justify-between font-semibold'>
+								<li className='flex items-center justify-between'>
 									<span className='text-muted-foreground'>Release Date</span>
 									<span>{format(new Date(release_date), "MMM dd,yyyy")}</span>
 								</li>
 
-								<li className='flex items-center justify-between font-semibold'>
+								<li className='flex items-center justify-between'>
 									<span className='text-muted-foreground'>
 										Ideal Purchase Price
 									</span>

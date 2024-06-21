@@ -8,11 +8,9 @@ import AdminButtons from "./AdminButtons";
 export default async function CollectionCard({
 	sneaker,
 	showtxt,
-	
 }: {
 	sneaker: any;
 	showtxt: boolean;
-	
 }) {
 	// console.log("sneakers from Collection", sneakers);
 	//console.log("myBlurDataUrl - sneakers from function",sneakers.collection_image)
@@ -25,41 +23,41 @@ export default async function CollectionCard({
 		<>
 			{/* {sneakers?.map((sneaker: any) => ( */}
 			<div>
-					<div
-						key={sneaker.id}
-						className={`flex flex-col max-w-sm relative justify-center align-middle items-start  hover:bg-gray-900 ${
-							showtxt ? "bg-gray-800/50 px-1 py-2 md:px-2 md:py-4 w-full" : ""
-						} `}>
-						{showtxt && (
-							<>
-								<div className=' flex flex-col  items-center  mx-3 my-3 text-end rounded-xl bg-indigo-900/50 p-1 absolute top-0 right-0'>
-									<div className='px-1 '>
-										<span className=' text-[1.35rem] md:text-[1.3rem] leading-[1.2] text-start'>
-											8.8
-										</span>
-										<span className='text-[0.68rem]'>/10</span>
-									</div>
-
-									<p className='text-[0.67rem] md:text-[0.67rem] leading-[1.2] text-start px-2 '>
-										Our Score
-									</p>
-								</div>
-
-								<div className=' flex flex-col  items-center  mx-3 my-3 text-end rounded-full bg-gray-500/50 p-1 absolute top-0 left-0'>
-									<span className='  '>
-										<img
-											className='text-gray-300 w-7 h-7 m-0 fill-gray-300'
-											src={sneaker.brand_id.brand_logo}
-										/>
+				<div
+					key={sneaker.id}
+					className={`flex flex-col max-w-sm relative justify-center align-middle items-start  hover:bg-gray-900 ${
+						showtxt ? "bg-gray-800/50 px-1 py-2 md:px-2 md:py-4 w-full" : ""
+					} `}>
+					{showtxt && (
+						<>
+							<div className=' flex flex-col  items-center  mx-3 my-3 text-end rounded-xl bg-indigo-900/50 p-1 absolute top-0 right-0'>
+								<div className='px-1 '>
+									<span className=' text-[1.35rem] md:text-[1.3rem] leading-[1.2] text-start'>
+										8.8
 									</span>
+									<span className='text-[0.68rem]'>/10</span>
 								</div>
-							</>
-						)}
-						<div
-							className={`${
-								showtxt ? "mx-12 my-6 sm:mt-14  md:mt-16 lg:mt-20" : ""
-							} `}>
-									<Link href={`/sneakers/detail/${sneaker.id}`}>
+
+								<p className='text-[0.67rem] md:text-[0.67rem] leading-[1.2] text-start px-2 '>
+									Our Score
+								</p>
+							</div>
+
+							<div className=' flex flex-col  items-center  mx-3 my-3 text-end rounded-full bg-gray-500/50 p-1 absolute top-0 left-0'>
+								<span className='  '>
+									<img
+										className='text-gray-300 w-7 h-7 m-0 fill-gray-300'
+										src={sneaker.brand_id.brand_logo}
+									/>
+								</span>
+							</div>
+						</>
+					)}
+					<div
+						className={`${
+							showtxt ? "mx-12 my-6 sm:mt-14  md:mt-16 lg:mt-20" : ""
+						} `}>
+						<Link href={`/sneakers/detail/${sneaker.id}`}>
 							{/* <Link href={`/sneakers/detail/${sneaker.id}`}> */}
 							<Image
 								width={250}
@@ -79,23 +77,38 @@ export default async function CollectionCard({
 								// }
 								blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
 								placeholder='blur'
-								quality={30}
+								quality={80}
 							/>
-							</Link>
-						</div>
-						{showtxt && (
-							<p className=' line-clamp-2 text-[0.95rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>
-								{sneaker?.name}-{sneaker.id}
-							</p>
-						)}
+						</Link>
+					</div>
+					{showtxt && (
+						<p className=' line-clamp-2 text-[0.95rem] md:text-[0.9rem] mt-2 leading-[1.2] text-start mx-2  md:mx-5 '>
+							{sneaker?.name}-{sneaker.id}
+						</p>
+					)}
 
-						<div className='border-t-2 border-b-2 h-10 w-full grid grid-cols-2 mt-6 gap-y-6 text-[0.75rem] place-items-center'>
-							<div className="">Added on {format(new Date(sneaker.release_date),'PP')}</div>
-						
-							<div>${sneaker.price}</div>
+					<div className='border-t-2 border-b-2 h-10 w-full grid grid-cols-2 mt-6 gap-y-6 text-[0.75rem] place-items-center'>
+						<div className=''>
+							Purchased on {format(new Date(sneaker?.purchase_date), "PP")}
 						</div>
 
-						{/*showtxt && (
+						{/* <div>${sneaker.price}</div> */}
+<div> 
+						<AdminButtons
+					sneaker={sneaker}
+					id={sneaker.id}
+					showAddToCollectionButton={false}
+					showEditButton={false}
+					showDeleteButton={false}
+					showElement={false}
+					collectionPage={true}
+					refeshPage={undefined}
+				/></div>
+
+
+					</div>
+
+					{/*showtxt && (
 						<div className='md:mt-5 mt-3 mb-1 mx-auto'>
 							<Link href={`/sneakers/detail/${sneaker.id}`}>
 								<button className='bg-white text-xs md:text-sm hover:bg-gray-100 text-gray-800 font-semibold py-1 px-2 border border-gray-400 rounded shadow'>
@@ -105,11 +118,10 @@ export default async function CollectionCard({
 						</div>
 						
 					)*/}
-					</div>
+				</div>
 
-
-<AdminButtons sneaker={sneaker} id={sneaker.id} showAddToCollectionButton={false} showEditButton={false} showDeleteButton={false} showElement={false} collectionPage={true}  />
-</div>
+			
+			</div>
 			{/* ))} */}
 		</>
 	);

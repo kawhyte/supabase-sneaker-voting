@@ -77,15 +77,23 @@ const ratings = [
 	{ label: "Not for me ", value: "3", icon: ThumbsDown, color: "red" },
 ] as const;
 
+
+const imageStyle = {
+	width: '100%',
+	height: 'auto',
+   }
+
 const formSchema = z.object({
 	name: z.string().min(2, {
 		message: "Sneaker name must be at least 2 characters.",
 	}),
 
 	// collection_image: z.union([z.string().url().nullish(), z.literal("")]),
-	collection_image: z
-		.union([z.literal(""), z.string().url().trim().url()])
-		.optional(),
+	collection_image: z.string().url({ message: "Please enter a valid URL." }).optional(),
+	
+	// z
+	// 	.union([z.literal(""), z.string().url().trim().url()])
+	// 	.optional(),
 
 	SKU: z.string().min(2, {
 		message: "SKU must be at least 2 characters.",
@@ -118,6 +126,9 @@ const formSchema = z.object({
 	release_date: z.date({
 		required_error: "A sneaker release date is required.",
 	}),
+	purchase_date: z.date({
+		required_error: "A sneaker release date is required.",
+	}).optional(),
 
 	retailPrice: z
 		.union([
@@ -139,7 +150,7 @@ const CreateEditForm = ({
 	all_images: any;
 }) => {
 	const [formError, setFormError] = useState("");
-	const [data, setData] = useState("");
+	// const [data, setData] = useState("");
 
 	//console.log("Snealers ", sneaker);
 
@@ -173,8 +184,9 @@ const CreateEditForm = ({
 					retailPrice: sneaker.price,
 					brand: sneaker?.brand_id?.id?.toString(),
 					rating: sneaker?.rating_id?.vote?.vote_id?.toString(),
-					collection_image: sneaker.collection_image || "", //sneaker.images[0].image_link,
+					collection_image: sneaker?.collection_image, //sneaker.images[0].image_link,
 					release_date: new Date(sneaker.release_date),
+					purchase_date: new Date(sneaker.purchase_date),
 					images: sneaker.images,
 			  }
 			: undefined,
@@ -191,6 +203,8 @@ const CreateEditForm = ({
 		// ✅ This will be type-safe and validated.
 
 		const supabase = createClient();
+console.log("Values ",values)
+
 
 		// Check if there us exsisting sneaker to be updated.
 		// If no sneaker is available, then create a new listing
@@ -203,8 +217,10 @@ const CreateEditForm = ({
 					name: values.name,
 					brand_id: values.brand,
 					release_date: values.release_date,
+					purchase_date: values.purchase_date,
 					price: values.retailPrice,
 					style: values.SKU,
+					collection_image: values.collection_image,
 					//main_image: values.main_image,
 				})
 				.eq("id", id)
@@ -310,25 +326,29 @@ const CreateEditForm = ({
 						<div className='my-10  '>
 							<>
 								{sneaker?.images ? (
-									<Carousel className=' bg-white w-[408px] md:w-[708px]'>
-										<CarouselContent className=' '>
+									<Carousel className=' bg-white w-[408px] md:w-[690px]'>
+										<CarouselContent className='  '>
 											{sneaker?.images
 												.sort((a: any, b: any) => b.main_image - a.main_image)
 												?.map((item: any, index: any) => {
 													return (
-														<CarouselItem key={item.id}>
-															<div className=' w-[358px] h-[212px] md:w-[698px] md:h-[412px] '>
-																<AspectRatio ratio={16 / 10}>
+														<CarouselItem  key={item.id}>
+															<div className=' ml-20 w-[570px] h-[410px] md:w-[508px] md:h-[472px] '>
+																{/* <AspectRatio ratio={16 / 9}> */}
+																<div className="">
 																	<Image
 																		src={item.image_link}
 																		alt='Image'
-																		fill
-																		className='rounded-md object-cover'
+																		// fill
+																		width={530}
+																		height={530}
+																		className='rounded-md object-cover h-auto w-3/4 md:w-full '
 																		blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
 																		placeholder='blur'
-																		quality={30}
-																	/>
-																</AspectRatio>
+																		quality={5}
+																		// style={imageStyle}
+																	/></div>
+																{/* </AspectRatio> */}
 															</div>
 														</CarouselItem>
 													);
@@ -454,6 +474,47 @@ const CreateEditForm = ({
 									</FormItem>
 								)}
 							/>
+							<FormField
+								control={form.control}
+								name='purchase_date'
+								render={({ field }) => (
+									<FormItem className='flex flex-col '>
+										<FormLabel className='uppercase'>Purchase Date </FormLabel>
+										<Popover>
+											<PopoverTrigger asChild>
+												<FormControl>
+													<Button
+														variant={"outline"}
+														className={cn(
+															" w-[200px] md:w-[220px]  text-left font-normal",
+															!field.value && "text-muted-foreground"
+														)}>
+														{field.value ? (
+															format(field.value, "PPP")
+														) : (
+															<span>Pick a date</span>
+														)}
+														<CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+													</Button>
+												</FormControl>
+											</PopoverTrigger>
+											<PopoverContent className='w-auto p-0' align='start'>
+												<Calendar
+													mode='single'
+													selected={field.value}
+													onSelect={field.onChange}
+													// disabled={(date) =>
+													// 	date > new Date() || date < new Date("1900-01-01")
+													// }
+													initialFocus
+												/>
+											</PopoverContent>
+										</Popover>
+
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
 							<FormField
 								control={form.control}
@@ -515,7 +576,7 @@ const CreateEditForm = ({
 								)}
 							/>
 
-							{sneaker?.rating_id.vote.vote_id && (
+							{sneaker?.rating_id?.vote?.vote_id && (
 								<FormField
 									control={form.control}
 									name='rating'
@@ -671,7 +732,7 @@ const CreateEditForm = ({
 								Add more Sneaker URLs
 							</Button>
 						</div>
-						<Button type='submit'>Submit</Button>
+						<Button type='submit'>Save</Button>
 					</form>
 				</Form>
 			</div>

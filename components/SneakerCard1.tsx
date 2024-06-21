@@ -36,18 +36,17 @@ export default function SneakerCard({
 	showElement,
 	showVotingSection,
 	showCardDetails,
-showCardNote,
-showCardImages
-
+	showCardNote,
+	showCardImages,
 }: {
 	sneaker: any;
 	showtxt: boolean;
 	refeshPage: any;
 	showElement: boolean;
-	showVotingSection:boolean;
-	showCardDetails:boolean
-showCardNote:boolean
-showCardImages:boolean
+	showVotingSection: boolean;
+	showCardDetails: boolean;
+	showCardNote: boolean;
+	showCardImages: boolean;
 }) {
 	//console.log("sneakers from Sneaker", sneaker);
 	const supabase = createClient();
@@ -58,8 +57,6 @@ showCardImages:boolean
 		undefined
 	);
 
-	
-
 	const result = compareAsc(new Date(), new Date(sneaker?.release_date));
 
 	const { toast } = useToast();
@@ -67,7 +64,6 @@ showCardImages:boolean
 	const [vote, setVote] = useState(
 		sneaker?.rating_id?.vote?.vote_id?.toString()
 	);
-
 
 	// const handleDelete = (id: any) => {
 	// 	setSneakers((prevSmoothies: any) => {
@@ -78,7 +74,13 @@ showCardImages:boolean
 	// 	});
 	// };
 
-	const handleSneakerVote = sneakerVote(supabase, sneaker, toast, setVote, refeshPage);
+	const handleSneakerVote = sneakerVote(
+		supabase,
+		sneaker,
+		toast,
+		setVote,
+		refeshPage
+	);
 	//console.log("myBlurDataUrl - sneakers from function",sneakers.collection_image)
 
 	//const sneakersWithBlurDataUrl = await addBlurredDataUrls(sneakers);
@@ -102,7 +104,6 @@ showCardImages:boolean
 														src={item?.image_link}
 														alt='Image'
 														fill
-													
 														className='rounded-md object-cover '
 														blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
 														placeholder='blur'
@@ -115,9 +116,11 @@ showCardImages:boolean
 							</CarouselContent>
 							<div className='bg-red-300 flex flex-col absolute bottom-5 right-20 '>
 								{sneaker.images.length > 1 && (
-									<CarouselPrevious type="button"  className='    ' />
+									<CarouselPrevious type='button' className='    ' />
 								)}
-								{sneaker.images.length > 1 && <CarouselNext type="button"  className='   ' />}
+								{sneaker.images.length > 1 && (
+									<CarouselNext type='button' className='   ' />
+								)}
 							</div>
 						</Carousel>
 
@@ -133,16 +136,13 @@ showCardImages:boolean
 							ideal_cost={50}
 							notes={""}
 							links={undefined}
-							show_element={showElement} 
+							show_element={showElement}
 							refeshPage={refeshPage}
 							vote_date={sneaker?.rating_id?.vote?.created_at}
-
-showCardDetails={showCardDetails}
-showCardNote={showCardNote}
-showCardImages={showCardImages}
-
-
-													/>
+							showCardDetails={showCardDetails}
+							showCardNote={showCardNote}
+							showCardImages={showCardImages}
+						/>
 
 						{/* {!showElement && 	} */}
 
@@ -343,5 +343,3 @@ showCardImages={showCardImages}
 		</>
 	);
 }
-
-
