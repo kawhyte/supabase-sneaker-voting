@@ -92,14 +92,14 @@ export default function SneakerCard({
 			<div className='max-w-xl'>
 				<div className='relative'>
 					<Card className='flex flex-col justify-between '>
-						<Carousel className=' bg-white'>
+						<Carousel className=' bg-white p-9'>
 							<CarouselContent className=' '>
 								{sneaker.images
 									.sort((a: any, b: any) => b.main_image - a.main_image)
 									.map((item: any) => (
 										<CarouselItem key={item.id}>
 											<div className='  '>
-												<AspectRatio ratio={16 / 10}>
+												<AspectRatio ratio={16 / 12}>
 													<Image
 														src={item?.image_link}
 														alt='Image'
