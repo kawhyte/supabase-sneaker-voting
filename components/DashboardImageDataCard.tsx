@@ -23,9 +23,6 @@ export type CardProps = {
 };
 
 export default function DashboardImageDataCard(props: CardProps) {
- 
-
-
 	return (
 		<Card className=' '>
 			<CardHeader>
@@ -35,10 +32,14 @@ export default function DashboardImageDataCard(props: CardProps) {
 
 			<CardContent>
 				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  max-w-xl'>
-					{  props.images?.slice(0, 6).map((item: any) => (
+					{props?.images?.slice(0, 6).map((item: any) => (
 						<div key={item.id}>
 							<Image
-								src={item?.collection_image}
+								src={
+									item?.collection_image
+										? item?.collection_image
+										: "https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png"
+								}
 								width={0}
 								height={0}
 								style={{ width: "120px", height: "auto" }}
@@ -49,8 +50,10 @@ export default function DashboardImageDataCard(props: CardProps) {
 								{item.name}
 							</p>
 							<p className=' text-[0.8rem] text-gray-400 '>
-							
-								{item?.purchase_date !== null ? "Purchased on " + format(new Date(item?.purchase_date), "MMM dd,yyyy"):""}
+								{item?.purchase_date !== null
+									? "Purchased on " +
+									  format(new Date(item?.purchase_date), "MMM dd,yyyy")
+									: ""}
 							</p>
 						</div>
 					))}

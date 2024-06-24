@@ -163,7 +163,7 @@ export default function Page() {
 		},
 	];
 
-	//console.log(count);
+	console.log("collection?.length", collection);
 	return (
 		<div className='animate-in flex-1 w-full flex flex-col gap-x-20 items-center  justify-center align-middle '>
 			<SectionHeader
@@ -204,9 +204,7 @@ export default function Page() {
 						icon={ArchiveX}
 						description={"Last 6 Sneakers added to collection"}
 						images={collection}
-						// cardTitle={"Latest Sneaker pickups"}
-						// cardDescription={"Last 4 Sneakers added to collection"}
-						// cardContent={collection}
+					
 					/>
 					{/* <DashboardImageDataCard
 						cardTitle={"Most worn sneakers"}

@@ -333,7 +333,7 @@ console.log("Values ",values)
 												?.map((item: any, index: any) => {
 													return (
 														<CarouselItem  key={item.id}>
-															<div className=' ml-20 w-[570px] h-[410px] md:w-[508px] md:h-[472px] '>
+															<div className=' mx-auto container ml-20 w-[570px] h-[410px] md:w-[508px] md:h-[472px] '>
 																{/* <AspectRatio ratio={16 / 9}> */}
 																<div className="">
 																	<Image

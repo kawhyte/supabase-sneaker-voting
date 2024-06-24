@@ -126,7 +126,7 @@ export default function Component({
 			{showCardDetails && (
 				<CardContent className='p-6 text-sm'>
 					<div className='grid gap-3'>
-						<ul className='grid gap-3'>
+						<ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2  lg:grid-cols-2 xl:grid-cols-3 gap-3 gap-y-8'>
 							{/* <li className="flex items-center justify-between">
                 <span className="text-muted-foreground">Name</span>
                 <span>{sneaker_name}</span>
@@ -137,31 +137,30 @@ export default function Component({
               </li> */}
 
 							<>
-								<li className='flex items-center justify-between'>
+								<li className='flex flex-col gap-y-2 items-center justify-between'>
 									<span className='text-muted-foreground'>Ideal Size</span>
 									<span>{ideal_size}</span>
 								</li>
-								<li className='flex items-center justify-between'>
+								<li className='flex flex-col gap-y-2 items-center justify-between'>
 									<span className='text-muted-foreground'>Tried on</span>
-									<Badge className='bg-green-700 text-black' variant='outline'>
 										{tried_on ? "Yes" : "No"}
-									</Badge>
+									
 								</li>
 
-								<li className='flex items-center justify-between '>
-									<span className='text-muted-foreground'>Retail Cost</span>
+								<li className='flex flex-col gap-y-2 items-center justify-between '>
+									<span className='text-muted-foreground'>Brand</span>
 									<span>{brand}</span>
 								</li>
-								<li className='flex items-center justify-between'>
+								<li className='flex flex-col gap-y-2 items-center justify-between'>
 									<span className='text-muted-foreground'>Retail Cost</span>
 									<span>${cost}</span>
 								</li>
-								<li className='flex items-center justify-between'>
+								<li className='flex flex-col gap-y-2 items-center justify-between'>
 									<span className='text-muted-foreground'>Release Date</span>
 									<span>{format(new Date(release_date), "MMM dd,yyyy")}</span>
 								</li>
 
-								<li className='flex items-center justify-between'>
+								<li className='flex flex-col gap-y-2 items-center justify-between'>
 									<span className='text-muted-foreground'>
 										Ideal Purchase Price
 									</span>
