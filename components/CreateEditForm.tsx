@@ -77,11 +77,10 @@ const ratings = [
 	{ label: "Not for me ", value: "3", icon: ThumbsDown, color: "red" },
 ] as const;
 
-
 const imageStyle = {
-	width: '100%',
-	height: 'auto',
-   }
+	width: "100%",
+	height: "auto",
+};
 
 const formSchema = z.object({
 	name: z.string().min(2, {
@@ -89,8 +88,11 @@ const formSchema = z.object({
 	}),
 
 	// collection_image: z.union([z.string().url().nullish(), z.literal("")]),
-	collection_image: z.string().url({ message: "Please enter a valid URL." }).optional(),
-	
+	collection_image: z
+		.string()
+		.url({ message: "Please enter a valid URL." })
+		.optional(),
+
 	// z
 	// 	.union([z.literal(""), z.string().url().trim().url()])
 	// 	.optional(),
@@ -126,9 +128,11 @@ const formSchema = z.object({
 	release_date: z.date({
 		required_error: "A sneaker release date is required.",
 	}),
-	purchase_date: z.date({
-		required_error: "A sneaker release date is required.",
-	}).optional(),
+	purchase_date: z
+		.date({
+			required_error: "A sneaker release date is required.",
+		})
+		.optional(),
 
 	retailPrice: z
 		.union([
@@ -203,8 +207,7 @@ const CreateEditForm = ({
 		// ✅ This will be type-safe and validated.
 
 		const supabase = createClient();
-console.log("Values ",values)
-
+		console.log("Values ", values);
 
 		// Check if there us exsisting sneaker to be updated.
 		// If no sneaker is available, then create a new listing
@@ -326,43 +329,48 @@ console.log("Values ",values)
 						<div className='my-10  '>
 							<>
 								{sneaker?.images ? (
-									<Carousel className=' bg-white w-[408px] md:w-[690px]'>
-										<CarouselContent className='  '>
-											{sneaker?.images
-												.sort((a: any, b: any) => b.main_image - a.main_image)
-												?.map((item: any, index: any) => {
-													return (
-														<CarouselItem  key={item.id}>
-															<div className=' mx-auto container ml-20 w-[570px] h-[410px] md:w-[508px] md:h-[472px] '>
-																{/* <AspectRatio ratio={16 / 9}> */}
-																<div className="">
-																	<Image
-																		src={item.image_link}
-																		alt='Image'
-																		// fill
-																		width={530}
-																		height={530}
-																		className='rounded-md object-cover h-auto w-3/4 md:w-full '
-																		blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
-																		placeholder='blur'
-																		quality={5}
-																		// style={imageStyle}
-																	/></div>
-																{/* </AspectRatio> */}
-															</div>
-														</CarouselItem>
-													);
-												})}
-										</CarouselContent>
-										<div className='bg-red-300 flex flex-col absolute bottom-5 right-20 '>
-											{sneaker.images.length > 1 && (
-												<CarouselPrevious type='button' className='    ' />
-											)}
-											{sneaker.images.length > 1 && (
-												<CarouselNext type='button' className='   ' />
-											)}
+									<div className='max-w-2xl'>
+										<div className='relative'>
+											<div className='flex flex-col justify-between w-[400px] sm:w-[600px]  md:w-[690px]  lg:w-[730px] '>
+												<Carousel className=' bg-white p-9 w-full'>
+													<CarouselContent className=' '>
+														{sneaker.images
+															.sort(
+																(a: any, b: any) => b.main_image - a.main_image
+															)
+															.map((item: any) => (
+																<CarouselItem key={item.id}>
+																	<div className='  '>
+																		<AspectRatio ratio={16 / 12}>
+																			<Image
+																				src={item?.image_link}
+																				alt='Image'
+																				fill
+																				className='rounded-md object-cover '
+																				blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAO0lEQVR4nGNgYGBg+P//P1t9fT0TiM0we3ZjxZxZjQ9XLpwwe9nCHkOGGZOyanraY9aumN2wbsn0hmQA/MEWfj4ocjcAAAAASUVORK5CYII='
+																				placeholder='blur'
+																				quality={80}
+																			/>
+																		</AspectRatio>
+																	</div>
+																</CarouselItem>
+															))}
+													</CarouselContent>
+													<div className='bg-red-300 flex flex-col absolute bottom-5 right-20 '>
+														{sneaker.images.length > 1 && (
+															<CarouselPrevious
+																type='button'
+																className='    '
+															/>
+														)}
+														{sneaker.images.length > 1 && (
+															<CarouselNext type='button' className='   ' />
+														)}
+													</div>
+												</Carousel>
+											</div>
 										</div>
-									</Carousel>
+									</div>
 								) : (
 									<></>
 								)}
@@ -662,7 +670,7 @@ console.log("Values ",values)
 											{/* onBlur={() => setImage(field.value)} */}
 											<FormControl>
 												<Input
-													className='w-[650px]'
+													className='w-[320px] md:w-[650px]  '
 													placeholder='https:// '
 													{...field}
 												/>
