@@ -38,6 +38,7 @@ export default function SneakerCard({
 	showCardDetails,
 	showCardNote,
 	showCardImages,
+	role
 }: {
 	sneaker: any;
 	showtxt: boolean;
@@ -47,6 +48,7 @@ export default function SneakerCard({
 	showCardDetails: boolean;
 	showCardNote: boolean;
 	showCardImages: boolean;
+	role:any
 }) {
 	//console.log("sneakers from Sneaker", sneaker);
 	const supabase = createClient();
@@ -141,8 +143,8 @@ export default function SneakerCard({
 							vote_date={sneaker?.rating_id?.vote?.created_at}
 							showCardDetails={showCardDetails}
 							showCardNote={showCardNote}
-							showCardImages={showCardImages}
-						/>
+							showCardImages={showCardImages} 
+							role={role}						/>
 
 						{/* {!showElement && 	} */}
 

@@ -11,6 +11,7 @@ import { UpdateData } from "@/lib/sneakerUtils";
 
 export default function PendingVote() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
+	const [role, setRole] = useState<any[] | null>(null);
 	const [sneakerCount, setSneakerCount] = useState<number | undefined>(
 		undefined
 	);
@@ -55,10 +56,16 @@ export default function PendingVote() {
 			setSneakers(data);
 
 			setSneakerCount(data?.length);
+
+			const { data: users, error } = await supabase.from("user").select("role").single();
+
+			setRole(users?.role)
 		};
 		getData();
 	}, []);
 
+
+	console.log("Role7", role)
 	return supabaseUser ? (
 		<>
 			<div className='animate-in flex-1 w-full flex flex-col gap-y-20 items-center  justify-center align-middle '>
@@ -83,8 +90,8 @@ export default function PendingVote() {
 									showVotingSection={true}
 									showCardDetails={false}
 									showCardNote={false}
-									showCardImages={false}
-								/>
+									showCardImages={false} 
+									role={role}								/>
 							</div>
 						))}
 					</div>

@@ -166,10 +166,12 @@ const CreateEditForm = ({
 			name: "",
 			SKU: "",
 			retailPrice: 0,
-			brand: "",
+			brand: "1",
 			rating: "",
-			// collection_image: "https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png",
-			collection_image: "",
+			purchase_date: new Date(Date.now()),
+			release_date: new Date(Date.now()),
+			collection_image: "https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png",
+			//collection_image: "",
 
 			images: [
 				{
@@ -263,9 +265,19 @@ const CreateEditForm = ({
 					.eq("sneaker_id", sneakerID)
 					.select();
 
-				toast({
-					title: `${values.name} was successfully updated 🚀`,
-				});
+					console.log("Toast ",values)
+
+					toast({
+						action: (
+							<ToastAction altText='Try again'>
+								title: `${values.name} was successfully added 🚀`,
+								<Image alt={values.name} width={50} height={50} src="https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png" />
+								{/* <Link href={"/sneakers/dashboard/pending"} className='font-sm'>
+									View Listing{" "}
+								</Link> */}
+							</ToastAction>
+						),
+					});
 
 				//router.push("/sneakers/dashboard/pending");
 			}
@@ -307,6 +319,7 @@ const CreateEditForm = ({
 					title: `${values.name} was successfully added 🚀`,
 					action: (
 						<ToastAction altText='Try again'>
+							<Image alt="sneaker" width={50} height={50} src="https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png" />
 							<Link href={"/sneakers/dashboard/pending"} className='font-sm'>
 								View Listing{" "}
 							</Link>

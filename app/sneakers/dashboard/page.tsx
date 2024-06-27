@@ -163,7 +163,6 @@ export default function Page() {
 		},
 	];
 
-	console.log("collection?.length", collection);
 	return (
 		<div className='animate-in flex-1 w-full flex flex-col gap-x-20 items-center  justify-center align-middle '>
 			<SectionHeader

@@ -29,6 +29,7 @@ type Props = {
 	showElement: boolean;
 	collectionPage: boolean;
 	refeshPage: any;
+	role:any
 };
 
 function AdminButtons({
@@ -40,6 +41,7 @@ function AdminButtons({
 	showDeleteButton,
 	showEditButton,
 	refeshPage,
+	role,
 }: Props) {
 	const supabase = createClient();
 
@@ -86,9 +88,10 @@ function AdminButtons({
 		}
 	};
 
-	//console.log("ADMIN BUTTON", id);
+	//console.log("ADMIN BUTTON", role);
 	return (
 		<>
+		
 			<Link className='' href={"/sneakers/edit/" + id}>
 				<Button size='sm' variant='outline' className='h-8 gap-1'>
 					<Pen className='h-3.5 w-3.5' />
@@ -129,7 +132,9 @@ function AdminButtons({
 						</span>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
-			</DropdownMenu>
+			</DropdownMenu> 
+			
+			
 		</>
 	);
 }

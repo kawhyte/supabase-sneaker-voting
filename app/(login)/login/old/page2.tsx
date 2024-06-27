@@ -1,13 +1,8 @@
+
 import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { SubmitButton } from "./submit-button";
-import Image from "next/image";
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { SubmitButton } from "../submit-button";
 
 export default function Login({
 	searchParams,
@@ -58,85 +53,82 @@ export default function Login({
 
 	return (
 		<>
-			<div className='w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px] max-w-7xl mt-10'>
-				<div className='flex items-center justify-center py-12'>
-					<div className='mx-auto grid w-[350px] gap-6'>
-						<div className='grid gap-2 text-center'>
-							<h1 className='text-3xl font-bold'>Login</h1>
-							<p className='text-balance text-muted-foreground'>
-								Enter your email below to login to your account
-							</p>
-						</div>
+			<div className='py-16  w-full '>
+				<div className='flex bg-white rounded-lg shadow-lg overflow-hidden mx-auto max-w-sm lg:max-w-6xl'>
+					<div
+						className='hidden lg:block lg:w-1/2 bg-cover'
+						style={{
+							backgroundImage:
+								"url(" +
+								"https://images.unsplash.com/photo-1586525198428-225f6f12cff5?q=80" +
+								")",
+							backgroundPosition: "center",
+							backgroundSize: "cover",
+							backgroundRepeat: "no-repeat",
+						}}></div>
+					<div className='w-full p-8 lg:w-1/2'>
+						<p className='text-base text-gray-600 text-center font-mono mb-6'>
+							Welcome back
+						</p>
+						
+
+						
 						<form className='animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground'>
-							<div className='grid gap-4'>
-								<div className='grid gap-2'>
-									<Label htmlFor='email'>Email</Label>
-									<Input
-										id='email'
-										type='email'
-										name='email'
-										placeholder='m@example.com'
-										required
-									/>
+							<div className='mt-4'>
+								<label className='block text-gray-700 text-sm font-bold mb-2'>
+									Email Address
+								</label>
+								<input
+									className='bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none'
+									type='email'
+									required
+									name='email'
+									placeholder='you@gmail.com'
+								/>
+							</div>
+							<div className='mt-4'>
+								<div className='flex justify-between'>
+									<label className='block text-gray-700 text-sm font-bold mb-2'>
+										Password
+									</label>
 								</div>
-								<div className='grid gap-2'>
-									<div className='flex items-center'>
-										<Label htmlFor='password'>Password</Label>
-										<Link
-											href='/forgot-password'
-											className='ml-auto inline-block text-sm underline'>
-											Forgot your password?
-										</Link>
-									</div>
-									<Input
-										id='password'
-										type='password'
-										name='password'
-										placeholder='••••••••'
-										required
-									/>
-								</div>
-								{/* <Button type='submit' className='w-full'>
-									Login-nah
-								</Button> */}
+								<input
+									className='bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none'
+									type='password'
+									required
+									name='password'
+									placeholder='••••••••'
+								/>
+							</div>
+							<div className='mt-8'>
 								<SubmitButton
 									formAction={signIn}
-									className='bg-green-500 hover:bg-green-500/90 text-black  text-sm  rounded-md px-4 py-2 w-full text-foreground mb-2'
+									className='bg-green-700 rounded-md px-4 py-2 w-full text-foreground mb-2'
 									pendingText='Signing In...'>
-									Login
+									Sign In
 								</SubmitButton>
-								{/* <Button variant='outline' className='w-full'>
-									Login with Google
-								</Button> */}
 							</div>
-							<div className='mt-4 text-center text-sm'>
-								Don&apos;t have an account?{" "}
-								<Link href='/signup' className='underline'>
-									Sign up
-								</Link>
-								{/* <SubmitButton
+
+							<div className='mt-4 flex items-center justify-between'>
+								<span className='border-b w-1/5 md:w-1/4'></span>
+
+								<SubmitButton
 									formAction={signUp}
 									className=' rounded-md px-4 py-2 text-foreground mb-2 text-xs text-gray-500 uppercase'
 									pendingText='Signing Up...'>
 									or Sign Up
-								</SubmitButton> */}
+								</SubmitButton>
+
 								{searchParams?.message && (
 									<p className='mt-4 p-4 bg-foreground/10 text-foreground text-center'>
 										{searchParams.message}
 									</p>
 								)}
+
+								<span className='border-b w-1/5 md:w-1/4'></span>
 							</div>
 						</form>
 					</div>
-				</div>
-				<div className='hidden bg-muted lg:block'>
-					<Image
-						src='https://images.unsplash.com/photo-1562424995-2efe650421dd?q=80&w=3687&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-						alt='Image'
-						width='1920'
-						height='1080'
-						className='h-full w-full object-cover dark:brightness-[0.2] dark:grayscale'
-					/>
 				</div>
 			</div>
 

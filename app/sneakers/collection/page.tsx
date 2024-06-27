@@ -13,6 +13,11 @@ export default async function Index() {
 		.eq(`rating_id.in_collection`, true)
 		.order("purchase_date", { ascending: false });
 
+
+		const { data: users, error } = await supabase.from("user").select("role").single();
+
+
+
 	return (
 		<div className='animate-in flex-1 w-full flex flex-col gap-20 items-center  justify-center align-middle '>
 			<SectionHeader
@@ -24,7 +29,7 @@ export default async function Index() {
 			<div className='flex flex-col gap-10 mx-4 items-center '>
 				<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-x-4 gap-y-5'>
 					{sneakers?.map((sneaker) => (
-						<CollectionCard sneaker={sneaker} showtxt={true} />
+						<CollectionCard sneaker={sneaker} showtxt={true} role={users?.role} />
 					))}
 				</div>
 			</div>

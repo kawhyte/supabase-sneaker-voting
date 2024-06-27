@@ -51,6 +51,7 @@ type Props = {
 	showCardDetails: boolean;
 	showCardNote: boolean;
 	showCardImages: boolean;
+	role:any
 };
 
 export default function Component({
@@ -71,6 +72,7 @@ export default function Component({
 	showCardDetails,
 	showCardNote,
 	showCardImages,
+	role,
 }: Props) {
 	return (
 		<Card className='overflow-hidden'>
@@ -87,7 +89,7 @@ export default function Component({
 					)}
 				</div>
 				<div className='ml-auto flex items-center gap-1'>
-					<AdminButtons
+				{role ==="admin" ? 	<AdminButtons
 						sneaker={undefined}
 						id={sneaker_id}
 						showAddToCollectionButton={false}
@@ -95,8 +97,8 @@ export default function Component({
 						showDeleteButton={false}
 						showElement={false}
 						collectionPage={false}
-						refeshPage={refeshPage}
-					/>
+						refeshPage={refeshPage} 
+						role={undefined}					/>:""}
 
 					{/* <Link className='' href={"/sneakers/edit/" + sneaker_id}>
             <Button size="sm" variant="outline" className="h-8 gap-1">

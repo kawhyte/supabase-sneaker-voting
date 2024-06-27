@@ -8,10 +8,15 @@ import AdminButtons from "./AdminButtons";
 export default async function CollectionCard({
 	sneaker,
 	showtxt,
+	role,
 }: {
 	sneaker: any;
 	showtxt: boolean;
+	role:any
 }) {
+
+	//console.log("TEST", role)
+
 	// console.log("sneakers from Collection", sneakers);
 	//console.log("myBlurDataUrl - sneakers from function",sneakers.collection_image)
 
@@ -94,7 +99,8 @@ export default async function CollectionCard({
 
 						{/* <div>${sneaker.price}</div> */}
 <div> 
-						<AdminButtons
+	
+{role ==="admin" ? <AdminButtons
 					sneaker={sneaker}
 					id={sneaker.id}
 					showAddToCollectionButton={false}
@@ -103,7 +109,10 @@ export default async function CollectionCard({
 					showElement={false}
 					collectionPage={true}
 					refeshPage={undefined}
-				/></div>
+					role={role}
+				/>:""}
+				
+				</div>
 
 
 					</div>
