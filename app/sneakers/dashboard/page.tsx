@@ -25,6 +25,8 @@ import BarGraph from "@/components/BarGraph";
 
 export default function Page() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
+	const [role, setRole] = useState<any[] | null>(null);
+
 	const [count, setCount] = useState(0);
 	const [collection, setCollection] = useState<any[] | null>(null);
 	const [sneakersVoted, setSneakersVoted] = useState<any[] | null>(null);
@@ -103,6 +105,9 @@ export default function Page() {
 				.not("rating_id", "is", null)
 				.order("created_at", { ascending: false });
 
+				const { data: users, error } = await supabase.from("user").select("role").single();
+
+				setRole(users?.role)
 			setPendingSneakerVote(pendingSneakerVote);
 			setSneakersVoted(sneakersVoted);
 			setCollection(collectionSneakers);
@@ -186,7 +191,7 @@ export default function Page() {
 				
 
 				<section className='grid grid-cols-1 gap-4 transition-all lg:grid-cols-2   w-full '>
-					<Card>
+					<Card className="col-span-4">
 						<CardHeader>
 							<h1 className='text-sm font-semibold  font-mono'>
 								Sneakers Collection Brand Count{" "}

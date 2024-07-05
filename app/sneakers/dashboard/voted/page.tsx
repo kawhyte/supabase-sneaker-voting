@@ -14,6 +14,7 @@ import { UpdateData } from "@/lib/sneakerUtils";
 export default function Voted() {
 	const [sneakers, setSneakers] = useState<any[] | null>(null);
 	// const [filteredsneakers, setFilteredSneakers] = useState<any[] | null>(null);
+	const [role, setRole] = useState<any[] | null>(null);
 
 	const [sneakerCount, setSneakerCount] = useState<number | undefined>(
 		undefined
@@ -37,8 +38,12 @@ export default function Voted() {
 				.not("rating_id", "is", null)
 				.order("created_at", { ascending: false });
 
+
+				const { data: users, error } = await supabase.from("user").select("role").single();
+
 			setSneakers(data);
 			setSneakerCount(data?.length);
+			setRole(users?.role)
 		};
 		getData();
 	}, []);
@@ -65,8 +70,7 @@ export default function Voted() {
 								showVotingSection={false}
 								showCardDetails={true}
 								showCardNote={true}
-								showCardImages={true}
-							/>
+								showCardImages={true} role={role}							/>
 						))}
 					</div>
 				</div>

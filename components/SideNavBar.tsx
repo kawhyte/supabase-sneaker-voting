@@ -98,13 +98,13 @@ const [windowWidth, setWindowWidth] = useState(0);
 						variant: "ghost",
 					},
 
-						{
-						title: "Create New Listing",
-						label: "",
-						href: "/sneakers/create",
-						icon: CirclePlus,
-						variant: "ghost",
-					},
+					// 	{
+					// 	title: "Create New Listing",
+					// 	label: "",
+					// 	href: "/sneakers/create",
+					// 	icon: CirclePlus,
+					// 	variant: "ghost",
+					// },
 				]}
 			/>
 		</div>

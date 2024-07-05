@@ -18,6 +18,8 @@ export default async function AuthButton() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data: users, error } = await supabase.from("user").select("role").single();
+
 
   const signOut = async () => {
     "use server";
@@ -29,7 +31,17 @@ export default async function AuthButton() {
 
   return user ? (
     <div className="flex items-end gap-x-6   font-semibold text-base px-3 leading-[1.2]  ">
+      
+      { users?.role ==="admin" ? <Link href="/sneakers/create">
+      
+      <CirclePlus className="mb-2"/> 
+      {/* <Button variant={"ghost"} className="hover:border-gray-300 rounded-xl border-2  h-9" >
+          Create New
+        </Button> */}
+   </Link> :"" }
+      
       {/* Hey, {user.email?.slice(0,2)}! */}
+     
       <Avatar>
       <AvatarImage src="" alt="@shadcn" />
       <AvatarFallback className="uppercase">{user.email?.slice(0,2)}</AvatarFallback>
@@ -39,7 +51,6 @@ export default async function AuthButton() {
           Logout
         </Button>
       </form>
-
    
 						
     </div>

@@ -73,7 +73,7 @@ export default async function CollectionCard({
 										: "https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png"
 								}
 								alt={sneaker?.name}
-								className='w-56 mt-6 md:mt-0 md:w-80 img-outline cursor-pointer '
+								className='w-56 rotate-12 mt-6 md:mt-0 md:w-80 img-outline cursor-pointer hover: '
 								// blurDataURL={
 								// 	sneaker?.blurredDataUrl !== undefined ||
 								// 	sneaker?.blurredDataUrl !== null
