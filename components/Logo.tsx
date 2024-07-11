@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Logo() {
   return (
     <Link
-      className="py-2 px-3 flex justify-between items-baseline rounded-md no-underline hover:bg-btn-background-hover "
+      className="py-2 pl-3 pr-12 flex justify-between items-baseline rounded-md no-underline hover:bg-btn-background-hover "
       href="/"
    
       rel="noreferrer"
@@ -21,7 +21,7 @@ export default function Logo() {
       </svg> */}
 
       <div> 
-<svg xmlns="http://www.w3.org/2000/svg"  className="h-7 w-7 "  zoomAndPan="magnify" viewBox="0 0 375 374.999991"  preserveAspectRatio="xMidYMid meet" version="1.0">
+<svg xmlns="http://www.w3.org/2000/svg"  className="h-9 w-9 "  zoomAndPan="magnify" viewBox="0 0 375 374.999991"  preserveAspectRatio="xMidYMid meet" version="1.0">
   <defs>
     <g/>
   </defs>

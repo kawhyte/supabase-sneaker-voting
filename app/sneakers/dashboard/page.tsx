@@ -7,6 +7,7 @@ import DeployButton from "@/components/Logo";
 import AuthButton from "@/components/AuthButton";
 import Image from "next/image";
 import Link from "next/link";
+
 import {
 	Card,
 	CardContent,
@@ -155,7 +156,7 @@ export default function Page() {
 			description: "sneakers waiting for a vote",
 		},
 		{
-			title: "Potential Sneaker Purchases",
+			title: "Potential Purchases",
 			icon: Heart,
 			amount: potentialSneakers?.length,
 			description: "sneakers I want to purchase",

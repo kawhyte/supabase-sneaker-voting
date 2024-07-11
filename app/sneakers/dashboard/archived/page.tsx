@@ -58,8 +58,8 @@ export default function Voted() {
 								showVotingSection={false}
 								showCardDetails={false}
 								showCardNote={false}
-								showCardImages={false}
-							/>
+								showCardImages={false} 
+								role={undefined}							/>
 						))}
 					</div>
 				</div>

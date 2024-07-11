@@ -46,7 +46,7 @@ const [windowWidth, setWindowWidth] = useState(0);
 		setIsCollapsed(!isCollapsed);
 	}
 	return (
-		<div className=' relative min-w-[100px] border-r px-3 pb-10 pt-10  '>
+		  <div className=' relative min-w-[100px] border-r px-3 pb-10 pt-10  '>
 			{!mobileWidth && (
 				<div  className='absolute right-[-20px] top-7'>
 					<Button
@@ -61,14 +61,14 @@ const [windowWidth, setWindowWidth] = useState(0);
 				isCollapsed={mobileWidth ? true : isCollapsed}
 				links={[
 					{
-						title: "Sneakers Overview",
+						title: "Overview",
 						href: "/sneakers/dashboard",
 						// label: "128",
 						icon: LayoutDashboard,
 						variant: "ghost",
 					},
 					{
-						title: "Sneakers Awaiting Vote",
+						title: "Awaiting Vote",
 						href: "/sneakers/dashboard/pending",
 						// label: "9",
 						icon: Clock,
@@ -76,7 +76,7 @@ const [windowWidth, setWindowWidth] = useState(0);
 					},
 
 					{
-						title: "Potential Sneaker Purchases",
+						title: "Potential Purchases",
 						href: "/sneakers/dashboard/voted",
 						label: "",
 						icon: Heart,
@@ -91,7 +91,7 @@ const [windowWidth, setWindowWidth] = useState(0);
 					// 	variant: "ghost",
 					// },
 					{
-						title: "Archived Sneakers",
+						title: "Archived",
 						href: "/sneakers/dashboard/archived",
 						label: "",
 						icon: Archive,
@@ -107,6 +107,6 @@ const [windowWidth, setWindowWidth] = useState(0);
 					// },
 				]}
 			/>
-		</div>
+		</div> 
 	);
 }

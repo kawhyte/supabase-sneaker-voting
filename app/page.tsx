@@ -59,8 +59,6 @@ export default async function Index() {
 					</button>
 				</Link>
 			</div> */}
-
-		
 		</div>
 	);
 }

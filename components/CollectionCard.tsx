@@ -12,9 +12,8 @@ export default async function CollectionCard({
 }: {
 	sneaker: any;
 	showtxt: boolean;
-	role:any
+	role: any;
 }) {
-
 	//console.log("TEST", role)
 
 	// console.log("sneakers from Collection", sneakers);
@@ -51,7 +50,7 @@ export default async function CollectionCard({
 							<div className=' flex flex-col  items-center  mx-3 my-3 text-end rounded-full bg-gray-500/50 p-1 absolute top-0 left-0'>
 								<span className='  '>
 									<img
-										className='text-gray-300 w-7 h-7 m-0 fill-gray-300'
+										className='text-gray-300 w-7 h-7 m-0 fill-gray-300 '
 										src={sneaker.brand_id.brand_logo}
 									/>
 								</span>
@@ -73,7 +72,7 @@ export default async function CollectionCard({
 										: "https://res.cloudinary.com/babyhulk/image/upload/a_vflip.180/co_rgb:e7e7e7,e_colorize:100/v1710621770/sneakers/baseball.png"
 								}
 								alt={sneaker?.name}
-								className='w-56 rotate-12 mt-6 md:mt-0 md:w-80 img-outline cursor-pointer hover: '
+								className='w-56 rotate-12 mt-6 md:mt-0 md:w-80 img-outline cursor-pointer hover:scale-110 duration-300 '
 								// blurDataURL={
 								// 	sneaker?.blurredDataUrl !== undefined ||
 								// 	sneaker?.blurredDataUrl !== null
@@ -98,23 +97,23 @@ export default async function CollectionCard({
 						</div>
 
 						{/* <div>${sneaker.price}</div> */}
-<div> 
-	
-{role ==="admin" ? <AdminButtons
-					sneaker={sneaker}
-					id={sneaker.id}
-					showAddToCollectionButton={false}
-					showEditButton={false}
-					showDeleteButton={false}
-					showElement={false}
-					collectionPage={true}
-					refeshPage={undefined}
-					role={role}
-				/>:""}
-				
-				</div>
-
-
+						<div>
+							{role === "admin" ? (
+								<AdminButtons
+									sneaker={sneaker}
+									id={sneaker.id}
+									showAddToCollectionButton={false}
+									showEditButton={false}
+									showDeleteButton={false}
+									showElement={false}
+									collectionPage={true}
+									refeshPage={undefined}
+									role={role}
+								/>
+							) : (
+								""
+							)}
+						</div>
 					</div>
 
 					{/*showtxt && (
@@ -128,8 +127,6 @@ export default async function CollectionCard({
 						
 					)*/}
 				</div>
-
-			
 			</div>
 			{/* ))} */}
 		</>

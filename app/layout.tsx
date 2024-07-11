@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import SideNavBar from "@/components/SideNavBar";
 import MainPageLayout from "@/components/MainPageLayout";
 
+
 const defaultUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
 	: "http://localhost:3000";
@@ -32,9 +33,9 @@ export default function RootLayout({
 			)}>
 			<body className='    '>
 				<Header />
+				
+				
 				<div className='h-screen  flex-col mx-auto size-full flex items-center'>
-					
-
 					{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
 
 					{/* side bar */}

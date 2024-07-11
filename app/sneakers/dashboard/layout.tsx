@@ -16,20 +16,14 @@ export default function RootLayout({
 
 				{ "debug-screens": process.env.NODE_ENV === "development" }
 			)}>
-			
-			
-				{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
-				<div className='flex  w-full  m-0'>
-					{/* side bar */}
-					<MainPageLayout children={children}></MainPageLayout>
+			{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
+			<div className='flex  w-full  m-0'>
+				{/* side bar */}
+				<MainPageLayout children={children}></MainPageLayout>
 
-		
-
-					{/* main page */}
-					{/* {children} */}
-				</div>
-			
-			
+				{/* main page */}
+				{/* {children} */}
+			</div>
 		</div>
 	);
 }
