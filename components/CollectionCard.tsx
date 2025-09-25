@@ -119,7 +119,7 @@ export default async function CollectionCard({
 					{/*showtxt && (
 						<div className='md:mt-5 mt-3 mb-1 mx-auto'>
 							<Link href={`/sneakers/detail/${sneaker.id}`}>
-								<button className='bg-white text-xs md:text-sm hover:bg-gray-100 text-gray-800 font-semibold py-1 px-2 border border-gray-400 rounded shadow'>
+								<button className='bg-white text-xs md:text-sm hover:bg-gray-100 text-gray-800 font-semibold py-1 px-2 border border-gray-400 rounded shadow-sm'>
 									View Sneaker Stats - {sneaker.id}
 								</button>
 							</Link>

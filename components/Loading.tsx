@@ -5,9 +5,9 @@ export default function Loading() {
 	return (
 		<>
 			<main className='animate-in container mx-auto p-10  w-full'>
-				<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
+				<div className='w-full p-px bg-linear-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
 
-				<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
+				<div className='w-full p-px bg-linear-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
 
 				<div className=' flex flex-row gap-x-8 sm:gap-x-8 md:gap-x-20 justify-center items-center mx-auto'>
 					<div className=' flex flex-col justify-center align-middle text-center'>

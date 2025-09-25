@@ -109,7 +109,7 @@ const SneakerCard = ({ sneaker, onDelete, onVote }) => {
 
 	return (
 		<div>
-			<div className='w-full max-w-5xl flex flex-col  container  border  rounded-lg shadow bg-gray-800 border-gray-700 '>
+			<div className='w-full max-w-5xl flex flex-col  container  border  rounded-lg shadow-sm bg-gray-800 border-gray-700 '>
 				<div className='relative bg-white  h-60 sm:h-96'>
 					<div className=''>
 						<Carousel className=' '>

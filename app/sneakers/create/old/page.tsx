@@ -114,7 +114,7 @@ const Create = () => {
 
 			<form
 				onSubmit={handleSubmit}
-				className='w-full max-w-xl p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
+				className='w-full max-w-xl p-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700'>
 				<div className='mb-6'>
 					<img
 						src={
@@ -136,7 +136,7 @@ const Create = () => {
 						<input
 							value={name}
 							onChange={(e) => setName(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-hidden focus:bg-white'
 							id='grid-first-name'
 							type='text'
 							placeholder='Air Jordan 1'
@@ -150,7 +150,7 @@ const Create = () => {
 						</label>
 						<input
 							onChange={(e) => setDate(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 							id='grid-last-name'
 							type='date'
 							placeholder='02-10-24'
@@ -165,7 +165,7 @@ const Create = () => {
 								<input
 									name='image_link'
 									placeholder='Name'
-									className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+									className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 									value={input.image_link}
 									onChange={(event) => handleFormChange(event, index)}
 								/>
@@ -185,7 +185,7 @@ const Create = () => {
 						<input
 							value={main_image}
 							onChange={(e) => setImage(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 							id='grid-password'
 							type='text'
 							placeholder='https://'
@@ -203,7 +203,7 @@ const Create = () => {
 							<select
 								value={brand}
 								onChange={(e) => setBrand(e.target.value)}
-								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 								id='grid-state'>
 								<option value='1'>Jordan</option>
 								<option value='2'>Nike</option>
@@ -234,7 +234,7 @@ const Create = () => {
 						<input
 							value={style}
 							onChange={(e) => setStyle(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 							id='grid-zip'
 							type='string'
 							placeholder='AQ9129 500'
@@ -249,7 +249,7 @@ const Create = () => {
 						<input
 							value={price}
 							onChange={(e) => setPrice(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 							id='grid-zip'
 							type='number'
 							placeholder='210'
@@ -258,7 +258,7 @@ const Create = () => {
 				</div>
 				<button
 					type='submit'
-					className='py-4 px-4 my-6 inline-flex items-center bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg '>
+					className='py-4 px-4 my-6 inline-flex items-center bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-hidden focus:ring-2 focus:ring-offset-2  rounded-lg '>
 					<svg
 						className='me-1 -ms-1 w-5 h-5'
 						fill='currentColor'

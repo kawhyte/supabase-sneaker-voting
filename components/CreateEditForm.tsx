@@ -464,7 +464,7 @@ const CreateEditForm = ({
 											<PopoverTrigger asChild>
 												<FormControl>
 													<Button
-														variant={"outline"}
+														variant={"outline-solid"}
 														className={cn(
 															" w-[200px] md:w-[220px]  text-left font-normal",
 															!field.value && "text-muted-foreground"
@@ -505,7 +505,7 @@ const CreateEditForm = ({
 											<PopoverTrigger asChild>
 												<FormControl>
 													<Button
-														variant={"outline"}
+														variant={"outline-solid"}
 														className={cn(
 															" w-[200px] md:w-[220px]  text-left font-normal",
 															!field.value && "text-muted-foreground"

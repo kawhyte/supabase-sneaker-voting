@@ -173,7 +173,7 @@ export default function CollectionDetailPage({
 					</div>
 				</div>
 			</section>
-			<div className='w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
+			<div className='w-full p-px bg-linear-to-r from-transparent via-foreground/10 to-transparent my-8 ' />
 
 			{stats && (
 				<div className='  my-20'>
@@ -229,7 +229,7 @@ export default function CollectionDetailPage({
 				</div>
 				{cardElement.map((item) => (
 					<div key={item.name}>
-						<div className='inline-flex items-center align-bottom  leading-none ${props.textColor} rounded-full p-2 shadow text-teal text-sm'>
+						<div className='inline-flex items-center align-bottom  leading-none ${props.textColor} rounded-full p-2 shadow-sm text-teal text-sm'>
 							<span className='inline-flex  text-white rounded-full h-6 px-3 justify-center items-center'>
 								<span>{item.svg} </span>
 

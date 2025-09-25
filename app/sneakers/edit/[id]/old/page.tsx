@@ -113,7 +113,7 @@ const Edit = ({ params }: { params: any }) => {
 
 			<form
 				onSubmit={handleSubmit}
-				className='w-full max-w-2xl p-5  border border-gray-200 rounded-lg shadow bg-gray-800 border-gray-7005'>
+				className='w-full max-w-2xl p-5  border border-gray-200 rounded-lg shadow-sm bg-gray-800 border-gray-7005'>
 				<div className='mb-6'>
 					<img src={main_image} alt='Sneaker' />
 				</div>
@@ -128,7 +128,7 @@ const Edit = ({ params }: { params: any }) => {
 						<input
 							value={name}
 							onChange={(e) => setName(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-hidden focus:bg-white'
 							id='grid-first-name'
 							type='text'
 							placeholder='Air Jordan 1'
@@ -142,7 +142,7 @@ const Edit = ({ params }: { params: any }) => {
 						</label>
 						<input
 							onChange={(e) => setDate(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 							id='grid-last-name'
 							type='date'
 							placeholder='02-10-24'
@@ -160,7 +160,7 @@ const Edit = ({ params }: { params: any }) => {
 						<input
 							value={main_image}
 							onChange={(e) => setImage(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 							id='grid-password'
 							type='text'
 							placeholder='https://'
@@ -181,7 +181,7 @@ const Edit = ({ params }: { params: any }) => {
 							<select
 								value={brand}
 								onChange={(e) => setBrand(e.target.value)}
-								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 								id='grid-state'>
 								<option value='1'>Jordan</option>
 								<option value='2'>Nike</option>
@@ -214,7 +214,7 @@ const Edit = ({ params }: { params: any }) => {
 							<select
 								value={vote}
 								onChange={(e) => setVote(e.target.value)}
-								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+								className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 								id='grid-state'>
 								<option value='1'>I love it ❤️</option>
 								<option value='4'>I like it 👌</option>
@@ -242,7 +242,7 @@ const Edit = ({ params }: { params: any }) => {
 						<input
 							value={style}
 							onChange={(e) => setStyle(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 							id='grid-zip'
 							type='string'
 							placeholder='AQ9129 500'
@@ -257,7 +257,7 @@ const Edit = ({ params }: { params: any }) => {
 						<input
 							value={price}
 							onChange={(e) => setPrice(e.target.value)}
-							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+							className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-hidden focus:bg-white focus:border-gray-500'
 							id='grid-zip'
 							type='number'
 							placeholder='210'
@@ -266,7 +266,7 @@ const Edit = ({ params }: { params: any }) => {
 				</div>
 				<button
 					type='submit'
-					className='py-4 px-4 my-6 inline-flex items-center bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg '>
+					className='py-4 px-4 my-6 inline-flex items-center bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-hidden focus:ring-2 focus:ring-offset-2  rounded-lg '>
 					<svg
 						xmlns='http://www.w3.org/2000/svg'
 						viewBox='0 0 24 24'

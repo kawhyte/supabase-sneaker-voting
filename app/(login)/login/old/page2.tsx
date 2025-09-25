@@ -79,7 +79,7 @@ export default function Login({
 									Email Address
 								</label>
 								<input
-									className='bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none'
+									className='bg-gray-200 text-gray-700 focus:outline-hidden focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none'
 									type='email'
 									required
 									name='email'
@@ -93,7 +93,7 @@ export default function Login({
 									</label>
 								</div>
 								<input
-									className='bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none'
+									className='bg-gray-200 text-gray-700 focus:outline-hidden focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none'
 									type='password'
 									required
 									name='password'
