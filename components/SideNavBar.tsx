@@ -61,50 +61,13 @@ const [windowWidth, setWindowWidth] = useState(0);
 				isCollapsed={mobileWidth ? true : isCollapsed}
 				links={[
 					{
-						title: "Overview",
-						href: "/sneakers/dashboard",
+						title: "Home",
+						href: "/",
 						// label: "128",
 						icon: LayoutDashboard,
 						variant: "ghost",
 					},
-					{
-						title: "Awaiting Vote",
-						href: "/sneakers/dashboard/pending",
-						// label: "9",
-						icon: Clock,
-						variant: "ghost",
-					},
-
-					{
-						title: "Potential Purchases",
-						href: "/sneakers/dashboard/voted",
-						label: "",
-						icon: Heart,
-						variant: "ghost",
-					},
 				
-					// {
-					// 	title: "Our Collection",
-					// 	label: "",
-					// 	href: "/sneakers/collection",
-					// 	icon: Trash2,
-					// 	variant: "ghost",
-					// },
-					{
-						title: "Archived",
-						href: "/sneakers/dashboard/archived",
-						label: "",
-						icon: Archive,
-						variant: "ghost",
-					},
-
-					// 	{
-					// 	title: "Create New Listing",
-					// 	label: "",
-					// 	href: "/sneakers/create",
-					// 	icon: CirclePlus,
-					// 	variant: "ghost",
-					// },
 				]}
 			/>
 		</div> 
