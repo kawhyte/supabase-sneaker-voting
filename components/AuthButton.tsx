@@ -12,21 +12,36 @@ import {
 import { CirclePlus } from "lucide-react";
 
 export default async function AuthButton() {
-  const supabase = createClient();
+  let user = null;
+  let users = null;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = await createClient();
+    if (supabase) {
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+      user = authUser;
 
-  const { data: users, error } = await supabase.from("user").select("role").single();
-
+      if (user) {
+        const { data: userData, error } = await supabase.from("user").select("role").single();
+        users = userData;
+      }
+    }
+  } catch (error) {
+    console.error('Auth error:', error);
+  }
 
   const signOut = async () => {
     "use server";
 
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    return redirect("/login");
+    try {
+      const supabase = await createClient();
+      await supabase.auth.signOut();
+      return redirect("/login");
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   };
 
   return user ? (

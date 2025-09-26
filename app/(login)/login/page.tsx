@@ -121,7 +121,7 @@ export default function Login({
 									or Sign Up
 								</SubmitButton> */}
 								{searchParams?.message && (
-									<p className='mt-4 p-4 bg-foreground/10 text-foreground text-center'>
+									<p className='mt-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-md text-center'>
 										{searchParams.message}
 									</p>
 								)}

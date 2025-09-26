@@ -2,7 +2,7 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "sonner";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { cn } from "@/lib/utils";
 import SideNavBar from "@/components/SideNavBar";

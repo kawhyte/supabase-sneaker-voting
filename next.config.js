@@ -8,7 +8,20 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
+  },
+  transpilePackages: ['undici', 'cheerio'],
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals.push('re2');
+    }
+    return config;
   },
 };
 

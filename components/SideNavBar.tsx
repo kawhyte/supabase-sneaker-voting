@@ -9,7 +9,8 @@ import {
 	LayoutDashboard,
 	Heart,
 	Clock,
-	CirclePlus
+	CirclePlus,
+	Home
 	
 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -63,7 +64,12 @@ const [windowWidth, setWindowWidth] = useState(0);
 					{
 						title: "Home",
 						href: "/",
-						// label: "128",
+						icon: Home,
+						variant: "ghost",
+					},
+					{
+						title: "Dashboard",
+						href: "/dashboard",
 						icon: LayoutDashboard,
 						variant: "ghost",
 					},
