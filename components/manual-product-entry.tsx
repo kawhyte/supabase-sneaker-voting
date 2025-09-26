@@ -32,6 +32,8 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
+  const [showProgressiveOptions, setShowProgressiveOptions] = useState(false)
+  const [savedProductId, setSavedProductId] = useState<string | null>(null)
 
   const supabase = createClient()
 
@@ -157,26 +159,25 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
 
       console.log('Attempting to insert product data:', productData)
 
-      // Create the product
-      const { error: productError } = await supabase
+      // Create the product and get the ID back
+      const { data: insertedProduct, error: productError } = await supabase
         .from('products')
         .insert(productData)
+        .select('id')
+        .single()
 
       if (productError) {
         console.error('Supabase error:', productError)
         throw productError
       }
 
+      setSavedProductId(insertedProduct.id)
       setSuccessMessage('🎉 Product saved successfully!')
 
-      // Reset form after short delay
+      // Show progressive disclosure options after a short delay
       setTimeout(() => {
-        reset()
-        setImagePreview(null)
-        setSuccessMessage('')
-        setUploadProgress('')
-        onProductAdded?.()
-      }, 2000)
+        setShowProgressiveOptions(true)
+      }, 1000)
 
     } catch (error) {
       console.error('Error saving product:', error)
@@ -192,6 +193,25 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
 
   const watchedProductName = watch('productName')
   const watchedPrice = watch('price')
+
+  // Handle adding more details
+  const handleAddMoreDetails = () => {
+    // TODO: Navigate to enhanced form or expand current form
+    console.log('Adding more details for product:', savedProductId)
+    // For now, just show an alert - we'll implement the full interface next
+    alert(`Ready to add more details for product ${savedProductId}!\n\nComing in next update:\n• Available sizes\n• More photos\n• Stock quantities`)
+  }
+
+  // Handle "I'm Done" - reset everything
+  const handleImDone = () => {
+    reset()
+    setImagePreview(null)
+    setSuccessMessage('')
+    setUploadProgress('')
+    setShowProgressiveOptions(false)
+    setSavedProductId(null)
+    onProductAdded?.()
+  }
 
   return (
     <Card className="max-w-lg mx-auto">
@@ -336,8 +356,50 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
           </Button>
         </form>
 
+        {/* Progressive Disclosure Options */}
+        {showProgressiveOptions && (
+          <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                🎯 Want to add more details?
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Your product is saved! You can add additional details now or come back later.
+              </p>
+
+              <div className="grid grid-cols-1 gap-3 mb-4">
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                  <span>📏</span> Available sizes and stock levels
+                </div>
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                  <span>📸</span> Additional product photos
+                </div>
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                  <span>💰</span> Sale pricing and promotions
+                </div>
+              </div>
+
+              <div className="flex gap-3 justify-center">
+                <Button
+                  onClick={handleAddMoreDetails}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  ➕ Add Details
+                </Button>
+                <Button
+                  onClick={handleImDone}
+                  variant="outline"
+                  className="border-gray-300"
+                >
+                  🏁 I'm Done
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Preview Section */}
-        {watchedProductName && watchedPrice && !errors.productName && !errors.price && (
+        {!showProgressiveOptions && watchedProductName && watchedPrice && !errors.productName && !errors.price && (
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
             <div className="text-sm text-gray-600">
