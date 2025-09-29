@@ -25,6 +25,9 @@ export const metadata = {
 	formatDetection: {
 		telephone: false,
 	},
+};
+
+export const viewport = {
 	themeColor: "#2563eb",
 };
 

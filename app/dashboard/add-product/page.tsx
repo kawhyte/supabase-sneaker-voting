@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
-import { ManualProductEntry } from '@/components/manual-product-entry'
+import { AddProductClient } from '@/components/add-product-client'
 
 export default async function AddProductPage() {
   let user = null;
@@ -34,10 +34,7 @@ export default async function AddProductPage() {
           </p>
         </div>
 
-        <ManualProductEntry onProductAdded={() => {
-          // Could redirect to products list or show success
-          console.log('Product added successfully!')
-        }} />
+        <AddProductClient />
 
         <div className="mt-8 text-center">
           <a

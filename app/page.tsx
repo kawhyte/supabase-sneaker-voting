@@ -1,5 +1,12 @@
 import { SneakerTrackerApp } from "@/components/sneaker-tracker-app";
 
 export default function Index() {
-  return <SneakerTrackerApp />;
+  return (
+  <>
+  <div>Home Page</div>
+  
+  {/* <SneakerTrackerApp /> */}
+  
+  
+  </>);
 }

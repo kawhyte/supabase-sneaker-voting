@@ -12,13 +12,21 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { CheckCircle, Upload, Loader2 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { EnhancedProductDetails } from './enhanced-product-details'
+import { MultiPhotoUpload } from './multi-photo-upload'
+
+interface PhotoItem {
+  id: string
+  file: File
+  preview: string
+  isMain: boolean
+  order: number
+}
 
 // Ultra-simple form schema - Phase 1A
 const productSchema = z.object({
   productName: z.string().min(1, 'Product name is required').min(3, 'Product name too short'),
   sku: z.string().min(1, 'SKU/Style code is required'),
-  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Enter a valid price'),
-  image: z.any().optional()
+  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Enter a valid price')
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -30,8 +38,7 @@ interface ManualProductEntryProps {
 export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps = {}) {
   const [isLoading, setIsLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [dragActive, setDragActive] = useState(false)
+  const [photos, setPhotos] = useState<PhotoItem[]>([])
   const [uploadProgress, setUploadProgress] = useState('')
   const [showProgressiveOptions, setShowProgressiveOptions] = useState(false)
   const [savedProductId, setSavedProductId] = useState<string | null>(null)
@@ -78,38 +85,6 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
     return { brand, model, colorway }
   }
 
-  // Handle file upload
-  const handleFileChange = (file: File | null) => {
-    if (file && file.type.startsWith('image/')) {
-      setValue('image', file)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  // Drag and drop handlers
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true)
-    } else if (e.type === "dragleave") {
-      setDragActive(false)
-    }
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileChange(e.dataTransfer.files[0])
-    }
-  }
 
   const onSubmit = async (data: ProductFormData) => {
     setIsLoading(true)
@@ -119,33 +94,35 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
       // Parse the product name
       const { brand, model, colorway } = parseProductName(data.productName)
 
-      let imageUrl = null
-      let cloudinaryId = null
+      let mainImageUrl = null
+      let mainCloudinaryId = null
 
-      // Upload image to Cloudinary if provided
-      if (data.image) {
-        setUploadProgress('📤 Uploading image...')
-        console.log('Uploading image to Cloudinary...')
+      // Upload photos to Cloudinary if provided
+      if (photos.length > 0) {
+        setUploadProgress(`📤 Uploading ${photos.length} photo(s)...`)
+        console.log(`Uploading ${photos.length} photos to Cloudinary...`)
 
-        const formData = new FormData()
-        formData.append('file', data.image)
+        // Upload main photo first
+        const mainPhoto = photos.find(p => p.isMain) || photos[0]
+        const mainFormData = new FormData()
+        mainFormData.append('file', mainPhoto.file)
 
-        const uploadResponse = await fetch('/api/upload-image', {
+        const mainUploadResponse = await fetch('/api/upload-image', {
           method: 'POST',
-          body: formData
+          body: mainFormData
         })
 
-        if (!uploadResponse.ok) {
-          const error = await uploadResponse.json()
-          throw new Error(error.error || 'Failed to upload image')
+        if (!mainUploadResponse.ok) {
+          const error = await mainUploadResponse.json()
+          throw new Error(error.error || 'Failed to upload main image')
         }
 
-        const uploadResult = await uploadResponse.json()
-        imageUrl = uploadResult.data.url
-        cloudinaryId = uploadResult.data.publicId
+        const mainUploadResult = await mainUploadResponse.json()
+        mainImageUrl = mainUploadResult.data.url
+        mainCloudinaryId = mainUploadResult.data.publicId
 
-        setUploadProgress('✅ Image uploaded!')
-        console.log('Image uploaded successfully:', uploadResult.data)
+        setUploadProgress('✅ Photos uploaded!')
+        console.log('Main image uploaded successfully:', mainUploadResult.data)
       }
 
       const productData = {
@@ -155,8 +132,8 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
         colorway: colorway || 'Standard',
         retail_price: parseFloat(data.price),
         category: 'sneakers',
-        image_url: imageUrl,
-        cloudinary_id: cloudinaryId
+        image_url: mainImageUrl,
+        cloudinary_id: mainCloudinaryId
       }
 
       console.log('Attempting to insert product data:', productData)
@@ -215,7 +192,9 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
   // Handle "I'm Done" - reset everything
   const handleImDone = () => {
     reset()
-    setImagePreview(null)
+    // Clean up photo preview URLs
+    photos.forEach(photo => URL.revokeObjectURL(photo.preview))
+    setPhotos([])
     setSuccessMessage('')
     setUploadProgress('')
     setShowProgressiveOptions(false)
@@ -321,44 +300,20 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
             )}
           </div>
 
-          {/* Image Upload */}
+          {/* Multi-Photo Upload */}
           <div className="space-y-2">
             <Label className="text-base flex items-center gap-2">
-              📸 Main Photo
+              📸 Product Photos
             </Label>
-            <label
-              className={`relative block border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
-                dragActive
-                  ? 'border-blue-400 bg-blue-50'
-                  : imagePreview
-                    ? 'border-green-300 bg-green-50'
-                    : 'border-gray-300 hover:border-gray-400'
-              }`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-            >
-              {imagePreview ? (
-                <div className="space-y-2">
-                  <img src={imagePreview} alt="Preview" className="max-h-32 mx-auto rounded" />
-                  <p className="text-sm text-green-600">✅ Image ready</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Upload className="h-8 w-8 mx-auto text-gray-400" />
-                  <p className="text-sm text-gray-600">
-                    📷 Tap to add photo or drag & drop here
-                  </p>
-                </div>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
-                className="sr-only"
-              />
-            </label>
+            <MultiPhotoUpload
+              photos={photos}
+              onPhotosChange={setPhotos}
+              maxPhotos={5}
+              className="w-full"
+            />
+            <p className="text-xs text-gray-500">
+              💡 Upload up to 5 photos. The first photo will be the main image, or click "Set Main" on any photo.
+            </p>
           </div>
 
           {/* Submit Button */}
@@ -394,7 +349,7 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
                   <span>📏</span> Available sizes and stock levels
                 </div>
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                  <span>📸</span> Additional product photos
+                  <span>🏷️</span> Product tags and categories
                 </div>
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
                   <span>💰</span> Sale pricing and promotions

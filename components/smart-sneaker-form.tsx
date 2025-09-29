@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,7 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle, Zap, Camera, Loader2, ThumbsUp, Upload, Brain } from 'lucide-react'
+import { CheckCircle, Zap, Camera, Loader2, ThumbsUp, Upload, Brain, Link, Bell, Target, Globe } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { calculateSizeRecommendations, type FitData } from '@/lib/size-analytics'
 
@@ -20,6 +21,11 @@ import { calculateSizeRecommendations, type FitData } from '@/lib/size-analytics
 const sneakerSchema = z.object({
   userName: z.enum(['Kenny', 'Rene'], { required_error: 'Select who is tracking this sneaker' }),
   interactionType: z.enum(['seen', 'tried'], { required_error: 'Select your experience' }),
+  // URL import fields
+  productUrl: z.string().optional(),
+  targetPrice: z.string().optional(),
+  enableNotifications: z.boolean().optional(),
+  // Product fields
   brand: z.string().min(1, 'Brand is required'),
   model: z.string().min(1, 'Model is required'),
   colorway: z.string().optional(),
@@ -89,6 +95,12 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
   const [uploadProgress, setUploadProgress] = useState('')
   const [fitData, setFitData] = useState<FitData[]>([])
   const [sizeRecommendation, setSizeRecommendation] = useState<any>(null)
+
+  // New URL processing states
+  const [isScrapingUrl, setIsScrapingUrl] = useState(false)
+  const [urlData, setUrlData] = useState<any>(null)
+  const [showUrlImport, setShowUrlImport] = useState(false)
+  const [priceMonitorCreated, setPriceMonitorCreated] = useState(false)
 
   const supabase = createClient()
 
@@ -190,6 +202,100 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
     }
   }
 
+  // URL scraping function
+  const handleUrlScrape = async (url: string) => {
+    if (!url.trim()) return
+
+    setIsScrapingUrl(true)
+    setUploadProgress('🔍 Analyzing product URL...')
+
+    try {
+      const response = await fetch('/api/scrape-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: url.trim() })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze URL')
+      }
+
+      const data = await response.json()
+
+      if (data.success) {
+        setUrlData(data.data)
+
+        // Auto-fill form with scraped data
+        if (data.data.title) {
+          // Try to extract brand and model from title
+          const titleParts = data.data.title.split(' ')
+          if (titleParts.length > 0 && COMMON_BRANDS.some(brand =>
+            titleParts[0].toLowerCase().includes(brand.toLowerCase()) ||
+            brand.toLowerCase().includes(titleParts[0].toLowerCase())
+          )) {
+            const detectedBrand = COMMON_BRANDS.find(brand =>
+              titleParts[0].toLowerCase().includes(brand.toLowerCase()) ||
+              brand.toLowerCase().includes(titleParts[0].toLowerCase())
+            )
+            if (detectedBrand) {
+              setValue('brand', detectedBrand)
+              setValue('model', titleParts.slice(1).join(' '))
+            }
+          } else {
+            setValue('model', data.data.title)
+          }
+        }
+
+        if (data.data.price) {
+          setValue('retailPrice', data.data.price.toString())
+        }
+
+        if (data.data.image) {
+          setImagePreview(data.data.image)
+        }
+
+        if (data.data.storeName) {
+          setValue('storeName', data.data.storeName)
+        }
+
+        setUploadProgress('✅ Product data imported!')
+        setTimeout(() => setUploadProgress(''), 2000)
+      }
+    } catch (error) {
+      console.error('URL scraping error:', error)
+      setUploadProgress('❌ Could not analyze URL')
+      setTimeout(() => setUploadProgress(''), 3000)
+    } finally {
+      setIsScrapingUrl(false)
+    }
+  }
+
+  // Create price monitor function
+  const createPriceMonitor = async (data: SneakerFormData) => {
+    if (!data.productUrl || !data.userName) return
+
+    try {
+      const response = await fetch('/api/create-monitor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: data.productUrl,
+          userName: data.userName,
+          targetPrice: data.targetPrice ? parseFloat(data.targetPrice) : null,
+          enableNotifications: data.enableNotifications || false
+        })
+      })
+
+      if (response.ok) {
+        setPriceMonitorCreated(true)
+        return true
+      }
+    } catch (error) {
+      console.error('Failed to create price monitor:', error)
+    }
+    return false
+  }
+
   // Handle file upload
   const handleFileChange = (file: File | null) => {
     if (file && file.type.startsWith('image/')) {
@@ -282,16 +388,34 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         throw error
       }
 
-      setSuccessMessage(data.interactionType === 'tried' ? '⚡ Try-on experience saved!' : '✨ Sneaker added to your list!')
+      // Create price monitor if URL provided
+      if (data.productUrl) {
+        setUploadProgress('📊 Setting up price monitoring...')
+        const monitorCreated = await createPriceMonitor(data)
+        if (monitorCreated) {
+          setUploadProgress('🎯 Price monitoring enabled!')
+        }
+      }
 
-      // Auto-reset after 2 seconds for rapid entry
+      setSuccessMessage(
+        data.interactionType === 'tried'
+          ? '⚡ Try-on experience saved!'
+          : data.productUrl
+            ? '✨ Sneaker added with price monitoring!'
+            : '✨ Sneaker added to your list!'
+      )
+
+      // Auto-reset after 3 seconds for rapid entry
       setTimeout(() => {
         reset()
         setSuccessMessage('')
         setUploadProgress('')
         setImagePreview(null)
+        setUrlData(null)
+        setPriceMonitorCreated(false)
+        setShowUrlImport(false)
         onSneakerAdded?.()
-      }, 2000)
+      }, 3000)
 
     } catch (error) {
       console.error('Error saving:', error)
@@ -327,14 +451,30 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
   }
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl flex items-center justify-center gap-2">
-          <Zap className="h-6 w-6 text-yellow-500" />
-          {getFormTitle()}
-        </CardTitle>
-        <p className="text-sm text-gray-600">{getFormDescription()}</p>
-      </CardHeader>
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
+    >
+      <Card className="max-w-2xl mx-auto shadow-lg border-0 bg-gradient-to-br from-white via-gray-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
+        <CardHeader className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <CardTitle className="text-3xl flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              >
+                <Zap className="h-7 w-7 text-yellow-500" />
+              </motion.div>
+              {getFormTitle()}
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{getFormDescription()}</p>
+          </motion.div>
+        </CardHeader>
 
       <CardContent>
         {successMessage && (
@@ -403,9 +543,148 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
             </div>
           )}
 
+          {/* Step 2.5: URL Import Feature */}
+          {watchedInteractionType && (
+            <AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center gap-2 mb-3">
+                    <motion.div
+                      animate={{ rotate: showUrlImport ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Globe className="h-5 w-5 text-blue-600" />
+                    </motion.div>
+                    <Label className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                      🚀 Smart Import (Optional)
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowUrlImport(!showUrlImport)}
+                      className="ml-auto text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                    >
+                      {showUrlImport ? 'Hide' : 'Import from URL'}
+                    </Button>
+                  </div>
+
+                  <AnimatePresence>
+                    {showUrlImport && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-4"
+                      >
+                        {/* URL Input */}
+                        <div>
+                          <Label className="text-xs text-blue-700 dark:text-blue-300 mb-2 block">
+                            Paste product URL from Nike, Adidas, Foot Locker, etc.
+                          </Label>
+                          <div className="flex gap-2">
+                            <Input
+                              {...register('productUrl')}
+                              placeholder="https://www.nike.com/t/..."
+                              className="flex-1"
+                              disabled={isScrapingUrl}
+                            />
+                            <Button
+                              type="button"
+                              onClick={() => handleUrlScrape(watch('productUrl') || '')}
+                              disabled={isScrapingUrl || !watch('productUrl')}
+                              size="sm"
+                              className="px-3"
+                            >
+                              {isScrapingUrl ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link className="h-4 w-4" />}
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* URL Data Preview */}
+                        {urlData && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-700"
+                          >
+                            <div className="flex items-start gap-3">
+                              {urlData.image && (
+                                <img src={urlData.image} alt="Product" className="w-16 h-16 object-cover rounded-lg" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-medium text-sm text-green-800 dark:text-green-200 truncate">
+                                  {urlData.title || 'Product Found'}
+                                </h4>
+                                <div className="flex gap-4 mt-1">
+                                  {urlData.price && (
+                                    <span className="text-lg font-bold text-green-600">${urlData.price}</span>
+                                  )}
+                                  {urlData.storeName && (
+                                    <span className="text-xs text-gray-600 dark:text-gray-400">{urlData.storeName}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+
+                        {/* Price Monitoring Options */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs text-blue-700 dark:text-blue-300 mb-1 block">
+                              Target Price (Optional)
+                            </Label>
+                            <div className="relative">
+                              <Target className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input
+                                {...register('targetPrice')}
+                                placeholder="120.00"
+                                type="number"
+                                step="0.01"
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                {...register('enableNotifications')}
+                                className="rounded"
+                              />
+                              <Bell className="h-4 w-4 text-yellow-600" />
+                              <span className="text-xs text-blue-700 dark:text-blue-300">
+                                Notify when price drops
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 p-2 rounded">
+                          💡 This will automatically fill product details and optionally monitor prices
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          )}
+
           {/* Step 3: Sneaker Details */}
           {watchedInteractionType && (
-            <>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
               {/* Brand Selection */}
               <div>
                 <Label className="text-sm font-medium text-gray-700">Brand</Label>
@@ -457,12 +736,16 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                   <p className="text-xs text-red-600 mt-1">{errors.model.message}</p>
                 )}
               </div>
-            </>
+            </motion.div>
           )}
 
           {/* Step 4: Try-On Specific Fields */}
           {watchedInteractionType === 'tried' && (
-            <>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
               {/* Size Selection */}
               <div>
                 <Label className="text-sm font-medium text-gray-700">What size did you try?</Label>
@@ -530,12 +813,16 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                 )}
               </div>
 
-            </>
+            </motion.div>
           )}
 
           {/* Step 5: Universal Fields */}
           {watchedInteractionType && (
-            <>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+            >
               {/* Photo Upload */}
               <div>
                 <Label className="text-sm font-medium text-gray-700">📸 Add Photo (Optional)</Label>
@@ -646,10 +933,11 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                   watchedInteractionType === 'tried' ? '⚡ Save Try-On Experience' : '✨ Add to Collection'
                 )}
               </Button>
-            </>
+            </motion.div>
           )}
         </form>
       </CardContent>
     </Card>
+    </motion.div>
   )
 }
