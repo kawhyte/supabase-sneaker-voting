@@ -134,7 +134,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
   const loadFitData = async () => {
     try {
       const { data, error } = await supabase
-        .from('sneaker_experiences')
+        .from('sneakers')
         .select('user_name, brand, size_tried, fit_rating')
         .eq('interaction_type', 'tried')
         .not('size_tried', 'is', null)
@@ -274,7 +274,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
       }
 
       const { error } = await supabase
-        .from('sneaker_experiences')
+        .from('sneakers')
         .insert(experienceData)
 
       if (error) {

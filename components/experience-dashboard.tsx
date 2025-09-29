@@ -67,7 +67,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
     try {
       setLoading(true)
       const { data, error } = await supabase
-        .from('sneaker_experiences')
+        .from('sneakers')
         .select('*')
         .order('created_at', { ascending: false })
 
@@ -151,7 +151,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
 
       // Step 2: Delete the experience from database
       const { error } = await supabase
-        .from('sneaker_experiences')
+        .from('sneakers')
         .delete()
         .eq('id', deletingExperience.id)
 

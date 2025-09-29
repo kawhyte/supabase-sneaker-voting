@@ -42,7 +42,7 @@ export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
     try {
       setLoading(true)
       const { data, error } = await supabase
-        .from('sneaker_experiences')
+        .from('sneakers')
         .select('user_name, brand, size_tried, fit_rating')
         .eq('interaction_type', 'tried')
         .not('size_tried', 'is', null)

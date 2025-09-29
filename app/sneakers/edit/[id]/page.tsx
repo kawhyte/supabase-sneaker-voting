@@ -1,7 +1,6 @@
 "use client";
 
 import { createClient } from "@/utils/supabase/client";
-import SectionHeader from "@/components/SectionHeader";
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Sneaker } from "@/app/types/Sneaker";

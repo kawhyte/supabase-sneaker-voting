@@ -214,7 +214,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
       }
 
       const { error } = await supabase
-        .from('sneaker_experiences')
+        .from('sneakers')
         .update(experienceData)
         .eq('id', experience.id)
 
