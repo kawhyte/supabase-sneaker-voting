@@ -82,17 +82,111 @@ async function scrapeShoePalace(url: string): Promise<PriceData> {
     const html = await response.text()
     const $ = cheerio.load(html)
 
-    // Shoe Palace specific selectors
-    const priceSelector = '.price-current, .product-price, [class*="price"]'
-    const originalPriceSelector = '.price-original, .price-was, [class*="original-price"]'
+    let price: number | undefined
+    let originalPrice: number | undefined
+
+    // Priority 1: Try to extract from Open Graph meta tags
+    const ogPriceAmount = $('meta[property="og:price:amount"]').attr('content')
+    if (ogPriceAmount) {
+      price = parseFloat(ogPriceAmount)
+    }
+
+    // Priority 2: Try to extract from JSON-LD or inline JSON data
+    if (!price) {
+      const scriptTags = $('script').toArray()
+      for (const script of scriptTags) {
+        const scriptContent = $(script).html() || ''
+
+        // Look for price data in JSON
+        const priceMatches = scriptContent.match(/"price":\s*{\s*"amount":\s*([\d.]+)/g)
+        if (priceMatches && priceMatches.length > 0) {
+          const priceValue = priceMatches[0].match(/[\d.]+/)
+          if (priceValue) {
+            price = parseFloat(priceValue[0])
+            break
+          }
+        }
+
+        // Also check for price in cents format
+        const centsPriceMatches = scriptContent.match(/"price":\s*(\d+)/g)
+        if (centsPriceMatches && centsPriceMatches.length > 0) {
+          const centsValue = centsPriceMatches[0].match(/\d+/)
+          if (centsValue) {
+            const centsPrice = parseInt(centsValue[0])
+            if (centsPrice > 1000) { // Likely in cents if > $10
+              price = centsPrice / 100
+              break
+            }
+          }
+        }
+      }
+    }
+
+    // Priority 3: CSS selector fallback (only if JSON/meta methods failed)
+    if (!price) {
+      // Shoe Palace specific selectors - prioritize sale prices
+      const salePriceSelectors = [
+        '.price-current',
+        '.sale-price',
+        '.discounted-price',
+        '[class*="sale"]',
+        '.price .money:last-child',  // Often the sale price is the last money element
+        '.price span:last-child'
+      ]
+
+      const regularPriceSelectors = [
+        '.product-price',
+        '.price',
+        '[class*="price"]:not([class*="original"]):not([class*="was"])',
+        '.money'
+      ]
+
+      // Try to find sale price first
+      let priceText = ''
+
+      // Look for sale price indicators
+      for (const selector of salePriceSelectors) {
+        const found = $(selector).first().text().trim()
+        if (found && extractPrice(found)) {
+          priceText = found
+          break
+        }
+      }
+
+      // If no sale price found, try regular price selectors
+      if (!priceText) {
+        for (const selector of regularPriceSelectors) {
+          const found = $(selector).first().text().trim()
+          if (found && extractPrice(found)) {
+            priceText = found
+            break
+          }
+        }
+      }
+
+      price = extractPrice(priceText)
+    }
+
+    // Try to find original price using selectors
+    const originalPriceSelectors = [
+      '.price-original',
+      '.price-was',
+      '[class*="original-price"]',
+      '.was-price',
+      '.compare-at-price',
+      '.price .money:first-child'  // Often the original price is the first money element
+    ]
+
+    for (const selector of originalPriceSelectors) {
+      const found = $(selector).first().text().trim()
+      if (found && extractPrice(found)) {
+        originalPrice = extractPrice(found)
+        break
+      }
+    }
+
     const stockSelector = '.in-stock, .out-of-stock, [class*="stock"], [class*="availability"]'
-
-    const priceText = $(priceSelector).first().text().trim()
-    const originalPriceText = $(originalPriceSelector).first().text().trim()
     const stockText = $(stockSelector).first().text().toLowerCase()
-
-    const price = extractPrice(priceText)
-    const originalPrice = extractPrice(originalPriceText)
 
     // Check stock status
     const inStock = !stockText.includes('out of stock') &&
@@ -112,7 +206,7 @@ async function scrapeShoePalace(url: string): Promise<PriceData> {
       inStock: false,
       storeName: 'Shoe Palace',
       success: false,
-      error: `Shoe Palace scraping failed: ${error.message}`
+      error: `Shoe Palace scraping failed: ${error instanceof Error ? error.message : String(error)}`
     }
   }
 }
@@ -170,7 +264,7 @@ async function scrapeHibbett(url: string): Promise<PriceData> {
       inStock: false,
       storeName: 'Hibbett',
       success: false,
-      error: `Hibbett scraping failed: ${error.message}`
+      error: `Hibbett scraping failed: ${error instanceof Error ? error.message : String(error)}`
     }
   }
 }
@@ -262,7 +356,7 @@ async function scrapeJDSports(url: string): Promise<PriceData> {
           inStock: false,
           storeName: 'JD Sports',
           success: false,
-          error: `JD Sports scraping failed: ${error.message}`
+          error: `JD Sports scraping failed: ${error instanceof Error ? error.message : String(error)}`
         }
       }
     }
@@ -323,7 +417,7 @@ async function scrapeGenericPrice(url: string): Promise<PriceData> {
       inStock: false,
       storeName: 'Unknown Store',
       success: false,
-      error: `Generic price scraping failed: ${error.message}`
+      error: `Generic price scraping failed: ${error instanceof Error ? error.message : String(error)}`
     }
   }
 }

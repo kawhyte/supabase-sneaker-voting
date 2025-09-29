@@ -9,8 +9,23 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
 	metadataBase: new URL(defaultUrl),
-	title: "Sneaker Sizing Tracker",
-	description: "Personal sneaker sizing and try-on experience tracker",
+	title: "SoleTracker - Sneaker Price Monitor",
+	description: "Track sneaker prices across multiple stores and get notified when prices drop",
+	manifest: "/manifest.json",
+	icons: {
+		icon: "/icon-192x192.png",
+		shortcut: "/icon-192x192.png",
+		apple: "/icon-192x192.png",
+	},
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "default",
+		title: "SoleTracker",
+	},
+	formatDetection: {
+		telephone: false,
+	},
+	themeColor: "#2563eb",
 };
 
 export default function RootLayout({

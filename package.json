@@ -36,6 +36,7 @@
     "@types/cheerio": "^0.22.35",
     "@types/node-cron": "^3.0.11",
     "@types/react-beautiful-dnd": "^13.1.8",
+    "@types/web-push": "^3.6.4",
     "autoprefixer": "10.4.17",
     "chart.js": "^4.4.2",
     "cheerio": "^1.1.2",
@@ -70,6 +71,7 @@
     "tailwindcss": "^4.1.13",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.3.3",
+    "web-push": "^3.6.7",
     "zod": "^3.23.8"
   },
   "devDependencies": {

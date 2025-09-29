@@ -9,7 +9,8 @@ import { MultiPhotoUpload } from '@/components/multi-photo-upload'
 import { PhotoCarousel } from '@/components/photo-carousel'
 import { ProductUrlInput } from '@/components/product-url-input'
 import { PriceMonitorManager } from '@/components/price-monitor-manager'
-import { CheckCircle, XCircle, Clock, Camera, Link2, Timer, DollarSign } from 'lucide-react'
+import { NotificationSettings } from '@/components/notification-settings'
+import { CheckCircle, XCircle, Clock, Camera, Link2, Timer, DollarSign, Bell } from 'lucide-react'
 
 interface PhotoItem {
   id: string
@@ -76,16 +77,21 @@ export default function TestFeaturesPage() {
           </Badge>
           <Badge variant="outline" className="text-sm">
             <Timer className="w-3 h-3 mr-1" />
-            Phase 3.1: Cron Scheduling
+            Phase 3.1: Price Monitoring
+          </Badge>
+          <Badge variant="outline" className="text-sm">
+            <Bell className="w-3 h-3 mr-1" />
+            Phase 3.2: Notifications
           </Badge>
         </div>
       </div>
 
       <Tabs defaultValue="phase1" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="phase1">Phase 1: Photo Management</TabsTrigger>
-          <TabsTrigger value="phase2">Phase 2.1: Auto-Population</TabsTrigger>
-          <TabsTrigger value="phase3">Phase 3.1: Cron Scheduling</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="phase1">Phase 1: Photos</TabsTrigger>
+          <TabsTrigger value="phase2">Phase 2.1: Auto-Fill</TabsTrigger>
+          <TabsTrigger value="phase3">Phase 3.1: Monitoring</TabsTrigger>
+          <TabsTrigger value="phase3.2">Phase 3.2: Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="phase1" className="space-y-6">
@@ -320,6 +326,73 @@ export default function TestFeaturesPage() {
                     <div className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4 text-green-600" />
                       Database integration: Working (monitors and history saved)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="phase3.2" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="w-5 h-5" />
+                Phase 3.2: Web Push Notifications Testing
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">🔔 Browser Notification System</h3>
+
+                <div className="space-y-4">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium mb-2">Implementation Status:</h4>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        Service Worker: Created (/public/sw.js) ✅
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        PWA Manifest: Created (/public/manifest.json) ✅
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        NotificationService: Complete with VAPID support ✅
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        Permission handling: Interactive UI ready ✅
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium mb-4">Test Notification System:</h4>
+                    <NotificationSettings />
+                  </div>
+
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-medium mb-2 text-blue-800">📱 Testing Instructions:</h4>
+                    <div className="space-y-1 text-sm text-blue-700">
+                      <div>1. Click "Enable Notifications" to request browser permission</div>
+                      <div>2. Allow notifications when your browser prompts</div>
+                      <div>3. Click "Test" to send a sample notification</div>
+                      <div>4. Check that notifications appear even when tab is in background</div>
+                      <div>5. Test notification interactions (click to view, dismiss)</div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <h4 className="font-medium mb-2 text-green-800">✅ Next Integration Steps:</h4>
+                    <div className="space-y-1 text-sm text-green-700">
+                      <div>✅ Service worker handles push notifications</div>
+                      <div>✅ Permission management with persistent storage</div>
+                      <div>✅ PWA capabilities (installable web app)</div>
+                      <div>🔄 Connect to price monitoring system (next step)</div>
+                      <div>🔄 Server-side push notification sending</div>
                     </div>
                   </div>
                 </div>
