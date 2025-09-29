@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import ProductCard from "@/components/ProductCard";
+import { SneakerTrackerApp } from "@/components/sneaker-tracker-app";
+
 
 // Helper function to extract product name from URL
 function extractProductInfo(url: string, storeName: string) {
@@ -50,6 +52,8 @@ function ProductMonitorCard({ monitor, index }: { monitor: any, index: number })
   const gradientClass = getPlaceholderImage(monitor.store_name);
 
   return (
+<> 
+    {/* <SneakerTrackerApp /> */}
     <motion.div
       whileHover={{ y: -8 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
@@ -62,7 +66,7 @@ function ProductMonitorCard({ monitor, index }: { monitor: any, index: number })
           <div className={`w-full h-full ${gradientClass} flex items-center justify-center`}>
             <div className="text-center text-white p-4">
               <div className="text-2xl font-bold mb-2">👟</div>
-              <div className="text-sm opacity-90">{monitor.store_name}</div>
+              <div className="text-sm opacity-90">{monitor.store_name}Kennnnn</div>
             </div>
           </div>
 
@@ -143,10 +147,11 @@ function ProductMonitorCard({ monitor, index }: { monitor: any, index: number })
         </div>
       </div>
     </motion.div>
+    </>
   );
 }
 
-import { SneakerTrackerApp } from "@/components/sneaker-tracker-app";
+// import { SneakerTrackerApp } from "@/components/sneaker-tracker-app";
 
 export default function Dashboard() {
   return <SneakerTrackerApp />;

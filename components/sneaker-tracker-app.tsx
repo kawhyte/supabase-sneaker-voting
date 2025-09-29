@@ -42,7 +42,7 @@ export function SneakerTrackerApp() {
             whileTap={{ scale: 0.95 }}
             className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent cursor-pointer"
           >
-            👟 Sneaker Sizing Tracker
+            👟 Sneaker Sizing Tracker44
           </motion.h1>
 
           <motion.div
