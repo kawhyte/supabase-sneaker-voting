@@ -1,13 +1,7 @@
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Toaster } from "sonner";
-import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { cn } from "@/lib/utils";
-import SideNavBar from "@/components/SideNavBar";
-import MainPageLayout from "@/components/MainPageLayout";
-
 
 const defaultUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
@@ -15,8 +9,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
 	metadataBase: new URL(defaultUrl),
-	title: "MTW Sneaker Collection",
-	description: "MTW Sneaker Collection & Tracking",
+	title: "Sneaker Sizing Tracker",
+	description: "Personal sneaker sizing and try-on experience tracker",
 };
 
 export default function RootLayout({
@@ -27,25 +21,14 @@ export default function RootLayout({
 	return (
 		<html
 			className={cn(
-				" dark bg-background text-foreground",
-				GeistSans.className,
-				{ "debug-screens": process.env.NODE_ENV === "development" }
+				"light bg-background text-foreground",
+				GeistSans.className
 			)}>
-			<body className='    '>
-				<Header />
-				
-				
-				<div className='h-screen  flex-col mx-auto size-full flex items-center'>
-					{/* <main className=" flex flex-col justify-center items-center align-middle "> */}
-
-					{/* side bar */}
-					{/* <MainPageLayout children={undefined}></MainPageLayout> */}
-					{/* main page */}
+			<body className="min-h-screen">
+				<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
 					{children}
 					<Toaster />
 				</div>
-
-				{/* <Footer /> */}
 			</body>
 		</html>
 	);

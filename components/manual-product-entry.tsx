@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { CheckCircle, Upload, Loader2 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import { EnhancedProductDetails } from './enhanced-product-details'
 
 // Ultra-simple form schema - Phase 1A
 const productSchema = z.object({
@@ -34,6 +35,7 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
   const [uploadProgress, setUploadProgress] = useState('')
   const [showProgressiveOptions, setShowProgressiveOptions] = useState(false)
   const [savedProductId, setSavedProductId] = useState<string | null>(null)
+  const [showEnhancedDetails, setShowEnhancedDetails] = useState(false)
 
   const supabase = createClient()
 
@@ -196,10 +198,18 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
 
   // Handle adding more details
   const handleAddMoreDetails = () => {
-    // TODO: Navigate to enhanced form or expand current form
-    console.log('Adding more details for product:', savedProductId)
-    // For now, just show an alert - we'll implement the full interface next
-    alert(`Ready to add more details for product ${savedProductId}!\n\nComing in next update:\n• Available sizes\n• More photos\n• Stock quantities`)
+    setShowEnhancedDetails(true)
+  }
+
+  // Handle back from enhanced details
+  const handleBackFromEnhanced = () => {
+    setShowEnhancedDetails(false)
+  }
+
+  // Handle completion of enhanced details
+  const handleEnhancedComplete = () => {
+    setShowEnhancedDetails(false)
+    handleImDone() // Reset everything
   }
 
   // Handle "I'm Done" - reset everything
@@ -210,7 +220,19 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
     setUploadProgress('')
     setShowProgressiveOptions(false)
     setSavedProductId(null)
+    setShowEnhancedDetails(false)
     onProductAdded?.()
+  }
+
+  // Show enhanced details view if requested
+  if (showEnhancedDetails && savedProductId) {
+    return (
+      <EnhancedProductDetails
+        productId={savedProductId}
+        onBack={handleBackFromEnhanced}
+        onComplete={handleEnhancedComplete}
+      />
+    )
   }
 
   return (
