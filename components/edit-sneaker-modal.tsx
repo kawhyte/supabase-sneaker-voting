@@ -26,10 +26,10 @@ const sneakerSchema = z.object({
   sizeTried: z.string().optional(),
   fitRating: z.coerce.number().min(1).max(5).optional(),
   comfortRating: z.coerce.number().min(1).max(5).optional(),
-  wouldRecommend: z.boolean().optional(),
   // General fields
   storeName: z.string().optional(),
-  listedPrice: z.string().optional(),
+  retailPrice: z.string().optional(),
+  idealPrice: z.string().optional(),
   notes: z.string().optional(),
   image: z.any().optional()
 }).refine((data) => {
@@ -47,8 +47,24 @@ type SneakerFormData = z.infer<typeof sneakerSchema>
 // Common sneaker brands for quick selection
 const COMMON_BRANDS = ['Nike', 'Jordan', 'Adidas', 'New Balance', 'Asics', 'Puma', 'Vans', 'Converse']
 
-// Common sizes
-const COMMON_SIZES = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12', '12.5', '13', '14']
+// Common sizes with EU and Women's equivalents (US Men's 3.5 - 10.5)
+const COMMON_SIZES = [
+  { us: '3.5', women: '5', eu: '35.5' },
+  { us: '4', women: '5.5', eu: '36' },
+  { us: '4.5', women: '6', eu: '37' },
+  { us: '5', women: '6.5', eu: '37.5' },
+  { us: '5.5', women: '7', eu: '38' },
+  { us: '6', women: '7.5', eu: '38.5' },
+  { us: '6.5', women: '8', eu: '39' },
+  { us: '7', women: '8.5', eu: '40' },
+  { us: '7.5', women: '9', eu: '40.5' },
+  { us: '8', women: '9.5', eu: '41' },
+  { us: '8.5', women: '10', eu: '42' },
+  { us: '9', women: '10.5', eu: '42.5' },
+  { us: '9.5', women: '11', eu: '43' },
+  { us: '10', women: '11.5', eu: '44' },
+  { us: '10.5', women: '12', eu: '44.5' }
+]
 
 // Fit rating descriptions
 const FIT_RATINGS = [
@@ -101,9 +117,9 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
       setValue('sizeTried', experience.size_tried || '')
       setValue('fitRating', experience.fit_rating || undefined)
       setValue('comfortRating', experience.comfort_rating || undefined)
-      setValue('wouldRecommend', experience.would_recommend || false)
       setValue('storeName', experience.store_name || '')
-      setValue('listedPrice', experience.listed_price?.toString() || '')
+      setValue('retailPrice', experience.retail_price?.toString() || '')
+      setValue('idealPrice', experience.ideal_price?.toString() || '')
       setValue('notes', experience.notes || '')
 
       if (experience.image_url) {
@@ -187,10 +203,10 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         size_tried: data.interactionType === 'tried' ? data.sizeTried : null,
         fit_rating: data.interactionType === 'tried' ? data.fitRating : null,
         comfort_rating: data.interactionType === 'tried' ? (data.comfortRating || null) : null,
-        would_recommend: data.interactionType === 'tried' ? (data.wouldRecommend || false) : null,
         // Always optional fields
         store_name: data.storeName || null,
-        listed_price: data.listedPrice ? parseFloat(data.listedPrice) : null,
+        retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
+        ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
         notes: data.notes || null,
         interested_in_buying: true, // If they're keeping it, they're interested
         image_url: imageUrl,
@@ -350,7 +366,12 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                         </SelectTrigger>
                         <SelectContent>
                           {COMMON_SIZES.map((size) => (
-                            <SelectItem key={size} value={size}>{size}</SelectItem>
+                            <SelectItem key={size.us} value={size.us}>
+                              <div className="flex flex-col">
+                                <span>US M {size.us} / W {size.women}</span>
+                                <span className="text-xs text-gray-500">EU {size.eu}</span>
+                              </div>
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -372,20 +393,6 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                     </div>
                   </div>
 
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Would you recommend this sneaker?</Label>
-                    <div className="flex gap-3 mt-2">
-                      <Button
-                        type="button"
-                        variant={watch('wouldRecommend') ? 'default' : 'outline'}
-                        onClick={() => setValue('wouldRecommend', !watch('wouldRecommend'))}
-                        className="flex items-center gap-2 h-12"
-                      >
-                        <ThumbsUp className="h-4 w-4" />
-                        {watch('wouldRecommend') ? 'Yes, recommend' : 'Recommend?'}
-                      </Button>
-                    </div>
-                  </div>
                 </>
               )}
 
@@ -411,33 +418,45 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium text-gray-700">Listed Price ($)</Label>
+                  <Label className="text-sm font-medium text-gray-700">Retail Price ($)</Label>
                   <Input
-                    {...register('listedPrice')}
+                    {...register('retailPrice')}
                     placeholder="170.00"
                     type="number"
                     step="0.01"
                     className="mt-2"
                   />
                 </div>
-                {watchedInteractionType === 'tried' && (
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Comfort Rating</Label>
-                    <Select onValueChange={(value) => setValue('comfortRating', parseInt(value))} value={watch('comfortRating')?.toString()}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue placeholder="1-5" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[1, 2, 3, 4, 5].map((rating) => (
-                          <SelectItem key={rating} value={rating.toString()}>
-                            {rating} {rating === 1 ? '(Uncomfortable)' : rating === 5 ? '(Very Comfortable)' : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Ideal Price ($)</Label>
+                  <Input
+                    {...register('idealPrice')}
+                    placeholder="120.00"
+                    type="number"
+                    step="0.01"
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Price you'd be willing to pay</p>
+                </div>
               </div>
+
+              {watchedInteractionType === 'tried' && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Comfort Rating</Label>
+                  <Select onValueChange={(value) => setValue('comfortRating', parseInt(value))} value={watch('comfortRating')?.toString()}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="1-5" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 4, 5].map((rating) => (
+                        <SelectItem key={rating} value={rating.toString()}>
+                          {rating} {rating === 1 ? '(Uncomfortable)' : rating === 5 ? '(Very Comfortable)' : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Photo Upload */}
               <div>

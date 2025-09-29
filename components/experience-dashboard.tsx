@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { createClient } from '@/utils/supabase/client'
-import { Star, ThumbsUp, Calendar, MapPin, DollarSign, User, Search, Filter, Edit } from 'lucide-react'
+import { Star, ThumbsUp, Calendar, MapPin, DollarSign, User, Search, Filter, Edit, Trash2, Loader2 } from 'lucide-react'
 import { EditSneakerModal } from './edit-sneaker-modal'
 
 interface SneakerExperience {
@@ -28,6 +28,7 @@ interface SneakerExperience {
   would_recommend: boolean | null
   interested_in_buying: boolean
   image_url?: string
+  cloudinary_id?: string
 }
 
 // Fit rating descriptions
@@ -52,6 +53,9 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
   const [sortBy, setSortBy] = useState<string>('date-desc')
   const [editingExperience, setEditingExperience] = useState<SneakerExperience | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [deletingExperience, setDeletingExperience] = useState<SneakerExperience | null>(null)
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const supabase = createClient()
 
@@ -111,6 +115,67 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
   const handleSaveEdit = () => {
     // Refresh the experiences list
     loadExperiences()
+  }
+
+  const handleDeleteExperience = (experience: SneakerExperience) => {
+    setDeletingExperience(experience)
+    setIsDeleteConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deletingExperience) return
+
+    setIsDeleting(true)
+    try {
+      // Step 1: Delete the image from Cloudinary if it exists
+      if (deletingExperience.cloudinary_id) {
+        try {
+          const deleteImageResponse = await fetch('/api/delete-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              publicId: deletingExperience.cloudinary_id
+            })
+          })
+
+          if (!deleteImageResponse.ok) {
+            console.warn('Failed to delete image from Cloudinary, but continuing with experience deletion')
+          }
+        } catch (imageError) {
+          console.warn('Error deleting image from Cloudinary:', imageError)
+          // Continue with experience deletion even if image deletion fails
+        }
+      }
+
+      // Step 2: Delete the experience from database
+      const { error } = await supabase
+        .from('sneaker_experiences')
+        .delete()
+        .eq('id', deletingExperience.id)
+
+      if (error) {
+        console.error('Error deleting experience:', error)
+        alert('Failed to delete experience. Please try again.')
+        return
+      }
+
+      // Step 3: Refresh the experiences list
+      loadExperiences()
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Failed to delete experience. Please try again.')
+    } finally {
+      setIsDeleting(false)
+      setIsDeleteConfirmOpen(false)
+      setDeletingExperience(null)
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setIsDeleteConfirmOpen(false)
+    setDeletingExperience(null)
   }
 
   // Filter and sort experiences
@@ -384,15 +449,26 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
                         <div className="text-xs text-gray-500">
                           Added {formatDate(experience.created_at)}
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditExperience(experience)}
-                          className="text-xs text-gray-500 hover:text-gray-700"
-                        >
-                          <Edit className="h-3 w-3 mr-1" />
-                          Edit
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditExperience(experience)}
+                            className="text-xs text-gray-500 hover:text-gray-700"
+                          >
+                            <Edit className="h-3 w-3 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteExperience(experience)}
+                            className="text-xs text-gray-500 hover:text-red-600"
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -411,6 +487,69 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
           onClose={handleCloseEditModal}
           onSave={handleSaveEdit}
         />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {isDeleteConfirmOpen && deletingExperience && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Delete Experience</h3>
+                <p className="text-sm text-gray-500">This action cannot be undone.</p>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-3 mb-6">
+              <div className="font-medium text-gray-900">
+                {deletingExperience.brand} {deletingExperience.model}
+              </div>
+              <div className="text-sm text-gray-600">
+                {deletingExperience.colorway !== 'Standard' && deletingExperience.colorway && (
+                  <span>{deletingExperience.colorway} • </span>
+                )}
+                {deletingExperience.user_name} • {deletingExperience.interaction_type === 'tried' ? 'Tried On' : 'Spotted'}
+                {deletingExperience.size_tried && ` • Size ${deletingExperience.size_tried}`}
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete this sneaker experience? This will permanently remove it from your collection and analytics.
+            </p>
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleCancelDelete}
+                className="flex-1"
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                className="flex-1"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

@@ -1,50 +1,155 @@
-// SoleTracker Database Types
-// Generated from Supabase schema for sneaker price tracking app
-// Run: npx supabase gen types typescript --project-id YOUR_PROJECT_ID --schema public > types/database.types.ts
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       products: {
         Row: {
-          id: string;
-          sku: string;
-          brand: string;
-          model: string;
-          colorway: string;
-          category: string;
-          retail_price: number;
-          image_url: string | null;
-          cloudinary_id: string | null;
-          created_at: string;
-          updated_at: string;
-        };
+          brand: string
+          category: string | null
+          cloudinary_id: string | null
+          colorway: string
+          created_at: string | null
+          id: string
+          image_url: string | null
+          model: string
+          retail_price: number
+          sku: string
+          updated_at: string | null
+        }
         Insert: {
-          id?: string;
-          sku: string;
-          brand: string;
-          model: string;
-          colorway: string;
-          category?: string;
-          retail_price: number;
-          image_url?: string | null;
-          cloudinary_id?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          brand: string
+          category?: string | null
+          cloudinary_id?: string | null
+          colorway: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          model: string
+          retail_price: number
+          sku: string
+          updated_at?: string | null
+        }
         Update: {
-          id?: string;
-          sku?: string;
-          brand?: string;
-          model?: string;
-          colorway?: string;
-          category?: string;
-          retail_price?: number;
-          image_url?: string | null;
-          cloudinary_id?: string | null;
-          updated_at?: string;
-        };
-      };
+          brand?: string
+          category?: string | null
+          cloudinary_id?: string | null
+          colorway?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          model?: string
+          retail_price?: number
+          sku?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      size_preferences: {
+        Row: {
+          brand: string
+          confidence_level: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          preferred_size: string
+          user_name: string
+        }
+        Insert: {
+          brand: string
+          confidence_level?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          preferred_size: string
+          user_name: string
+        }
+        Update: {
+          brand?: string
+          confidence_level?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          preferred_size?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
+      sneaker_experiences: {
+        Row: {
+          brand: string
+          cloudinary_id: string | null
+          colorway: string | null
+          comfort_rating: number | null
+          created_at: string
+          fit_rating: number | null
+          id: string
+          ideal_price: number | null
+          image_url: string | null
+          interaction_type: string | null
+          interested_in_buying: boolean | null
+          model: string
+          notes: string | null
+          retail_price: number | null
+          size_tried: string | null
+          store_name: string | null
+          try_on_date: string | null
+          updated_at: string
+          user_name: string
+          would_buy_at_price: number | null
+        }
+        Insert: {
+          brand: string
+          cloudinary_id?: string | null
+          colorway?: string | null
+          comfort_rating?: number | null
+          created_at?: string
+          fit_rating?: number | null
+          id?: string
+          ideal_price?: number | null
+          image_url?: string | null
+          interaction_type?: string | null
+          interested_in_buying?: boolean | null
+          model: string
+          notes?: string | null
+          retail_price?: number | null
+          size_tried?: string | null
+          store_name?: string | null
+          try_on_date?: string | null
+          updated_at?: string
+          user_name: string
+          would_buy_at_price?: number | null
+        }
+        Update: {
+          brand?: string
+          cloudinary_id?: string | null
+          colorway?: string | null
+          comfort_rating?: number | null
+          created_at?: string
+          fit_rating?: number | null
+          id?: string
+          ideal_price?: number | null
+          image_url?: string | null
+          interaction_type?: string | null
+          interested_in_buying?: boolean | null
+          model?: string
+          notes?: string | null
+          retail_price?: number | null
+          size_tried?: string | null
+          store_name?: string | null
+          try_on_date?: string | null
+          updated_at?: string
+          user_name?: string
+          would_buy_at_price?: number | null
+        }
+        Relationships: []
+      }
       users_extended: {
         Row: {
           id: string;

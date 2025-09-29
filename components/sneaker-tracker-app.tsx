@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { SmartSneakerForm } from './smart-sneaker-form'
 import { ExperienceDashboard } from './experience-dashboard'
-import { Zap, BarChart3 } from 'lucide-react'
+import { InsightsDashboard } from './insights-dashboard'
+import { Zap, BarChart3, Brain } from 'lucide-react'
 
-type ViewMode = 'entry' | 'dashboard'
+type ViewMode = 'entry' | 'dashboard' | 'insights'
 
 export function SneakerTrackerApp() {
   const [currentView, setCurrentView] = useState<ViewMode>('entry')
@@ -43,13 +44,23 @@ export function SneakerTrackerApp() {
               <BarChart3 className="h-4 w-4" />
               Dashboard
             </Button>
+            <Button
+              variant={currentView === 'insights' ? 'default' : 'outline'}
+              onClick={() => setCurrentView('insights')}
+              className="flex items-center gap-2"
+            >
+              <Brain className="h-4 w-4" />
+              Insights
+            </Button>
           </div>
         </div>
 
         <p className="text-gray-600 text-center">
           {currentView === 'entry'
             ? 'Add sneakers you\'ve seen or tried on to your collection'
-            : 'View your sneaker collection and experiences'
+            : currentView === 'dashboard'
+              ? 'View your sneaker collection and experiences'
+              : 'AI-powered size recommendations and fit analysis'
           }
         </p>
       </div>
@@ -60,8 +71,10 @@ export function SneakerTrackerApp() {
           <div className="flex justify-center">
             <SmartSneakerForm onSneakerAdded={handleSneakerAdded} />
           </div>
-        ) : (
+        ) : currentView === 'dashboard' ? (
           <ExperienceDashboard onAddNew={handleAddNew} />
+        ) : (
+          <InsightsDashboard onGoBack={() => setCurrentView('dashboard')} />
         )}
       </div>
     </div>

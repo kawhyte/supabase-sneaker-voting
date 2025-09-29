@@ -12,8 +12,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle, Zap, Camera, Loader2, ThumbsUp, Upload } from 'lucide-react'
+import { CheckCircle, Zap, Camera, Loader2, ThumbsUp, Upload, Brain } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import { calculateSizeRecommendations, type FitData } from '@/lib/size-analytics'
 
 // Apple-style contextual form schema
 const sneakerSchema = z.object({
@@ -26,10 +27,10 @@ const sneakerSchema = z.object({
   sizeTried: z.string().optional(),
   fitRating: z.coerce.number().min(1).max(5).optional(),
   comfortRating: z.coerce.number().min(1).max(5).optional(),
-  wouldRecommend: z.boolean().optional(),
   // General fields
   storeName: z.string().optional(),
-  listedPrice: z.string().optional(),
+  retailPrice: z.string().optional(),
+  idealPrice: z.string().optional(),
   notes: z.string().optional(),
   image: z.any().optional()
 }).refine((data) => {
@@ -47,8 +48,24 @@ type SneakerFormData = z.infer<typeof sneakerSchema>
 // Common sneaker brands for quick selection
 const COMMON_BRANDS = ['Nike', 'Jordan', 'Adidas', 'New Balance', 'Asics', 'Puma', 'Vans', 'Converse']
 
-// Common sizes
-const COMMON_SIZES = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12', '12.5', '13', '14']
+// Common sizes with EU and Women's equivalents (US Men's 3.5 - 10.5)
+const COMMON_SIZES = [
+  { us: '3.5', women: '5', eu: '35.5' },
+  { us: '4', women: '5.5', eu: '36' },
+  { us: '4.5', women: '6', eu: '37' },
+  { us: '5', women: '6.5', eu: '37.5' },
+  { us: '5.5', women: '7', eu: '38' },
+  { us: '6', women: '7.5', eu: '38.5' },
+  { us: '6.5', women: '8', eu: '39' },
+  { us: '7', women: '8.5', eu: '40' },
+  { us: '7.5', women: '9', eu: '40.5' },
+  { us: '8', women: '9.5', eu: '41' },
+  { us: '8.5', women: '10', eu: '42' },
+  { us: '9', women: '10.5', eu: '42.5' },
+  { us: '9.5', women: '11', eu: '43' },
+  { us: '10', women: '11.5', eu: '44' },
+  { us: '10.5', women: '12', eu: '44.5' }
+]
 
 // Fit rating descriptions
 const FIT_RATINGS = [
@@ -70,6 +87,8 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
+  const [fitData, setFitData] = useState<FitData[]>([])
+  const [sizeRecommendation, setSizeRecommendation] = useState<any>(null)
 
   const supabase = createClient()
 
@@ -88,6 +107,21 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
   const watchedUser = watch('userName')
   const watchedBrand = watch('brand')
   const watchedInteractionType = watch('interactionType')
+
+  // Load fit data on component mount
+  useEffect(() => {
+    loadFitData()
+  }, [])
+
+  // Generate size recommendation when user/brand changes
+  useEffect(() => {
+    if (watchedUser && watchedBrand && fitData.length > 0 && watchedInteractionType === 'tried') {
+      const recommendation = calculateSizeRecommendations(fitData, watchedBrand, watchedUser)
+      setSizeRecommendation(recommendation)
+    } else {
+      setSizeRecommendation(null)
+    }
+  }, [watchedUser, watchedBrand, watchedInteractionType, fitData])
   const watchedFitRating = watch('fitRating')
 
   // Load size preferences when user/brand changes
@@ -96,6 +130,47 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
       loadSizePreference(watchedUser, watchedBrand)
     }
   }, [watchedUser, watchedBrand])
+
+  const loadFitData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('sneaker_experiences')
+        .select('user_name, brand, size_tried, fit_rating')
+        .eq('interaction_type', 'tried')
+        .not('size_tried', 'is', null)
+        .not('fit_rating', 'is', null)
+
+      if (error) {
+        console.error('Error loading fit data:', error)
+        return
+      }
+
+      // Transform to FitData format with frequency calculation
+      const transformedData: FitData[] = []
+      const groupedData = data.reduce((acc, item) => {
+        const key = `${item.user_name}-${item.brand}-${item.size_tried}-${item.fit_rating}`
+        if (!acc[key]) {
+          acc[key] = { ...item, frequency: 0 }
+        }
+        acc[key].frequency += 1
+        return acc
+      }, {} as Record<string, any>)
+
+      Object.values(groupedData).forEach((item: any) => {
+        transformedData.push({
+          user_name: item.user_name,
+          brand: item.brand,
+          size_tried: item.size_tried,
+          fit_rating: item.fit_rating,
+          frequency: item.frequency
+        })
+      })
+
+      setFitData(transformedData)
+    } catch (error) {
+      console.error('Error loading fit data:', error)
+    }
+  }
 
   const loadSizePreference = async (userName: string, brand: string) => {
     try {
@@ -187,10 +262,10 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         size_tried: data.interactionType === 'tried' ? data.sizeTried : null,
         fit_rating: data.interactionType === 'tried' ? data.fitRating : null,
         comfort_rating: data.interactionType === 'tried' ? (data.comfortRating || null) : null,
-        would_recommend: data.interactionType === 'tried' ? (data.wouldRecommend || false) : null,
         // Always optional fields
         store_name: data.storeName || null,
-        listed_price: data.listedPrice ? parseFloat(data.listedPrice) : null,
+        retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
+        ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
         notes: data.notes || null,
         interested_in_buying: true, // If they're adding it, they're interested
         try_on_date: new Date().toISOString().split('T')[0],
@@ -391,15 +466,32 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
               {/* Size Selection */}
               <div>
                 <Label className="text-sm font-medium text-gray-700">What size did you try?</Label>
+
+                {/* Smart Size Recommendation */}
+                {sizeRecommendation && (
+                  <Alert className="mt-2 border-blue-200 bg-blue-50">
+                    <Brain className="h-4 w-4 text-blue-600" />
+                    <AlertDescription className="text-blue-800">
+                      <strong>Smart Suggestion:</strong> Try size <strong>{sizeRecommendation.recommendedSize}</strong>
+                      <span className="text-sm block mt-1">
+                        {sizeRecommendation.reasoning} ({sizeRecommendation.confidence}% confidence)
+                      </span>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 <Select onValueChange={(value) => setValue('sizeTried', value)}>
                   <SelectTrigger className="h-12 mt-2">
                     <SelectValue placeholder="Select size" />
                   </SelectTrigger>
                   <SelectContent>
                     {COMMON_SIZES.map((size) => (
-                      <SelectItem key={size} value={size}>
-                        {size}
-                        {sizePreferences[watchedBrand] === size && (
+                      <SelectItem key={size.us} value={size.us}>
+                        <div className="flex flex-col">
+                          <span>US M {size.us} / W {size.women}</span>
+                          <span className="text-xs text-gray-500">EU {size.eu}</span>
+                        </div>
+                        {sizePreferences[watchedBrand] === size.us && (
                           <Badge variant="secondary" className="ml-2 text-xs">Your usual</Badge>
                         )}
                       </SelectItem>
@@ -438,21 +530,6 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                 )}
               </div>
 
-              {/* Would Recommend */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700">Would you recommend this sneaker?</Label>
-                <div className="mt-2">
-                  <Button
-                    type="button"
-                    variant={watch('wouldRecommend') ? 'default' : 'outline'}
-                    onClick={() => setValue('wouldRecommend', !watch('wouldRecommend'))}
-                    className="flex items-center gap-2 h-12"
-                  >
-                    <ThumbsUp className="h-4 w-4" />
-                    {watch('wouldRecommend') ? 'Yes, recommend' : 'Recommend?'}
-                  </Button>
-                </div>
-              </div>
             </>
           )}
 
@@ -535,11 +612,21 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                     <Input {...register('storeName')} placeholder="Foot Locker, etc." className="mt-1" />
                   </div>
                 </div>
-                <div className="mt-4">
-                  <Label className="text-sm text-gray-600">Listed Price (Optional)</Label>
-                  <div className="relative mt-1">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                    <Input {...register('listedPrice')} placeholder="170.00" type="number" step="0.01" className="pl-8" />
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <Label className="text-sm text-gray-600">Retail Price (Optional)</Label>
+                    <div className="relative mt-1">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                      <Input {...register('retailPrice')} placeholder="170.00" type="number" step="0.01" className="pl-8" />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm text-gray-600">Ideal Price (Optional)</Label>
+                    <div className="relative mt-1">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                      <Input {...register('idealPrice')} placeholder="120.00" type="number" step="0.01" className="pl-8" />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Price you'd be willing to pay</p>
                   </div>
                 </div>
               </div>
