@@ -72,13 +72,16 @@ export async function POST(request: NextRequest) {
     console.error('Failed to send push notification:', error)
 
     // Handle specific web-push errors
-    if (error.statusCode === 410 || error.statusCode === 413) {
-      // Subscription is no longer valid, should be removed from database
-      return NextResponse.json({
-        success: false,
-        error: 'Subscription expired or invalid',
-        shouldRemoveSubscription: true
-      }, { status: 410 })
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      const statusCode = (error as { statusCode: number }).statusCode
+      if (statusCode === 410 || statusCode === 413) {
+        // Subscription is no longer valid, should be removed from database
+        return NextResponse.json({
+          success: false,
+          error: 'Subscription expired or invalid',
+          shouldRemoveSubscription: true
+        }, { status: 410 })
+      }
     }
 
     return NextResponse.json(

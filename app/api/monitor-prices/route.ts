@@ -58,16 +58,12 @@ async function startPriceMonitoring() {
     const hourlyTask = cron.schedule('0 * * * *', async () => {
       console.log('Running hourly price check:', new Date().toISOString())
       await checkAllPricesNow()
-    }, {
-      scheduled: false
     })
 
     // Schedule daily summary at 9 AM
     const dailyTask = cron.schedule('0 9 * * *', async () => {
       console.log('Running daily price summary:', new Date().toISOString())
       await generateDailySummary()
-    }, {
-      scheduled: false
     })
 
     // Start the scheduled tasks
@@ -224,10 +220,11 @@ async function checkAllPricesNow() {
         console.error(`Error checking price for ${monitor.product_url}:`, error)
         errorCount++
 
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
         results.push({
           monitor_id: monitor.id,
           product_url: monitor.product_url,
-          error: error.message || 'Unknown error'
+          error: errorMessage
         })
       }
 

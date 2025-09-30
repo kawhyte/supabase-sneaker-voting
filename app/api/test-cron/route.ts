@@ -9,8 +9,6 @@ export async function POST(request: NextRequest) {
     // Create a test cron job that runs immediately (every second for 2 seconds)
     const task = cron.schedule('* * * * * *', () => {
       testResult = `Cron task executed successfully at ${new Date().toISOString()}`
-    }, {
-      scheduled: false // Don't start automatically
     })
 
     // Start the task
@@ -42,9 +40,10 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Cron test error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json({
       success: false,
-      error: error.message,
+      error: errorMessage,
       message: 'Node-cron test failed'
     }, { status: 500 })
   }

@@ -9,17 +9,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function Login({
+export default async function Login({
 	searchParams,
 }: {
-	searchParams: { message: string };
+	searchParams: Promise<{ message: string }>;
 }) {
+	const params = await searchParams;
 	const signIn = async (formData: FormData) => {
 		"use server";
 
 		const email = formData.get("email") as string;
 		const password = formData.get("password") as string;
-		const supabase = createClient();
+		const supabase = await createClient();
 
 		const { error } = await supabase.auth.signInWithPassword({
 			email,
@@ -36,10 +37,10 @@ export default function Login({
 	const signUp = async (formData: FormData) => {
 		"use server";
 
-		const origin = headers().get("origin");
+		const origin = (await headers()).get("origin");
 		const email = formData.get("email") as string;
 		const password = formData.get("password") as string;
-		const supabase = createClient();
+		const supabase = await createClient();
 
 		const { error } = await supabase.auth.signUp({
 			email,
@@ -120,9 +121,9 @@ export default function Login({
 									pendingText='Signing Up...'>
 									or Sign Up
 								</SubmitButton> */}
-								{searchParams?.message && (
+								{params?.message && (
 									<p className='mt-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-md text-center'>
-										{searchParams.message}
+										{params.message}
 									</p>
 								)}
 							</div>
@@ -193,9 +194,9 @@ export default function Login({
 						pendingText='Signing Up...'>
 						Sign Up
 					</SubmitButton>
-					{searchParams?.message && (
+					{params?.message && (
 						<p className='mt-4 p-4 bg-foreground/10 text-foreground text-center'>
-							{searchParams.message}
+							{params.message}
 						</p>
 					)}
 				</form>

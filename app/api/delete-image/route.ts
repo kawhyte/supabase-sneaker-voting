@@ -22,8 +22,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Delete API error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Failed to delete image'
     return NextResponse.json(
-      { error: error.message || 'Failed to delete image' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

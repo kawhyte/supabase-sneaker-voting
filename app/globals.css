@@ -69,6 +69,17 @@
   /* Default Gap Utility */
   --gap-base: var(--spacing-2\.5);   /* 20px - Default grid/flex gap */
 
+  /* ============================================
+     TYPOGRAPHY - Line Heights Aligned to Grid
+     ============================================ */
+
+  /* Line Height Scale (8px increments) */
+  --line-height-tight: 24px;      /* 3 units - Headings, tight text */
+  --line-height-snug: 32px;       /* 4 units - Large headings */
+  --line-height-normal: 24px;     /* 3 units - Body text, paragraphs */
+  --line-height-relaxed: 32px;    /* 4 units - Comfortable reading */
+  --line-height-loose: 40px;      /* 5 units - Spacious content */
+
   /* Shadcn Color System */
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
@@ -222,16 +233,23 @@
 }
 
 main, nav {
-  @apply max-w-6xl mx-auto my-12;
+  @apply max-w-6xl mx-auto;
+  margin-block: var(--space-xl);
 }
 p {
-  @apply mt-2;
+  margin-top: var(--space-md);
+  line-height: var(--line-height-relaxed);
 }
 h1 {
   @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+  line-height: var(--line-height-snug);
+  margin-bottom: var(--space-lg);
 }
 h2 {
-  @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+  @apply scroll-m-20 border-b text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+  line-height: var(--line-height-tight);
+  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 /*
   ---break---

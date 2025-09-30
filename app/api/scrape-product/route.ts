@@ -78,8 +78,9 @@ export async function POST(request: NextRequest) {
         productData = await scrapeWithTimeout(() => scrapeGeneric(url))
       }
     } catch (timeoutError) {
+      const errorMessage = timeoutError instanceof Error ? timeoutError.message : 'Request timeout'
       return NextResponse.json(
-        { success: false, error: timeoutError.message || 'Request timeout' },
+        { success: false, error: errorMessage },
         { status: 408 }
       )
     }
@@ -167,9 +168,10 @@ async function scrapeSoleRetriever(url: string): Promise<ProductData> {
       success: true
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return {
       success: false,
-      error: `SoleRetriever scraping failed: ${error.message}`
+      error: `SoleRetriever scraping failed: ${errorMessage}`
     }
   }
 }
@@ -247,7 +249,7 @@ async function scrapeNike(url: string): Promise<ProductData> {
   } catch (error) {
     return {
       success: false,
-      error: `Nike scraping failed: ${error.message}`
+      error: `Nike scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
     }
   }
 }
@@ -327,7 +329,7 @@ async function scrapeAdidas(url: string): Promise<ProductData> {
   } catch (error) {
     return {
       success: false,
-      error: `Adidas scraping failed: ${error.message}`
+      error: `Adidas scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
     }
   }
 }
@@ -407,7 +409,7 @@ async function scrapeStockX(url: string): Promise<ProductData> {
   } catch (error) {
     return {
       success: false,
-      error: `StockX scraping failed: ${error.message}`
+      error: `StockX scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
     }
   }
 }
@@ -481,7 +483,7 @@ async function scrapeGeneric(url: string): Promise<ProductData> {
   } catch (error) {
     return {
       success: false,
-      error: `Generic scraping failed: ${error.message}`
+      error: `Generic scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
     }
   }
 }

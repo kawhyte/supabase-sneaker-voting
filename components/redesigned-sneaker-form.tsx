@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle, Loader2, Upload, Link, User, Eye, Footprints, Sparkles, ChevronUp, ChevronDown, Zap, UserCircle, Image, AlertTriangle, Camera, Rocket, Lightbulb, Star } from 'lucide-react'
+import { CheckCircle, Loader2, Upload, Link, User, Eye, Footprints, Sparkles, ChevronUp, ChevronDown, Zap, UserCircle, AlertTriangle, Camera, Rocket, Lightbulb, Star, RefreshCw, X } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { calculateSizeRecommendations, type FitData } from '@/lib/size-analytics'
 import { MultiPhotoUpload } from '@/components/multi-photo-upload'
@@ -64,28 +64,6 @@ const sneakerSchema = z.object({
 
 type SneakerFormData = z.infer<typeof sneakerSchema>
 
-// Common sneaker brands for quick selection
-const COMMON_BRANDS = ['Nike', 'Jordan', 'Adidas', 'New Balance', 'Asics', 'Puma', 'Vans', 'Converse']
-
-// Common sizes with EU and Women's equivalents (US Men's 3.5 - 10.5)
-const COMMON_SIZES = [
-  { us: '3.5', women: '5', eu: '35.5' },
-  { us: '4', women: '5.5', eu: '36' },
-  { us: '4.5', women: '6', eu: '37' },
-  { us: '5', women: '6.5', eu: '37.5' },
-  { us: '5.5', women: '7', eu: '38' },
-  { us: '6', women: '7.5', eu: '38.5' },
-  { us: '6.5', women: '8', eu: '39' },
-  { us: '7', women: '8.5', eu: '40' },
-  { us: '7.5', women: '9', eu: '40.5' },
-  { us: '8', women: '9.5', eu: '41' },
-  { us: '8.5', women: '10', eu: '42' },
-  { us: '9', women: '10.5', eu: '42.5' },
-  { us: '9.5', women: '11', eu: '43' },
-  { us: '10', women: '11.5', eu: '44' },
-  { us: '10.5', women: '12', eu: '44.5' }
-]
-
 // Fit rating descriptions
 const FIT_RATINGS = [
   { value: 1, label: 'Too Small', icon: '🔴', description: 'Cramped, uncomfortable' },
@@ -106,16 +84,20 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
   const [photos, setPhotos] = useState<PhotoItem[]>([])
   const [uploadProgress, setUploadProgress] = useState('')
   const [fitData, setFitData] = useState<FitData[]>([])
-  const [sizeRecommendation, setSizeRecommendation] = useState<any>(null)
 
   // Smart Import states
   const [isScrapingUrl, setIsScrapingUrl] = useState(false)
   const [urlData, setUrlData] = useState<any>(null)
   const [smartImportExpanded, setSmartImportExpanded] = useState(true) // Expanded by default
   const [scrapeFailed, setScrapeFailed] = useState(false)
-  const [priceMonitorCreated, setPriceMonitorCreated] = useState(false)
   const [showImageModal, setShowImageModal] = useState(false)
   const [scrapedImages, setScrapedImages] = useState<string[]>([])
+
+  // Phase 5: Form State Management
+  const [isDraftRestored, setIsDraftRestored] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [lastSavedTime, setLastSavedTime] = useState<Date | null>(null)
+  const [showDraftNotification, setShowDraftNotification] = useState(false)
 
   const supabase = createClient()
 
@@ -123,7 +105,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
     register,
     handleSubmit,
     reset,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
     setValue,
     watch
   } = useForm<SneakerFormData>({
@@ -146,17 +128,37 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
   // Load fit data on component mount
   useEffect(() => {
     loadFitData()
+    restoreDraft()
   }, [])
 
-  // Generate size recommendation when user/brand changes
+  // Track unsaved changes
   useEffect(() => {
-    if (watchedUser && watchedBrand && fitData.length > 0 && watchedInteractionType === 'tried') {
-      const recommendation = calculateSizeRecommendations(fitData, watchedBrand, watchedUser)
-      setSizeRecommendation(recommendation)
-    } else {
-      setSizeRecommendation(null)
+    setHasUnsavedChanges(isDirty || photos.length > 0)
+  }, [isDirty, photos])
+
+  // Auto-save draft every 30 seconds
+  useEffect(() => {
+    if (!hasUnsavedChanges) return
+
+    const autoSaveInterval = setInterval(() => {
+      saveDraft()
+    }, 30000) // 30 seconds
+
+    return () => clearInterval(autoSaveInterval)
+  }, [hasUnsavedChanges, watch(), photos, urlData])
+
+  // Unsaved changes warning before page unload
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges && !isLoading) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
     }
-  }, [watchedUser, watchedBrand, watchedInteractionType, fitData])
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [hasUnsavedChanges, isLoading])
 
   // Load size preferences when user/brand changes
   useEffect(() => {
@@ -164,6 +166,77 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
       loadSizePreference(watchedUser, watchedBrand)
     }
   }, [watchedUser, watchedBrand])
+
+  // Phase 5: Draft Management Functions
+  const saveDraft = () => {
+    try {
+      const formData = watch()
+      const draft = {
+        formData,
+        urlData,
+        timestamp: new Date().toISOString(),
+        photoCount: photos.length
+      }
+      localStorage.setItem('sneaker-form-draft', JSON.stringify(draft))
+      setLastSavedTime(new Date())
+      console.log('📝 Draft auto-saved at', new Date().toLocaleTimeString())
+    } catch (error) {
+      console.error('Failed to save draft:', error)
+    }
+  }
+
+  const restoreDraft = () => {
+    try {
+      const savedDraft = localStorage.getItem('sneaker-form-draft')
+      if (!savedDraft) return
+
+      const draft = JSON.parse(savedDraft)
+      const draftAge = Date.now() - new Date(draft.timestamp).getTime()
+      const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
+
+      // Only restore drafts less than 7 days old
+      if (draftAge > maxAge) {
+        localStorage.removeItem('sneaker-form-draft')
+        return
+      }
+
+      // Restore form data
+      Object.keys(draft.formData).forEach((key) => {
+        const value = draft.formData[key]
+        if (value !== undefined && value !== null && value !== '') {
+          setValue(key as any, value, { shouldDirty: false })
+        }
+      })
+
+      // Restore URL data
+      if (draft.urlData) {
+        setUrlData(draft.urlData)
+      }
+
+      setIsDraftRestored(true)
+      setShowDraftNotification(true)
+
+      // Hide notification after 5 seconds
+      setTimeout(() => setShowDraftNotification(false), 5000)
+
+      console.log('✅ Draft restored from', new Date(draft.timestamp).toLocaleString())
+    } catch (error) {
+      console.error('Failed to restore draft:', error)
+      localStorage.removeItem('sneaker-form-draft')
+    }
+  }
+
+  const clearDraft = () => {
+    try {
+      localStorage.removeItem('sneaker-form-draft')
+      setIsDraftRestored(false)
+      setShowDraftNotification(false)
+      setLastSavedTime(null)
+      console.log('🗑️ Draft cleared')
+    } catch (error) {
+      console.error('Failed to clear draft:', error)
+    }
+  }
 
   const loadFitData = async () => {
     try {
@@ -410,7 +483,6 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
       })
 
       if (response.ok) {
-        setPriceMonitorCreated(true)
         return true
       }
     } catch (error) {
@@ -500,7 +572,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
             : '✨ Sneaker added to your collection!'
       )
 
-      // Clear form after 3 seconds
+      // Clear form and draft after 3 seconds
       setTimeout(() => {
         reset()
         setSuccessMessage('')
@@ -509,6 +581,8 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
         setUrlData(null)
         setScrapeFailed(false)
         setSmartImportExpanded(true) // Reset to expanded
+        clearDraft() // Clear saved draft
+        setHasUnsavedChanges(false)
         onSneakerAdded?.()
       }, 3000)
 
@@ -545,6 +619,38 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
             </Alert>
           )}
 
+          {/* Draft Restored Notification */}
+          {showDraftNotification && (
+            <Alert className="mb-6 border-blue-200 bg-blue-50">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-blue-800">
+                    Draft restored from previous session
+                  </AlertDescription>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowDraftNotification(false)}
+                  className="h-6 w-6 p-0"
+                  aria-label="Dismiss notification"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </Alert>
+          )}
+
+          {/* Auto-save Indicator */}
+          {lastSavedTime && hasUnsavedChanges && (
+            <div className="mb-4 text-xs text-gray-500 flex items-center gap-1">
+              <RefreshCw className="h-3 w-3" />
+              <span>Last saved: {lastSavedTime.toLocaleTimeString()}</span>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* User and Experience Dropdowns - Required First */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b">
@@ -573,7 +679,13 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                   </SelectContent>
                 </Select>
                 {errors.userName && (
-                  <p className="text-xs text-red-600 mt-1">{errors.userName.message}</p>
+                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-red-700">{errors.userName.message}</p>
+                      <p className="text-xs text-red-600 mt-0.5">Please select who is tracking this sneaker</p>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -602,7 +714,13 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                   </SelectContent>
                 </Select>
                 {errors.interactionType && (
-                  <p className="text-xs text-red-600 mt-1">{errors.interactionType.message}</p>
+                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-red-700">{errors.interactionType.message}</p>
+                      <p className="text-xs text-red-600 mt-0.5">Choose "Seen" if viewed online/in-store, or "Tried On" if you've worn them</p>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -741,7 +859,13 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                         />
                       </div>
                       {errors.brand && (
-                        <p className="text-xs text-red-600 mt-1">{errors.brand.message}</p>
+                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                          <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-semibold text-red-700">{errors.brand.message}</p>
+                            <p className="text-xs text-red-600 mt-0.5">Select from popular brands or type a custom brand name</p>
+                          </div>
+                        </div>
                       )}
                     </div>
 
@@ -754,7 +878,13 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                         className="mt-2"
                       />
                       {errors.model && (
-                        <p className="text-xs text-red-600 mt-1">{errors.model.message}</p>
+                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                          <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-semibold text-red-700">{errors.model.message}</p>
+                            <p className="text-xs text-red-600 mt-0.5">Enter the sneaker model (e.g., "Air Jordan 1 High", "990v6")</p>
+                          </div>
+                        </div>
                       )}
                     </div>
 
@@ -807,7 +937,13 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                             />
                           </div>
                           {errors.sizeTried && (
-                            <p className="text-xs text-red-600 mt-1">{errors.sizeTried.message}</p>
+                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                              <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <p className="text-xs font-semibold text-red-700">{errors.sizeTried.message}</p>
+                                <p className="text-xs text-red-600 mt-0.5">Select the US Men's size you tried on</p>
+                              </div>
+                            </div>
                           )}
                         </div>
 
@@ -843,7 +979,13 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                             </div>
                           )}
                           {errors.fitRating && (
-                            <p className="text-xs text-red-600 mt-2">{errors.fitRating.message}</p>
+                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                              <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <p className="text-xs font-semibold text-red-700">{errors.fitRating.message}</p>
+                                <p className="text-xs text-red-600 mt-0.5">Rate how the sneaker fit - from too small to too big</p>
+                              </div>
+                            </div>
                           )}
                         </div>
 
