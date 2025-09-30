@@ -69,10 +69,10 @@ export function SizeCombobox({ value, onChange, disabled, preferredSize }: SizeC
           role="combobox"
           aria-expanded={open}
           disabled={disabled}
-          className="w-full justify-between h-11"
+          className="w-full justify-between h-5"
         >
           <span className="truncate">{displayValue}</span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
@@ -96,7 +96,7 @@ export function SizeCombobox({ value, onChange, disabled, preferredSize }: SizeC
                   >
                     <Check
                       className={cn(
-                        'mr-[var(--space-md)] h-4 w-4',
+                        'mr-[var(--space-xs)] h-4 w-4',
                         value === size.us ? 'opacity-100' : 'opacity-0'
                       )}
                     />
@@ -105,7 +105,7 @@ export function SizeCombobox({ value, onChange, disabled, preferredSize }: SizeC
                         US M {size.us} / W {size.women} (EU {size.eu})
                       </span>
                       {isPreferred && (
-                        <span className="text-xs text-blue-600 ml-[var(--space-md)]">Your usual</span>
+                        <span className="text-xs text-blue-600 ml-[var(--space-xs)]">Your usual</span>
                       )}
                     </div>
                   </CommandItem>
