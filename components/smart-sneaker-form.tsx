@@ -459,7 +459,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <CardTitle className="text-3xl flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-teal-600 to-orange-500 bg-clip-text text-transparent">
+            <CardTitle className="text-3xl flex items-center justify-center gap-[var(--space-md)] bg-gradient-to-r from-blue-600 via-teal-600 to-orange-500 bg-clip-text text-transparent">
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
@@ -468,7 +468,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
               </motion.div>
               {getFormTitle()}
             </CardTitle>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{getFormDescription()}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-[var(--space-md)]">{getFormDescription()}</p>
           </motion.div>
         </CardHeader>
 
@@ -480,11 +480,11 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-[var(--space-lg)]">
           {/* Step 1: User Selection */}
           <div>
             <Label className="text-sm font-medium text-gray-700">Who's tracking this sneaker?</Label>
-            <div className="grid grid-cols-2 gap-3 mt-2">
+            <div className="grid grid-cols-2 gap-[var(--space-sm)] mt-[var(--space-md)]">
               <Button
                 type="button"
                 variant={watchedUser === 'Kenny' ? 'default' : 'outline'}
@@ -503,7 +503,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
               </Button>
             </div>
             {errors.userName && (
-              <p className="text-xs text-red-600 mt-1">{errors.userName.message}</p>
+              <p className="text-xs text-red-600 mt-[var(--space-xs)]">{errors.userName.message}</p>
             )}
           </div>
 
@@ -511,7 +511,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
           {watchedUser && (
             <div>
               <Label className="text-sm font-medium text-gray-700">What's your experience with this sneaker?</Label>
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-2 gap-[var(--space-sm)] mt-[var(--space-md)]">
                 <Button
                   type="button"
                   variant={watchedInteractionType === 'seen' ? 'default' : 'outline'}
@@ -534,7 +534,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                 </Button>
               </div>
               {errors.interactionType && (
-                <p className="text-xs text-red-600 mt-1">{errors.interactionType.message}</p>
+                <p className="text-xs text-red-600 mt-[var(--space-xs)]">{errors.interactionType.message}</p>
               )}
             </div>
           )}
@@ -549,7 +549,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                 transition={{ duration: 0.3 }}
               >
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-[var(--space-md)] mb-[var(--space-sm)]">
                     <motion.div
                       animate={{ rotate: showUrlImport ? 180 : 0 }}
                       transition={{ duration: 0.3 }}
@@ -577,14 +577,14 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="space-y-4"
+                        className="space-y-[var(--space-base)]"
                       >
                         {/* URL Input */}
                         <div>
-                          <Label className="text-xs text-blue-700 dark:text-blue-300 mb-2 block">
+                          <Label className="text-xs text-blue-700 dark:text-blue-300 mb-[var(--space-md)] block">
                             Paste product URL from Nike, Adidas, Foot Locker, etc.
                           </Label>
-                          <div className="flex gap-2">
+                          <div className="flex gap-[var(--space-md)]">
                             <Input
                               {...register('productUrl')}
                               placeholder="https://www.nike.com/t/..."
@@ -610,7 +610,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                             animate={{ opacity: 1, scale: 1 }}
                             className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-700"
                           >
-                            <div className="flex items-start gap-3">
+                            <div className="flex items-start gap-[var(--space-sm)]">
                               {urlData.image && (
                                 <img src={urlData.image} alt="Product" className="w-16 h-16 object-cover rounded-lg" />
                               )}
@@ -618,7 +618,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                                 <h4 className="font-medium text-sm text-green-800 dark:text-green-200 truncate">
                                   {urlData.title || 'Product Found'}
                                 </h4>
-                                <div className="flex gap-4 mt-1">
+                                <div className="flex gap-[var(--space-base)] mt-[var(--space-xs)]">
                                   {urlData.price && (
                                     <span className="text-lg font-bold text-green-600">${urlData.price}</span>
                                   )}
@@ -632,7 +632,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                         )}
 
                         {/* Price Monitoring Options */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--space-sm)]">
                           <div>
                             <Label className="text-xs text-blue-700 dark:text-blue-300 mb-1 block">
                               Target Price (Optional)
@@ -649,7 +649,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                             </div>
                           </div>
                           <div className="flex items-center justify-center">
-                            <label className="flex items-center gap-2 cursor-pointer">
+                            <label className="flex items-center gap-[var(--space-md)] cursor-pointer">
                               <input
                                 type="checkbox"
                                 {...register('enableNotifications')}
@@ -684,7 +684,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
               {/* Brand Selection */}
               <div>
                 <Label className="text-sm font-medium text-gray-700">Brand</Label>
-                <div className="grid grid-cols-4 gap-2 mt-2">
+                <div className="grid grid-cols-4 gap-[var(--space-md)] mt-[var(--space-md)]">
                   {COMMON_BRANDS.slice(0, 4).map((brand) => (
                     <Button
                       key={brand}
@@ -697,7 +697,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                     </Button>
                   ))}
                 </div>
-                <div className="grid grid-cols-4 gap-2 mt-2">
+                <div className="grid grid-cols-4 gap-[var(--space-md)] mt-[var(--space-md)]">
                   {COMMON_BRANDS.slice(4).map((brand) => (
                     <Button
                       key={brand}
@@ -713,10 +713,10 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                 <Input
                   {...register('brand')}
                   placeholder="Or type brand name"
-                  className="mt-2"
+                  className="mt-[var(--space-md)]"
                 />
                 {errors.brand && (
-                  <p className="text-xs text-red-600 mt-1">{errors.brand.message}</p>
+                  <p className="text-xs text-red-600 mt-[var(--space-xs)]">{errors.brand.message}</p>
                 )}
               </div>
 
@@ -726,10 +726,10 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                 <Input
                   {...register('model')}
                   placeholder="Air Jordan 1, Air Max 90, etc."
-                  className="mt-2"
+                  className="mt-[var(--space-md)]"
                 />
                 {errors.model && (
-                  <p className="text-xs text-red-600 mt-1">{errors.model.message}</p>
+                  <p className="text-xs text-red-600 mt-[var(--space-xs)]">{errors.model.message}</p>
                 )}
               </div>
             </motion.div>
@@ -748,11 +748,11 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
 
                 {/* Smart Size Recommendation */}
                 {sizeRecommendation && (
-                  <Alert className="mt-2 border-blue-200 bg-blue-50">
+                  <Alert className="mt-[var(--space-md)] border-blue-200 bg-blue-50">
                     <Brain className="h-4 w-4 text-blue-600" />
                     <AlertDescription className="text-blue-800">
                       <strong>Smart Suggestion:</strong> Try size <strong>{sizeRecommendation.recommendedSize}</strong>
-                      <span className="text-sm block mt-1">
+                      <span className="text-sm block mt-[var(--space-xs)]">
                         {sizeRecommendation.reasoning} ({sizeRecommendation.confidence}% confidence)
                       </span>
                     </AlertDescription>
@@ -760,7 +760,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                 )}
 
                 <Select onValueChange={(value) => setValue('sizeTried', value)}>
-                  <SelectTrigger className="h-12 mt-2">
+                  <SelectTrigger className="h-12 mt-[var(--space-md)]">
                     <SelectValue placeholder="Select size" />
                   </SelectTrigger>
                   <SelectContent>
@@ -778,14 +778,14 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                   </SelectContent>
                 </Select>
                 {errors.sizeTried && (
-                  <p className="text-xs text-red-600 mt-1">{errors.sizeTried.message}</p>
+                  <p className="text-xs text-red-600 mt-[var(--space-xs)]">{errors.sizeTried.message}</p>
                 )}
               </div>
 
               {/* Fit Rating */}
               <div>
                 <Label className="text-sm font-medium text-gray-700">How did it fit? ⭐</Label>
-                <div className="grid grid-cols-5 gap-1 mt-2">
+                <div className="grid grid-cols-5 gap-[var(--space-xs)] mt-[var(--space-md)]">
                   {FIT_RATINGS.map((rating) => (
                     <Button
                       key={rating.value}
@@ -800,12 +800,12 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                   ))}
                 </div>
                 {watchedFitRating && (
-                  <p className="text-xs text-gray-600 mt-1 text-center">
+                  <p className="text-xs text-gray-600 mt-[var(--space-xs)] text-center">
                     {getFitRatingInfo(watchedFitRating)?.description}
                   </p>
                 )}
                 {errors.fitRating && (
-                  <p className="text-xs text-red-600 mt-1">{errors.fitRating.message}</p>
+                  <p className="text-xs text-red-600 mt-[var(--space-xs)]">{errors.fitRating.message}</p>
                 )}
               </div>
 
@@ -821,7 +821,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
             >
               {/* Multi-Photo Upload */}
               <div>
-                <Label className="text-sm font-medium text-gray-700 mb-3 block">📸 Add Photos (Optional - Up to 5)</Label>
+                <Label className="text-sm font-medium text-gray-700 mb-[var(--space-sm)] block">📸 Add Photos (Optional - Up to 5)</Label>
                 <MultiPhotoUpload
                   photos={photos}
                   onPhotosChange={setPhotos}
@@ -846,10 +846,10 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                     ? "How did they feel? Any thoughts? Comparisons?"
                     : "Why are you interested? Where did you see them?"
                   }
-                  className="mt-2 resize-none"
+                  className="mt-[var(--space-md)] resize-none"
                   rows={2}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 mt-[var(--space-xs)]">
                   💡 Quick thoughts: {watchedInteractionType === 'tried'
                     ? '"Tight on pinky toe", "Great for walking"'
                     : '"Love the colorway", "Perfect for summer"'
@@ -859,31 +859,31 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
 
               {/* Advanced Details Toggle */}
               <div className="border-t pt-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-[var(--space-base)]">
                   <div>
                     <Label className="text-sm text-gray-600">Colorway (Optional)</Label>
-                    <Input {...register('colorway')} placeholder="Bred, Chicago, etc." className="mt-1" />
+                    <Input {...register('colorway')} placeholder="Bred, Chicago, etc." className="mt-[var(--space-xs)]" />
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600">Store (Optional)</Label>
-                    <Input {...register('storeName')} placeholder="Foot Locker, etc." className="mt-1" />
+                    <Input {...register('storeName')} placeholder="Foot Locker, etc." className="mt-[var(--space-xs)]" />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-2 gap-[var(--space-base)] mt-4">
                   <div>
                     <Label className="text-sm text-gray-600">Retail Price (Optional)</Label>
-                    <div className="relative mt-1">
+                    <div className="relative mt-[var(--space-xs)]">
                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                       <Input {...register('retailPrice')} placeholder="170.00" type="number" step="0.01" className="pl-8" />
                     </div>
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600">Ideal Price (Optional)</Label>
-                    <div className="relative mt-1">
+                    <div className="relative mt-[var(--space-xs)]">
                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                       <Input {...register('idealPrice')} placeholder="120.00" type="number" step="0.01" className="pl-8" />
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Price you'd be willing to pay</p>
+                    <p className="text-xs text-gray-500 mt-[var(--space-xs)]">Price you'd be willing to pay</p>
                   </div>
                 </div>
               </div>

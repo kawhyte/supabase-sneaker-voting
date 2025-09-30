@@ -53,7 +53,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-[var(--space-base)] py-[var(--space-base)]">
           {images.map((image, index) => {
             const isSelected = selectedImages.includes(image)
             const isMain = isSelected && selectedImages[mainImageIndex] === image
@@ -76,7 +76,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
 
                 {/* Selection Checkbox */}
                 <div className={cn(
-                  "absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                  "absolute top-[var(--space-md)] left-[var(--space-md)] w-[var(--space-lg)] h-[var(--space-lg)] rounded-full flex items-center justify-center transition-all",
                   isSelected ? "bg-blue-600" : "bg-white/80 border border-gray-300"
                 )}>
                   {isSelected && <CheckCircle className="h-4 w-4 text-white" />}
@@ -84,7 +84,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
 
                 {/* Main Image Badge */}
                 {isMain && (
-                  <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                  <div className="absolute top-[var(--space-md)] right-[var(--space-md)] bg-blue-600 text-white text-xs px-[var(--space-md)] py-[var(--space-xs)] rounded">
                     Main
                   </div>
                 )}
@@ -97,7 +97,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
                       const index = selectedImages.indexOf(image)
                       setMainImageIndex(index)
                     }}
-                    className="absolute bottom-2 right-2 bg-white/90 hover:bg-white text-xs px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute bottom-[var(--space-md)] right-[var(--space-md)] bg-white/90 hover:bg-white text-xs px-[var(--space-md)] py-[var(--space-xs)] rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     Set as Main
                   </button>
@@ -110,7 +110,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
                       e.stopPropagation()
                       toggleImageSelection(image)
                     }}
-                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-[var(--space-md)] right-[var(--space-md)] bg-red-500 hover:bg-red-600 text-white p-[var(--space-xs)] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -124,7 +124,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
           <div className="text-sm text-gray-600">
             {selectedImages.length} of {images.length} selected
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-[var(--space-md)]">
             <Button variant="outline" onClick={handleSkip}>
               Skip Import
             </Button>

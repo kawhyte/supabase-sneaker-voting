@@ -96,7 +96,7 @@ export function SizeCombobox({ value, onChange, disabled, preferredSize }: SizeC
                   >
                     <Check
                       className={cn(
-                        'mr-2 h-4 w-4',
+                        'mr-[var(--space-md)] h-4 w-4',
                         value === size.us ? 'opacity-100' : 'opacity-0'
                       )}
                     />
@@ -105,7 +105,7 @@ export function SizeCombobox({ value, onChange, disabled, preferredSize }: SizeC
                         US M {size.us} / W {size.women} (EU {size.eu})
                       </span>
                       {isPreferred && (
-                        <span className="text-xs text-blue-600 ml-2">Your usual</span>
+                        <span className="text-xs text-blue-600 ml-[var(--space-md)]">Your usual</span>
                       )}
                     </div>
                   </CommandItem>

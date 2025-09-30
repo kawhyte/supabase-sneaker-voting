@@ -603,12 +603,12 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
   return (
     <div className="max-w-6xl mx-auto">
       <Card className="shadow-lg border-0 bg-gradient-to-br from-white via-gray-50 to-blue-50">
-        <CardHeader className="text-center pb-4">
-          <CardTitle className="text-3xl flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-teal-600 to-orange-500 bg-clip-text text-transparent">
+        <CardHeader className="text-center pb-[var(--space-base)]">
+          <CardTitle className="text-3xl flex items-center justify-center gap-[var(--space-md)] bg-gradient-to-r from-blue-600 via-teal-600 to-orange-500 bg-clip-text text-transparent">
             <Sparkles className="h-7 w-7 text-blue-600" />
             Track Your Sneakers
           </CardTitle>
-          <p className="text-sm text-gray-600 mt-2">Import from URL or add manually</p>
+          <p className="text-sm text-gray-600 mt-[var(--space-md)]">Import from URL or add manually</p>
         </CardHeader>
 
         <CardContent>
@@ -623,7 +623,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
           {showDraftNotification && (
             <Alert className="mb-6 border-blue-200 bg-blue-50">
               <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-[var(--space-md)]">
                   <RefreshCw className="h-4 w-4 text-blue-600" />
                   <AlertDescription className="text-blue-800">
                     Draft restored from previous session
@@ -645,33 +645,33 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
 
           {/* Auto-save Indicator */}
           {lastSavedTime && hasUnsavedChanges && (
-            <div className="mb-4 text-xs text-gray-500 flex items-center gap-1">
+            <div className="mb-4 text-xs text-gray-500 flex items-center gap-[var(--space-xs)]">
               <RefreshCw className="h-3 w-3" />
               <span>Last saved: {lastSavedTime.toLocaleTimeString()}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-[var(--space-lg)]">
             {/* User and Experience Dropdowns - Required First */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-base)] pb-[var(--space-base)] border-b">
               <div>
-                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
                   <User className="h-4 w-4 text-blue-600" />
                   Who's tracking? *
                 </Label>
                 <Select onValueChange={(value: 'Kenny' | 'Rene') => setValue('userName', value)} value={watchedUser}>
-                  <SelectTrigger className="h-11 mt-2">
+                  <SelectTrigger className="h-11 mt-[var(--space-md)]">
                     <SelectValue placeholder="Select user" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Kenny">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-[var(--space-md)]">
                         <UserCircle className="h-4 w-4" />
                         <span>Kenny</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="Rene">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-[var(--space-md)]">
                         <UserCircle className="h-4 w-4" />
                         <span>Rene</span>
                       </div>
@@ -679,7 +679,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                   </SelectContent>
                 </Select>
                 {errors.userName && (
-                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                  <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
                     <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs font-semibold text-red-700">{errors.userName.message}</p>
@@ -690,23 +690,23 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
               </div>
 
               <div>
-                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
                   <Eye className="h-4 w-4 text-teal-600" />
                   Experience *
                 </Label>
                 <Select onValueChange={(value: 'seen' | 'tried') => setValue('interactionType', value)} value={watchedInteractionType}>
-                  <SelectTrigger className="h-11 mt-2">
+                  <SelectTrigger className="h-11 mt-[var(--space-md)]">
                     <SelectValue placeholder="Select experience type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="seen">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-[var(--space-md)]">
                         <Eye className="h-4 w-4" />
                         <span>Seen - Online or in store</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="tried">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-[var(--space-md)]">
                         <Footprints className="h-4 w-4" />
                         <span>Tried On - Worn & tested</span>
                       </div>
@@ -714,7 +714,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                   </SelectContent>
                 </Select>
                 {errors.interactionType && (
-                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                  <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
                     <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs font-semibold text-red-700">{errors.interactionType.message}</p>
@@ -732,9 +732,9 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                   <button
                     type="button"
                     onClick={() => setSmartImportExpanded(!smartImportExpanded)}
-                    className="w-full flex items-center justify-between mb-3"
+                    className="w-full flex items-center justify-between mb-[var(--space-sm)]"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-[var(--space-md)]">
                       <Rocket className="h-5 w-5 text-blue-600" />
                       <Label className="text-base font-semibold text-blue-800 cursor-pointer">
                         Smart Import - Auto-fill from URL
@@ -748,13 +748,13 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                   </button>
 
                   {smartImportExpanded && (
-                    <div className="space-y-4">
+                    <div className="space-y-[var(--space-base)]">
                       {/* URL Input */}
                       <div>
-                        <Label className="text-xs text-blue-700 mb-2 block">
+                        <Label className="text-xs text-blue-700 mb-[var(--space-md)] block">
                           Paste product URL from Nike, Adidas, Foot Locker, StockX, etc.
                         </Label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-[var(--space-md)]">
                           <Input
                             {...register('productUrl')}
                             placeholder="https://www.nike.com/t/..."
@@ -781,8 +781,8 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
 
                       {/* Scraping Skeleton Loader */}
                       {isScrapingUrl && (
-                        <div className="bg-white rounded-lg p-3 border-2 border-blue-300">
-                          <div className="flex items-start gap-3">
+                        <div className="bg-white rounded-lg p-[var(--space-sm)] border-2 border-blue-300">
+                          <div className="flex items-start gap-[var(--space-sm)]">
                             <Skeleton className="w-16 h-16 rounded-lg" />
                             <div className="flex-1 space-y-2">
                               <Skeleton className="h-4 w-3/4" />
@@ -795,19 +795,19 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
 
                       {/* URL Data Preview */}
                       {!isScrapingUrl && urlData && (
-                        <div className="bg-white rounded-lg p-3 border-2 border-green-300 animate-in fade-in slide-in-from-top-2 duration-300">
-                          <div className="flex items-start gap-3">
+                        <div className="bg-white rounded-lg p-[var(--space-sm)] border-2 border-green-300 animate-in fade-in slide-in-from-top-[var(--space-md)] duration-300">
+                          <div className="flex items-start gap-[var(--space-sm)]">
                             {urlData.image && (
                               <img src={urlData.image} alt="Product" className="w-16 h-16 object-cover rounded-lg" />
                             )}
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-[var(--space-md)]">
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                                 <h4 className="font-medium text-sm text-green-800 truncate">
                                   {urlData.title || 'Product Found'}
                                 </h4>
                               </div>
-                              <div className="flex gap-4 mt-1">
+                              <div className="flex gap-[var(--space-base)] mt-[var(--space-xs)]">
                                 {urlData.price && (
                                   <span className="text-lg font-bold text-green-600">${urlData.price}</span>
                                 )}
@@ -816,7 +816,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                                 )}
                               </div>
                               {urlData.images && urlData.images.length > 1 && (
-                                <div className="flex items-center gap-1 mt-1">
+                                <div className="flex items-center gap-[var(--space-xs)] mt-[var(--space-xs)]">
                                   <Camera className="h-3 w-3 text-blue-600" />
                                   <p className="text-xs text-blue-600">{urlData.images.length} images found</p>
                                 </div>
@@ -834,7 +834,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                         </Alert>
                       )}
 
-                      <div className="text-xs text-blue-700 bg-blue-100 p-2 rounded flex items-center gap-2">
+                      <div className="text-xs text-blue-700 bg-blue-100 p-[var(--space-md)] rounded flex items-center gap-[var(--space-md)]">
                         <Lightbulb className="h-4 w-4" />
                         <span>Smart Import will automatically fill brand, model, colorway, store, and price</span>
                       </div>
@@ -843,15 +843,15 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                 </div>
 
                 {/* Two-Column Layout - Primary Fields Left, Metadata Right */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--space-lg)]">
                   {/* LEFT COLUMN - Primary Product Info */}
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-gray-700 border-b pb-2">Product Details</h3>
+                  <div className="space-y-[var(--space-base)]">
+                    <h3 className="font-semibold text-gray-700 border-b pb-[var(--space-md)]">Product Details</h3>
 
                     {/* Brand */}
                     <div>
                       <Label className="text-sm font-medium text-gray-700">Brand *</Label>
-                      <div className="mt-2">
+                      <div className="mt-[var(--space-md)]">
                         <BrandCombobox
                           value={watchedBrand}
                           onChange={(value) => setValue('brand', value, { shouldValidate: true, shouldDirty: true, shouldTouch: true })}
@@ -859,7 +859,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                         />
                       </div>
                       {errors.brand && (
-                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                        <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
                           <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
                           <div>
                             <p className="text-xs font-semibold text-red-700">{errors.brand.message}</p>
@@ -875,10 +875,10 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                       <Input
                         {...register('model')}
                         placeholder="Air Jordan 1, Air Max 90, etc."
-                        className="mt-2"
+                        className="mt-[var(--space-md)]"
                       />
                       {errors.model && (
-                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                        <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
                           <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
                           <div>
                             <p className="text-xs font-semibold text-red-700">{errors.model.message}</p>
@@ -894,13 +894,13 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                       <Input
                         {...register('sku')}
                         placeholder="DM7866-140"
-                        className="mt-2"
+                        className="mt-[var(--space-md)]"
                       />
                     </div>
 
                     {/* Photos */}
                     <div>
-                      <Label className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <Label className="text-sm font-medium text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)]">
                         <Camera className="h-4 w-4" />
                         Photos (Required - Min 1)
                       </Label>
@@ -910,7 +910,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                         maxPhotos={5}
                       />
                       {photos.length === 0 && (
-                        <div className="flex items-center gap-1 mt-1">
+                        <div className="flex items-center gap-[var(--space-xs)] mt-[var(--space-xs)]">
                           <AlertTriangle className="h-3 w-3 text-orange-600" />
                           <p className="text-xs text-orange-600">At least one photo is required</p>
                         </div>
@@ -919,8 +919,8 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
 
                     {/* Try-On Info (Conditional) */}
                     {watchedInteractionType === 'tried' && (
-                      <div className="border-t pt-4">
-                        <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                      <div className="border-t pt-[var(--space-base)]">
+                        <h4 className="font-semibold text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)]">
                           <Footprints className="h-4 w-4 text-teal-600" />
                           Try-On Details
                         </h4>
@@ -928,7 +928,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                         {/* Size Selection */}
                         <div className="mb-4">
                           <Label className="text-sm font-medium text-gray-700">Size Tried *</Label>
-                          <div className="mt-2">
+                          <div className="mt-[var(--space-md)]">
                             <SizeCombobox
                               value={watch('sizeTried')}
                               onChange={(value) => setValue('sizeTried', value, { shouldValidate: true, shouldDirty: true, shouldTouch: true })}
@@ -937,7 +937,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                             />
                           </div>
                           {errors.sizeTried && (
-                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                            <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
                               <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
                               <div>
                                 <p className="text-xs font-semibold text-red-700">{errors.sizeTried.message}</p>
@@ -950,8 +950,8 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                         {/* Fit Rating */}
                         <div>
                           <Label className="text-sm font-medium text-gray-700">How did they fit? *</Label>
-                          <p className="text-xs text-gray-500 mt-1">Select the fit that best describes your experience</p>
-                          <div className="grid grid-cols-5 gap-2 mt-3">
+                          <p className="text-xs text-gray-500 mt-[var(--space-xs)]">Select the fit that best describes your experience</p>
+                          <div className="grid grid-cols-5 gap-[var(--space-md)] mt-[var(--space-sm)]">
                             {FIT_RATINGS.map((rating) => (
                               <Button
                                 key={rating.value}
@@ -959,7 +959,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                                 variant={watchedFitRating === rating.value ? 'default' : 'outline'}
                                 onClick={() => setValue('fitRating', rating.value)}
                                 className={cn(
-                                  "min-h-[80px] md:h-20 flex flex-col items-center justify-center p-2 relative touch-manipulation",
+                                  "min-h-[80px] md:h-20 flex flex-col items-center justify-center p-[var(--space-md)] relative touch-manipulation",
                                   watchedFitRating === rating.value && "ring-2 ring-blue-600 ring-offset-2",
                                   "focus:ring-4 focus:ring-blue-300"
                                 )}
@@ -972,14 +972,14 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                             ))}
                           </div>
                           {watchedFitRating && (
-                            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="mt-[var(--space-sm)] p-[var(--space-sm)] bg-blue-50 border border-blue-200 rounded-lg">
                               <p className="text-sm text-blue-800 font-medium">
                                 {getFitRatingInfo(watchedFitRating)?.label}: {getFitRatingInfo(watchedFitRating)?.description}
                               </p>
                             </div>
                           )}
                           {errors.fitRating && (
-                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                            <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
                               <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
                               <div>
                                 <p className="text-xs font-semibold text-red-700">{errors.fitRating.message}</p>
@@ -992,14 +992,14 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                         {/* Comfort Rating (Optional) */}
                         <div>
                           <Label className="text-sm font-medium text-gray-700">How comfortable were they? (Optional)</Label>
-                          <p className="text-xs text-gray-500 mt-1">Rate overall comfort - cushioning, support, breathability</p>
-                          <div className="flex items-center gap-1 mt-3">
+                          <p className="text-xs text-gray-500 mt-[var(--space-xs)]">Rate overall comfort - cushioning, support, breathability</p>
+                          <div className="flex items-center gap-[var(--space-xs)] mt-[var(--space-sm)]">
                             {[1, 2, 3, 4, 5].map((rating) => (
                               <button
                                 key={rating}
                                 type="button"
                                 onClick={() => setValue('comfortRating', rating, { shouldValidate: true })}
-                                className="group p-3 md:p-2 hover:scale-110 transition-transform touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 rounded"
+                                className="group p-[var(--space-sm)] md:p-[var(--space-md)] hover:scale-110 transition-transform touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 rounded"
                                 title={`${rating} star${rating !== 1 ? 's' : ''}`}
                                 aria-label={`${rating} star${rating !== 1 ? 's' : ''} comfort rating`}
                               >
@@ -1026,7 +1026,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                             )}
                           </div>
                           {watch('comfortRating') && (
-                            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                            <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-yellow-50 border border-yellow-200 rounded">
                               <p className="text-sm text-yellow-800">
                                 <span className="font-semibold">{watch('comfortRating')} / 5 stars</span> - {
                                   watch('comfortRating') === 1 ? 'Very uncomfortable' :
@@ -1044,26 +1044,26 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                   </div>
 
                   {/* RIGHT COLUMN - Metadata */}
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-gray-700 border-b pb-2">Additional Info</h3>
+                  <div className="space-y-[var(--space-base)]">
+                    <h3 className="font-semibold text-gray-700 border-b pb-[var(--space-md)]">Additional Info</h3>
 
                     {/* Colorway */}
                     <div>
                       <Label className="text-sm text-gray-600">Colorway (Optional)</Label>
-                      <Input {...register('colorway')} placeholder="Bred, Chicago, etc." className="mt-2" />
+                      <Input {...register('colorway')} placeholder="Bred, Chicago, etc." className="mt-[var(--space-md)]" />
                     </div>
 
                     {/* Store */}
                     <div>
                       <Label className="text-sm text-gray-600">Store (Optional)</Label>
-                      <Input {...register('storeName')} placeholder="Foot Locker, etc." className="mt-2" />
+                      <Input {...register('storeName')} placeholder="Foot Locker, etc." className="mt-[var(--space-md)]" />
                     </div>
 
                     {/* Pricing Section */}
-                    <div className="space-y-3 border-t pt-4">
+                    <div className="space-y-[var(--space-sm)] border-t pt-[var(--space-base)]">
                       <div>
                         <Label className="text-sm text-gray-600">Retail Price (Optional)</Label>
-                        <div className="relative mt-2">
+                        <div className="relative mt-[var(--space-md)]">
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                           <Input {...register('retailPrice')} placeholder="215.00" type="number" step="0.01" className="pl-8" />
                         </div>
@@ -1071,7 +1071,7 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
 
                       <div>
                         <Label className="text-sm text-gray-600">Sale Price (Optional)</Label>
-                        <div className="relative mt-2">
+                        <div className="relative mt-[var(--space-md)]">
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                           <Input {...register('salePrice')} placeholder="120.00" type="number" step="0.01" className="pl-8" />
                         </div>
@@ -1079,8 +1079,8 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
 
                       {/* Discount Display */}
                       {watchedRetailPrice && watchedSalePrice && parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                          <div className="flex items-baseline gap-2">
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-[var(--space-sm)]">
+                          <div className="flex items-baseline gap-[var(--space-md)]">
                             <span className="text-lg font-bold text-green-600">${watchedSalePrice}</span>
                             <span className="text-sm text-gray-500 line-through">${watchedRetailPrice}</span>
                             <span className="text-sm font-semibold text-green-700">({discountPercentage}% off)</span>
@@ -1090,11 +1090,11 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
 
                       <div>
                         <Label className="text-sm text-gray-600">Ideal Price (Optional)</Label>
-                        <div className="relative mt-2">
+                        <div className="relative mt-[var(--space-md)]">
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                           <Input {...register('idealPrice')} placeholder="120.00" type="number" step="0.01" className="pl-8" />
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">Price you'd be willing to pay</p>
+                        <p className="text-xs text-gray-500 mt-[var(--space-xs)]">Price you'd be willing to pay</p>
                       </div>
                     </div>
 
@@ -1114,11 +1114,11 @@ export function RedesignedSneakerForm({ onSneakerAdded }: RedesignedSneakerFormP
                           ? "e.g., 'Tight on pinky toe', 'Great for walking', 'Runs small compared to other Nikes'"
                           : "e.g., 'Love the colorway', 'Perfect for summer', 'Saw on Instagram'"
                         }
-                        className="mt-2 resize-none"
+                        className="mt-[var(--space-md)] resize-none"
                         rows={3}
                         maxLength={500}
                       />
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-[var(--space-md)] text-xs text-gray-500">
                         💡 Quick tips: {watchedInteractionType === 'tried'
                           ? 'Mention fit issues, comfort level, or comparisons with other shoes'
                           : 'Note where you saw them, what caught your eye, or styling ideas'

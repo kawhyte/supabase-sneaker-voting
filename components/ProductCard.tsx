@@ -32,7 +32,7 @@ export default function ProductCard({
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-black/10">
 
         {/* Image Container */}
-        <div className="relative aspect-square bg-gray-50 dark:bg-gray-800 p-4">
+        <div className="relative aspect-square bg-gray-50 dark:bg-gray-800 p-[var(--space-base)]">
           <motion.div
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -52,7 +52,7 @@ export default function ProductCard({
         </div>
 
         {/* Content */}
-        <div className="p-4 space-y-2">
+        <div className="p-[var(--space-base)] space-y-[var(--space-md)]">
           {/* Title */}
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
             {title}
@@ -72,7 +72,7 @@ export default function ProductCard({
             transition={{ duration: 0.2 }}
             className="group-hover:opacity-100 opacity-0 transition-opacity duration-200"
           >
-            <button className="w-full mt-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200">
+            <button className="w-full mt-[var(--space-md)] bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-[var(--space-md)] px-[var(--space-base)] rounded-lg text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200">
               View Details
             </button>
           </motion.div>
