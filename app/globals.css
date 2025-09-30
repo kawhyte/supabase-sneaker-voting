@@ -8,7 +8,7 @@
 
 @utility container {
   margin-inline: auto;
-  padding-inline: 2rem;
+  padding-inline: var(--space-md);
   @media (width >= --theme(--breakpoint-sm)) {
     max-width: none;
   }
@@ -18,6 +18,58 @@
 }
 
 @theme {
+  /* ============================================
+     SPACING SYSTEM - 8-Point Grid Foundation
+     ============================================ */
+
+  /* Core Spacing Scale (Mathematical Base) */
+  --spacing-0: 0px;
+  --spacing-1: 8px;
+  --spacing-2: 16px;
+  --spacing-3: 24px;
+  --spacing-4: 32px;
+  --spacing-5: 40px;
+  --spacing-6: 48px;
+  --spacing-7: 56px;
+  --spacing-8: 64px;
+  --spacing-9: 72px;
+  --spacing-10: 80px;
+  --spacing-11: 96px;
+  --spacing-12: 128px;
+
+  /* Optical Half-Steps (Visual Balance) */
+  --spacing-1\.5: 12px;  /* Between micro and element */
+  --spacing-2\.5: 20px;  /* Between element and component */
+  --spacing-3\.5: 28px;  /* Between component and separation */
+  --spacing-4\.5: 36px;  /* Between separation and section */
+
+  /* Semantic Spacing Aliases (Team Communication) */
+  /* Micro Level */
+  --space-xs: var(--spacing-1);      /* 8px - Icon gaps, checkbox spacing */
+  --space-sm: var(--spacing-1\.5);   /* 12px - Button padding, input spacing */
+
+  /* Element Level */
+  --space-md: var(--spacing-2);      /* 16px - Default element spacing */
+  --space-base: var(--spacing-2\.5); /* 20px - Comfortable element spacing */
+
+  /* Component Level */
+  --space-lg: var(--spacing-3);      /* 24px - Card inner padding */
+  --space-xl: var(--spacing-4);      /* 32px - Component separation */
+
+  /* Section Level */
+  --space-2xl: var(--spacing-5);     /* 40px - Section internal */
+  --space-3xl: var(--spacing-6);     /* 48px - Section separation */
+  --space-4xl: var(--spacing-8);     /* 64px - Major sections */
+
+  /* Page Level */
+  --space-5xl: var(--spacing-10);    /* 80px - Page spacing */
+  --space-6xl: var(--spacing-11);    /* 96px - Hero sections */
+  --space-7xl: var(--spacing-12);    /* 128px - Ultra spacing */
+
+  /* Default Gap Utility */
+  --gap-base: var(--spacing-2\.5);   /* 20px - Default grid/flex gap */
+
+  /* Shadcn Color System */
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
