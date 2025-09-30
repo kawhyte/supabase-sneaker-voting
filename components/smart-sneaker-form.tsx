@@ -13,9 +13,18 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle, Zap, Camera, Loader2, ThumbsUp, Upload, Brain, Link, Bell, Target, Globe } from 'lucide-react'
+import { CheckCircle, Zap, Loader2, ThumbsUp, Upload, Brain, Link, Bell, Target, Globe } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { calculateSizeRecommendations, type FitData } from '@/lib/size-analytics'
+import { MultiPhotoUpload } from '@/components/multi-photo-upload'
+
+interface PhotoItem {
+  id: string
+  file: File
+  preview: string
+  isMain: boolean
+  order: number
+}
 
 // Apple-style contextual form schema
 const sneakerSchema = z.object({
@@ -37,8 +46,7 @@ const sneakerSchema = z.object({
   storeName: z.string().optional(),
   retailPrice: z.string().optional(),
   idealPrice: z.string().optional(),
-  notes: z.string().optional(),
-  image: z.any().optional()
+  notes: z.string().optional()
 }).refine((data) => {
   if (data.interactionType === 'tried') {
     return data.sizeTried && data.fitRating
@@ -90,8 +98,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
   const [isLoading, setIsLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [sizePreferences, setSizePreferences] = useState<Record<string, string>>({})
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [dragActive, setDragActive] = useState(false)
+  const [photos, setPhotos] = useState<PhotoItem[]>([])
   const [uploadProgress, setUploadProgress] = useState('')
   const [fitData, setFitData] = useState<FitData[]>([])
   const [sizeRecommendation, setSizeRecommendation] = useState<any>(null)
@@ -222,44 +229,65 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
 
       const data = await response.json()
 
+      console.log('🔍 Scraped data received:', data)
+
       if (data.success) {
-        setUrlData(data.data)
+        // Clean and trim all text data
+        const cleanBrand = data.brand ? data.brand.replace(/[\n\t\r]/g, ' ').replace(/\s+/g, ' ').trim() : ''
+        const cleanModel = data.model ? data.model.replace(/[\n\t\r]/g, ' ').replace(/\s+/g, ' ').trim() : ''
+        const cleanColorway = data.colorway ? data.colorway.replace(/[\n\t\r]/g, ' ').replace(/\s+/g, ' ').trim() : ''
+
+        // Extract store name from URL
+        const storeName = new URL(url).hostname.replace('www.', '').split('.')[0]
+        const capitalizedStoreName = storeName.charAt(0).toUpperCase() + storeName.slice(1)
+
+        // Store the scraped data for display
+        setUrlData({
+          title: `${cleanBrand} ${cleanModel}`.trim(),
+          price: data.retailPrice,
+          image: data.images?.[0],
+          storeName: capitalizedStoreName
+        })
 
         // Auto-fill form with scraped data
-        if (data.data.title) {
-          // Try to extract brand and model from title
-          const titleParts = data.data.title.split(' ')
-          if (titleParts.length > 0 && COMMON_BRANDS.some(brand =>
-            titleParts[0].toLowerCase().includes(brand.toLowerCase()) ||
-            brand.toLowerCase().includes(titleParts[0].toLowerCase())
-          )) {
-            const detectedBrand = COMMON_BRANDS.find(brand =>
-              titleParts[0].toLowerCase().includes(brand.toLowerCase()) ||
-              brand.toLowerCase().includes(titleParts[0].toLowerCase())
-            )
-            if (detectedBrand) {
-              setValue('brand', detectedBrand)
-              setValue('model', titleParts.slice(1).join(' '))
-            }
-          } else {
-            setValue('model', data.data.title)
+        // Use setTimeout to ensure form fields are rendered before setting values
+        setTimeout(() => {
+          if (cleanBrand) {
+            console.log('✅ Setting brand:', cleanBrand)
+            setValue('brand', cleanBrand, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
           }
-        }
 
-        if (data.data.price) {
-          setValue('retailPrice', data.data.price.toString())
-        }
+          if (cleanModel) {
+            console.log('✅ Setting model:', cleanModel)
+            setValue('model', cleanModel, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+          }
 
-        if (data.data.image) {
-          setImagePreview(data.data.image)
-        }
+          if (cleanColorway && cleanColorway !== 'Standard') {
+            console.log('✅ Setting colorway:', cleanColorway)
+            setValue('colorway', cleanColorway, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+          }
 
-        if (data.data.storeName) {
-          setValue('storeName', data.data.storeName)
+          if (capitalizedStoreName) {
+            console.log('✅ Setting store name:', capitalizedStoreName)
+            setValue('storeName', capitalizedStoreName, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+          }
+
+          if (data.retailPrice) {
+            console.log('✅ Setting retail price:', data.retailPrice)
+            setValue('retailPrice', data.retailPrice.toString(), { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+          }
+        }, 100)
+
+        if (data.images && data.images.length > 0 && photos.length === 0) {
+          console.log('📸 Product images available:', data.images.length)
         }
 
         setUploadProgress('✅ Product data imported!')
         setTimeout(() => setUploadProgress(''), 2000)
+      } else {
+        console.error('❌ Scraping failed:', data.error)
+        setUploadProgress('❌ Could not extract product data')
+        setTimeout(() => setUploadProgress(''), 3000)
       }
     } catch (error) {
       console.error('URL scraping error:', error)
@@ -296,52 +324,21 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
     return false
   }
 
-  // Handle file upload
-  const handleFileChange = (file: File | null) => {
-    if (file && file.type.startsWith('image/')) {
-      setValue('image', file)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  // Drag and drop handlers
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true)
-    } else if (e.type === "dragleave") {
-      setDragActive(false)
-    }
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileChange(e.dataTransfer.files[0])
-    }
-  }
 
   const onSubmit = async (data: SneakerFormData) => {
     setIsLoading(true)
     setSuccessMessage('')
 
     try {
-      let imageUrl = null
-      let cloudinaryId = null
+      let mainImageUrl = null
+      let mainCloudinaryId = null
 
-      // Upload image to Cloudinary if provided
-      if (data.image) {
-        setUploadProgress('📤 Uploading image...')
+      // Upload main photo to Cloudinary if provided
+      const mainPhoto = photos.find(p => p.isMain) || photos[0]
+      if (mainPhoto) {
+        setUploadProgress(`📤 Uploading ${photos.length} photo${photos.length > 1 ? 's' : ''}...`)
         const formData = new FormData()
-        formData.append('file', data.image)
+        formData.append('file', mainPhoto.file)
 
         const uploadResponse = await fetch('/api/upload-image', {
           method: 'POST',
@@ -354,9 +351,9 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         }
 
         const uploadResult = await uploadResponse.json()
-        imageUrl = uploadResult.data.url
-        cloudinaryId = uploadResult.data.publicId
-        setUploadProgress('✅ Image uploaded!')
+        mainImageUrl = uploadResult.data.url
+        mainCloudinaryId = uploadResult.data.publicId
+        setUploadProgress(`✅ ${photos.length} photo${photos.length > 1 ? 's' : ''} uploaded!`)
       }
 
       const experienceData = {
@@ -375,8 +372,8 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         notes: data.notes || null,
         interested_in_buying: true, // If they're adding it, they're interested
         try_on_date: new Date().toISOString().split('T')[0],
-        image_url: imageUrl,
-        cloudinary_id: cloudinaryId
+        image_url: mainImageUrl,
+        cloudinary_id: mainCloudinaryId
       }
 
       const { error } = await supabase
@@ -410,9 +407,8 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         reset()
         setSuccessMessage('')
         setUploadProgress('')
-        setImagePreview(null)
+        setPhotos([])
         setUrlData(null)
-        setPriceMonitorCreated(false)
         setShowUrlImport(false)
         onSneakerAdded?.()
       }, 3000)
@@ -421,7 +417,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
       console.error('Error saving:', error)
       setSuccessMessage('')
       setUploadProgress('')
-      alert(`Failed to save: ${error.message || 'Unknown error'}`)
+      alert(`Failed to save: ${(error as Error).message || 'Unknown error'}`)
     } finally {
       setIsLoading(false)
     }
@@ -463,7 +459,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <CardTitle className="text-3xl flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <CardTitle className="text-3xl flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-teal-600 to-orange-500 bg-clip-text text-transparent">
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
@@ -823,40 +819,14 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.4 }}
             >
-              {/* Photo Upload */}
+              {/* Multi-Photo Upload */}
               <div>
-                <Label className="text-sm font-medium text-gray-700">📸 Add Photo (Optional)</Label>
-                <label
-                  className={`relative block border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer mt-2 ${
-                    dragActive
-                      ? 'border-blue-400 bg-blue-50'
-                      : imagePreview
-                        ? 'border-green-300 bg-green-50'
-                        : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                >
-                  {imagePreview ? (
-                    <div className="space-y-2">
-                      <img src={imagePreview} alt="Preview" className="max-h-24 mx-auto rounded" />
-                      <p className="text-xs text-green-600">✅ Photo ready</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-1">
-                      <Camera className="h-6 w-6 mx-auto text-gray-400" />
-                      <p className="text-xs text-gray-600">📷 Tap to add photo or drag & drop</p>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
-                    className="sr-only"
-                  />
-                </label>
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">📸 Add Photos (Optional - Up to 5)</Label>
+                <MultiPhotoUpload
+                  photos={photos}
+                  onPhotosChange={setPhotos}
+                  maxPhotos={5}
+                />
               </div>
 
               {/* Upload Progress */}

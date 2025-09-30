@@ -2,6 +2,7 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
+import { Navbar } from "@/components/navbar";
 
 const defaultUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
@@ -29,6 +30,8 @@ export const metadata = {
 
 export const viewport = {
 	themeColor: "#2563eb",
+	width: "device-width",
+	initialScale: 1,
 };
 
 export default function RootLayout({
@@ -43,8 +46,9 @@ export default function RootLayout({
 				GeistSans.className
 			)}>
 			<body className="min-h-screen">
-				<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-					{children}
+				<div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+					<Navbar />
+					<main>{children}</main>
 					<Toaster />
 				</div>
 			</body>

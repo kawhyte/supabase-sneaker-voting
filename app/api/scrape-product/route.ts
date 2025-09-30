@@ -5,10 +5,20 @@ interface ProductData {
   brand?: string
   model?: string
   colorway?: string
+  sku?: string
   retailPrice?: number
+  salePrice?: number
   images?: string[]
   success: boolean
   error?: string
+}
+
+// Helper function to clean text
+function cleanText(text: string): string {
+  return text
+    .replace(/[\n\t\r]/g, ' ')  // Replace newlines and tabs with spaces
+    .replace(/\s+/g, ' ')        // Replace multiple spaces with single space
+    .trim()                       // Remove leading/trailing whitespace
 }
 
 export async function POST(request: NextRequest) {
@@ -28,34 +38,59 @@ export async function POST(request: NextRequest) {
       validUrl = new URL(url)
     } catch (e) {
       return NextResponse.json(
-        { success: false, error: 'Invalid URL format' },
+        { success: false, error: 'Invalid URL format. Please provide a valid product URL.' },
+        { status: 400 }
+      )
+    }
+
+    // Validate URL protocol
+    if (!validUrl.protocol.startsWith('http')) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid URL protocol. Use http:// or https://' },
         { status: 400 }
       )
     }
 
     const hostname = validUrl.hostname.toLowerCase()
 
-    // Route to appropriate scraper based on hostname
+    // Route to appropriate scraper based on hostname with timeout
     let productData: ProductData
 
-    if (hostname.includes('soleretriever.com')) {
-      productData = await scrapeSoleRetriever(url)
-    } else if (hostname.includes('nike.com')) {
-      productData = await scrapeNike(url)
-    } else if (hostname.includes('adidas.com')) {
-      productData = await scrapeAdidas(url)
-    } else if (hostname.includes('stockx.com')) {
-      productData = await scrapeStockX(url)
-    } else {
-      productData = await scrapeGeneric(url)
+    const scrapeWithTimeout = async (scraperFn: () => Promise<ProductData>, timeoutMs: number = 15000) => {
+      return Promise.race([
+        scraperFn(),
+        new Promise<ProductData>((_, reject) =>
+          setTimeout(() => reject(new Error('Request timeout - website took too long to respond')), timeoutMs)
+        )
+      ])
+    }
+
+    try {
+      if (hostname.includes('soleretriever.com')) {
+        productData = await scrapeWithTimeout(() => scrapeSoleRetriever(url))
+      } else if (hostname.includes('nike.com')) {
+        productData = await scrapeWithTimeout(() => scrapeNike(url))
+      } else if (hostname.includes('adidas.com')) {
+        productData = await scrapeWithTimeout(() => scrapeAdidas(url))
+      } else if (hostname.includes('stockx.com')) {
+        productData = await scrapeWithTimeout(() => scrapeStockX(url))
+      } else {
+        productData = await scrapeWithTimeout(() => scrapeGeneric(url))
+      }
+    } catch (timeoutError) {
+      return NextResponse.json(
+        { success: false, error: timeoutError.message || 'Request timeout' },
+        { status: 408 }
+      )
     }
 
     return NextResponse.json(productData)
 
   } catch (error) {
     console.error('Scraping error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Failed to scrape product data'
     return NextResponse.json(
-      { success: false, error: 'Failed to scrape product data' },
+      { success: false, error: errorMessage },
       { status: 500 }
     )
   }
@@ -76,22 +111,45 @@ async function scrapeSoleRetriever(url: string): Promise<ProductData> {
     const html = await response.text()
     const $ = cheerio.load(html)
 
-    const brand = $('h1').text().split(' ')[0] || ''
-    const fullTitle = $('h1').text() || ''
-    const model = fullTitle.replace(brand, '').trim()
+    const rawTitle = cleanText($('h1').text())
+    const brand = rawTitle.split(' ')[0] || ''
+    const model = rawTitle.replace(brand, '').trim()
 
     // Try to extract colorway from title or subtitle
-    const colorway = $('.product-subtitle').text() ||
+    const colorway = cleanText($('.product-subtitle').text() ||
                      $('[class*="colorway"]').text() ||
-                     'Standard'
+                     'Standard')
 
-    // Price extraction
-    const priceText = $('.price, [class*="price"]').first().text()
-    const retailPrice = extractPrice(priceText)
+    // SKU extraction
+    const sku = cleanText($('[class*="sku"]').text() ||
+                $('[class*="style"]').text() ||
+                $('[class*="product-code"]').text() ||
+                '')
 
-    // Image extraction
+    // Price extraction - look for sale and retail prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    // Try to find sale price
+    const salePriceText = cleanText($('.sale-price, [class*="sale-price"], [class*="discounted"]').first().text())
+    if (salePriceText) {
+      salePrice = extractPrice(salePriceText)
+    }
+
+    // Try to find retail/original price
+    const retailPriceText = cleanText($('.original-price, [class*="original-price"], .price, [class*="price"]').first().text())
+    retailPrice = extractPrice(retailPriceText)
+
+    // If we found a sale price but no retail, use the first price as retail
+    if (!retailPrice && salePrice) {
+      retailPrice = salePrice
+      salePrice = undefined
+    }
+
+    // Image extraction - limit to 5
     const images: string[] = []
     $('img[src*="product"], .product-image img, [class*="product-image"] img').each((_, el) => {
+      if (images.length >= 5) return false // Stop after 5 images
       const src = $(el).attr('src')
       if (src && !images.includes(src)) {
         images.push(src.startsWith('http') ? src : `https://soleretriever.com${src}`)
@@ -102,7 +160,9 @@ async function scrapeSoleRetriever(url: string): Promise<ProductData> {
       brand: brand || undefined,
       model: model || undefined,
       colorway: colorway !== 'Standard' ? colorway : undefined,
+      sku: sku || undefined,
       retailPrice,
+      salePrice,
       images: images.length > 0 ? images : undefined,
       success: true
     }
@@ -130,22 +190,44 @@ async function scrapeNike(url: string): Promise<ProductData> {
     const $ = cheerio.load(html)
 
     const brand = 'Nike'
-    const model = $('h1[data-qa="product-title"]').text() ||
+    const model = cleanText($('h1[data-qa="product-title"]').text() ||
                   $('#pdp_product_title').text() ||
-                  $('h1').first().text()
+                  $('h1').first().text())
 
-    const colorway = $('[data-qa="product-subtitle"]').text() ||
+    const colorway = cleanText($('[data-qa="product-subtitle"]').text() ||
                      $('.product-subtitle').text() ||
                      $('[class*="subtitle"]').text() ||
-                     'Standard'
+                     'Standard')
 
-    const priceText = $('[data-qa="product-price"]').text() ||
+    // SKU extraction - Nike uses style code
+    const sku = cleanText($('[class*="style"]').text() ||
+                $('[class*="product-code"]').text() ||
+                $('[class*="sku"]').text() ||
+                '')
+
+    // Price extraction - look for sale and retail prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    const salePriceText = cleanText($('[class*="sale"], [class*="discount"]').first().text())
+    if (salePriceText) {
+      salePrice = extractPrice(salePriceText)
+    }
+
+    const retailPriceText = cleanText($('[data-qa="product-price"]').text() ||
                       $('.product-price').text() ||
-                      $('[class*="price"]').first().text()
-    const retailPrice = extractPrice(priceText)
+                      $('[class*="price"]').first().text())
+    retailPrice = extractPrice(retailPriceText)
 
+    if (!retailPrice && salePrice) {
+      retailPrice = salePrice
+      salePrice = undefined
+    }
+
+    // Image extraction - limit to 5
     const images: string[] = []
     $('img[src*="static.nike.com"], .product-image img, [class*="product-image"] img').each((_, el) => {
+      if (images.length >= 5) return false
       const src = $(el).attr('src')
       if (src && !images.includes(src)) {
         images.push(src.startsWith('http') ? src : `https://static.nike.com${src}`)
@@ -156,7 +238,9 @@ async function scrapeNike(url: string): Promise<ProductData> {
       brand,
       model: model || undefined,
       colorway: colorway !== 'Standard' ? colorway : undefined,
+      sku: sku || undefined,
       retailPrice,
+      salePrice,
       images: images.length > 0 ? images : undefined,
       success: true
     }
@@ -184,21 +268,46 @@ async function scrapeAdidas(url: string): Promise<ProductData> {
     const $ = cheerio.load(html)
 
     const brand = 'Adidas'
-    const model = $('[data-qa="product-title"]').text() ||
+    const model = cleanText($('[data-qa="product-title"]').text() ||
                   $('.product-title').text() ||
-                  $('h1').first().text()
+                  $('h1').first().text())
 
-    const colorway = $('.product-subtitle').text() ||
+    const colorway = cleanText($('.product-subtitle').text() ||
                      $('[data-qa="product-subtitle"]').text() ||
-                     'Standard'
+                     'Standard')
 
-    const priceText = $('[data-qa="product-price"]').text() ||
+    // SKU extraction
+    const sku = cleanText($('[class*="sku"]').text() ||
+                $('[class*="style"]').text() ||
+                $('[class*="product-code"]').text() ||
+                '')
+
+    // Price extraction - look for sale and retail prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    // Try to find sale price
+    const salePriceText = cleanText($('.sale-price, [class*="sale-price"], [class*="discounted"]').first().text())
+    if (salePriceText) {
+      salePrice = extractPrice(salePriceText)
+    }
+
+    // Try to find retail/original price
+    const retailPriceText = cleanText($('[data-qa="product-price"]').text() ||
                       $('.product-price').text() ||
-                      $('.price').first().text()
-    const retailPrice = extractPrice(priceText)
+                      $('.price').first().text())
+    retailPrice = extractPrice(retailPriceText)
 
+    // If we found a sale price but no retail, use the first price as retail
+    if (!retailPrice && salePrice) {
+      retailPrice = salePrice
+      salePrice = undefined
+    }
+
+    // Image extraction - limit to 5
     const images: string[] = []
     $('img[src*="adidas"], .product-image img, [class*="product-image"] img').each((_, el) => {
+      if (images.length >= 5) return false // Stop after 5 images
       const src = $(el).attr('src')
       if (src && !images.includes(src)) {
         images.push(src.startsWith('http') ? src : `https://assets.adidas.com${src}`)
@@ -209,7 +318,9 @@ async function scrapeAdidas(url: string): Promise<ProductData> {
       brand,
       model: model || undefined,
       colorway: colorway !== 'Standard' ? colorway : undefined,
+      sku: sku || undefined,
       retailPrice,
+      salePrice,
       images: images.length > 0 ? images : undefined,
       success: true
     }
@@ -237,21 +348,46 @@ async function scrapeStockX(url: string): Promise<ProductData> {
     const $ = cheerio.load(html)
 
     // StockX typically has brand in the title
-    const fullTitle = $('h1').text() || $('.product-name').text()
+    const fullTitle = cleanText($('h1').text() || $('.product-name').text())
     const brand = fullTitle.split(' ')[0] || ''
     const model = fullTitle.replace(brand, '').trim()
 
-    const colorway = $('.product-details .colorway').text() ||
+    const colorway = cleanText($('.product-details .colorway').text() ||
                      $('[class*="colorway"]').text() ||
-                     'Standard'
+                     'Standard')
 
-    const priceText = $('.product-price').text() ||
+    // SKU extraction
+    const sku = cleanText($('[class*="sku"]').text() ||
+                $('[class*="style"]').text() ||
+                $('[class*="product-code"]').text() ||
+                '')
+
+    // Price extraction - look for sale and retail prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    // Try to find sale price
+    const salePriceText = cleanText($('[class*="sale"], [class*="discount"]').first().text())
+    if (salePriceText) {
+      salePrice = extractPrice(salePriceText)
+    }
+
+    // Try to find retail/original price
+    const retailPriceText = cleanText($('.product-price').text() ||
                       $('.bid-price').text() ||
-                      $('.price').first().text()
-    const retailPrice = extractPrice(priceText)
+                      $('.price').first().text())
+    retailPrice = extractPrice(retailPriceText)
 
+    // If we found a sale price but no retail, use the first price as retail
+    if (!retailPrice && salePrice) {
+      retailPrice = salePrice
+      salePrice = undefined
+    }
+
+    // Image extraction - limit to 5
     const images: string[] = []
     $('.product-media img, .product-image img').each((_, el) => {
+      if (images.length >= 5) return false // Stop after 5 images
       const src = $(el).attr('src')
       if (src && !images.includes(src)) {
         images.push(src.startsWith('http') ? src : `https://stockx.com${src}`)
@@ -262,7 +398,9 @@ async function scrapeStockX(url: string): Promise<ProductData> {
       brand: brand || undefined,
       model: model || undefined,
       colorway: colorway !== 'Standard' ? colorway : undefined,
+      sku: sku || undefined,
       retailPrice,
+      salePrice,
       images: images.length > 0 ? images : undefined,
       success: true
     }
@@ -290,15 +428,40 @@ async function scrapeGeneric(url: string): Promise<ProductData> {
     const $ = cheerio.load(html)
 
     // Generic extraction attempts
-    const title = $('h1').first().text() || $('[class*="title"]').first().text()
+    const title = cleanText($('h1').first().text() || $('[class*="title"]').first().text())
     const brand = title?.split(' ')[0] || ''
     const model = title?.replace(brand, '').trim()
 
-    const priceText = $('.price, [class*="price"]').first().text()
-    const retailPrice = extractPrice(priceText)
+    // SKU extraction
+    const sku = cleanText($('[class*="sku"]').text() ||
+                $('[class*="style"]').text() ||
+                $('[class*="product-code"]').text() ||
+                '')
 
+    // Price extraction - look for sale and retail prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    // Try to find sale price
+    const salePriceText = cleanText($('[class*="sale"], [class*="discount"]').first().text())
+    if (salePriceText) {
+      salePrice = extractPrice(salePriceText)
+    }
+
+    // Try to find retail/original price
+    const retailPriceText = cleanText($('.price, [class*="price"]').first().text())
+    retailPrice = extractPrice(retailPriceText)
+
+    // If we found a sale price but no retail, use the first price as retail
+    if (!retailPrice && salePrice) {
+      retailPrice = salePrice
+      salePrice = undefined
+    }
+
+    // Image extraction - limit to 5
     const images: string[] = []
     $('img[class*="product"], img[class*="main"]').each((_, el) => {
+      if (images.length >= 5) return false // Stop after 5 images
       const src = $(el).attr('src')
       if (src && !images.includes(src)) {
         images.push(src.startsWith('http') ? src : new URL(src, url).href)
@@ -309,7 +472,9 @@ async function scrapeGeneric(url: string): Promise<ProductData> {
       brand: brand || undefined,
       model: model || undefined,
       colorway: undefined,
+      sku: sku || undefined,
       retailPrice,
+      salePrice,
       images: images.length > 0 ? images : undefined,
       success: true
     }

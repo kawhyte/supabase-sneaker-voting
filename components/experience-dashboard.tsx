@@ -228,9 +228,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
           <h1 className="text-3xl font-bold">👟 Sneaker Experiences</h1>
           <p className="text-gray-600">Your try-on history and sizing insights</p>
         </div>
-        <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700">
-          ➕ Add New Experience
-        </Button>
+        
       </div>
 
       {/* Filters and Search */}
@@ -303,7 +301,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-teal-600">
               {experiences.filter(exp => exp.would_recommend && exp.interaction_type === 'tried').length}
             </div>
             <div className="text-sm text-gray-600">Recommended</div>

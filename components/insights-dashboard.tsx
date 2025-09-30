@@ -140,7 +140,7 @@ export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Brain className="h-8 w-8 text-purple-600" />
+            <Brain className="h-8 w-8 text-teal-600" />
             Fit Insights
           </h1>
           <p className="text-gray-600">AI-powered size recommendations and fit analysis</p>
@@ -203,7 +203,7 @@ export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
 
               <Card>
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-purple-600 mb-1">
+                  <div className="text-2xl font-bold text-teal-600 mb-1">
                     {insights.brandComparisons.length}
                   </div>
                   <div className="text-sm text-gray-600 flex items-center justify-center gap-1">

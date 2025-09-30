@@ -26,7 +26,7 @@ export function AddSneaker() {
           <motion.h1
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent cursor-pointer"
+            className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-teal-600 to-orange-500 bg-clip-text text-transparent cursor-pointer"
             onClick={() => setShowForm(!showForm)}
           >
             👟 Sneaker Sizing Tracker33
@@ -50,7 +50,7 @@ export function AddSneaker() {
                 </motion.div>
                 Add Sneaker
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100"
+                  className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-teal-400/20 opacity-0 group-hover:opacity-100"
                   initial={{ x: -100 }}
                   whileHover={{ x: 0 }}
                   transition={{ duration: 0.3 }}
