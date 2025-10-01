@@ -310,34 +310,36 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-[var(--space-xl)] mb-[var(--space-xl)]">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">{experiences.length}</div>
-            <div className="text-sm text-gray-600">Total Experiences</div>
+        <Card className="hover-lift">
+          <CardContent className="p-[var(--space-base)] text-center">
+            <div className="text-3xl font-bold mb-[var(--space-2xs)]" style={{ color: 'var(--color-primary-500)' }}>
+              {experiences.length}
+            </div>
+            <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Total Experiences</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">
+        <Card className="hover-lift">
+          <CardContent className="p-[var(--space-base)] text-center">
+            <div className="text-3xl font-bold mb-[var(--space-2xs)]" style={{ color: 'var(--color-accent-green-500)' }}>
               {experiences.filter(exp => exp.fit_rating === 3 && exp.interaction_type === 'tried').length}
             </div>
-            <div className="text-sm text-gray-600">Perfect Fits</div>
+            <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Perfect Fits</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-teal-600">
+        <Card className="hover-lift">
+          <CardContent className="p-[var(--space-base)] text-center">
+            <div className="text-3xl font-bold mb-[var(--space-2xs)]" style={{ color: 'var(--color-accent-blue-500)' }}>
               {experiences.filter(exp => exp.would_recommend && exp.interaction_type === 'tried').length}
             </div>
-            <div className="text-sm text-gray-600">Recommended</div>
+            <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Recommended</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">
+        <Card className="hover-lift">
+          <CardContent className="p-[var(--space-base)] text-center">
+            <div className="text-3xl font-bold mb-[var(--space-2xs)]" style={{ color: 'var(--color-accent-purple-500)' }}>
               {experiences.filter(exp => exp.interaction_type === 'seen').length}
             </div>
-            <div className="text-sm text-gray-600">Spotted</div>
+            <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Spotted</div>
           </CardContent>
         </Card>
       </div>
