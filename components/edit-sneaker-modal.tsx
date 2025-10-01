@@ -11,26 +11,12 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle, Edit, Loader2, Upload, X, GripVertical } from 'lucide-react'
+import { CheckCircle, Loader2, Upload, X, Camera, User, Eye, Footprints, AlertTriangle, Star } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { MultiPhotoUpload } from './multi-photo-upload'
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core'
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  rectSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { BrandCombobox } from './brand-combobox'
+import { SizeCombobox } from './size-combobox'
+import { cn } from '@/lib/utils'
 
 // Schema for journal entry editing
 const sneakerSchema = z.object({
@@ -38,6 +24,7 @@ const sneakerSchema = z.object({
   interactionType: z.enum(['seen', 'tried'], { required_error: 'Select your experience' }),
   brand: z.string().min(1, 'Brand is required'),
   model: z.string().min(1, 'Model is required'),
+  sku: z.string().optional(),
   colorway: z.string().optional(),
   // Try-on specific (conditional)
   sizeTried: z.string().optional(),
@@ -45,8 +32,9 @@ const sneakerSchema = z.object({
   // General fields
   storeName: z.string().optional(),
   retailPrice: z.string().optional(),
+  salePrice: z.string().optional(),
   idealPrice: z.string().optional(),
-  notes: z.string().max(80).optional()
+  notes: z.string().optional()
 }).refine((data) => {
   if (data.interactionType === 'tried') {
     return data.sizeTried
@@ -70,110 +58,16 @@ interface PhotoItem {
 interface ExistingPhoto {
   id: string
   image_url: string
+  cloudinary_id?: string
   image_order: number
   is_main_image: boolean
 }
-
-// Common sizes with EU and Women's equivalents (US Men's 3.5 - 10.5)
-const COMMON_SIZES = [
-  { us: '3.5', women: '5', eu: '35.5' },
-  { us: '4', women: '5.5', eu: '36' },
-  { us: '4.5', women: '6', eu: '37' },
-  { us: '5', women: '6.5', eu: '37.5' },
-  { us: '5.5', women: '7', eu: '38' },
-  { us: '6', women: '7.5', eu: '38.5' },
-  { us: '6.5', women: '8', eu: '39' },
-  { us: '7', women: '8.5', eu: '40' },
-  { us: '7.5', women: '9', eu: '40.5' },
-  { us: '8', women: '9.5', eu: '41' },
-  { us: '8.5', women: '10', eu: '42' },
-  { us: '9', women: '10.5', eu: '42.5' },
-  { us: '9.5', women: '11', eu: '43' },
-  { us: '10', women: '11.5', eu: '44' },
-  { us: '10.5', women: '12', eu: '44.5' }
-]
-
 
 interface EditSneakerModalProps {
   experience: any
   isOpen: boolean
   onClose: () => void
   onSave: () => void
-}
-
-// Sortable photo component for existing photos
-function SortableExistingPhoto({ photo, index, onSetMain, onDelete }: {
-  photo: ExistingPhoto
-  index: number
-  onSetMain: (id: string) => void
-  onDelete: (id: string) => void
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: photo.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`relative group ${isDragging ? 'z-10' : ''}`}
-    >
-      {/* Drag Handle */}
-      <div
-        {...attributes}
-        {...listeners}
-        className="absolute top-1 left-1 z-10 p-1 bg-black/50 rounded cursor-grab active:cursor-grabbing hover:bg-black/70 transition-colors"
-      >
-        <GripVertical className="h-3 w-3 text-white" />
-      </div>
-
-      <img
-        src={photo.image_url}
-        alt={`Photo ${index + 1}`}
-        className="w-full aspect-square object-cover rounded-lg"
-      />
-
-      {photo.is_main_image && (
-        <div className="absolute top-1 right-1 bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded z-10">
-          Main
-        </div>
-      )}
-
-      <div className="absolute top-1 right-1 flex gap-1">
-        {!photo.is_main_image && (
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] z-10"
-            onClick={() => onSetMain(photo.id)}
-          >
-            ★
-          </Button>
-        )}
-        <Button
-          type="button"
-          size="sm"
-          variant="destructive"
-          className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-          onClick={() => onDelete(photo.id)}
-        >
-          <X className="h-3 w-3" />
-        </Button>
-      </div>
-    </div>
-  )
 }
 
 export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSneakerModalProps) {
@@ -183,44 +77,87 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
   const [existingPhotos, setExistingPhotos] = useState<ExistingPhoto[]>([])
   const [photosToDelete, setPhotosToDelete] = useState<string[]>([])
   const [uploadProgress, setUploadProgress] = useState('')
+  const [sizePreferences, setSizePreferences] = useState<Record<string, string>>({})
+  const [isFormReady, setIsFormReady] = useState(false)
 
   const supabase = createClient()
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors, isValid },
     setValue,
     watch,
-    trigger
+    trigger,
+    reset
   } = useForm<SneakerFormData>({
     resolver: zodResolver(sneakerSchema),
-    mode: 'onChange'
+    mode: 'onBlur'
   })
 
+  const watchedUser = watch('userName')
+  const watchedBrand = watch('brand')
   const watchedInteractionType = watch('interactionType')
+  const watchedRetailPrice = watch('retailPrice')
+  const watchedSalePrice = watch('salePrice')
+
+  // Calculate discount percentage
+  const discountPercentage =
+    watchedRetailPrice && watchedSalePrice
+      ? Math.round(
+          ((parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)) /
+            parseFloat(watchedRetailPrice)) *
+            100
+        )
+      : 0
+
+  // Load size preferences when user/brand changes
+  useEffect(() => {
+    if (watchedUser && watchedBrand) {
+      loadSizePreference(watchedUser, watchedBrand)
+    }
+  }, [watchedUser, watchedBrand])
+
+  const loadSizePreference = async (userName: string, brand: string) => {
+    try {
+      const { data } = await supabase
+        .from('size_preferences')
+        .select('preferred_size')
+        .eq('user_name', userName)
+        .eq('brand', brand)
+        .single()
+
+      if (data?.preferred_size) {
+        setSizePreferences({ [brand]: data.preferred_size })
+      }
+    } catch (error) {
+      // No preference found, that's okay
+    }
+  }
 
   // Populate form with existing data when modal opens
   useEffect(() => {
     if (isOpen && experience) {
-      setValue('userName', experience.user_name)
-      setValue('interactionType', experience.interaction_type)
-      setValue('brand', experience.brand)
-      setValue('model', experience.model)
-      setValue('colorway', experience.colorway || '')
-      setValue('sizeTried', experience.size_tried || '')
-      setValue('comfortRating', experience.comfort_rating || undefined)
-      setValue('storeName', experience.store_name || '')
-      setValue('retailPrice', experience.retail_price?.toString() || '')
-      setValue('idealPrice', experience.ideal_price?.toString() || '')
-      setValue('notes', experience.notes || '')
+      console.log('Loading experience data:', experience)
+
+      setIsFormReady(false)
+
+      // Reset the form with new values
+      reset({
+        userName: experience.user_name,
+        interactionType: experience.interaction_type || 'seen',
+        brand: experience.brand,
+        model: experience.model,
+        sku: experience.sku || '',
+        colorway: experience.colorway || '',
+        sizeTried: experience.size_tried || '',
+        comfortRating: experience.comfort_rating || undefined,
+        storeName: experience.store_name || '',
+        retailPrice: experience.retail_price?.toString() || '',
+        salePrice: experience.sale_price?.toString() || '',
+        idealPrice: experience.ideal_price?.toString() || '',
+        notes: experience.notes || ''
+      })
 
       // Load existing photos from sneaker_photos
       if (experience.sneaker_photos && experience.sneaker_photos.length > 0) {
@@ -233,62 +170,30 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
       setPhotos([])
       setPhotosToDelete([])
 
-      // Trigger validation after setting values
-      setTimeout(() => trigger(), 100)
+      // Mark form as ready after data is loaded
+      setTimeout(() => setIsFormReady(true), 0)
+    } else if (!isOpen) {
+      setIsFormReady(false)
     }
-  }, [isOpen, experience, setValue, trigger])
-
-  const handleExistingPhotosDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-
-    if (over && active.id !== over.id) {
-      setExistingPhotos((items) => {
-        const oldIndex = items.findIndex(item => item.id === active.id)
-        const newIndex = items.findIndex(item => item.id === over.id)
-
-        const reordered = arrayMove(items, oldIndex, newIndex)
-
-        // Update order numbers
-        return reordered.map((item, index) => ({
-          ...item,
-          image_order: index + 1
-        }))
-      })
-    }
-  }
-
-  const handleSetMainPhoto = (photoId: string) => {
-    setExistingPhotos(prev => prev.map(p => ({
-      ...p,
-      is_main_image: p.id === photoId
-    })))
-  }
-
-  const handleDeleteExistingPhoto = (photoId: string) => {
-    setPhotosToDelete(prev => [...prev, photoId])
-    setExistingPhotos(prev => {
-      const filtered = prev.filter(p => p.id !== photoId)
-      // If we deleted the main photo, make first remaining photo main
-      const deletedPhoto = prev.find(p => p.id === photoId)
-      if (deletedPhoto?.is_main_image && filtered.length > 0) {
-        filtered[0].is_main_image = true
-      }
-      return filtered
-    })
-  }
+  }, [isOpen, experience, reset])
 
   const onSubmit = async (data: SneakerFormData) => {
     setIsLoading(true)
     setSuccessMessage('')
 
     try {
-      // Step 1: Upload new photos to Cloudinary
-      const uploadedPhotos: Array<{ url: string; publicId: string; order: number; isMain: boolean }> = []
+      let mainImageUrl = null
+      let mainCloudinaryId = null
+      const uploadedPhotos = []
 
+      // Upload all new photos to Cloudinary if provided
       if (photos.length > 0) {
-        setUploadProgress(`📤 Uploading ${photos.length} photo(s)...`)
+        setUploadProgress(
+          `📤 Uploading ${photos.length} photo${photos.length > 1 ? 's' : ''}...`
+        )
 
-        for (const photo of photos) {
+        for (let i = 0; i < photos.length; i++) {
+          const photo = photos[i]
           const formData = new FormData()
           formData.append('file', photo.file)
 
@@ -299,36 +204,53 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
 
           if (!uploadResponse.ok) {
             const error = await uploadResponse.json()
-            throw new Error(error.error || 'Failed to upload image')
+            throw new Error(error.error || `Failed to upload photo ${i + 1}`)
           }
 
           const uploadResult = await uploadResponse.json()
+
           uploadedPhotos.push({
             url: uploadResult.data.url,
-            publicId: uploadResult.data.publicId,
-            order: photo.order,
-            isMain: photo.isMain
+            cloudinaryId: uploadResult.data.publicId,
+            order: photo.order + existingPhotos.length,
+            isMain: photo.isMain && existingPhotos.length === 0
           })
+
+          if (photo.isMain && existingPhotos.length === 0) {
+            mainImageUrl = uploadResult.data.url
+            mainCloudinaryId = uploadResult.data.publicId
+          }
+
+          setUploadProgress(`📤 Uploaded ${i + 1}/${photos.length} photo${photos.length > 1 ? 's' : ''}...`)
         }
 
-        setUploadProgress('✅ Photos uploaded!')
+        setUploadProgress(`✅ ${photos.length} photo${photos.length > 1 ? 's' : ''} uploaded!`)
       }
 
-      // Step 2: Update the main entry data
+      // Use sale price if available, otherwise retail price
+      const finalPrice = data.salePrice
+        ? parseFloat(data.salePrice)
+        : data.retailPrice
+        ? parseFloat(data.retailPrice)
+        : null
+
+      // Update the main entry data
       const experienceData = {
         user_name: data.userName,
         brand: data.brand,
         model: data.model,
         colorway: data.colorway || 'Standard',
+        sku: data.sku || null,
         interaction_type: data.interactionType,
         size_tried: data.interactionType === 'tried' ? data.sizeTried : null,
         comfort_rating: data.interactionType === 'tried' ? (data.comfortRating || null) : null,
         store_name: data.storeName || null,
-        retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
+        retail_price: finalPrice,
         ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
         notes: data.notes || null,
         interested_in_buying: true,
-        try_on_date: new Date().toISOString()
+        // Keep existing main image if no new main was uploaded
+        ...(mainImageUrl && { image_url: mainImageUrl, cloudinary_id: mainCloudinaryId })
       }
 
       const { error: updateError } = await supabase
@@ -341,8 +263,26 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         throw updateError
       }
 
-      // Step 3: Delete photos marked for deletion
+      // Delete photos marked for deletion from Cloudinary and DB
       if (photosToDelete.length > 0) {
+        for (const photoId of photosToDelete) {
+          const photoToDelete = experience.sneaker_photos?.find((p: any) => p.id === photoId)
+
+          // Delete from Cloudinary if cloudinary_id exists
+          if (photoToDelete?.cloudinary_id) {
+            try {
+              await fetch('/api/delete-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ publicId: photoToDelete.cloudinary_id })
+              })
+            } catch (imageError) {
+              console.warn('Error deleting image from Cloudinary:', imageError)
+            }
+          }
+        }
+
+        // Delete from DB
         const { error: deleteError } = await supabase
           .from('sneaker_photos')
           .delete()
@@ -353,7 +293,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         }
       }
 
-      // Step 4: Update existing photos (main status and order)
+      // Update existing photos (main status and order)
       for (const existingPhoto of existingPhotos) {
         const { error: photoUpdateError } = await supabase
           .from('sneaker_photos')
@@ -368,14 +308,14 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         }
       }
 
-      // Step 5: Insert new photos
+      // Insert new photos
       if (uploadedPhotos.length > 0) {
         const newPhotoRecords = uploadedPhotos.map(photo => ({
           sneaker_id: experience.id,
           image_url: photo.url,
-          cloudinary_id: photo.publicId,
-          image_order: photo.order + existingPhotos.length,
-          is_main_image: photo.isMain && existingPhotos.length === 0 // Only set main if no existing photos
+          cloudinary_id: photo.cloudinaryId,
+          image_order: photo.order,
+          is_main_image: photo.isMain
         }))
 
         const { error: insertError } = await supabase
@@ -388,15 +328,16 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         }
       }
 
-      setSuccessMessage('✅ Journal entry updated successfully!')
+      setSuccessMessage('✅ Entry updated successfully!')
 
-      // Close modal and refresh after 1 second
+      // Close modal and refresh after 1.5 seconds
       setTimeout(() => {
         setSuccessMessage('')
         setUploadProgress('')
+        reset()
         onSave()
         onClose()
-      }, 1000)
+      }, 1500)
 
     } catch (error: any) {
       console.error('Error updating journal entry:', error)
@@ -408,26 +349,58 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
     }
   }
 
+  // Convert existing photos to PhotoItem format for MultiPhotoUpload preview
+  const combinedPhotos = [
+    ...existingPhotos.map(photo => ({
+      id: photo.id,
+      file: null as any, // Existing photos don't have file
+      preview: photo.image_url,
+      isMain: photo.is_main_image,
+      order: photo.image_order
+    })),
+    ...photos
+  ]
+
+  const handlePhotosChange = (newPhotos: PhotoItem[]) => {
+    // Separate existing and new photos
+    const existing = newPhotos.filter(p => existingPhotos.some(ep => ep.id === p.id))
+    const newOnes = newPhotos.filter(p => !existingPhotos.some(ep => ep.id === p.id))
+
+    // Update existing photos
+    setExistingPhotos(existing.map((p, i) => ({
+      id: p.id,
+      image_url: p.preview,
+      cloudinary_id: existingPhotos.find(ep => ep.id === p.id)?.cloudinary_id,
+      image_order: i,
+      is_main_image: p.isMain
+    })))
+
+    // Update new photos
+    setPhotos(newOnes)
+  }
+
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+      <div className="flex items-start justify-center min-h-screen p-4 py-8">
+        <div className="bg-white rounded-lg max-w-4xl w-full my-8">
         <Card className="border-0">
-          <CardHeader className="text-center relative">
+          <CardHeader className="text-left pb-6 relative">
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="absolute right-2 top-2"
+              className="absolute right-4 top-4"
             >
               <X className="h-4 w-4" />
             </Button>
-            <CardTitle className="text-2xl flex items-center justify-center gap-2">
-              <Edit className="h-6 w-6 text-blue-500" />
-              Edit Journal Entry
+            <CardTitle className="text-3xl flex flex-col justify-start">
+              <p className="-mb-2">Edit Your Entry</p>
+              <p className="text-sm text-gray-600 font-normal">
+                Update your sizing journal entry
+              </p>
             </CardTitle>
-            <p className="text-sm text-gray-600">Update your sizing journal entry</p>
           </CardHeader>
 
           <CardContent>
@@ -438,208 +411,357 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
               </Alert>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* User Selection */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700">Who's tracking this sneaker?</Label>
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  <Button
-                    type="button"
-                    variant={watch('userName') === 'Kenny' ? 'default' : 'outline'}
-                    onClick={() => setValue('userName', 'Kenny')}
-                    className="h-12 text-base"
-                  >
-                    👤 Kenny
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={watch('userName') === 'Rene' ? 'default' : 'outline'}
-                    onClick={() => setValue('userName', 'Rene')}
-                    className="h-12 text-base"
-                  >
-                    👤 Rene
-                  </Button>
-                </div>
-              </div>
-
-              {/* Interaction Type */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700">What's your experience with this sneaker?</Label>
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  <Button
-                    type="button"
-                    variant={watchedInteractionType === 'seen' ? 'default' : 'outline'}
-                    onClick={() => setValue('interactionType', 'seen')}
-                    className="h-16 flex flex-col items-center justify-center p-2"
-                  >
-                    <span className="text-lg mb-1">👀</span>
-                    <span className="text-sm font-medium">Seen</span>
-                    <span className="text-xs text-gray-500">Online or in store</span>
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={watchedInteractionType === 'tried' ? 'default' : 'outline'}
-                    onClick={() => setValue('interactionType', 'tried')}
-                    className="h-16 flex flex-col items-center justify-center p-2"
-                  >
-                    <span className="text-lg mb-1">👟</span>
-                    <span className="text-sm font-medium">Tried On</span>
-                    <span className="text-xs text-gray-500">Worn & tested</span>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Brand and Model */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Brand</Label>
-                  <Input
-                    {...register('brand')}
-                    placeholder="Nike, Adidas, etc."
-                    className="mt-2"
-                  />
-                  {errors.brand && (
-                    <p className="text-xs text-red-600 mt-1">{errors.brand.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Model</Label>
-                  <Input
-                    {...register('model')}
-                    placeholder="Air Jordan 1, etc."
-                    className="mt-2"
-                  />
-                  {errors.model && (
-                    <p className="text-xs text-red-600 mt-1">{errors.model.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Try-On Specific Fields */}
-              {watchedInteractionType === 'tried' && (
-                <>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-[var(--space-lg)]">
+              {/* User and Experience Dropdowns */}
+              {isFormReady && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-base)] pb-[var(--space-base)]">
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Size Tried</Label>
-                    <Select onValueChange={(value) => setValue('sizeTried', value)} value={watch('sizeTried')}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue placeholder="Select size" />
+                    <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
+                      <User className="h-3 w-3 text-blue-600" />
+                      Who's tracking? *
+                    </Label>
+                    <Select
+                      onValueChange={(value: "Kenny" | "Rene") => setValue("userName", value, { shouldValidate: true })}
+                      value={watchedUser}
+                    >
+                      <SelectTrigger className="h-4 mt-[var(--space-md)] max-w-xs">
+                        <SelectValue placeholder="Select user" />
                       </SelectTrigger>
                       <SelectContent>
-                        {COMMON_SIZES.map((size) => (
-                          <SelectItem key={size.us} value={size.us}>
-                            <div className="flex flex-col">
-                              <span>US M {size.us} / W {size.women}</span>
-                              <span className="text-xs text-gray-500">EU {size.eu}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="Kenny">Kenny</SelectItem>
+                        <SelectItem value="Rene">Rene</SelectItem>
                       </SelectContent>
                     </Select>
-                    {errors.sizeTried && (
-                      <p className="text-xs text-red-600 mt-1">{errors.sizeTried.message}</p>
+                    {errors.userName && (
+                      <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
+                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs font-semibold text-red-700">{errors.userName.message}</p>
+                      </div>
                     )}
                   </div>
-                </>
-              )}
 
-              {/* Optional Details */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Colorway</Label>
-                  <Input
-                    {...register('colorway')}
-                    placeholder="Bred, Chicago, etc."
-                    className="mt-2"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Store</Label>
-                  <Input
-                    {...register('storeName')}
-                    placeholder="Foot Locker, etc."
-                    className="mt-2"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Retail Price ($)</Label>
-                  <Input
-                    {...register('retailPrice')}
-                    placeholder="170.00"
-                    type="number"
-                    step="0.01"
-                    className="mt-2"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Ideal Price ($)</Label>
-                  <Input
-                    {...register('idealPrice')}
-                    placeholder="120.00"
-                    type="number"
-                    step="0.01"
-                    className="mt-2"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Price you'd be willing to pay</p>
-                </div>
-              </div>
-
-              {watchedInteractionType === 'tried' && (
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Comfort Rating</Label>
-                  <Select onValueChange={(value) => setValue('comfortRating', parseInt(value))} value={watch('comfortRating')?.toString()}>
-                    <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="1-5" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1, 2, 3, 4, 5].map((rating) => (
-                        <SelectItem key={rating} value={rating.toString()}>
-                          {rating} {rating === 1 ? '(Uncomfortable)' : rating === 5 ? '(Very Comfortable)' : ''}
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
+                      <span>Experience</span>
+                      <span className="text-red-500 -ml-1">*</span>
+                    </Label>
+                    <Select
+                      onValueChange={(value: "seen" | "tried") => setValue("interactionType", value, { shouldValidate: true })}
+                      value={watchedInteractionType}
+                    >
+                      <SelectTrigger className="h-4 mt-[var(--space-md)] max-w-sm">
+                        <SelectValue placeholder="Select experience type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="seen">
+                          <div className="flex items-center gap-[var(--space-md)]">
+                            <Eye className="h-2 w-2" />
+                            <span>Seen - Online or in store</span>
+                          </div>
                         </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {/* Existing Photos Management */}
-              {existingPhotos.length > 0 && (
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Current Photos - Drag to reorder
-                  </Label>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleExistingPhotosDragEnd}
-                  >
-                    <SortableContext items={existingPhotos.map(p => p.id)} strategy={rectSortingStrategy}>
-                      <div className="grid grid-cols-3 gap-2 mb-4">
-                        {existingPhotos.map((photo, index) => (
-                          <SortableExistingPhoto
-                            key={photo.id}
-                            photo={photo}
-                            index={index}
-                            onSetMain={handleSetMainPhoto}
-                            onDelete={handleDeleteExistingPhoto}
-                          />
-                        ))}
+                        <SelectItem value="tried">
+                          <div className="flex items-center gap-[var(--space-md)]">
+                            <Footprints className="h-2 w-2" />
+                            <span>Tried On - Worn & tested</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {errors.interactionType && (
+                      <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
+                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs font-semibold text-red-700">{errors.interactionType.message}</p>
                       </div>
-                    </SortableContext>
-                  </DndContext>
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* Multi Photo Upload */}
-              <div>
-                <MultiPhotoUpload
-                  photos={photos}
-                  onPhotosChange={setPhotos}
-                  maxPhotos={5 - existingPhotos.length}
-                />
+              {/* Product Details Section */}
+              <h3 className="font-semibold text-gray-700 border-b pb-[var(--space-md)]">Product Details</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--space-lg)]">
+                {/* LEFT COLUMN */}
+                <div className="space-y-[var(--space-base)]">
+                  {/* Model */}
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Model *</Label>
+                    <Input
+                      {...register("model")}
+                      placeholder="Air Jordan 1, Air Max 90, etc."
+                      className="mt-[var(--space-md)] h-6"
+                    />
+                    {errors.model && (
+                      <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
+                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs font-semibold text-red-700">{errors.model.message}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Brand */}
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Brand *</Label>
+                    <div className="mt-[var(--space-md)] max-w-xs">
+                      <BrandCombobox
+                        value={watchedBrand}
+                        onChange={(value) =>
+                          setValue("brand", value, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                            shouldTouch: true
+                          })
+                        }
+                        disabled={isLoading}
+                      />
+                    </div>
+                    {errors.brand && (
+                      <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
+                        <AlertTriangle className="h-3 w-3 text-red-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs font-semibold text-red-700">{errors.brand.message}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* SKU */}
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">SKU / Style Code (Optional)</Label>
+                    <Input
+                      {...register("sku")}
+                      placeholder="DM7866-140"
+                      className="mt-[var(--space-md)] h-6"
+                    />
+                  </div>
+
+                  {/* Colorway */}
+                  <div>
+                    <Label className="text-sm text-gray-600">Colorway (Optional)</Label>
+                    <Input
+                      {...register("colorway")}
+                      placeholder="Bred, Chicago, etc."
+                      className="mt-[var(--space-md)] h-6"
+                    />
+                  </div>
+                </div>
+
+                {/* RIGHT COLUMN */}
+                <div className="space-y-[var(--space-base)]">
+                  {/* Store */}
+                  <div>
+                    <Label className="text-sm text-gray-600">Store (Optional)</Label>
+                    <Input
+                      {...register("storeName")}
+                      placeholder="Foot Locker, etc."
+                      className="mt-[var(--space-md)] h-6"
+                    />
+                  </div>
+
+                  {/* Pricing Section */}
+                  <div className="space-y-[var(--space-sm)]">
+                    <div>
+                      <Label className="text-sm text-gray-600">Retail Price (Optional)</Label>
+                      <div className="relative mt-[var(--space-md)]">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <Input
+                          {...register("retailPrice")}
+                          placeholder="215.00"
+                          type="number"
+                          step="0.01"
+                          className="pl-8 h-6"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm text-gray-600">Sale Price (Optional)</Label>
+                      <div className="relative mt-[var(--space-md)]">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <Input
+                          {...register("salePrice")}
+                          placeholder="120.00"
+                          type="number"
+                          step="0.01"
+                          className="pl-8 h-6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Discount Display */}
+                    {watchedRetailPrice &&
+                      watchedSalePrice &&
+                      parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-[var(--space-sm)]">
+                          <div className="flex items-baseline gap-[var(--space-md)]">
+                            <span className="text-lg font-bold text-green-600">${watchedSalePrice}</span>
+                            <span className="text-sm text-gray-500 line-through">${watchedRetailPrice}</span>
+                            <span className="text-sm font-semibold text-green-700">({discountPercentage}% off)</span>
+                          </div>
+                        </div>
+                      )}
+
+                    <div>
+                      <Label className="text-sm text-gray-600">Ideal Price (Optional)</Label>
+                      <div className="relative mt-[var(--space-md)]">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <Input
+                          {...register("idealPrice")}
+                          placeholder="120.00"
+                          type="number"
+                          step="0.01"
+                          className="pl-8 h-6"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-[var(--space-xs)]">Price you'd be willing to pay</p>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* Photos Section */}
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)]">
+                  <Camera className="h-4 w-4" />
+                  Photos (Required - Min 1)
+                </Label>
+                <MultiPhotoUpload
+                  photos={combinedPhotos}
+                  onPhotosChange={handlePhotosChange}
+                  maxPhotos={5}
+                />
+                {combinedPhotos.length === 0 && (
+                  <div className="flex items-center gap-[var(--space-xs)] mt-[var(--space-xs)]">
+                    <AlertTriangle className="h-3 w-3 text-orange-600" />
+                    <p className="text-xs text-orange-600">At least one photo is required</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Notes */}
+              <div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm text-gray-600">Notes (Optional)</Label>
+                  {watch("notes") && (
+                    <span className="text-xs text-gray-500">{watch("notes")?.length || 0} / 500</span>
+                  )}
+                </div>
+                <Textarea
+                  {...register("notes")}
+                  placeholder={
+                    watchedInteractionType === "tried"
+                      ? "e.g., 'Tight on pinky toe', 'Great for walking', 'Runs small compared to other Nikes'"
+                      : "e.g., 'Love the colorway', 'Perfect for summer', 'Saw on Instagram'"
+                  }
+                  className="mt-[var(--space-md)] resize-none"
+                  rows={3}
+                  maxLength={500}
+                />
+                <div className="mt-[var(--space-md)] text-xs text-gray-500">
+                  💡 Quick tips:{" "}
+                  {watchedInteractionType === "tried"
+                    ? "Mention fit issues, comfort level, or comparisons with other shoes"
+                    : "Note where you saw them, what caught your eye, or styling ideas"}
+                </div>
+              </div>
+
+              {/* Try-On Details Section */}
+              {watchedInteractionType === "tried" && (
+                <div className="border-t pt-[var(--space-base)]">
+                  <h4 className="font-semibold text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)] mt-4">
+                    Try-On Details
+                  </h4>
+
+                  <div className="flex justify-between gap-x-12">
+                    {/* Size Selection */}
+                    <div className="mb-4 mt-4 w-full">
+                      <Label className="text-sm font-medium text-gray-700">Size Tried *</Label>
+                      <div className="mt-[var(--space-md)] max-w-sm">
+                        <SizeCombobox
+                          value={watch("sizeTried")}
+                          onChange={(value) =>
+                            setValue("sizeTried", value, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                              shouldTouch: true
+                            })
+                          }
+                          disabled={isLoading}
+                          preferredSize={sizePreferences[watchedBrand]}
+                        />
+                      </div>
+                      {errors.sizeTried && (
+                        <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
+                          <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-semibold text-red-700">{errors.sizeTried.message}</p>
+                            <p className="text-xs text-red-600 mt-0.5">Select the US Men's size you tried on</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Comfort Rating */}
+                    <div className="mt-4">
+                      <Label className="text-sm font-medium text-gray-700">
+                        How comfortable were they? (Optional)
+                      </Label>
+                      <div className="flex items-center gap-[var(--space-xs)]">
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                          <button
+                            key={rating}
+                            type="button"
+                            onClick={() =>
+                              setValue("comfortRating", rating, {
+                                shouldValidate: true
+                              })
+                            }
+                            className="group p-[var(--space-sm)] md:p-[var(--space-md)] hover:scale-110 transition-transform touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 rounded"
+                            title={`${rating} star${rating !== 1 ? "s" : ""}`}
+                            aria-label={`${rating} star${rating !== 1 ? "s" : ""} comfort rating`}
+                          >
+                            <Star
+                              className={cn(
+                                "h-4 w-4 md:h-4 md:w-4 transition-colors",
+                                watch("comfortRating") && watch("comfortRating")! >= rating
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-gray-300 group-hover:text-gray-400"
+                              )}
+                              aria-hidden="true"
+                            />
+                          </button>
+                        ))}
+                        {watch("comfortRating") && (
+                          <button
+                            type="button"
+                            onClick={() => setValue("comfortRating", undefined)}
+                            className="ml-3 text-xs text-gray-500 hover:text-gray-700 underline min-h-[44px] flex items-center focus:ring-2 focus:ring-blue-300 rounded px-2"
+                            aria-label="Clear comfort rating"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      {watch("comfortRating") && (
+                        <div className="mt-1 p-1 rounded bg-blue-50 border border-blue-200">
+                          <p className="text-sm text-blue-900">
+                            <span className="font-semibold">{watch("comfortRating")} / 5 stars</span> -{" "}
+                            {watch("comfortRating") === 1
+                              ? "Very uncomfortable"
+                              : watch("comfortRating") === 2
+                              ? "Uncomfortable"
+                              : watch("comfortRating") === 3
+                              ? "Decent comfort"
+                              : watch("comfortRating") === 4
+                              ? "Very comfortable"
+                              : "Extremely comfortable"}
+                          </p>
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Rate overall comfort - cushioning, support, breathability
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Upload Progress */}
               {uploadProgress && (
@@ -649,46 +771,38 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                 </Alert>
               )}
 
-              {/* Notes */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700">💭 Notes</Label>
-                <Textarea
-                  {...register('notes')}
-                  placeholder="How did they feel? Any thoughts? Comparisons?"
-                  className="mt-2 resize-none"
-                  rows={3}
-                />
-              </div>
-
               {/* Submit Buttons */}
-              <div className="flex gap-3">
+              <div className="flex items-center justify-end gap-3 mt-6">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  className="flex-1"
+                  className="h-6 px-4 text-sm hover:bg-gray-100"
                   disabled={isLoading}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1"
-                  disabled={isLoading || !isValid}
+                  className="btn-primary rounded-lg px-6 py-3 font-semibold"
+                  disabled={isLoading || !isValid || combinedPhotos.length === 0}
+                  aria-label={isLoading ? "Saving changes" : "Save changes to entry"}
+                  aria-busy={isLoading}
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Saving...
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+                      <span>Saving...</span>
                     </>
                   ) : (
-                    '✅ Save Changes'
+                    "Save Changes"
                   )}
                 </Button>
               </div>
             </form>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   )

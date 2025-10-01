@@ -129,7 +129,7 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
         {/* Photo Info */}
         <div className="p-2 bg-gray-50 text-xs text-gray-600">
           <div className="flex items-center justify-between">
-            <span className="truncate">{photo.file.name}</span>
+            <span className="truncate">{photo.file?.name || 'Existing photo'}</span>
             <span>#{photo.order}</span>
           </div>
         </div>
