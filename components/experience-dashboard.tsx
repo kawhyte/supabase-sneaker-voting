@@ -473,7 +473,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
                 )}
 
                 {/* Content Section */}
-                <CardContent className="flex-1 p-[var(--space-base)] flex flex-col gap-[var(--space-xs)]">
+                <CardContent className="flex-1 p-[var(--space-base)] flex flex-col gap-[var(--space-xs)] min-h-[200px]">
                   {/* Brand */}
                   <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {experience.brand}
