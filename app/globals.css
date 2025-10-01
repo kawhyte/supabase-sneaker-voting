@@ -422,7 +422,7 @@
 }
 
 main, nav {
-  @apply max-w-6xl mx-auto;
+  @apply max-w-[1920px] mx-auto;
   margin-block: var(--space-xl);
 }
 p {

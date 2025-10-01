@@ -241,7 +241,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
 
   if (loading) {
     return (
-      <div className="max-w-[1400px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
+      <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">
           <div>
@@ -276,7 +276,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
+    <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">
         <div>
