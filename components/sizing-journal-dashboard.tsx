@@ -107,7 +107,34 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
 
     setIsDeleting(true)
     try {
-      // Delete image from Cloudinary if it exists
+      // First, fetch all photos associated with this sneaker
+      const { data: photos, error: photosError } = await supabase
+        .from('sneaker_photos')
+        .select('cloudinary_id')
+        .eq('sneaker_id', deletingEntry.id)
+
+      if (photosError) {
+        console.warn('Error fetching sneaker photos:', photosError)
+      }
+
+      // Delete all carousel images from Cloudinary
+      if (photos && photos.length > 0) {
+        for (const photo of photos) {
+          if (photo.cloudinary_id) {
+            try {
+              await fetch('/api/delete-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ publicId: photo.cloudinary_id })
+              })
+            } catch (imageError) {
+              console.warn('Error deleting carousel image from Cloudinary:', imageError)
+            }
+          }
+        }
+      }
+
+      // Delete main image from Cloudinary if it exists
       if (deletingEntry.cloudinary_id) {
         try {
           await fetch('/api/delete-image', {
@@ -116,11 +143,11 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
             body: JSON.stringify({ publicId: deletingEntry.cloudinary_id })
           })
         } catch (imageError) {
-          console.warn('Error deleting image from Cloudinary:', imageError)
+          console.warn('Error deleting main image from Cloudinary:', imageError)
         }
       }
 
-      // Delete the entry from database
+      // Delete the entry from database (cascade will delete sneaker_photos records)
       const { error } = await supabase
         .from('sneakers')
         .delete()
@@ -227,7 +254,7 @@ function DashboardHeader() {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">
       <div>
-        <h1 className="text-3xl font-bold">📏 Personal Sizing Journal</h1>
+        <h1 className="text-3xl font-bold"> Personal Sizing Watchlist</h1>
         <p className="text-gray-600">Track your sizing, fit, and comfort across brands</p>
       </div>
     </div>

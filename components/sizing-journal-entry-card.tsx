@@ -19,7 +19,7 @@ export function SizingJournalEntryCard({ entry, onEdit, onDelete }: SizingJourna
   const photos = preparePhotos(entry)
 
   return (
-    <Card className="overflow-hidden hover-lift card-interactive transition-all duration-300 group relative">
+    <Card className="overflow-hidden hover-lift card-interactive transition-all duration-300 group relative rounded-xl">
       <div className="flex flex-col md:flex-row">
         {/* Kebab Menu */}
         <div className="absolute top-2 right-2 z-50">
@@ -99,10 +99,10 @@ export function SizingJournalEntryCard({ entry, onEdit, onDelete }: SizingJourna
           </h3>
 
           {/* Metadata Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-2 text-xs mt-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-3 gap-x-3 gap-y-2 text-xs mt-2">
             {entry.size_tried && (
               <div className="flex items-center gap-1">
-                <span className="text-gray-500">Size:</span>
+                <span className="text-gray-500">Ideal Size:</span>
                 <span className="font-semibold">{entry.size_tried}</span>
               </div>
             )}

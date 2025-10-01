@@ -9,13 +9,30 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle, Edit, Camera, Loader2, ThumbsUp, Upload, X } from 'lucide-react'
+import { CheckCircle, Edit, Loader2, Upload, X, GripVertical } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import { MultiPhotoUpload } from './multi-photo-upload'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
-// Same schema as SmartSneakerForm
+// Schema for journal entry editing
 const sneakerSchema = z.object({
   userName: z.enum(['Kenny', 'Rene'], { required_error: 'Select who is tracking this sneaker' }),
   interactionType: z.enum(['seen', 'tried'], { required_error: 'Select your experience' }),
@@ -24,28 +41,38 @@ const sneakerSchema = z.object({
   colorway: z.string().optional(),
   // Try-on specific (conditional)
   sizeTried: z.string().optional(),
-  fitRating: z.coerce.number().min(1).max(5).optional(),
   comfortRating: z.coerce.number().min(1).max(5).optional(),
   // General fields
   storeName: z.string().optional(),
   retailPrice: z.string().optional(),
   idealPrice: z.string().optional(),
-  notes: z.string().optional(),
-  image: z.any().optional()
+  notes: z.string().max(80).optional()
 }).refine((data) => {
   if (data.interactionType === 'tried') {
-    return data.sizeTried && data.fitRating
+    return data.sizeTried
   }
   return true
 }, {
-  message: "Size and fit rating are required when you've tried the sneaker",
+  message: "Size is required when you've tried the sneaker",
   path: ["sizeTried"]
 })
 
 type SneakerFormData = z.infer<typeof sneakerSchema>
 
-// Common sneaker brands for quick selection
-const COMMON_BRANDS = ['Nike', 'Jordan', 'Adidas', 'New Balance', 'Asics', 'Puma', 'Vans', 'Converse']
+interface PhotoItem {
+  id: string
+  file: File
+  preview: string
+  isMain: boolean
+  order: number
+}
+
+interface ExistingPhoto {
+  id: string
+  image_url: string
+  image_order: number
+  is_main_image: boolean
+}
 
 // Common sizes with EU and Women's equivalents (US Men's 3.5 - 10.5)
 const COMMON_SIZES = [
@@ -66,14 +93,6 @@ const COMMON_SIZES = [
   { us: '10.5', women: '12', eu: '44.5' }
 ]
 
-// Fit rating descriptions
-const FIT_RATINGS = [
-  { value: 1, label: '1 - Too Small', icon: '🔴', description: 'Cramped, uncomfortable' },
-  { value: 2, label: '2 - Snug', icon: '🟠', description: 'Tight but wearable' },
-  { value: 3, label: '3 - Perfect', icon: '🟢', description: 'Just right!' },
-  { value: 4, label: '4 - Loose', icon: '🟡', description: 'A bit roomy' },
-  { value: 5, label: '5 - Too Big', icon: '🔴', description: 'Swimming in them' }
-]
 
 interface EditSneakerModalProps {
   experience: any
@@ -82,29 +101,111 @@ interface EditSneakerModalProps {
   onSave: () => void
 }
 
+// Sortable photo component for existing photos
+function SortableExistingPhoto({ photo, index, onSetMain, onDelete }: {
+  photo: ExistingPhoto
+  index: number
+  onSetMain: (id: string) => void
+  onDelete: (id: string) => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: photo.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`relative group ${isDragging ? 'z-10' : ''}`}
+    >
+      {/* Drag Handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute top-1 left-1 z-10 p-1 bg-black/50 rounded cursor-grab active:cursor-grabbing hover:bg-black/70 transition-colors"
+      >
+        <GripVertical className="h-3 w-3 text-white" />
+      </div>
+
+      <img
+        src={photo.image_url}
+        alt={`Photo ${index + 1}`}
+        className="w-full aspect-square object-cover rounded-lg"
+      />
+
+      {photo.is_main_image && (
+        <div className="absolute top-1 right-1 bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded z-10">
+          Main
+        </div>
+      )}
+
+      <div className="absolute top-1 right-1 flex gap-1">
+        {!photo.is_main_image && (
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] z-10"
+            onClick={() => onSetMain(photo.id)}
+          >
+            ★
+          </Button>
+        )}
+        <Button
+          type="button"
+          size="sm"
+          variant="destructive"
+          className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+          onClick={() => onDelete(photo.id)}
+        >
+          <X className="h-3 w-3" />
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSneakerModalProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [dragActive, setDragActive] = useState(false)
+  const [photos, setPhotos] = useState<PhotoItem[]>([])
+  const [existingPhotos, setExistingPhotos] = useState<ExistingPhoto[]>([])
+  const [photosToDelete, setPhotosToDelete] = useState<string[]>([])
   const [uploadProgress, setUploadProgress] = useState('')
 
   const supabase = createClient()
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
   const {
     register,
     handleSubmit,
-    reset,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
     setValue,
-    watch
+    watch,
+    trigger
   } = useForm<SneakerFormData>({
     resolver: zodResolver(sneakerSchema),
     mode: 'onChange'
   })
 
   const watchedInteractionType = watch('interactionType')
-  const watchedFitRating = watch('fitRating')
 
   // Populate form with existing data when modal opens
   useEffect(() => {
@@ -115,50 +216,65 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
       setValue('model', experience.model)
       setValue('colorway', experience.colorway || '')
       setValue('sizeTried', experience.size_tried || '')
-      setValue('fitRating', experience.fit_rating || undefined)
       setValue('comfortRating', experience.comfort_rating || undefined)
       setValue('storeName', experience.store_name || '')
       setValue('retailPrice', experience.retail_price?.toString() || '')
       setValue('idealPrice', experience.ideal_price?.toString() || '')
       setValue('notes', experience.notes || '')
 
-      if (experience.image_url) {
-        setImagePreview(experience.image_url)
+      // Load existing photos from sneaker_photos
+      if (experience.sneaker_photos && experience.sneaker_photos.length > 0) {
+        setExistingPhotos(experience.sneaker_photos)
+      } else {
+        setExistingPhotos([])
       }
-    }
-  }, [isOpen, experience, setValue])
 
-  // Handle file upload
-  const handleFileChange = (file: File | null) => {
-    if (file && file.type.startsWith('image/')) {
-      setValue('image', file)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
+      // Reset new photos and deletion list
+      setPhotos([])
+      setPhotosToDelete([])
+
+      // Trigger validation after setting values
+      setTimeout(() => trigger(), 100)
+    }
+  }, [isOpen, experience, setValue, trigger])
+
+  const handleExistingPhotosDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      setExistingPhotos((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id)
+        const newIndex = items.findIndex(item => item.id === over.id)
+
+        const reordered = arrayMove(items, oldIndex, newIndex)
+
+        // Update order numbers
+        return reordered.map((item, index) => ({
+          ...item,
+          image_order: index + 1
+        }))
+      })
     }
   }
 
-  // Drag and drop handlers
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true)
-    } else if (e.type === "dragleave") {
-      setDragActive(false)
-    }
+  const handleSetMainPhoto = (photoId: string) => {
+    setExistingPhotos(prev => prev.map(p => ({
+      ...p,
+      is_main_image: p.id === photoId
+    })))
   }
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileChange(e.dataTransfer.files[0])
-    }
+  const handleDeleteExistingPhoto = (photoId: string) => {
+    setPhotosToDelete(prev => [...prev, photoId])
+    setExistingPhotos(prev => {
+      const filtered = prev.filter(p => p.id !== photoId)
+      // If we deleted the main photo, make first remaining photo main
+      const deletedPhoto = prev.find(p => p.id === photoId)
+      if (deletedPhoto?.is_main_image && filtered.length > 0) {
+        filtered[0].is_main_image = true
+      }
+      return filtered
+    })
   }
 
   const onSubmit = async (data: SneakerFormData) => {
@@ -166,64 +282,113 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
     setSuccessMessage('')
 
     try {
-      let imageUrl = experience.image_url
-      let cloudinaryId = experience.cloudinary_id
+      // Step 1: Upload new photos to Cloudinary
+      const uploadedPhotos: Array<{ url: string; publicId: string; order: number; isMain: boolean }> = []
 
-      // Upload new image to Cloudinary if provided
-      if (data.image) {
-        setUploadProgress('📤 Uploading image...')
+      if (photos.length > 0) {
+        setUploadProgress(`📤 Uploading ${photos.length} photo(s)...`)
 
-        const formData = new FormData()
-        formData.append('file', data.image)
+        for (const photo of photos) {
+          const formData = new FormData()
+          formData.append('file', photo.file)
 
-        const uploadResponse = await fetch('/api/upload-image', {
-          method: 'POST',
-          body: formData
-        })
+          const uploadResponse = await fetch('/api/upload-image', {
+            method: 'POST',
+            body: formData
+          })
 
-        if (!uploadResponse.ok) {
-          const error = await uploadResponse.json()
-          throw new Error(error.error || 'Failed to upload image')
+          if (!uploadResponse.ok) {
+            const error = await uploadResponse.json()
+            throw new Error(error.error || 'Failed to upload image')
+          }
+
+          const uploadResult = await uploadResponse.json()
+          uploadedPhotos.push({
+            url: uploadResult.data.url,
+            publicId: uploadResult.data.publicId,
+            order: photo.order,
+            isMain: photo.isMain
+          })
         }
 
-        const uploadResult = await uploadResponse.json()
-        imageUrl = uploadResult.data.url
-        cloudinaryId = uploadResult.data.publicId
-
-        setUploadProgress('✅ Image uploaded!')
+        setUploadProgress('✅ Photos uploaded!')
       }
 
+      // Step 2: Update the main entry data
       const experienceData = {
         user_name: data.userName,
         brand: data.brand,
         model: data.model,
         colorway: data.colorway || 'Standard',
         interaction_type: data.interactionType,
-        // Only include try-on specific fields if actually tried on
         size_tried: data.interactionType === 'tried' ? data.sizeTried : null,
-        fit_rating: data.interactionType === 'tried' ? data.fitRating : null,
         comfort_rating: data.interactionType === 'tried' ? (data.comfortRating || null) : null,
-        // Always optional fields
         store_name: data.storeName || null,
         retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
         ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
         notes: data.notes || null,
-        interested_in_buying: true, // If they're keeping it, they're interested
-        image_url: imageUrl,
-        cloudinary_id: cloudinaryId
+        interested_in_buying: true,
+        try_on_date: new Date().toISOString()
       }
 
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('sneakers')
         .update(experienceData)
         .eq('id', experience.id)
 
-      if (error) {
-        console.error('Database error:', error)
-        throw error
+      if (updateError) {
+        console.error('Database error:', updateError)
+        throw updateError
       }
 
-      setSuccessMessage('✅ Experience updated successfully!')
+      // Step 3: Delete photos marked for deletion
+      if (photosToDelete.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('sneaker_photos')
+          .delete()
+          .in('id', photosToDelete)
+
+        if (deleteError) {
+          console.error('Error deleting photos:', deleteError)
+        }
+      }
+
+      // Step 4: Update existing photos (main status and order)
+      for (const existingPhoto of existingPhotos) {
+        const { error: photoUpdateError } = await supabase
+          .from('sneaker_photos')
+          .update({
+            is_main_image: existingPhoto.is_main_image,
+            image_order: existingPhoto.image_order
+          })
+          .eq('id', existingPhoto.id)
+
+        if (photoUpdateError) {
+          console.error('Error updating photo:', photoUpdateError)
+        }
+      }
+
+      // Step 5: Insert new photos
+      if (uploadedPhotos.length > 0) {
+        const newPhotoRecords = uploadedPhotos.map(photo => ({
+          sneaker_id: experience.id,
+          image_url: photo.url,
+          cloudinary_id: photo.publicId,
+          image_order: photo.order + existingPhotos.length,
+          is_main_image: photo.isMain && existingPhotos.length === 0 // Only set main if no existing photos
+        }))
+
+        const { error: insertError } = await supabase
+          .from('sneaker_photos')
+          .insert(newPhotoRecords)
+
+        if (insertError) {
+          console.error('Error inserting photos:', insertError)
+          throw insertError
+        }
+      }
+
+      setSuccessMessage('✅ Journal entry updated successfully!')
 
       // Close modal and refresh after 1 second
       setTimeout(() => {
@@ -233,18 +398,14 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         onClose()
       }, 1000)
 
-    } catch (error) {
-      console.error('Error updating experience:', error)
+    } catch (error: any) {
+      console.error('Error updating journal entry:', error)
       setSuccessMessage('')
       setUploadProgress('')
       alert(`Failed to update: ${error.message || 'Unknown error'}`)
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const getFitRatingInfo = (rating: number) => {
-    return FIT_RATINGS.find(r => r.value === rating)
   }
 
   if (!isOpen) return null
@@ -264,9 +425,9 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
             </Button>
             <CardTitle className="text-2xl flex items-center justify-center gap-2">
               <Edit className="h-6 w-6 text-blue-500" />
-              Edit Experience
+              Edit Journal Entry
             </CardTitle>
-            <p className="text-sm text-gray-600">Update your sneaker details</p>
+            <p className="text-sm text-gray-600">Update your sizing journal entry</p>
           </CardHeader>
 
           <CardContent>
@@ -357,42 +518,27 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
               {/* Try-On Specific Fields */}
               {watchedInteractionType === 'tried' && (
                 <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">Size Tried</Label>
-                      <Select onValueChange={(value) => setValue('sizeTried', value)} value={watch('sizeTried')}>
-                        <SelectTrigger className="mt-2">
-                          <SelectValue placeholder="Select size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {COMMON_SIZES.map((size) => (
-                            <SelectItem key={size.us} value={size.us}>
-                              <div className="flex flex-col">
-                                <span>US M {size.us} / W {size.women}</span>
-                                <span className="text-xs text-gray-500">EU {size.eu}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">Fit Rating</Label>
-                      <Select onValueChange={(value) => setValue('fitRating', parseInt(value))} value={watch('fitRating')?.toString()}>
-                        <SelectTrigger className="mt-2">
-                          <SelectValue placeholder="How did it fit?" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {FIT_RATINGS.map((rating) => (
-                            <SelectItem key={rating.value} value={rating.value.toString()}>
-                              {rating.icon} {rating.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Size Tried</Label>
+                    <Select onValueChange={(value) => setValue('sizeTried', value)} value={watch('sizeTried')}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COMMON_SIZES.map((size) => (
+                          <SelectItem key={size.us} value={size.us}>
+                            <div className="flex flex-col">
+                              <span>US M {size.us} / W {size.women}</span>
+                              <span className="text-xs text-gray-500">EU {size.eu}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.sizeTried && (
+                      <p className="text-xs text-red-600 mt-1">{errors.sizeTried.message}</p>
+                    )}
                   </div>
-
                 </>
               )}
 
@@ -458,44 +604,41 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                 </div>
               )}
 
-              {/* Photo Upload */}
+              {/* Existing Photos Management */}
+              {existingPhotos.length > 0 && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Current Photos - Drag to reorder
+                  </Label>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleExistingPhotosDragEnd}
+                  >
+                    <SortableContext items={existingPhotos.map(p => p.id)} strategy={rectSortingStrategy}>
+                      <div className="grid grid-cols-3 gap-2 mb-4">
+                        {existingPhotos.map((photo, index) => (
+                          <SortableExistingPhoto
+                            key={photo.id}
+                            photo={photo}
+                            index={index}
+                            onSetMain={handleSetMainPhoto}
+                            onDelete={handleDeleteExistingPhoto}
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+                </div>
+              )}
+
+              {/* Multi Photo Upload */}
               <div>
-                <Label className="text-sm font-medium flex items-center gap-2">
-                  📸 Update Photo (Optional)
-                </Label>
-                <label
-                  className={`relative block border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer mt-2 ${
-                    dragActive
-                      ? 'border-blue-400 bg-blue-50'
-                      : imagePreview
-                        ? 'border-green-300 bg-green-50'
-                        : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                >
-                  {imagePreview ? (
-                    <div className="space-y-2">
-                      <img src={imagePreview} alt="Preview" className="max-h-24 mx-auto rounded" />
-                      <p className="text-xs text-green-600">✅ Photo ready</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-1">
-                      <Camera className="h-6 w-6 mx-auto text-gray-400" />
-                      <p className="text-xs text-gray-600">
-                        📷 Tap to add photo or drag & drop
-                      </p>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
-                    className="sr-only"
-                  />
-                </label>
+                <MultiPhotoUpload
+                  photos={photos}
+                  onPhotosChange={setPhotos}
+                  maxPhotos={5 - existingPhotos.length}
+                />
               </div>
 
               {/* Upload Progress */}
