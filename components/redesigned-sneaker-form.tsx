@@ -632,31 +632,52 @@ export function RedesignedSneakerForm({
 		try {
 			let mainImageUrl = null;
 			let mainCloudinaryId = null;
+			const uploadedPhotos = [];
 
-			// Upload main photo to Cloudinary if provided
-			const mainPhoto = photos.find((p) => p.isMain) || photos[0];
-			if (mainPhoto) {
+			// Upload all photos to Cloudinary if provided
+			if (photos.length > 0) {
 				setUploadProgress(
 					`📤 Uploading ${photos.length} photo${
 						photos.length > 1 ? "s" : ""
 					}...`
 				);
-				const formData = new FormData();
-				formData.append("file", mainPhoto.file);
 
-				const uploadResponse = await fetch("/api/upload-image", {
-					method: "POST",
-					body: formData,
-				});
+				for (let i = 0; i < photos.length; i++) {
+					const photo = photos[i];
+					const formData = new FormData();
+					formData.append("file", photo.file);
 
-				if (!uploadResponse.ok) {
-					const error = await uploadResponse.json();
-					throw new Error(error.error || "Failed to upload image");
+					const uploadResponse = await fetch("/api/upload-image", {
+						method: "POST",
+						body: formData,
+					});
+
+					if (!uploadResponse.ok) {
+						const error = await uploadResponse.json();
+						throw new Error(error.error || `Failed to upload photo ${i + 1}`);
+					}
+
+					const uploadResult = await uploadResponse.json();
+
+					// Store uploaded photo info
+					uploadedPhotos.push({
+						url: uploadResult.data.url,
+						cloudinaryId: uploadResult.data.publicId,
+						order: photo.order,
+						isMain: photo.isMain
+					});
+
+					// Keep track of main image for backward compatibility
+					if (photo.isMain) {
+						mainImageUrl = uploadResult.data.url;
+						mainCloudinaryId = uploadResult.data.publicId;
+					}
+
+					setUploadProgress(
+						`📤 Uploaded ${i + 1}/${photos.length} photo${photos.length > 1 ? "s" : ""}...`
+					);
 				}
 
-				const uploadResult = await uploadResponse.json();
-				mainImageUrl = uploadResult.data.url;
-				mainCloudinaryId = uploadResult.data.publicId;
 				setUploadProgress(
 					`✅ ${photos.length} photo${photos.length > 1 ? "s" : ""} uploaded!`
 				);
@@ -691,11 +712,35 @@ export function RedesignedSneakerForm({
 				cloudinary_id: mainCloudinaryId,
 			};
 
-			const { error } = await supabase.from("sneakers").insert(experienceData);
+			const { data: insertedSneaker, error } = await supabase
+				.from("sneakers")
+				.insert(experienceData)
+				.select()
+				.single();
 
 			if (error) {
 				console.error("Database error:", error);
 				throw error;
+			}
+
+			// Insert all photos into sneaker_photos table
+			if (uploadedPhotos.length > 0 && insertedSneaker) {
+				const photoRecords = uploadedPhotos.map(photo => ({
+					sneaker_id: insertedSneaker.id,
+					image_url: photo.url,
+					cloudinary_id: photo.cloudinaryId,
+					image_order: photo.order,
+					is_main_image: photo.isMain
+				}));
+
+				const { error: photosError } = await supabase
+					.from("sneaker_photos")
+					.insert(photoRecords);
+
+				if (photosError) {
+					console.warn("Failed to save photos:", photosError);
+					// Don't throw - sneaker is already saved
+				}
 			}
 
 			// Create price monitor if URL provided
