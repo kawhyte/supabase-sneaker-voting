@@ -62,41 +62,127 @@ interface PhotoItem {
 const sneakerSchema = z
 	.object({
 		userName: z.enum(["Kenny", "Rene"], {
-			required_error: "Select who is tracking this sneaker",
+			required_error: "Please select who is tracking this sneaker",
 		}),
 		interactionType: z.enum(["seen", "tried"], {
-			required_error: "Select your experience",
+			required_error: "Please select whether you saw or tried on this sneaker",
 		}),
 		// Smart Import fields
-		productUrl: z.string().optional(),
-		targetPrice: z.string().optional(),
-		enableNotifications: z.boolean().optional(),
+		productUrl: z.string()
+			.url('Please enter a valid URL (e.g., https://www.nike.com/...)')
+			.max(500, 'URL must be less than 500 characters')
+			.optional()
+			.or(z.literal('')),
+		targetPrice: z.string()
+			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 100 or 100.00)')
+			.refine((val) => {
+				if (val === '') return true;
+				const price = parseFloat(val);
+				return price >= 0 && price <= 10000;
+			}, 'Target price must be between $0 and $10,000')
+			.optional()
+			.or(z.literal('')),
+		enableNotifications: z.boolean().default(false),
 		// Product fields
-		brand: z.string().min(1, "Brand is required"),
-		model: z.string().min(1, "Model is required"),
-		sku: z.string().optional(),
-		colorway: z.string().optional(),
+		brand: z.string()
+			.min(1, 'Please select or enter a brand name')
+			.max(50, 'Brand name must be less than 50 characters')
+			.trim(),
+		model: z.string()
+			.min(2, 'Please enter the sneaker model (e.g., Air Jordan 1, Yeezy 350)')
+			.max(100, 'Model name must be less than 100 characters')
+			.trim(),
+		sku: z.string()
+			.max(50, 'SKU must be less than 50 characters')
+			.regex(/^[A-Za-z0-9-]*$/, 'SKU can only contain letters, numbers, and hyphens')
+			.optional()
+			.or(z.literal('')),
+		colorway: z.string()
+			.max(100, 'Colorway must be less than 100 characters')
+			.trim()
+			.optional()
+			.or(z.literal('')),
 		// Try-on specific (conditional)
 		sizeTried: z.string().optional(),
-		fitRating: z.coerce.number().min(1).max(5).optional(),
 		comfortRating: z.coerce.number().min(1).max(5).optional(),
 		// General fields
-		storeName: z.string().optional(),
-		retailPrice: z.string().optional(),
-		salePrice: z.string().optional(),
-		idealPrice: z.string().optional(),
-		notes: z.string().optional(),
+		storeName: z.string()
+			.max(100, 'Store name must be less than 100 characters')
+			.trim()
+			.optional()
+			.or(z.literal('')),
+		retailPrice: z.string()
+			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 170 or 170.00)')
+			.refine((val) => {
+				if (val === '') return true;
+				const price = parseFloat(val);
+				return price >= 0 && price <= 10000;
+			}, 'Price must be between $0 and $10,000')
+			.optional()
+			.or(z.literal('')),
+		salePrice: z.string()
+			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 120 or 120.00)')
+			.refine((val) => {
+				if (val === '') return true;
+				const price = parseFloat(val);
+				return price >= 0 && price <= 10000;
+			}, 'Price must be between $0 and $10,000')
+			.optional()
+			.or(z.literal('')),
+		idealPrice: z.string()
+			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 100 or 100.00)')
+			.refine((val) => {
+				if (val === '') return true;
+				const price = parseFloat(val);
+				return price >= 0 && price <= 10000;
+			}, 'Price must be between $0 and $10,000')
+			.optional()
+			.or(z.literal('')),
+		notes: z.string()
+			.max(80, 'Notes must be less than 80 characters')
+			.trim()
+			.optional()
+			.or(z.literal('')),
 	})
 	.refine(
 		(data) => {
+			// Size is required when tried on
 			if (data.interactionType === "tried") {
-				return data.sizeTried;
+				return data.sizeTried && data.sizeTried.length > 0;
 			}
 			return true;
 		},
 		{
-			message: "Size is required when you've tried the sneaker",
+			message: "Please select the size you tried on - this helps track your perfect fit",
 			path: ["sizeTried"],
+		}
+	)
+	.refine(
+		(data) => {
+			// Comfort rating is required when tried on
+			if (data.interactionType === "tried") {
+				return data.comfortRating !== undefined && data.comfortRating >= 1 && data.comfortRating <= 5;
+			}
+			return true;
+		},
+		{
+			message: "Please rate the comfort - how did they feel on your feet?",
+			path: ["comfortRating"],
+		}
+	)
+	.refine(
+		(data) => {
+			// Sale price cannot be higher than retail price
+			if (data.retailPrice && data.salePrice) {
+				const retail = parseFloat(data.retailPrice);
+				const sale = parseFloat(data.salePrice);
+				return sale <= retail;
+			}
+			return true;
+		},
+		{
+			message: 'Sale price cannot be higher than retail price',
+			path: ['salePrice'],
 		}
 	);
 
@@ -163,7 +249,6 @@ export function RedesignedSneakerForm({
 	const watchedUser = watch("userName");
 	const watchedBrand = watch("brand");
 	const watchedInteractionType = watch("interactionType");
-	const watchedFitRating = watch("fitRating");
 	const watchedRetailPrice = watch("retailPrice");
 	const watchedSalePrice = watch("salePrice");
 
@@ -754,7 +839,6 @@ export function RedesignedSneakerForm({
 				sku: data.sku || null,
 				// Only include try-on specific fields if actually tried on
 				size_tried: data.interactionType === "tried" ? data.sizeTried : null,
-				fit_rating: data.interactionType === "tried" ? data.fitRating : null,
 				comfort_rating:
 					data.interactionType === "tried" ? data.comfortRating || null : null,
 				// Always optional fields
@@ -904,8 +988,9 @@ export function RedesignedSneakerForm({
 						<div className='grid grid-cols-1 md:grid-cols-2 gap-[var(--space-base)] pb-[var(--space-base)]'>
 							<div>
 								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]'>
-									<User className='h-3 w-3 text-blue-600' />
-									Who's tracking? *
+									{/* <User className='h-3 w-3 text-blue-600' /> */}
+									<span>Who's tracking?</span>
+									<span className='text-red-500 -ml-1'>*</span>
 								</Label>
 								<Select
 									onValueChange={(value: "Kenny" | "Rene") =>
@@ -1164,7 +1249,7 @@ export function RedesignedSneakerForm({
 										{/* Model */}
 										<div>
 											<Label className='text-sm font-medium text-gray-700'>
-												Model *
+												<span>Model</span> <span className='text-red-500'>*</span>
 											</Label>
 											<Input
 												{...register("model")}
@@ -1189,7 +1274,7 @@ export function RedesignedSneakerForm({
 										{/* Brand */}
 										<div>
 											<Label className='text-sm font-medium text-gray-700'>
-												Brand *
+												<span>Brand</span> <span className='text-red-500'>*</span>
 											</Label>
 											<div className='mt-[var(--space-md)] max-w-xs'>
 												<BrandCombobox
@@ -1361,7 +1446,7 @@ export function RedesignedSneakerForm({
 										<div>
 											<Label className='text-sm font-medium text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)]'>
 												<Camera className='h-4 w-4' />
-												Photos (Required - Min 1)
+												<span>Photos</span> <span className='text-red-500'>*</span> <span className='text-xs text-gray-500'>(Min 1)</span>
 											</Label>
 											<MultiPhotoUpload
 												photos={photos}
@@ -1387,7 +1472,7 @@ export function RedesignedSneakerForm({
 												</Label>
 												{watch("notes") && (
 													<span className='text-xs text-gray-500'>
-														{watch("notes")?.length || 0} / 500
+														{watch("notes")?.length || 0} / 80
 													</span>
 												)}
 											</div>
@@ -1400,7 +1485,7 @@ export function RedesignedSneakerForm({
 												}
 												className='mt-[var(--space-md)] resize-none'
 												rows={3}
-												maxLength={500}
+												maxLength={80}
 											/>
 											<div className='mt-[var(--space-md)] text-xs text-gray-500'>
 												💡 Quick tips:{" "}
@@ -1426,7 +1511,7 @@ export function RedesignedSneakerForm({
 												{/* Size Selection */}
 												<div className='mb-4 mt-4 w-full'>
 													<Label className='text-sm font-medium text-gray-700'>
-														Size Tried *
+														<span>Size Tried</span> <span className='text-red-500'>*</span>
 													</Label>
 													<div className='mt-[var(--space-md)] max-w-sm'>
 														<SizeCombobox
@@ -1526,10 +1611,10 @@ export function RedesignedSneakerForm({
 													)}
 												</div>*/}
 
-												{/* Comfort Rating (Optional) */}
+												{/* Comfort Rating (Required) */}
 												<div className="mt-4 ">
 													<Label className='text-sm font-medium text-gray-700 '>
-														How comfortable were they? (Optional)
+														<span>How comfortable were they?</span> <span className='text-red-500'>*</span>
 													</Label>
 											
 													<div className='flex items-center gap-[var(--space-xs)] '>

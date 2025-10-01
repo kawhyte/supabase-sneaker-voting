@@ -20,29 +20,100 @@ import { cn } from '@/lib/utils'
 
 // Schema for journal entry editing
 const sneakerSchema = z.object({
-  userName: z.enum(['Kenny', 'Rene'], { required_error: 'Select who is tracking this sneaker' }),
-  interactionType: z.enum(['seen', 'tried'], { required_error: 'Select your experience' }),
-  brand: z.string().min(1, 'Brand is required'),
-  model: z.string().min(1, 'Model is required'),
-  sku: z.string().optional(),
-  colorway: z.string().optional(),
+  userName: z.enum(['Kenny', 'Rene'], {
+    required_error: 'Please select who is tracking this sneaker'
+  }),
+  interactionType: z.enum(['seen', 'tried'], {
+    required_error: 'Please select whether you saw or tried on this sneaker'
+  }),
+  brand: z.string()
+    .min(1, 'Please select or enter a brand name')
+    .max(50, 'Brand name must be less than 50 characters')
+    .trim(),
+  model: z.string()
+    .min(2, 'Please enter the sneaker model (e.g., Air Jordan 1, Yeezy 350)')
+    .max(100, 'Model name must be less than 100 characters')
+    .trim(),
+  sku: z.string()
+    .max(50, 'SKU must be less than 50 characters')
+    .regex(/^[A-Za-z0-9-]*$/, 'SKU can only contain letters, numbers, and hyphens')
+    .optional()
+    .or(z.literal('')),
+  colorway: z.string()
+    .max(100, 'Colorway must be less than 100 characters')
+    .trim()
+    .optional()
+    .or(z.literal('')),
   // Try-on specific (conditional)
   sizeTried: z.string().optional(),
   comfortRating: z.coerce.number().min(1).max(5).optional(),
   // General fields
-  storeName: z.string().optional(),
-  retailPrice: z.string().optional(),
-  salePrice: z.string().optional(),
-  idealPrice: z.string().optional(),
-  notes: z.string().optional()
+  storeName: z.string()
+    .max(100, 'Store name must be less than 100 characters')
+    .trim()
+    .optional()
+    .or(z.literal('')),
+  retailPrice: z.string()
+    .regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 170 or 170.00)')
+    .refine((val) => {
+      if (val === '') return true;
+      const price = parseFloat(val);
+      return price >= 0 && price <= 10000;
+    }, 'Price must be between $0 and $10,000')
+    .optional()
+    .or(z.literal('')),
+  salePrice: z.string()
+    .regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 120 or 120.00)')
+    .refine((val) => {
+      if (val === '') return true;
+      const price = parseFloat(val);
+      return price >= 0 && price <= 10000;
+    }, 'Price must be between $0 and $10,000')
+    .optional()
+    .or(z.literal('')),
+  idealPrice: z.string()
+    .regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 100 or 100.00)')
+    .refine((val) => {
+      if (val === '') return true;
+      const price = parseFloat(val);
+      return price >= 0 && price <= 10000;
+    }, 'Price must be between $0 and $10,000')
+    .optional()
+    .or(z.literal('')),
+  notes: z.string()
+    .max(80, 'Notes must be less than 80 characters')
+    .trim()
+    .optional()
+    .or(z.literal(''))
 }).refine((data) => {
+  // Size is required when tried on
   if (data.interactionType === 'tried') {
-    return data.sizeTried
+    return data.sizeTried && data.sizeTried.length > 0;
   }
-  return true
+  return true;
 }, {
-  message: "Size is required when you've tried the sneaker",
+  message: "Please select the size you tried on - this helps track your perfect fit",
   path: ["sizeTried"]
+}).refine((data) => {
+  // Comfort rating is required when tried on
+  if (data.interactionType === 'tried') {
+    return data.comfortRating !== undefined && data.comfortRating >= 1 && data.comfortRating <= 5;
+  }
+  return true;
+}, {
+  message: "Please rate the comfort - how did they feel on your feet?",
+  path: ["comfortRating"]
+}).refine((data) => {
+  // Sale price cannot be higher than retail price
+  if (data.retailPrice && data.salePrice) {
+    const retail = parseFloat(data.retailPrice);
+    const sale = parseFloat(data.salePrice);
+    return sale <= retail;
+  }
+  return true;
+}, {
+  message: 'Sale price cannot be higher than retail price',
+  path: ['salePrice']
 })
 
 type SneakerFormData = z.infer<typeof sneakerSchema>
@@ -417,8 +488,8 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-base)] pb-[var(--space-base)]">
                   <div>
                     <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
-                      <User className="h-3 w-3 text-blue-600" />
-                      Who's tracking? *
+                      {/* <User className="h-3 w-3 text-blue-600" /> */}
+                      Who's tracking? <span className="text-red-500">*</span>
                     </Label>
                     <Select
                       onValueChange={(value: "Kenny" | "Rene") => setValue("userName", value, { shouldValidate: true })}
@@ -442,8 +513,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
 
                   <div>
                     <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
-                      <span>Experience</span>
-                      <span className="text-red-500 -ml-1">*</span>
+                      Experience <span className="text-red-500">*</span>
                     </Label>
                     <Select
                       onValueChange={(value: "seen" | "tried") => setValue("interactionType", value, { shouldValidate: true })}
@@ -484,7 +554,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                 <div className="space-y-[var(--space-base)]">
                   {/* Model */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Model *</Label>
+                    <Label className="text-sm font-medium text-gray-700">Model <span className="text-red-500">*</span></Label>
                     <Input
                       {...register("model")}
                       placeholder="Air Jordan 1, Air Max 90, etc."
@@ -500,7 +570,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
 
                   {/* Brand */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Brand *</Label>
+                    <Label className="text-sm font-medium text-gray-700">Brand <span className="text-red-500">*</span></Label>
                     <div className="mt-[var(--space-md)] max-w-xs">
                       <BrandCombobox
                         value={watchedBrand}
@@ -620,7 +690,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
               <div>
                 <Label className="text-sm font-medium text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)]">
                   <Camera className="h-4 w-4" />
-                  Photos (Required - Min 1)
+                  Photos <span className="text-red-500">*</span> <span className="text-xs text-gray-500">(Min 1)</span>
                 </Label>
                 <MultiPhotoUpload
                   photos={combinedPhotos}
@@ -640,7 +710,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-gray-600">Notes (Optional)</Label>
                   {watch("notes") && (
-                    <span className="text-xs text-gray-500">{watch("notes")?.length || 0} / 500</span>
+                    <span className="text-xs text-gray-500">{watch("notes")?.length || 0} / 80</span>
                   )}
                 </div>
                 <Textarea
@@ -652,7 +722,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                   }
                   className="mt-[var(--space-md)] resize-none"
                   rows={3}
-                  maxLength={500}
+                  maxLength={80}
                 />
                 <div className="mt-[var(--space-md)] text-xs text-gray-500">
                   💡 Quick tips:{" "}
@@ -672,7 +742,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                   <div className="flex justify-between gap-x-12">
                     {/* Size Selection */}
                     <div className="mb-4 mt-4 w-full">
-                      <Label className="text-sm font-medium text-gray-700">Size Tried *</Label>
+                      <Label className="text-sm font-medium text-gray-700">Size Tried <span className="text-red-500">*</span></Label>
                       <div className="mt-[var(--space-md)] max-w-sm">
                         <SizeCombobox
                           value={watch("sizeTried")}
@@ -701,7 +771,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                     {/* Comfort Rating */}
                     <div className="mt-4">
                       <Label className="text-sm font-medium text-gray-700">
-                        How comfortable were they? (Optional)
+                        How comfortable were they? <span className="text-red-500">*</span>
                       </Label>
                       <div className="flex items-center gap-[var(--space-xs)]">
                         {[1, 2, 3, 4, 5].map((rating) => (
@@ -753,6 +823,12 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                               ? "Very comfortable"
                               : "Extremely comfortable"}
                           </p>
+                        </div>
+                      )}
+                      {errors.comfortRating && (
+                        <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
+                          <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs font-semibold text-red-700">{errors.comfortRating.message}</p>
                         </div>
                       )}
                       <p className="text-xs text-gray-500 mt-1">

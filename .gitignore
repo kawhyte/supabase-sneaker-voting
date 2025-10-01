@@ -36,6 +36,7 @@ yarn-error.log*
 next-env.d.ts
 
 .mcp.json
+.md
 
 # Build permissions fix
 .next-backup/
