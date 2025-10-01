@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, X } from 'lucide-react'
@@ -14,8 +14,17 @@ interface ImageConfirmationModalProps {
 }
 
 export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }: ImageConfirmationModalProps) {
-  const [selectedImages, setSelectedImages] = useState<string[]>(images)
+  const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [mainImageIndex, setMainImageIndex] = useState(0)
+
+  // Initialize selected images when modal opens or images change
+  useEffect(() => {
+    if (open && images.length > 0) {
+      console.log('📸 Modal received images:', images)
+      setSelectedImages(images)
+      setMainImageIndex(0)
+    }
+  }, [open, images])
 
   const toggleImageSelection = (image: string) => {
     if (selectedImages.includes(image)) {
@@ -72,6 +81,11 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
                   src={image}
                   alt={`Product ${index + 1}`}
                   className="w-full h-40 object-cover"
+                  crossOrigin="anonymous"
+                  onError={(e) => {
+                    console.error('Image failed to load:', image)
+                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3EImage unavailable%3C/text%3E%3C/svg%3E'
+                  }}
                 />
 
                 {/* Selection Checkbox */}

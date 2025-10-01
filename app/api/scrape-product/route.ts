@@ -74,6 +74,8 @@ export async function POST(request: NextRequest) {
         productData = await scrapeWithTimeout(() => scrapeAdidas(url))
       } else if (hostname.includes('stockx.com')) {
         productData = await scrapeWithTimeout(() => scrapeStockX(url))
+      } else if (hostname.includes('shoepalace.com')) {
+        productData = await scrapeWithTimeout(() => scrapeShoePalace(url))
       } else {
         productData = await scrapeWithTimeout(() => scrapeGeneric(url))
       }
@@ -410,6 +412,107 @@ async function scrapeStockX(url: string): Promise<ProductData> {
     return {
       success: false,
       error: `StockX scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+    }
+  }
+}
+
+async function scrapeShoePalace(url: string): Promise<ProductData> {
+  try {
+    // Shopify stores have a .json endpoint
+    // Convert URL to JSON endpoint
+    let jsonUrl = url.split('?')[0] // Remove query params
+    if (!jsonUrl.endsWith('.json')) {
+      jsonUrl += '.json'
+    }
+
+    const response = await fetch(jsonUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+    const product = data.product
+
+    if (!product) {
+      throw new Error('No product data found')
+    }
+
+    // Extract title and parse brand/model
+    const title = cleanText(product.title || '')
+    let brand = ''
+    let model = ''
+
+    if (title) {
+      // First word is usually the brand
+      const parts = title.split(' ')
+      brand = parts[0] || ''
+      model = parts.slice(1).join(' ')
+    }
+
+    // Get SKU from first variant if available
+    const sku = product.variants?.[0]?.sku || ''
+
+    // Price extraction from first variant
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    if (product.variants && product.variants.length > 0) {
+      const variant = product.variants[0]
+      const price = parseFloat(variant.price)
+      const compareAtPrice = variant.compare_at_price ? parseFloat(variant.compare_at_price) : 0
+
+      if (compareAtPrice > 0 && compareAtPrice > price) {
+        // On sale
+        retailPrice = compareAtPrice
+        salePrice = price
+      } else {
+        retailPrice = price
+      }
+    }
+
+    // Extract images from Shopify product data
+    const images: string[] = []
+    if (product.images && Array.isArray(product.images)) {
+      product.images.slice(0, 5).forEach((img: any) => {
+        if (img.src) {
+          // Ensure HTTPS
+          const imgUrl = img.src.startsWith('http') ? img.src : `https:${img.src}`
+          images.push(imgUrl)
+        }
+      })
+    }
+
+    console.log('🔍 Shoe Palace (Shopify) scraper found:', {
+      title,
+      brand,
+      model,
+      sku,
+      retailPrice,
+      salePrice,
+      imageCount: images.length,
+      images
+    })
+
+    return {
+      brand: brand || undefined,
+      model: model || undefined,
+      colorway: undefined,
+      sku: sku || undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      success: true
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Shoe Palace scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
     }
   }
 }

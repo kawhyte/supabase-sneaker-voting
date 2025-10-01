@@ -493,12 +493,14 @@ export function RedesignedSneakerForm({
 
 				// Show image confirmation modal if images were found
 				if (data.images && data.images.length > 0) {
+					console.log("🖼️ Scraped images:", data.images);
 					setScrapedImages(data.images);
 					setShowImageModal(true);
 					setUploadProgress(
 						"📸 Found " + data.images.length + " images - review and import"
 					);
 				} else {
+					console.log("⚠️ No images found in scraped data");
 					setUploadProgress("✅ Product data imported!");
 					setTimeout(() => setUploadProgress(""), 2000);
 				}
@@ -594,10 +596,64 @@ export function RedesignedSneakerForm({
 			mainImageIndex
 		);
 
-		// TODO: Convert URLs to File objects and add to photos state
-		// For now, just log and close modal
-		setUploadProgress("✅ Product data and images imported!");
-		setTimeout(() => setUploadProgress(""), 2000);
+		setUploadProgress("📥 Downloading images...");
+
+		try {
+			const photoItems: PhotoItem[] = [];
+
+			// Convert each URL to a File object
+			for (let i = 0; i < selectedImages.length; i++) {
+				const imageUrl = selectedImages[i];
+
+				try {
+					// Fetch the image
+					const response = await fetch(imageUrl);
+					if (!response.ok) throw new Error(`Failed to fetch image ${i + 1}`);
+
+					// Get the blob
+					const blob = await response.blob();
+
+					// Determine filename and type
+					const urlObj = new URL(imageUrl);
+					const pathname = urlObj.pathname;
+					const extension = pathname.split('.').pop() || 'jpg';
+					const filename = `imported-image-${i + 1}.${extension}`;
+
+					// Create File from blob
+					const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+
+					// Create preview URL
+					const preview = URL.createObjectURL(file);
+
+					// Add to photos array
+					photoItems.push({
+						id: `imported-${Date.now()}-${i}`,
+						file,
+						preview,
+						isMain: i === mainImageIndex,
+						order: i
+					});
+
+					setUploadProgress(`📥 Downloaded ${i + 1}/${selectedImages.length} images...`);
+				} catch (error) {
+					console.error(`Failed to download image ${i + 1}:`, error);
+					// Continue with other images
+				}
+			}
+
+			if (photoItems.length > 0) {
+				setPhotos(photoItems);
+				setUploadProgress(`✅ ${photoItems.length} image${photoItems.length > 1 ? 's' : ''} imported!`);
+			} else {
+				setUploadProgress("❌ Failed to import images. Please upload manually.");
+			}
+
+			setTimeout(() => setUploadProgress(""), 3000);
+		} catch (error) {
+			console.error("Error importing images:", error);
+			setUploadProgress("❌ Failed to import images. Please upload manually.");
+			setTimeout(() => setUploadProgress(""), 3000);
+		}
 	};
 
 	// Create price monitor function
