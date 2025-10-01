@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { createClient } from '@/utils/supabase/client'
-import { Star, ThumbsUp, Calendar, MapPin, DollarSign, User, Search, Filter, Edit, Trash2, Loader2 } from 'lucide-react'
+import { Star, ThumbsUp, Calendar, MapPin, DollarSign, User, Search, Filter, Edit, Trash2, Loader2, Image as ImageIcon } from 'lucide-react'
 import { EditSneakerModal } from './edit-sneaker-modal'
 
 interface SneakerExperience {
@@ -345,131 +345,133 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
         ) : (
           filteredExperiences.map((experience) => {
             const fitInfo = getFitRatingInfo(experience.fit_rating)
+            const isTried = experience.interaction_type === 'tried'
+
             return (
-              <Card key={experience.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Image */}
-                    {experience.image_url && (
-                      <div className="lg:col-span-1">
-                        <img
-                          src={experience.image_url}
-                          alt={`${experience.brand} ${experience.model}`}
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
+              <Card
+                key={experience.id}
+                className="overflow-hidden hover-lift card-interactive flex flex-col"
+              >
+                {/* Image Section - 16:9 Aspect Ratio */}
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                  {experience.image_url ? (
+                    <img
+                      src={experience.image_url}
+                      alt={`${experience.brand} ${experience.model}`}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                      <ImageIcon className="h-12 w-12 text-gray-300" />
+                    </div>
+                  )}
+
+                  {/* Badge Overlay - Single distinction */}
+                  <div className="absolute top-[var(--space-xs)] left-[var(--space-xs)]">
+                    <Badge
+                      variant="secondary"
+                      className="bg-black/80 text-white border-none"
+                    >
+                      {isTried ? '✓ Tried' : '👀 Seen'}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <CardContent className="flex-1 p-[var(--space-base)] flex flex-col gap-[var(--space-xs)]">
+                  {/* Brand */}
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {experience.brand}
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-base font-bold leading-snug line-clamp-2">
+                    {experience.model}
+                    {experience.colorway !== 'Standard' && (
+                      <span className="block text-sm font-normal text-gray-600 mt-1">
+                        {experience.colorway}
+                      </span>
+                    )}
+                  </h3>
+
+                  {/* Metadata Grid */}
+                  <div className="grid grid-cols-2 gap-x-[var(--space-xs)] gap-y-[var(--space-2xs)] text-xs mt-[var(--space-xs)]">
+                    {experience.size_tried && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-500">Size:</span>
+                        <span className="font-semibold">{experience.size_tried}</span>
                       </div>
                     )}
 
-                    {/* Main Info */}
-                    <div className={experience.image_url ? "lg:col-span-2" : "lg:col-span-3"}>
-                      <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <Badge variant="secondary" className="flex items-center gap-1">
-                          <User className="h-3 w-3" />
-                          {experience.user_name}
-                        </Badge>
-                        <Badge variant="outline">{experience.brand}</Badge>
-                        {fitInfo ? (
-                          <Badge className={fitInfo.color}>
-                            {fitInfo.icon} {fitInfo.label}
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                            👀 Spotted
-                          </Badge>
-                        )}
+                    {fitInfo && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-500">Fit:</span>
+                        <span className="font-medium">{fitInfo.icon} {fitInfo.label}</span>
                       </div>
+                    )}
 
-                      <h3 className="text-lg font-semibold mb-2">
-                        {experience.brand} {experience.model}
-                        {experience.colorway !== 'Standard' && (
-                          <span className="text-gray-600"> - {experience.colorway}</span>
-                        )}
-                      </h3>
-
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                        {experience.size_tried && (
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">Size:</span>
-                            <span className="text-lg font-bold text-blue-600">{experience.size_tried}</span>
-                          </div>
-                        )}
-
-                        {experience.comfort_rating && (
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">Comfort:</span>
-                            <span>{getComfortStars(experience.comfort_rating)}</span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-gray-400" />
-                          <span>{formatDate(experience.try_on_date)}</span>
-                        </div>
-
-                        {experience.store_name && (
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-gray-400" />
-                            <span>{experience.store_name}</span>
-                          </div>
-                        )}
-
-                        {experience.listed_price && (
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-gray-400" />
-                            <span>${experience.listed_price}</span>
-                          </div>
-                        )}
+                    {experience.comfort_rating && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-500">Comfort:</span>
+                        <span>{getComfortStars(experience.comfort_rating)}</span>
                       </div>
+                    )}
 
-                      {experience.notes && (
-                        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                          <span className="text-sm text-gray-700">{experience.notes}</span>
-                        </div>
+                    {experience.listed_price && (
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="h-3 w-3 text-gray-400" />
+                        <span className="font-medium">${experience.listed_price}</span>
+                      </div>
+                    )}
+
+                    {experience.store_name && (
+                      <div className="flex items-center gap-1 col-span-2">
+                        <MapPin className="h-3 w-3 text-gray-400" />
+                        <span className="truncate">{experience.store_name}</span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-1 col-span-2">
+                      <Calendar className="h-3 w-3 text-gray-400" />
+                      <span>{formatDate(experience.try_on_date)}</span>
+                    </div>
+                  </div>
+
+                  {/* Notes */}
+                  {experience.notes && (
+                    <div className="mt-[var(--space-xs)] p-[var(--space-xs)] bg-gray-50 rounded text-xs text-gray-700 line-clamp-2">
+                      {experience.notes}
+                    </div>
+                  )}
+
+                  {/* Footer - Actions */}
+                  <div className="flex items-center justify-between mt-auto pt-[var(--space-xs)] border-t border-gray-100">
+                    <div className="flex items-center gap-1">
+                      <Badge variant="outline" className="text-xs">
+                        {experience.user_name}
+                      </Badge>
+                      {experience.would_recommend && isTried && (
+                        <ThumbsUp className="h-3 w-3 text-green-600" />
                       )}
                     </div>
 
-                    {/* Quick Actions & Indicators */}
-                    <div className={`flex flex-col justify-between ${experience.image_url ? "" : "lg:col-span-1"}`}>
-                      <div className="space-y-2">
-                        {experience.would_recommend && experience.interaction_type === 'tried' && (
-                          <div className="flex items-center gap-2 text-green-600 text-sm">
-                            <ThumbsUp className="h-4 w-4" />
-                            <span>Recommended</span>
-                          </div>
-                        )}
-                        {experience.interaction_type === 'seen' && (
-                          <div className="flex items-center gap-2 text-blue-600 text-sm">
-                            <span className="text-lg">👀</span>
-                            <span>Spotted</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between mt-4">
-                        <div className="text-xs text-gray-500">
-                          Added {formatDate(experience.created_at)}
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditExperience(experience)}
-                            className="text-xs text-gray-500 hover:text-gray-700"
-                          >
-                            <Edit className="h-3 w-3 mr-1" />
-                            Edit
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteExperience(experience)}
-                            className="text-xs text-gray-500 hover:text-red-600"
-                          >
-                            <Trash2 className="h-3 w-3 mr-1" />
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditExperience(experience)}
+                        className="h-7 px-2 text-xs"
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteExperience(experience)}
+                        className="h-7 px-2 text-xs hover:text-red-600"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
