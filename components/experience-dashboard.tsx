@@ -221,9 +221,9 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-[1400px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">
         <div>
           <h1 className="text-3xl font-bold">👟 Sneaker Experiences</h1>
           <p className="text-gray-600">Your try-on history and sizing insights</p>
@@ -232,16 +232,16 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
       </div>
 
       {/* Filters and Search */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <Card className="mb-[var(--space-xl)]">
+        <CardContent className="p-[var(--space-base)]">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-[var(--space-base)]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-2 w-2 text-gray-400" />
               <Input
                 placeholder="Search sneakers..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-6"
               />
             </div>
 
@@ -284,7 +284,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
       </Card>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-[var(--space-xl)] mb-[var(--space-xl)]">
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-blue-600">{experiences.length}</div>
@@ -318,10 +318,11 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
       </div>
 
       {/* Experiences List */}
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[var(--space-xl)]">
         {filteredExperiences.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
+          <div className="col-span-1 md:col-span-2 xl:col-span-3">
+            <Card>
+              <CardContent className="p-8 text-center">
               <div className="text-gray-400 mb-4">
                 <Search className="h-12 w-12 mx-auto mb-2" />
               </div>
@@ -338,8 +339,9 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
                   Add Your First Experience
                 </Button>
               )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         ) : (
           filteredExperiences.map((experience) => {
             const fitInfo = getFitRatingInfo(experience.fit_rating)
