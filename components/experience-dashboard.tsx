@@ -9,6 +9,14 @@ import { Input } from '@/components/ui/input'
 import { createClient } from '@/utils/supabase/client'
 import { Star, ThumbsUp, Calendar, MapPin, DollarSign, User, Search, Filter, Edit, Trash2, Loader2, Image as ImageIcon } from 'lucide-react'
 import { EditSneakerModal } from './edit-sneaker-modal'
+import { PhotoCarousel } from './photo-carousel'
+
+interface SneakerPhoto {
+  id: string
+  image_url: string
+  image_order: number
+  is_main_image: boolean
+}
 
 interface SneakerExperience {
   id: string
@@ -29,6 +37,7 @@ interface SneakerExperience {
   interested_in_buying: boolean
   image_url?: string
   cloudinary_id?: string
+  sneaker_photos?: SneakerPhoto[]
 }
 
 // Fit rating descriptions
@@ -68,7 +77,15 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
       setLoading(true)
       const { data, error } = await supabase
         .from('sneakers')
-        .select('*')
+        .select(`
+          *,
+          sneaker_photos (
+            id,
+            image_url,
+            image_order,
+            is_main_image
+          )
+        `)
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -374,35 +391,75 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
             const fitInfo = getFitRatingInfo(experience.fit_rating)
             const isTried = experience.interaction_type === 'tried'
 
+            // Prepare photos for carousel
+            const photos = experience.sneaker_photos && experience.sneaker_photos.length > 0
+              ? experience.sneaker_photos
+              : experience.image_url
+                ? [{
+                    id: 'main',
+                    image_url: experience.image_url,
+                    image_order: 0,
+                    is_main_image: true
+                  }]
+                : []
+
             return (
               <Card
                 key={experience.id}
                 className="overflow-hidden hover-lift card-interactive flex flex-col"
               >
-                {/* Image Section - 16:9 Aspect Ratio */}
-                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                  {experience.image_url ? (
-                    <img
-                      src={experience.image_url}
-                      alt={`${experience.brand} ${experience.model}`}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  ) : (
+                {/* Image Section - 16:9 Aspect Ratio with Carousel */}
+                {photos.length > 0 ? (
+                  <div className="relative">
+                    {/* Badge Overlay - Single distinction */}
+                    <div className="absolute top-[var(--space-xs)] left-[var(--space-xs)] z-20">
+                      <Badge
+                        variant="secondary"
+                        className="bg-black/80 text-white border-none"
+                      >
+                        {isTried ? '✓ Tried' : '👀 Seen'}
+                      </Badge>
+                    </div>
+
+                    {/* Photo Display */}
+                    {photos.length === 1 ? (
+                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                        <img
+                          src={photos[0].image_url}
+                          alt={`${experience.brand} ${experience.model}`}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                        <div className="absolute inset-0">
+                          <PhotoCarousel
+                            photos={photos}
+                            showControls={true}
+                            showIndicators={true}
+                            autoHeight={false}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                     <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
                       <ImageIcon className="h-12 w-12 text-gray-300" />
                     </div>
-                  )}
 
-                  {/* Badge Overlay - Single distinction */}
-                  <div className="absolute top-[var(--space-xs)] left-[var(--space-xs)]">
-                    <Badge
-                      variant="secondary"
-                      className="bg-black/80 text-white border-none"
-                    >
-                      {isTried ? '✓ Tried' : '👀 Seen'}
-                    </Badge>
+                    {/* Badge Overlay - Single distinction */}
+                    <div className="absolute top-[var(--space-xs)] left-[var(--space-xs)]">
+                      <Badge
+                        variant="secondary"
+                        className="bg-black/80 text-white border-none"
+                      >
+                        {isTried ? '✓ Tried' : '👀 Seen'}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Content Section */}
                 <CardContent className="flex-1 p-[var(--space-base)] flex flex-col gap-[var(--space-xs)]">

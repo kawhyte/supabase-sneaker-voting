@@ -139,14 +139,13 @@ export function PhotoCarousel({
   return (
     <div className={`relative ${className}`}>
       {/* Main Carousel */}
-      <Card>
-        <CardContent className="p-0 relative">
-          <div className="overflow-hidden rounded-lg" ref={emblaRef}>
-            <div className="flex">
+      <div className="relative h-full">
+        <div className="overflow-hidden h-full" ref={emblaRef}>
+            <div className="flex h-full">
               {sortedPhotos.map((photo, index) => (
                 <div
                   key={photo.id}
-                  className="flex-[0_0_100%] min-w-0 relative"
+                  className="flex-[0_0_100%] min-w-0 relative h-full"
                 >
                   {photo.is_main_image && (
                     <Badge className="absolute top-3 left-3 z-10 bg-blue-600">
@@ -155,14 +154,13 @@ export function PhotoCarousel({
                   )}
 
                   <div
-                    className="relative cursor-pointer group"
+                    className="relative cursor-pointer group h-full"
                     onClick={() => onPhotoClick?.(photo)}
                   >
                     <img
                       src={photo.image_url}
                       alt={`Sneaker photo ${index + 1}`}
                       className="w-full h-full object-cover"
-                      style={{ aspectRatio: autoHeight ? 'auto' : '1 / 1' }}
                     />
 
                     {onPhotoClick && (
@@ -205,17 +203,16 @@ export function PhotoCarousel({
             </>
           )}
 
-          {/* Photo Counter */}
-          <div className="absolute bottom-3 right-3 z-10">
-            <Badge variant="secondary" className="bg-black/70 text-white">
-              {selectedIndex + 1} / {sortedPhotos.length}
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Photo Counter */}
+        <div className="absolute bottom-3 right-3 z-10">
+          <Badge variant="secondary" className="bg-black/70 text-white">
+            {selectedIndex + 1} / {sortedPhotos.length}
+          </Badge>
+        </div>
+      </div>
 
-      {/* Thumbnail Indicators */}
-      {showIndicators && sortedPhotos.length > 1 && (
+      {/* Thumbnail Indicators - Hidden for dashboard cards */}
+      {showIndicators && sortedPhotos.length > 1 && false && (
         <div className="flex justify-center space-x-2 mt-4">
           {sortedPhotos.map((photo, index) => (
             <button
