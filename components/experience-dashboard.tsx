@@ -435,16 +435,14 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
                     </div>
 
                     {/* Photo Display */}
-                    {photos.length === 1 ? (
-                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                    <div className="relative w-full bg-gray-100" style={{ paddingBottom: '56.25%' }}>
+                      {photos.length === 1 ? (
                         <img
                           src={photos[0].image_url}
                           alt={`${experience.brand} ${experience.model}`}
                           className="absolute inset-0 w-full h-full object-cover"
                         />
-                      </div>
-                    ) : (
-                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                      ) : (
                         <div className="absolute inset-0">
                           <PhotoCarousel
                             photos={photos}
@@ -453,8 +451,8 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
                             autoHeight={false}
                           />
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>

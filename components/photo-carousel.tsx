@@ -147,12 +147,6 @@ export function PhotoCarousel({
                   key={photo.id}
                   className="flex-[0_0_100%] min-w-0 relative h-full"
                 >
-                  {photo.is_main_image && (
-                    <Badge className="absolute top-3 left-3 z-10 bg-blue-600">
-                      Main Photo
-                    </Badge>
-                  )}
-
                   <div
                     className="relative cursor-pointer group h-full"
                     onClick={() => onPhotoClick?.(photo)}
