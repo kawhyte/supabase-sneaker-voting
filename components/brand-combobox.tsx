@@ -78,10 +78,10 @@ export function BrandCombobox({ value, onChange, disabled }: BrandComboboxProps)
           size='sm'
           aria-expanded={open}
           disabled={disabled}
-          className="w-full justify-between h-6" 
+          className="w-full justify-between h-5" 
         >
           {displayValue}
-          <ChevronsUpDown className="ml-[var(--space-xs)] h-3 w-3 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-[var(--space-xs)] h-2 w-2 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
@@ -107,7 +107,7 @@ export function BrandCombobox({ value, onChange, disabled }: BrandComboboxProps)
                   </Button>
                 </div>
               ) : (
-                <p className="py-6 text-center text-sm text-muted-foreground">
+                <p className="py-4 text-center text-sm text-muted-foreground">
                   Start typing to search brands
                 </p>
               )}
@@ -121,7 +121,7 @@ export function BrandCombobox({ value, onChange, disabled }: BrandComboboxProps)
                 >
                   <Check
                     className={cn(
-                      'mr-[var(--space-xs)] h-4 w-4',
+                      'mr-[var(--space-xs)] h-2 w-2',
                       value === brand.value ? 'opacity-100' : 'opacity-0'
                     )}
                   />

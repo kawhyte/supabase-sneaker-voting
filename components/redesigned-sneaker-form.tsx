@@ -90,12 +90,12 @@ const sneakerSchema = z
 	.refine(
 		(data) => {
 			if (data.interactionType === "tried") {
-				return data.sizeTried && data.fitRating;
+				return data.sizeTried;
 			}
 			return true;
 		},
 		{
-			message: "Size and fit rating are required when you've tried the sneaker",
+			message: "Size is required when you've tried the sneaker",
 			path: ["sizeTried"],
 		}
 	);
@@ -1131,39 +1131,10 @@ export function RedesignedSneakerForm({
 											/>
 										</div>
 
-										{/* Photos */}
-										<div>
-											<Label className='text-sm font-medium text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)]'>
-												<Camera className='h-4 w-4' />
-												Photos (Required - Min 1)
-											</Label>
-											<MultiPhotoUpload
-												photos={photos}
-												onPhotosChange={setPhotos}
-												maxPhotos={5}
-											/>
-											{photos.length === 0 && (
-												<div className='flex items-center gap-[var(--space-xs)] mt-[var(--space-xs)]'>
-													<AlertTriangle className='h-3 w-3 text-orange-600' />
-													<p className='text-xs text-orange-600'>
-														At least one photo is required
-													</p>
-												</div>
-											)}
-										</div>
-
-										{/* Try-On Info (Conditional) */}
-										
-									</div>
-
-									{/* RIGHT COLUMN - Metadata */}
-									<div className='space-y-[var(--space-base)]'>
-										{/*<h3 className='font-semibold text-gray-700 border-b pb-[var(--space-md)]'>
-											Additional Info
-										</h3>*/}
-
 										{/* Colorway */}
-										<div>
+
+
+									<div>
 											<Label className='text-sm text-gray-600'>
 												Colorway (Optional)
 											</Label>
@@ -1173,6 +1144,18 @@ export function RedesignedSneakerForm({
 												className='mt-[var(--space-md)] h-6'
 											/>
 										</div>
+
+									
+										
+									</div>
+
+									{/* RIGHT COLUMN - Metadata */}
+									<div className='space-y-[var(--space-base)]'>
+										{/*<h3 className='font-semibold text-gray-700 border-b pb-[var(--space-md)]'>
+											Additional Info
+										</h3>*/}
+
+						
 
 										{/* Store */}
 										<div>
@@ -1187,7 +1170,7 @@ export function RedesignedSneakerForm({
 										</div>
 
 										{/* Pricing Section */}
-										<div className='space-y-[var(--space-sm)] border-t pt-[var(--space-base)]'>
+										<div className='space-y-[var(--space-sm)] '>
 											<div>
 												<Label className='text-sm text-gray-600'>
 													Retail Price (Optional)
@@ -1266,8 +1249,37 @@ export function RedesignedSneakerForm({
 											</div>
 										</div>
 
-										{/* Notes */}
+							
+									</div>
+								</div>
+
+
+
+
+			{/* Photos */}
 										<div>
+											<Label className='text-sm font-medium text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)]'>
+												<Camera className='h-4 w-4' />
+												Photos (Required - Min 1)
+											</Label>
+											<MultiPhotoUpload
+												photos={photos}
+												onPhotosChange={setPhotos}
+												maxPhotos={5}
+											/>
+											{photos.length === 0 && (
+												<div className='flex items-center gap-[var(--space-xs)] mt-[var(--space-xs)]'>
+													<AlertTriangle className='h-3 w-3 text-orange-600' />
+													<p className='text-xs text-orange-600'>
+														At least one photo is required
+													</p>
+												</div>
+											)}
+										</div>
+
+
+
+	<div>
 											<div className='flex items-center justify-between'>
 												<Label className='text-sm text-gray-600'>
 													Notes (Optional)
@@ -1296,8 +1308,6 @@ export function RedesignedSneakerForm({
 													: "Note where you saw them, what caught your eye, or styling ideas"}
 											</div>
 										</div>
-									</div>
-								</div>
 
 
 
@@ -1309,8 +1319,11 @@ export function RedesignedSneakerForm({
 													Try-On Details
 												</h4>
 
+
+                        <div className="flex justify-between gap-x-12 "> 
+
 												{/* Size Selection */}
-												<div className='mb-4 mt-4'>
+												<div className='mb-4 mt-4 w-full'>
 													<Label className='text-sm font-medium text-gray-700'>
 														Size Tried *
 													</Label>
@@ -1344,7 +1357,7 @@ export function RedesignedSneakerForm({
 												</div>
 
 												{/* Fit Rating */}
-												<div className="mt-8">
+												{/*<div className="mt-8">
 													<Label className='text-sm font-medium text-gray-700'>
 														How did they fit? *
 													</Label>
@@ -1410,18 +1423,15 @@ export function RedesignedSneakerForm({
 															</div>
 														</div>
 													)}
-												</div>
+												</div>*/}
 
 												{/* Comfort Rating (Optional) */}
-												<div className="mt-8">
+												<div className="mt-4 ">
 													<Label className='text-sm font-medium text-gray-700 '>
 														How comfortable were they? (Optional)
 													</Label>
-													<p className='text-xs text-gray-500 mt-[var(--space-xs)]'>
-														Rate overall comfort - cushioning, support,
-														breathability
-													</p>
-													<div className='flex items-center gap-[var(--space-xs)] mt-[var(--space-sm)]'>
+											
+													<div className='flex items-center gap-[var(--space-xs)] '>
 														{[1, 2, 3, 4, 5].map((rating) => (
 															<button
 																key={rating}
@@ -1440,7 +1450,7 @@ export function RedesignedSneakerForm({
 																} comfort rating`}>
 																<Star
 																	className={cn(
-																		"h-9 w-9 md:h-8 md:w-8 transition-colors",
+																		"h-4 w-4 md:h-4 md:w-4 transition-colors",
 																		watch("comfortRating") &&
 																			watch("comfortRating")! >= rating
 																			? "fill-yellow-400 text-yellow-400"
@@ -1463,7 +1473,7 @@ export function RedesignedSneakerForm({
 														)}
 													</div>
 													{watch("comfortRating") && (
-														<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-yellow-50 border border-yellow-200 rounded'>
+														<div className='mt-1 p-1 bg-yellow-50 border border-yellow-200 rounded'>
 															<p className='text-sm text-yellow-800'>
 																<span className='font-semibold'>
 																	{watch("comfortRating")} / 5 stars
@@ -1481,7 +1491,13 @@ export function RedesignedSneakerForm({
 															</p>
 														</div>
 													)}
+                          		<p className='text-xs text-gray-500 mt-1'>
+														Rate overall comfort - cushioning, support,
+														breathability
+													</p>
 												</div>
+
+                        </div>
 											</div>
 										)}
 
@@ -1494,9 +1510,9 @@ export function RedesignedSneakerForm({
 
 
 
-								<div className='flex items-center justify-end gap-3'>
+								<div className='flex items-center justify-end gap-3 mt-6'>
 									{/* Discard Button */}
-									<Button
+									{/*<Button
 										type='button'
 										variant='outline'
 										onClick={() => {
@@ -1511,12 +1527,12 @@ export function RedesignedSneakerForm({
 										className='h-6 px-4 text-sm hover:bg-gray-100'
 										disabled={isLoading}>
 										Discard
-									</Button>
+									</Button>*/}
 
 									{/* Submit Button */}
 									<Button
 										type='submit'
-										className='h-6 px-4 text-sm bg-black text-white hover:bg-gray-800'
+										className='h-6 px-4 text-sm bg-yellow-500 text-black hover:bg-yellow-800'
 										disabled={isLoading || !isValid || photos.length === 0}
 										aria-label={
 											isLoading

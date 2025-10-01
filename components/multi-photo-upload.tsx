@@ -78,7 +78,7 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
           {...listeners}
           className="absolute top-2 left-2 z-10 p-1 bg-black/50 rounded cursor-grab active:cursor-grabbing hover:bg-black/70 transition-colors"
         >
-          <GripVertical className="h-3 w-3 text-white" />
+          <GripVertical className="h-2 w-2 text-white" />
         </div>
 
         {/* Main Photo Badge */}
@@ -95,10 +95,10 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
         <Button
           variant="destructive"
           size="sm"
-          className="absolute top-2 right-2 z-10 h-6 w-6 p-0"
+          className="absolute top-2 right-2 z-10 h-3 w-3 p-0"
           onClick={() => onRemove(photo.id)}
         >
-          <X className="h-3 w-3" />
+          <X className="h-2 w-2" />
         </Button>
 
         {/* Photo */}
