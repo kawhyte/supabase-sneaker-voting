@@ -211,12 +211,37 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
 
   if (loading) {
     return (
-      <Card className="max-w-4xl mx-auto">
-        <CardContent className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading your sneaker experiences...</p>
-        </CardContent>
-      </Card>
+      <div className="max-w-[1400px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">
+          <div>
+            <h1 className="text-3xl font-bold">👟 Sneaker Experiences</h1>
+            <p className="text-gray-600">Your try-on history and sizing insights</p>
+          </div>
+        </div>
+
+        {/* Loading Skeleton Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[var(--space-xl)]">
+          {[...Array(6)].map((_, i) => (
+            <Card key={i} className="overflow-hidden flex flex-col animate-pulse">
+              {/* Image Skeleton */}
+              <div className="relative w-full bg-gray-200" style={{ paddingBottom: '56.25%' }} />
+
+              {/* Content Skeleton */}
+              <CardContent className="flex-1 p-[var(--space-base)] flex flex-col gap-[var(--space-xs)]">
+                <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-5 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+
+                <div className="grid grid-cols-2 gap-[var(--space-xs)] mt-[var(--space-xs)]">
+                  <div className="h-3 bg-gray-200 rounded"></div>
+                  <div className="h-3 bg-gray-200 rounded"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     )
   }
 
