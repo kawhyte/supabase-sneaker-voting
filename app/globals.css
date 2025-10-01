@@ -6,6 +6,195 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer base {
+  :root {
+    /* ============================================
+       PRIMARY BRAND COLORS
+       Core colors that define your brand identity
+       Usage: Main CTAs, brand elements, hero sections
+       ============================================ */
+
+    /* Primary Yellow - The star of the show */
+    --color-primary-50: #FFFEF7;   /* Subtle yellow tint for backgrounds */
+    --color-primary-100: #FFFCE0;  /* Light yellow for hover states */
+    --color-primary-200: #FFF9C4;  /* Soft yellow for selected states */
+    --color-primary-300: #FFF59D;  /* Medium-light yellow */
+    --color-primary-400: #FFEE58;  /* Mailchimp-style vibrant yellow */
+    --color-primary-500: #FFE01B;  /* Main brand yellow - USE FOR PRIMARY BUTTONS */
+    --color-primary-600: #FDD835;  /* Slightly deeper yellow for hover */
+    --color-primary-700: #F9C74F;  /* Deep yellow for pressed states */
+    --color-primary-800: #F9A825;  /* Dark yellow for borders */
+    --color-primary-900: #F57C00;  /* Darkest yellow for text on light bg */
+
+    /* Black & Near-blacks - For contrast and typography */
+    --color-black: #000000;        /* Pure black - USE FOR HEADINGS */
+    --color-black-soft: #241C15;   /* Warm black - USE FOR BODY TEXT */
+    --color-black-hover: #1A1511;  /* Deeper black for hover states */
+
+    /* ============================================
+       NEUTRAL COLORS
+       Gray scale with warm undertones
+       Usage: Backgrounds, borders, secondary text
+       ============================================ */
+
+    --color-gray-50: #FAFAF9;     /* Off-white - USE FOR PAGE BACKGROUNDS */
+    --color-gray-100: #F5F5F4;    /* Light gray - USE FOR CARD BACKGROUNDS */
+    --color-gray-200: #E7E5E4;    /* USE FOR BORDERS */
+    --color-gray-300: #D6D3D1;    /* USE FOR DISABLED BORDERS */
+    --color-gray-400: #A8A29E;    /* USE FOR PLACEHOLDER TEXT */
+    --color-gray-500: #78716C;    /* USE FOR SECONDARY TEXT */
+    --color-gray-600: #57534E;    /* USE FOR ICONS */
+    --color-gray-700: #44403C;    /* USE FOR SECONDARY BUTTONS */
+    --color-gray-800: #292524;    /* USE FOR DARK SECTIONS */
+    --color-gray-900: #1C1917;    /* USE FOR FOOTER/DARK BACKGROUNDS */
+    --color-gray-950: #0C0A09;    /* Deepest gray */
+
+    /* ============================================
+       ACCENT COLORS
+       Vibrant colors for different UI purposes
+       Usage: Status indicators, category colors, highlights
+       ============================================ */
+
+    /* Success Green - Vibrant and positive */
+    --color-green-50: #F0FDF4;
+    --color-green-100: #DCFCE7;
+    --color-green-200: #BBF7D0;
+    --color-green-300: #86EFAC;
+    --color-green-400: #4ADE80;    /* USE FOR SUCCESS STATES */
+    --color-green-500: #22C55E;    /* USE FOR SUCCESS BUTTONS */
+    --color-green-600: #16A34A;    /* USE FOR SUCCESS HOVER */
+    --color-green-700: #15803D;
+    --color-green-800: #166534;
+    --color-green-900: #14532D;
+
+    /* Info Blue - Bright and informative */
+    --color-blue-50: #EFF6FF;
+    --color-blue-100: #DBEAFE;
+    --color-blue-200: #BFDBFE;
+    --color-blue-300: #93C5FD;
+    --color-blue-400: #60A5FA;     /* USE FOR INFO STATES */
+    --color-blue-500: #3B82F6;     /* USE FOR INFO BUTTONS/LINKS */
+    --color-blue-600: #2563EB;     /* USE FOR LINK HOVER */
+    --color-blue-700: #1D4ED8;
+    --color-blue-800: #1E40AF;
+    --color-blue-900: #1E3A8A;
+
+    /* Warning Orange - Energetic and attention-grabbing */
+    --color-orange-50: #FFF7ED;
+    --color-orange-100: #FFEDD5;
+    --color-orange-200: #FED7AA;
+    --color-orange-300: #FDBA74;
+    --color-orange-400: #FB923C;   /* USE FOR WARNING STATES */
+    --color-orange-500: #F97316;   /* USE FOR WARNING BUTTONS */
+    --color-orange-600: #EA580C;   /* USE FOR WARNING HOVER */
+    --color-orange-700: #C2410C;
+    --color-orange-800: #9A3412;
+    --color-orange-900: #7C2D12;
+
+    /* Error Red - Bold and urgent */
+    --color-red-50: #FEF2F2;
+    --color-red-100: #FEE2E2;
+    --color-red-200: #FECACA;
+    --color-red-300: #FCA5A5;
+    --color-red-400: #F87171;      /* USE FOR ERROR STATES */
+    --color-red-500: #EF4444;      /* USE FOR ERROR BUTTONS */
+    --color-red-600: #DC2626;      /* USE FOR ERROR HOVER */
+    --color-red-700: #B91C1C;
+    --color-red-800: #991B1B;
+    --color-red-900: #7F1D1D;
+
+    /* Purple - Creative and special */
+    --color-purple-50: #FAF5FF;
+    --color-purple-100: #F3E8FF;
+    --color-purple-200: #E9D5FF;
+    --color-purple-300: #D8B4FE;
+    --color-purple-400: #C084FC;   /* USE FOR SPECIAL HIGHLIGHTS */
+    --color-purple-500: #A855F7;   /* USE FOR PREMIUM FEATURES */
+    --color-purple-600: #9333EA;   /* USE FOR PURPLE HOVER */
+    --color-purple-700: #7E22CE;
+    --color-purple-800: #6B21A8;
+    --color-purple-900: #581C87;
+
+    /* Pink - Playful and friendly */
+    --color-pink-50: #FDF2F8;
+    --color-pink-100: #FCE7F3;
+    --color-pink-200: #FBCFE8;
+    --color-pink-300: #F9A8D4;
+    --color-pink-400: #F472B6;     /* USE FOR SOCIAL FEATURES */
+    --color-pink-500: #EC4899;     /* USE FOR LOVE/FAVORITE */
+    --color-pink-600: #DB2777;     /* USE FOR PINK HOVER */
+    --color-pink-700: #BE185D;
+    --color-pink-800: #9D174D;
+    --color-pink-900: #831843;
+
+    /* ============================================
+       SEMANTIC COLOR ALIASES
+       Meaningful names for specific use cases
+       Usage: Direct application in components
+       ============================================ */
+
+    /* Background colors */
+    --color-bg-primary: var(--color-gray-50);        /* Main page background */
+    --color-bg-secondary: var(--color-white);        /* Card/section backgrounds */
+    --color-bg-tertiary: var(--color-gray-100);      /* Subtle section backgrounds */
+    --color-bg-inverse: var(--color-black);          /* Dark section backgrounds */
+    --color-bg-yellow: var(--color-primary-50);      /* Yellow tinted sections */
+
+    /* Surface colors for elevated elements */
+    --color-surface-primary: var(--color-white);     /* Main cards */
+    --color-surface-secondary: var(--color-gray-50); /* Secondary cards */
+    --color-surface-elevated: var(--color-white);    /* Modals, dropdowns */
+    --color-surface-yellow: var(--color-primary-100); /* Featured cards */
+
+    /* Text colors */
+    --color-text-primary: var(--color-black-soft);   /* Body text */
+    --color-text-secondary: var(--color-gray-600);   /* Secondary text */
+    --color-text-tertiary: var(--color-gray-500);    /* Helper text */
+    --color-text-placeholder: var(--color-gray-400); /* Input placeholders */
+    --color-text-inverse: var(--color-white);        /* Text on dark bg */
+    --color-text-brand: var(--color-primary-900);    /* Brand colored text */
+
+    /* Border colors */
+    --color-border-primary: var(--color-gray-200);   /* Default borders */
+    --color-border-secondary: var(--color-gray-100); /* Subtle borders */
+    --color-border-strong: var(--color-gray-300);    /* Emphasized borders */
+    --color-border-inverse: rgba(255, 255, 255, 0.2); /* Borders on dark bg */
+    --color-border-yellow: var(--color-primary-300); /* Yellow borders */
+
+    /* Interactive states */
+    --color-hover-overlay: rgba(0, 0, 0, 0.05);      /* Universal hover overlay */
+    --color-pressed-overlay: rgba(0, 0, 0, 0.1);     /* Pressed state overlay */
+    --color-focus-ring: var(--color-primary-400);    /* Focus ring color */
+    --color-selection-bg: var(--color-primary-200);  /* Text selection background */
+
+    /* ============================================
+       SHADOWS & EFFECTS
+       Elevations and visual depth
+       ============================================ */
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-yellow: 0 10px 25px -5px rgba(255, 224, 27, 0.3);
+
+    /* ============================================
+       ANIMATION TOKENS
+       Smooth transitions and micro-animations
+       ============================================ */
+
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slower: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Spring animations for playful interactions */
+    --spring-bouncy: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --spring-smooth: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
 @utility container {
   margin-inline: auto;
   padding-inline: var(--space-md);
@@ -375,3 +564,309 @@ h2 {
     @apply bg-background text-foreground;
   }
 }
+
+/* ============================================
+   UTILITY CLASSES
+   Ready-to-use Tailwind v4 utilities
+   ============================================ */
+
+@layer utilities {
+  /* Background utilities */
+  .bg-primary {
+    background-color: var(--color-bg-primary);
+  }
+
+  .bg-secondary {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .bg-yellow-tint {
+    background-color: var(--color-bg-yellow);
+  }
+
+  /* Text color utilities */
+  .text-primary {
+    color: var(--color-text-primary);
+  }
+
+  .text-secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .text-brand {
+    color: var(--color-text-brand);
+  }
+
+  /* Button base styles with animations */
+  .btn-primary {
+    background-color: var(--color-primary-500);
+    color: var(--color-black);
+    transition: all var(--transition-base);
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-yellow);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-black {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    transition: all var(--transition-base);
+  }
+
+  .btn-black:hover {
+    background-color: var(--color-black-hover);
+    transform: translateY(-2px);
+  }
+
+  /* Vibrant accent buttons */
+  .btn-success {
+    background-color: var(--color-green-500);
+    color: white;
+    transition: all var(--transition-base);
+  }
+
+  .btn-success:hover {
+    background-color: var(--color-green-600);
+    transform: scale(1.05);
+  }
+
+  .btn-error {
+    background-color: var(--color-red-500);
+    color: white;
+    transition: all var(--transition-base);
+  }
+
+  .btn-error:hover {
+    background-color: var(--color-red-600);
+    transform: scale(1.05);
+  }
+
+  /* Card hover effects */
+  .card-interactive {
+    transition: all var(--transition-base);
+    background: var(--color-surface-primary);
+    border: 1px solid var(--color-border-primary);
+  }
+
+  .card-interactive:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--color-primary-300);
+  }
+
+  /* Focus states for accessibility */
+  .focus-ring {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+  }
+
+  /* Text selection */
+  ::selection {
+    background-color: var(--color-selection-bg);
+    color: var(--color-text-primary);
+  }
+
+  /* Animated underline for links */
+  .link-animated {
+    position: relative;
+    color: var(--color-blue-500);
+    text-decoration: none;
+    transition: color var(--transition-base);
+  }
+
+  .link-animated::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-primary-500);
+    transition: width var(--transition-base) var(--spring-smooth);
+  }
+
+  .link-animated:hover {
+    color: var(--color-blue-600);
+  }
+
+  .link-animated:hover::after {
+    width: 100%;
+  }
+
+  /* Gradient text effect */
+  .text-gradient-primary {
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-orange-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Vibrant badges */
+  .badge-yellow {
+    background-color: var(--color-primary-200);
+    color: var(--color-primary-900);
+    border: 1px solid var(--color-primary-300);
+  }
+
+  .badge-green {
+    background-color: var(--color-green-100);
+    color: var(--color-green-700);
+    border: 1px solid var(--color-green-200);
+  }
+
+  .badge-blue {
+    background-color: var(--color-blue-100);
+    color: var(--color-blue-700);
+    border: 1px solid var(--color-blue-200);
+  }
+
+  .badge-purple {
+    background-color: var(--color-purple-100);
+    color: var(--color-purple-700);
+    border: 1px solid var(--color-purple-200);
+  }
+
+  /* Pulse animation for CTAs */
+  @keyframes pulse-yellow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(255, 224, 27, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba(255, 224, 27, 0);
+    }
+  }
+
+  .pulse-primary {
+    animation: pulse-yellow 2s infinite;
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    transition: transform var(--transition-base) var(--spring-bouncy);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-6px) scale(1.02);
+  }
+
+  /* Smooth color transitions */
+  .transition-colors-smooth {
+    transition: background-color var(--transition-base),
+                border-color var(--transition-base),
+                color var(--transition-base);
+  }
+}
+
+/* ============================================
+   COMPONENT EXAMPLES
+   Example usage patterns for common UI elements
+   ============================================ */
+
+/* Example: Hero section with yellow background */
+.hero-section {
+  background: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-50));
+  color: var(--color-text-primary);
+}
+
+/* Example: Feature card */
+.feature-card {
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-primary);
+  padding: 2rem;
+  border-radius: 1rem;
+  transition: all var(--transition-base);
+}
+
+.feature-card:hover {
+  border-color: var(--color-primary-400);
+  box-shadow: var(--shadow-lg), 0 10px 25px -5px rgba(255, 224, 27, 0.1);
+}
+
+/* Example: Navigation link */
+.nav-link {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.nav-link:hover {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-900);
+}
+
+.nav-link.active {
+  background-color: var(--color-primary-500);
+  color: var(--color-black);
+}
+
+/* Example: Form input */
+.form-input {
+  border: 2px solid var(--color-border-primary);
+  background: var(--color-surface-primary);
+  color: var(--color-text-primary);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+  border-color: var(--color-primary-500);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 224, 27, 0.2);
+}
+
+.form-input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/* ============================================
+   HOW TO USE THIS COLOR SYSTEM
+   ============================================
+
+   1. BRAND ELEMENTS:
+      - Primary CTA: Use --color-primary-500 with black text
+      - Secondary CTA: Use --color-black with white text
+      - Hero sections: Use yellow gradients (primary-50 to primary-100)
+
+   2. STATUS INDICATORS:
+      - Success: Use green-500 for backgrounds, green-700 for text
+      - Error: Use red-500 for backgrounds, white for text
+      - Warning: Use orange-500 for backgrounds, white for text
+      - Info: Use blue-500 for backgrounds, white for text
+
+   3. TYPOGRAPHY:
+      - Headings: Use --color-black or --color-text-primary
+      - Body text: Use --color-text-primary (warm black)
+      - Secondary text: Use --color-text-secondary (gray-600)
+      - Links: Use --color-blue-500, hover to blue-600
+
+   4. BACKGROUNDS:
+      - Page background: Use --color-bg-primary (gray-50)
+      - Cards: Use --color-surface-primary (white)
+      - Sections: Alternate between white and gray-50
+      - Featured sections: Use --color-bg-yellow (primary-50)
+
+   5. INTERACTIVE ELEMENTS:
+      - Add hover-lift class for floating effect
+      - Use transition-colors-smooth for color changes
+      - Apply pulse-primary to important CTAs
+      - Use card-interactive for clickable cards
+
+   6. ACCESSIBILITY:
+      - Always maintain WCAG AA contrast ratios
+      - Use focus-ring class for keyboard navigation
+      - Yellow on white needs primary-700 or darker for text
+
+   ============================================ */

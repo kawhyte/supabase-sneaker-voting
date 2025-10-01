@@ -23,7 +23,7 @@ export default function DashboardPage() {
               <BarChart3 className="h-4 w-4" />
               Collection
             </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-2">
+            <TabsTrigger value="insights" className="flex items-center gap-2 ">
               <Brain className="h-4 w-4" />
               Insights
             </TabsTrigger>

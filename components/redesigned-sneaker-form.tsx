@@ -744,12 +744,12 @@ export function RedesignedSneakerForm({
 
 	return (
 		<div className='max-w-6xl mx-auto'>
-			<Card className='shadow-lg border-0 bg-gradient-to-br from-white via-gray-50 to-blue-50'>
+			<Card className='card-interactive shadow-lg' style={{ background: 'linear-gradient(135deg, var(--color-surface-primary), var(--color-gray-50), var(--color-blue-50))' }}>
 				<CardHeader className='text-left pb-6'>
-					<CardTitle className='text-3xl flex flex-col  justify-start  text-black '>
+					<CardTitle className='text-3xl flex flex-col justify-start' style={{ color: 'var(--color-black)' }}>
 						<p className='-mb-2'> Track Your Sneakers</p>
 
-						<p className='text-sm text-gray-600 '>
+						<p className='text-sm' style={{ color: 'var(--color-text-secondary)' }}>
 							Import from URL or add manually
 						</p>
 					</CardTitle>
@@ -935,7 +935,7 @@ export function RedesignedSneakerForm({
 														}
 														disabled={isScrapingUrl || !watch("productUrl")}
 														size='sm'
-														className='px-2 bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 h-6'
+														className='btn-primary rounded-lg px-6 py-3 font-semibold cursor-pointer '
 														aria-label={
 															isScrapingUrl
 																? "Scraping product data"
@@ -1441,7 +1441,8 @@ export function RedesignedSneakerForm({
 																		shouldValidate: true,
 																	})
 																}
-																className='group p-[var(--space-sm)] md:p-[var(--space-md)] hover:scale-110 transition-transform touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 rounded'
+																className='group p-[var(--space-sm)] md:p-[var(--space-md)] hover:scale-110 transition-transform touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 rounded'
+																style={{ boxShadow: 'var(--color-focus-ring)' }}
 																title={`${rating} star${
 																	rating !== 1 ? "s" : ""
 																}`}
@@ -1473,8 +1474,8 @@ export function RedesignedSneakerForm({
 														)}
 													</div>
 													{watch("comfortRating") && (
-														<div className='mt-1 p-1 bg-yellow-50 border border-yellow-200 rounded'>
-															<p className='text-sm text-yellow-800'>
+														<div className='mt-1 p-1 rounded' style={{ backgroundColor: 'var(--color-primary-50)', borderColor: 'var(--color-primary-200)', border: '1px solid' }}>
+															<p className='text-sm' style={{ color: 'var(--color-primary-900)' }}>
 																<span className='font-semibold'>
 																	{watch("comfortRating")} / 5 stars
 																</span>{" "}
@@ -1532,7 +1533,7 @@ export function RedesignedSneakerForm({
 									{/* Submit Button */}
 									<Button
 										type='submit'
-										className='h-6 px-4 text-sm bg-yellow-500 text-black hover:bg-yellow-800'
+										className=' btn-primary rounded-lg px-6 py-3 font-semibold'
 										disabled={isLoading || !isValid || photos.length === 0}
 										aria-label={
 											isLoading

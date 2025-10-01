@@ -41,12 +41,13 @@ export default function RootLayout({
 }) {
 	return (
 		<html
+		lang="en"
 			className={cn(
-				"light bg-background text-foreground",
+				"light text-foreground",
 				GeistSans.className
 			)}>
-			<body className="min-h-screen">
-				<div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+			<body className="min-h-screen text-primary">
+				<div className="min-h-screen bg-primary">
 					<Navbar />
 					<main>{children}</main>
 					<Toaster />

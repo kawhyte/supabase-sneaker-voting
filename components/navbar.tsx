@@ -46,7 +46,7 @@ export function Navbar() {
             <Link href="/add-new-item">
               <Button
                 variant={isActive('/add-new-item') ? 'default' : 'ghost'}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 "
               >
                 <Plus className="h-2 w-2" />
                 <span className="hidden sm:inline">Add Sneaker</span>
