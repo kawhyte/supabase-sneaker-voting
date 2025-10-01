@@ -114,7 +114,7 @@ export function PhotoCarousel({
             <img
               src={photo.image_url}
               alt="Sneaker photo"
-              className="w-full h-full object-cover rounded-lg"
+              className="w-full h-full object-contain rounded-lg"
               style={{ aspectRatio: autoHeight ? 'auto' : '1 / 1' }}
             />
 
@@ -154,7 +154,7 @@ export function PhotoCarousel({
                     <img
                       src={photo.image_url}
                       alt={`Sneaker photo ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
 
                     {onPhotoClick && (
@@ -175,34 +175,34 @@ export function PhotoCarousel({
             </div>
           </div>
 
-          {/* Navigation Controls */}
+          {/* Navigation Controls with Counter */}
           {showControls && sortedPhotos.length > 1 && (
             <>
+              {/* Photo Counter Badge */}
+              <Badge className="absolute bottom-3 z-10 bg-white/95 text-gray-900 border-0 shadow-md">
+                {selectedIndex + 1}/{sortedPhotos.length}
+              </Badge>
+
+              {/* Navigation Arrows */}
               <Button
                 variant="outline"
-                size="sm"
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+                size="icon"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-white/95 hover:bg-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={scrollPrev}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-2 w-2" />
               </Button>
+
               <Button
                 variant="outline"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+                size="icon"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-white/95 hover:bg-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={scrollNext}
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-2 w-2" />
               </Button>
             </>
           )}
-
-        {/* Photo Counter */}
-        <div className="absolute bottom-3 right-3 z-10">
-          <Badge variant="secondary" className="bg-black/70 text-white">
-            {selectedIndex + 1} / {sortedPhotos.length}
-          </Badge>
-        </div>
       </div>
 
       {/* Thumbnail Indicators - Hidden for dashboard cards */}

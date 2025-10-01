@@ -6,8 +6,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { createClient } from '@/utils/supabase/client'
-import { Star, ThumbsUp, Calendar, MapPin, DollarSign, User, Search, Filter, Edit, Trash2, Loader2, Image as ImageIcon } from 'lucide-react'
+import { Star, ThumbsUp, Calendar, MapPin, DollarSign, User, Search, Filter, Edit, Trash2, Loader2, Image as ImageIcon, MoreVertical } from 'lucide-react'
 import { EditSneakerModal } from './edit-sneaker-modal'
 import { PhotoCarousel } from './photo-carousel'
 
@@ -251,14 +252,14 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
         </div>
 
         {/* Loading Skeleton Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[var(--space-xl)]">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-[var(--space-xl)]">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="overflow-hidden flex flex-col animate-pulse">
+            <Card key={i} className="overflow-hidden flex flex-col md:flex-row animate-pulse">
               {/* Image Skeleton */}
-              <div className="relative w-full bg-gray-200" style={{ paddingBottom: '56.25%' }} />
+              <div className="relative w-full h-[360px] md:h-[280px] md:w-[280px] bg-gray-200 flex-shrink-0" />
 
               {/* Content Skeleton */}
-              <CardContent className="flex-1 p-[var(--space-base)] flex flex-col gap-[var(--space-xs)]">
+              <CardContent className="flex-1 p-[var(--space-lg)] flex flex-col gap-[var(--space-sm)] md:border-l md:border-gray-200">
                 <div className="h-3 bg-gray-200 rounded w-1/4"></div>
                 <div className="h-5 bg-gray-200 rounded w-3/4"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -375,9 +376,9 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
       </div>
 
       {/* Experiences List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[var(--space-xl)]">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-[var(--space-xl)]">
         {filteredExperiences.length === 0 ? (
-          <div className="col-span-1 md:col-span-2 xl:col-span-3">
+          <div className="col-span-1 xl:col-span-2">
             <Card>
               <CardContent className="p-8 text-center">
               <div className="text-gray-400 mb-4">
@@ -419,31 +420,62 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
             return (
               <Card
                 key={experience.id}
-                className="overflow-hidden hover-lift card-interactive flex flex-col"
+                className="overflow-hidden hover-lift card-interactive transition-all duration-300 group relative"
               >
-                {/* Image Section - 16:9 Aspect Ratio with Carousel */}
-                {photos.length > 0 ? (
-                  <div className="relative">
+                <div className="flex flex-col md:flex-row">
+                  {/* Kebab Menu - Top Right */}
+                  <div className="absolute top-2 right-2 z-50">
+                    <DropdownMenu modal={false}>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          className="h-3 w-3 rounded-full   flex items-center justify-center transition-colors"
+                          type="button"
+                        >
+                          <MoreVertical className="h-4 w-4 text-gray-700" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48 z-50">
+                        <DropdownMenuItem
+                          onSelect={() => handleEditExperience(experience)}
+                          className="cursor-pointer"
+                        >
+                          <Edit className="h-2 w-2 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => handleDeleteExperience(experience)}
+                          className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                        >
+                          <Trash2 className="h-2 w-2 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* Image Section - 16:9 Aspect Ratio with Carousel */}
+                  {photos.length > 0 ? (
+                    <div className="relative w-full md:w-[280px] md:flex-shrink-0 overflow-hidden">
                     {/* Badge Overlay - Single distinction */}
-                    <div className="absolute top-[var(--space-xs)] left-[var(--space-xs)] z-20">
+                    {/* <div className="absolute top-[var(--space-xs)] left-[var(--space-xs)] z-20">
                       <Badge
                         variant="secondary"
                         className="bg-black/80 text-white border-none"
                       >
                         {isTried ? '✓ Tried' : '👀 Seen'}
                       </Badge>
-                    </div>
+                    </div> */}
 
                     {/* Photo Display */}
-                    <div className="relative w-full bg-gray-100" style={{ paddingBottom: '56.25%' }}>
+                    <div className="relative w-full h-[360px] md:h-[280px] bg-[var(--color-gray-100)] flex items-center justify-center p-2">
                       {photos.length === 1 ? (
                         <img
                           src={photos[0].image_url}
                           alt={`${experience.brand} ${experience.model}`}
-                          className="absolute inset-0 w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       ) : (
-                        <div className="absolute inset-0">
+                        <div className="w-full h-full">
                           <PhotoCarousel
                             photos={photos}
                             showControls={true}
@@ -455,25 +487,25 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
                     </div>
                   </div>
                 ) : (
-                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                    <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                  <div className="relative w-full h-[360px] md:h-[280px] md:w-[280px] md:flex-shrink-0">
+                    <div className="w-full h-full bg-[var(--color-gray-100)] flex items-center justify-center">
                       <ImageIcon className="h-12 w-12 text-gray-300" />
                     </div>
 
                     {/* Badge Overlay - Single distinction */}
-                    <div className="absolute top-[var(--space-xs)] left-[var(--space-xs)]">
+                    {/* <div className="absolute top-[var(--space-xs)] left-[var(--space-xs)]">
                       <Badge
                         variant="secondary"
                         className="bg-black/80 text-white border-none"
                       >
                         {isTried ? '✓ Tried' : '👀 Seen'}
                       </Badge>
-                    </div>
-                  </div>
+                    </div>*/}
+                  </div> 
                 )}
 
                 {/* Content Section */}
-                <CardContent className="flex-1 p-[var(--space-base)] flex flex-col gap-[var(--space-xs)] min-h-[200px]">
+                <CardContent className="flex-1 p-[var(--space-lg)] flex flex-col gap-[var(--space-sm)] md:border-l md:border-gray-200">
                   {/* Brand */}
                   <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {experience.brand}
@@ -490,7 +522,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
                   </h3>
 
                   {/* Metadata Grid */}
-                  <div className="grid grid-cols-2 gap-x-[var(--space-xs)] gap-y-[var(--space-2xs)] text-xs mt-[var(--space-xs)]">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-2 text-xs mt-2">
                     {experience.size_tried && (
                       <div className="flex items-center gap-1">
                         <span className="text-gray-500">Size:</span>
@@ -520,13 +552,13 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
                     )}
 
                     {experience.store_name && (
-                      <div className="flex items-center gap-1 col-span-2">
+                      <div className="flex items-center gap-1 col-span-2 md:col-span-1">
                         <MapPin className="h-3 w-3 text-gray-400" />
                         <span className="truncate">{experience.store_name}</span>
                       </div>
                     )}
 
-                    <div className="flex items-center gap-1 col-span-2">
+                    <div className="flex items-center gap-1 col-span-2 md:col-span-1">
                       <Calendar className="h-3 w-3 text-gray-400" />
                       <span>{formatDate(experience.try_on_date)}</span>
                     </div>
@@ -534,43 +566,32 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
 
                   {/* Notes */}
                   {experience.notes && (
-                    <div className="mt-[var(--space-xs)] p-[var(--space-xs)] bg-gray-50 rounded text-xs text-gray-700 line-clamp-2">
+                    <div className="mt-[var(--space-xs)] p-[var(--space-xs)] bg-gray-50 rounded text-xs text-gray-700 line-clamp-3">
                       {experience.notes}
                     </div>
                   )}
 
-                  {/* Footer - Actions */}
-                  <div className="flex items-center justify-between mt-auto pt-[var(--space-xs)] border-t border-gray-100">
-                    <div className="flex items-center gap-1">
-                      <Badge variant="outline" className="text-xs">
-                        {experience.user_name}
-                      </Badge>
-                      {experience.would_recommend && isTried && (
-                        <ThumbsUp className="h-3 w-3 text-green-600" />
-                      )}
-                    </div>
+                  {/* Footer - User Info */}
+                  <div className="flex items-center gap-1 mt-auto pt-[var(--space-xs)] border-t border-gray-100">
+                    <Badge variant="outline" className="text-xs">
+                      {experience.user_name}
+                    </Badge>
 
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditExperience(experience)}
-                        className="h-7 px-2 text-xs"
+                      
+                      <Badge
+                        variant="secondary"
+                        className="bg-black/80 text-white border-none"
                       >
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteExperience(experience)}
-                        className="h-7 px-2 text-xs hover:text-red-600"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
+                        {isTried ? 'Tried On' : 'Didnt Try On'}
+                      </Badge>
+                    
+                    {experience.would_recommend && isTried && (
+                      <ThumbsUp className="h-3 w-3 text-green-600" />
+                    )}
                   </div>
                 </CardContent>
-              </Card>
+              </div>
+            </Card>
             )
           })
         )}
