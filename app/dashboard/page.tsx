@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ExperienceDashboard } from '@/components/experience-dashboard'
+import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
 import { InsightsDashboard } from '@/components/insights-dashboard'
 import { BarChart3, Brain } from 'lucide-react'
 
@@ -35,7 +35,7 @@ export default function DashboardPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <ExperienceDashboard />
+              <SizingJournalDashboard />
             </motion.div>
           </TabsContent>
 

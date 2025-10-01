@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { SmartSneakerForm } from './smart-sneaker-form'
-import { ExperienceDashboard } from './experience-dashboard'
+import { SizingJournalDashboard } from './sizing-journal-dashboard'
 import { InsightsDashboard } from './insights-dashboard'
 import { Zap, BarChart3, Brain } from 'lucide-react'
 
@@ -164,7 +164,7 @@ export function SneakerTrackerApp() {
                 <SmartSneakerForm onSneakerAdded={handleSneakerAdded} />
               </div>
             ) : currentView === 'dashboard' ? (
-              <ExperienceDashboard onAddNew={handleAddNew} />
+              <SizingJournalDashboard onAddNew={handleAddNew} />
             ) : (
               <InsightsDashboard onGoBack={() => setCurrentView('dashboard')} />
             )}
