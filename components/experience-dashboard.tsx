@@ -228,7 +228,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
         case 'date-asc':
           return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
         case 'fit-rating':
-          return a.fit_rating - b.fit_rating
+          return (a.fit_rating || 0) - (b.fit_rating || 0)
         case 'brand':
           return a.brand.localeCompare(b.brand)
         default:
@@ -237,7 +237,7 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
     })
 
   // Get unique brands for filter
-  const uniqueBrands = [...new Set(experiences.map(exp => exp.brand))].sort()
+  const uniqueBrands = Array.from(new Set(experiences.map(exp => exp.brand))).sort()
 
   if (loading) {
     return (
