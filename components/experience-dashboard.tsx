@@ -75,7 +75,9 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
   const loadExperiences = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
+
+      // Try to fetch with sneaker_photos, fallback to basic query if table doesn't exist
+      let { data, error } = await supabase
         .from('sneakers')
         .select(`
           *,
@@ -87,6 +89,17 @@ export function ExperienceDashboard({ onAddNew }: ExperienceDashboardProps = {})
           )
         `)
         .order('created_at', { ascending: false })
+
+      // If sneaker_photos table doesn't exist, fallback to basic query
+      if (error && error.message?.includes('sneaker_photos')) {
+        const basicQuery = await supabase
+          .from('sneakers')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        data = basicQuery.data
+        error = basicQuery.error
+      }
 
       if (error) {
         console.error('Error loading experiences:', error)
