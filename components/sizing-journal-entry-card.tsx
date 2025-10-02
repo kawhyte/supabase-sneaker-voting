@@ -78,7 +78,7 @@ export function SizingJournalEntryCard({
 				{/* Image Section */}
 				{photos.length > 0 ? (
 					<div className='relative w-full sm:w-[340px] lg:w-[380px] sm:flex-shrink-0 overflow-hidden'>
-						<div className='relative w-full aspect-[4/3] max-h-[320px] sm:max-h-[340px] lg:max-h-[380px] flex items-center justify-center p-2' style={{ backgroundColor: '#f5f5f7' }}>
+						<div className='relative w-full aspect-[4/3] max-h-[320px] sm:max-h-[340px] lg:max-h-[380px] flex items-center justify-center p-4 sm:p-5 lg:p-6 transition-all duration-200' style={{ backgroundColor: '#f5f5f7' }}>
 							{photos.length === 1 ? (
 								<img
 									src={photos[0].image_url}
@@ -102,7 +102,7 @@ export function SizingJournalEntryCard({
 					</div>
 				) : (
 					<div className='relative w-full sm:w-[340px] lg:w-[380px] sm:flex-shrink-0'>
-						<div className='w-full aspect-[4/3] max-h-[320px] sm:max-h-[340px] lg:max-h-[380px] flex items-center justify-center' style={{ backgroundColor: '#f5f5f7' }}>
+						<div className='w-full aspect-[4/3] max-h-[320px] sm:max-h-[340px] lg:max-h-[380px] flex items-center justify-center transition-all duration-200' style={{ backgroundColor: '#f5f5f7' }}>
 							<ImageIcon className='h-12 w-12 text-gray-300' />
 						</div>
 					</div>
