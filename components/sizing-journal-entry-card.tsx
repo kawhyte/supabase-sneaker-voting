@@ -41,15 +41,18 @@ export function SizingJournalEntryCard({
 	const photos = preparePhotos(entry);
 
 	return (
-		<Card className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl' tabIndex={0}  role="article"
-  aria-label={`${entry.brand} ${entry.model}`}>
-			<div className='flex flex-col md:flex-row'>
+		<Card
+			className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl'
+			tabIndex={0}
+			role='article'
+			aria-label={`${entry.brand} ${entry.model}`}>
+			<div className='flex flex-col'>
 				{/* Kebab Menu */}
 				<div className='absolute top-2 right-2 z-50'>
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
 							<button
-								className='h-8 w-8 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100'
+								className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100 active:bg-gray-200'
 								type='button'
 								aria-label='Card actions'>
 								<MoreVertical className='h-5 w-5 text-gray-700' />
@@ -75,7 +78,7 @@ export function SizingJournalEntryCard({
 				{/* Image Section */}
 				{photos.length > 0 ? (
 					<div className='relative w-full md:w-[280px] md:flex-shrink-0 overflow-hidden'>
-						<div className='relative w-full h-[360px] md:h-[280px] bg-gray-50 flex items-center justify-center p-2'>
+						<div className='relative w-full h-[280px] md:h-[280px] bg-gray-50 flex items-center justify-center p-2'>
 							{photos.length === 1 ? (
 								<img
 									src={photos[0].image_url}
@@ -83,6 +86,7 @@ export function SizingJournalEntryCard({
 										entry.colorway !== "Standard" ? ` in ${entry.colorway}` : ""
 									}`}
 									className='w-full h-full object-contain'
+                  loading="lazy"
 								/>
 							) : (
 								<div className='w-full h-full'>
@@ -97,22 +101,22 @@ export function SizingJournalEntryCard({
 						</div>
 					</div>
 				) : (
-					<div className="relative w-full h-[360px] md:h-[280px] md:w-[280px] md:flex-shrink-0">
-  <div className="w-full h-full bg-gray-50 flex items-center justify-center">
-    <ImageIcon className="h-12 w-12 text-gray-300" />
-  </div>
-</div>
+					<div className='relative w-full h-[360px] md:h-[280px] md:w-[280px] md:flex-shrink-0'>
+						<div className='w-full h-full bg-gray-50 flex items-center justify-center'>
+							<ImageIcon className='h-12 w-12 text-gray-300' />
+						</div>
+					</div>
 				)}
 
 				{/* Content Section */}
-				<CardContent className='flex-1 p-6 flex flex-col gap-4 md:border-l md:border-gray-200'>
+				<CardContent className='flex-1 p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 md:border-l md:border-gray-200'>
 					{/* Brand */}
 					<div className='text-[10px] font-semibold uppercase tracking-widest text-gray-500'>
 						{entry.brand}
 					</div>
 
 					{/* Title */}
-					<h3 className='text-lg font-bold leading-tight line-clamp-3'>
+					<h3 className='text-base sm:text-lg font-bold leading-tight line-clamp-2'>
 						{entry.model}
 						{entry.colorway !== "Standard" && (
 							<span className='block text-sm font-normal text-gray-600 mt-1'>
@@ -131,7 +135,9 @@ export function SizingJournalEntryCard({
 										{entry.size_tried}
 									</span>
 									{(fitInfo || entry.comfort_rating) && (
-										<span className='text-gray-300 mx-0.5'>|</span>
+										<span className='hidden sm:inline text-gray-300 mx-0.5'>
+											|
+										</span>
 									)}
 								</>
 							)}
@@ -145,7 +151,9 @@ export function SizingJournalEntryCard({
 										</span>
 									</div>
 									{entry.comfort_rating && (
-										<span className='text-gray-300 mx-0.5'>|</span>
+										<span className='hidden sm:inline text-gray-300 mx-0.5'>
+											|
+										</span>
 									)}
 								</>
 							)}
@@ -172,7 +180,9 @@ export function SizingJournalEntryCard({
 										<span className='font-medium'>${entry.listed_price}</span>
 									</div>
 									{(entry.store_name || entry.try_on_date) && (
-										<span className='text-gray-300 mx-0.5'>|</span>
+										<span className='hidden sm:inline text-gray-300 mx-0.5'>
+											|
+										</span>
 									)}
 								</>
 							)}
@@ -181,11 +191,13 @@ export function SizingJournalEntryCard({
 								<>
 									<div className='flex items-center gap-1'>
 										<MapPin className='h-3.5 w-3.5 text-gray-400' />
-										<span className='truncate max-w-[140px]'>
+										<span className='truncate max-w-[160px] sm:max-w-[200px]'>
 											{entry.store_name}
 										</span>
 									</div>
-									<span className='text-gray-300 mx-0.5'>|</span>
+									<span className='hidden sm:inline text-gray-300 mx-0.5'>
+										|
+									</span>
 								</>
 							)}
 
@@ -198,14 +210,14 @@ export function SizingJournalEntryCard({
 
 					{/* Notes */}
 					{entry.notes && (
-						<div className='mt-3 p-3 bg-gray-50/50 rounded-lg text-xs text-gray-600 line-clamp-3 leading-relaxed'>
+						<div className='mt-2 sm:mt-3 p-2.5 sm:p-3 bg-gray-50/50 rounded-lg text-xs text-gray-600 line-clamp-3 leading-relaxed'>
 							{entry.notes}
 						</div>
 					)}
 
 					{/* Footer */}
 					<div className='flex items-center gap-2 flex-wrap mt-auto pt-3 border-t border-gray-100'>
-						<Badge variant='outline' className='text-xs'>
+						<Badge variant='outline' className='text-[11px] sm:text-xs'>
 							{entry.user_name}
 						</Badge>
 
