@@ -878,7 +878,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                     </div>
                   </div>
                   <div>
-                    <Label className="text-sm text-gray-600">Ideal Price (Optional)</Label>
+                    <Label className="text-sm text-gray-600">Ideal Price Im willing to Pay (Optional)</Label>
                     <div className="relative mt-[var(--space-xs)]">
                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                       <Input {...register('idealPrice')} placeholder="120.00" type="number" step="0.01" className="pl-8" />

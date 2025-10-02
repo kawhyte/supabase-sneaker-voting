@@ -388,7 +388,13 @@ export function RedesignedSneakerForm({
 				.not("fit_rating", "is", null);
 
 			if (error) {
-				console.error("Error loading fit data:", error);
+				// Silently handle error - fit recommendations are optional feature
+				console.warn("Could not load fit data for recommendations:", error.message || "Unknown error");
+				return;
+			}
+
+			if (!data || data.length === 0) {
+				// No fit data available yet - this is normal for new installations
 				return;
 			}
 
@@ -415,7 +421,8 @@ export function RedesignedSneakerForm({
 
 			setFitData(transformedData);
 		} catch (error) {
-			console.error("Error loading fit data:", error);
+			// Gracefully handle any unexpected errors
+			console.warn("Unexpected error loading fit data:", error);
 		}
 	};
 
@@ -611,20 +618,20 @@ export function RedesignedSneakerForm({
 				// Provide specific error message based on error type
 				let errorMessage = "❌ Could not extract product data. ";
 				if (data.error?.includes("HTTP 404")) {
-					errorMessage += "Product page not found.";
+					errorMessage += "Product page not found. Please check the URL.";
 				} else if (
 					data.error?.includes("HTTP 403") ||
 					data.error?.includes("HTTP 401")
 				) {
-					errorMessage += "Access denied by website.";
+					errorMessage += "Website blocked auto-import. Please enter details manually below.";
 				} else if (data.error?.includes("timeout")) {
-					errorMessage += "Request timed out.";
+					errorMessage += "Request timed out. Try again or enter manually.";
 				} else {
-					errorMessage += "Please fill manually.";
+					errorMessage += "Please enter details manually below.";
 				}
 
 				setUploadProgress(errorMessage);
-				setTimeout(() => setUploadProgress(""), 7000);
+				setTimeout(() => setUploadProgress(""), 10000);
 			}
 		} catch (error) {
 			// Network or fetch error, attempt retry if under max attempts
@@ -1415,7 +1422,7 @@ export function RedesignedSneakerForm({
 
 											<div>
 												<Label className='text-sm text-gray-600'>
-													Ideal Price (Optional)
+													Ideal Price Im willing to Pay (Optional)
 												</Label>
 												<div className='relative mt-[var(--space-md)]'>
 													<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'>
