@@ -71,7 +71,11 @@ export async function POST(request: NextRequest) {
       } else if (hostname.includes('nike.com')) {
         productData = await scrapeWithTimeout(() => scrapeNike(url))
       } else if (hostname.includes('adidas.com')) {
-        productData = await scrapeWithTimeout(() => scrapeAdidas(url))
+        // Adidas has strong bot protection - skip scraping
+        return NextResponse.json({
+          success: false,
+          error: 'Adidas auto-import is currently unavailable due to bot protection. Please enter product details manually or use an alternative source like SoleRetriever.com or ShoePalace.com'
+        })
       } else if (hostname.includes('stockx.com')) {
         productData = await scrapeWithTimeout(() => scrapeStockX(url))
       } else if (hostname.includes('shoepalace.com')) {
