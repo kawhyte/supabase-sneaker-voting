@@ -122,30 +122,32 @@ async function scrapeSoleRetriever(url: string): Promise<ProductData> {
     const brand = rawTitle.split(' ')[0] || ''
     const model = rawTitle.replace(brand, '').trim()
 
-    // Try to extract colorway from title or subtitle
-    const colorway = cleanText($('.product-subtitle').text() ||
-                     $('[class*="colorway"]').text() ||
-                     'Standard')
-
-    // SKU extraction
-    const sku = cleanText($('[class*="sku"]').text() ||
-                $('[class*="style"]').text() ||
-                $('[class*="product-code"]').text() ||
-                '')
-
-    // Price extraction - look for sale and retail prices
+    // Extract data from Release Details section
+    let colorway = 'Standard'
+    let sku = ''
     let retailPrice: number | undefined
     let salePrice: number | undefined
 
-    // Try to find sale price
-    const salePriceText = cleanText($('.sale-price, [class*="sale-price"], [class*="discounted"]').first().text())
-    if (salePriceText) {
-      salePrice = extractPrice(salePriceText)
-    }
+    // Find all detail rows in the Release Details section
+    $('.space-y-2.p-4 .flex.justify-between').each((_, row) => {
+      const label = cleanText($(row).find('.text-black\\/70, .dark\\:text-white').first().text()).toLowerCase()
+      const value = cleanText($(row).find('.font-medium').last().text())
 
-    // Try to find retail/original price
-    const retailPriceText = cleanText($('.original-price, [class*="original-price"], .price, [class*="price"]').first().text())
-    retailPrice = extractPrice(retailPriceText)
+      if (label.includes('sku') || label.includes('style code')) {
+        sku = value
+      } else if (label.includes('colorway') || label.includes('color')) {
+        colorway = value || 'Standard'
+      } else if (label.includes('retail') || label.includes('price')) {
+        const priceValue = extractPrice(value)
+        if (priceValue) {
+          if (label.includes('sale') || label.includes('discounted')) {
+            salePrice = priceValue
+          } else {
+            retailPrice = priceValue
+          }
+        }
+      }
+    })
 
     // If we found a sale price but no retail, use the first price as retail
     if (!retailPrice && salePrice) {
@@ -375,16 +377,45 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
     const title = cleanText(product.title || '')
     let brand = ''
     let model = ''
+    let colorway = 'Standard'
 
     if (title) {
       // First word is usually the brand
       const parts = title.split(' ')
       brand = parts[0] || ''
-      model = parts.slice(1).join(' ')
+
+      // Check if there's a colorway in parentheses at the end of title
+      const colorwayMatch = title.match(/\(([^)]+)\)\s*$/)
+      if (colorwayMatch) {
+        colorway = cleanText(colorwayMatch[1])
+        // Remove the colorway from the model name
+        model = title.replace(brand, '').replace(colorwayMatch[0], '').trim()
+      } else {
+        model = parts.slice(1).join(' ')
+      }
     }
 
-    // Get SKU from first variant if available
-    const sku = product.variants?.[0]?.sku || ''
+    // Extract SKU/Style code from product tags (e.g., "1203A537-300")
+    // This is different from variant SKU which is internal inventory code
+    let sku = ''
+
+    if (product.tags) {
+      const tags = Array.isArray(product.tags) ? product.tags : product.tags.split(', ')
+      // Look for pattern like "1203A537-300" (letters/numbers with hyphen)
+      const skuTag = tags.find((tag: string) => tag.match(/^[A-Z0-9]+-[A-Z0-9]+$/i))
+      if (skuTag) {
+        sku = skuTag
+      }
+    }
+
+    // Fallback: check variant title for SKU pattern
+    if (!sku && product.variants?.[0]) {
+      const variantTitle = product.variants[0].title || ''
+      const skuMatch = variantTitle.match(/([A-Z0-9]+-[A-Z0-9]+)/i)
+      if (skuMatch) {
+        sku = skuMatch[1]
+      }
+    }
 
     // Price extraction from first variant
     let retailPrice: number | undefined
@@ -420,6 +451,7 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
       title,
       brand,
       model,
+      colorway,
       sku,
       retailPrice,
       salePrice,
@@ -430,7 +462,7 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
     return {
       brand: brand || undefined,
       model: model || undefined,
-      colorway: undefined,
+      colorway: colorway !== 'Standard' ? colorway : undefined,
       sku: sku || undefined,
       retailPrice,
       salePrice,
