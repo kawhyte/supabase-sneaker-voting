@@ -260,94 +260,9 @@ async function scrapeNike(url: string): Promise<ProductData> {
   }
 }
 
-async function scrapeAdidas(url: string): Promise<ProductData> {
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
-        'Cache-Control': 'max-age=0'
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`)
-    }
-
-    const html = await response.text()
-    const $ = cheerio.load(html)
-
-    const brand = 'Adidas'
-    const model = cleanText($('[data-qa="product-title"]').text() ||
-                  $('.product-title').text() ||
-                  $('h1').first().text())
-
-    const colorway = cleanText($('.product-subtitle').text() ||
-                     $('[data-qa="product-subtitle"]').text() ||
-                     'Standard')
-
-    // SKU extraction
-    const sku = cleanText($('[class*="sku"]').text() ||
-                $('[class*="style"]').text() ||
-                $('[class*="product-code"]').text() ||
-                '')
-
-    // Price extraction - look for sale and retail prices
-    let retailPrice: number | undefined
-    let salePrice: number | undefined
-
-    // Try to find sale price
-    const salePriceText = cleanText($('.sale-price, [class*="sale-price"], [class*="discounted"]').first().text())
-    if (salePriceText) {
-      salePrice = extractPrice(salePriceText)
-    }
-
-    // Try to find retail/original price
-    const retailPriceText = cleanText($('[data-qa="product-price"]').text() ||
-                      $('.product-price').text() ||
-                      $('.price').first().text())
-    retailPrice = extractPrice(retailPriceText)
-
-    // If we found a sale price but no retail, use the first price as retail
-    if (!retailPrice && salePrice) {
-      retailPrice = salePrice
-      salePrice = undefined
-    }
-
-    // Image extraction - limit to 5
-    const images: string[] = []
-    $('img[src*="adidas"], .product-image img, [class*="product-image"] img').each((_, el) => {
-      if (images.length >= 5) return false // Stop after 5 images
-      const src = $(el).attr('src')
-      if (src && !images.includes(src)) {
-        images.push(src.startsWith('http') ? src : `https://assets.adidas.com${src}`)
-      }
-    })
-
-    return {
-      brand,
-      model: model || undefined,
-      colorway: colorway !== 'Standard' ? colorway : undefined,
-      sku: sku || undefined,
-      retailPrice,
-      salePrice,
-      images: images.length > 0 ? images : undefined,
-      success: true
-    }
-  } catch (error) {
-    return {
-      success: false,
-      error: `Adidas scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
-    }
-  }
-}
+// Adidas scraper removed - site has strong bot protection
+// Users are directed to use alternative sources (SoleRetriever, ShoePalace)
+// or manual entry when Adidas URLs are detected
 
 async function scrapeStockX(url: string): Promise<ProductData> {
   try {
