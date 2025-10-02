@@ -41,15 +41,17 @@ export function SizingJournalEntryCard({
 	const photos = preparePhotos(entry);
 
 	return (
-		<Card className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl'>
+		<Card className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl' tabIndex={0}  role="article"
+  aria-label={`${entry.brand} ${entry.model}`}>
 			<div className='flex flex-col md:flex-row'>
 				{/* Kebab Menu */}
 				<div className='absolute top-2 right-2 z-50'>
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
 							<button
-								className='h-3 w-3 rounded-full flex items-center justify-center transition-colors'
-								type='button'>
+								className='h-8 w-8 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100'
+								type='button'
+								aria-label='Card actions'>
 								<MoreVertical className='h-5 w-5 text-gray-700' />
 							</button>
 						</DropdownMenuTrigger>
@@ -57,13 +59,13 @@ export function SizingJournalEntryCard({
 							<DropdownMenuItem
 								onSelect={() => onEdit(entry)}
 								className='cursor-pointer'>
-								<Edit className='h-2 w-2 mr-2' />
+								<Edit className='h-4 w-4 mr-2' />
 								Edit
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								onSelect={() => onDelete(entry)}
 								className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
-								<Trash2 className='h-2 w-2 mr-2' />
+								<Trash2 className='h-4 w-4 mr-2' />
 								Delete
 							</DropdownMenuItem>
 						</DropdownMenuContent>
@@ -77,7 +79,9 @@ export function SizingJournalEntryCard({
 							{photos.length === 1 ? (
 								<img
 									src={photos[0].image_url}
-									alt={`${entry.brand} ${entry.model}`}
+									alt={`${entry.brand} ${entry.model}${
+										entry.colorway !== "Standard" ? ` in ${entry.colorway}` : ""
+									}`}
 									className='w-full h-full object-contain'
 								/>
 							) : (
@@ -93,11 +97,11 @@ export function SizingJournalEntryCard({
 						</div>
 					</div>
 				) : (
-					<div className='relative w-full h-[360px] md:h-[280px] md:w-[280px] md:flex-shrink-0'>
-						<div className='w-full h-full bg-gray-50 flex items-center justify-center'>
-							<ImageIcon className='h-12 w-12 text-gray-300' />
-						</div>
-					</div>
+					<div className="relative w-full h-[360px] md:h-[280px] md:w-[280px] md:flex-shrink-0">
+  <div className="w-full h-full bg-gray-50 flex items-center justify-center">
+    <ImageIcon className="h-12 w-12 text-gray-300" />
+  </div>
+</div>
 				)}
 
 				{/* Content Section */}
@@ -194,13 +198,13 @@ export function SizingJournalEntryCard({
 
 					{/* Notes */}
 					{entry.notes && (
-						<div className='mt-3 p-[var(--space-xs)] bg-gray-50 rounded text-xs text-gray-700 line-clamp-3'>
+						<div className='mt-3 p-3 bg-gray-50/50 rounded-lg text-xs text-gray-600 line-clamp-3 leading-relaxed'>
 							{entry.notes}
 						</div>
 					)}
 
 					{/* Footer */}
-					<div className='flex items-center gap-2 mt-auto pt-3 border-t border-gray-100'>
+					<div className='flex items-center gap-2 flex-wrap mt-auto pt-3 border-t border-gray-100'>
 						<Badge variant='outline' className='text-xs'>
 							{entry.user_name}
 						</Badge>
