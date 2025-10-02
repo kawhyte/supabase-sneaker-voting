@@ -85,7 +85,7 @@ export function SizingJournalEntryCard({
 									alt={`${entry.brand} ${entry.model}${
 										entry.colorway !== "Standard" ? ` in ${entry.colorway}` : ""
 									}`}
-									className='max-w-full max-h-full w-auto h-auto object-contain'
+									className='w-full h-full object-contain'
                   loading="lazy"
 								/>
 							) : (
