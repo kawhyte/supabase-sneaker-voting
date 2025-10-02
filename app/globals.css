@@ -834,6 +834,16 @@ h2 {
   filter: drop-shadow(0 0 4px rgba(255, 224, 27, 0.4));
 }
 
+/* Card image container background */
+.card-image-container {
+  background-color: #f5f5f7;
+  transition: background-color 200ms ease;
+}
+
+.card-image-container:hover {
+  background-color: #eef0f2;
+}
+
 
 }
 
