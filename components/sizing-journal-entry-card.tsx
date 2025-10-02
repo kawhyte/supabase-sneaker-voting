@@ -42,7 +42,7 @@ export function SizingJournalEntryCard({
 
 	return (
 		<Card
-			className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl'
+			className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full'
 			tabIndex={0}
 			role='article'
 			aria-label={`${entry.brand} ${entry.model}`}>
@@ -77,8 +77,8 @@ export function SizingJournalEntryCard({
 
 				{/* Image Section */}
 				{photos.length > 0 ? (
-					<div className='relative w-full sm:w-[340px] lg:w-[380px] sm:flex-shrink-0 overflow-hidden'>
-						<div className='relative w-full aspect-[4/3] max-h-[320px] sm:max-h-[340px] lg:max-h-[380px] flex items-center justify-center p-4 sm:p-5 lg:p-6 transition-all duration-200' style={{ backgroundColor: '#f5f5f7' }}>
+					<div className='relative w-full overflow-hidden'>
+						<div className='relative w-full aspect-[4/3] flex items-center justify-center p-4 sm:p-5 lg:p-6 transition-all duration-200 card-image-container'>
 							{photos.length === 1 ? (
 								<img
 									src={photos[0].image_url}
@@ -101,8 +101,8 @@ export function SizingJournalEntryCard({
 						</div>
 					</div>
 				) : (
-					<div className='relative w-full sm:w-[340px] lg:w-[380px] sm:flex-shrink-0'>
-						<div className='w-full aspect-[4/3] max-h-[320px] sm:max-h-[340px] lg:max-h-[380px] flex items-center justify-center transition-all duration-200' style={{ backgroundColor: '#f5f5f7' }}>
+					<div className='relative w-full overflow-hidden'>
+						<div className='w-full aspect-[4/3] flex items-center justify-center transition-all duration-200 card-image-container'>
 							<ImageIcon className='h-12 w-12 text-gray-300' />
 						</div>
 					</div>
