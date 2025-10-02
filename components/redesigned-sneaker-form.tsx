@@ -967,15 +967,34 @@ export function RedesignedSneakerForm({
 										Draft restored from previous session
 									</AlertDescription>
 								</div>
-								<Button
-									type='button'
-									variant='ghost'
-									size='sm'
-									onClick={() => setShowDraftNotification(false)}
-									className='h-6 w-6 p-0'
-									aria-label='Dismiss notification'>
-									<X className='h-4 w-4' />
-								</Button>
+								<div className='flex items-center gap-2'>
+									<Button
+										type='button'
+										variant='outline'
+										size='sm'
+										onClick={() => {
+											if (confirm('Clear draft and start fresh? This cannot be undone.')) {
+												clearDraft();
+												reset();
+												setPhotos([]);
+												setScrapedImages([]);
+												setUrlData(null);
+											}
+										}}
+										className='h-7 text-xs border-blue-300 text-blue-700 hover:bg-blue-100'
+										aria-label='Clear draft'>
+										Clear Draft
+									</Button>
+									<Button
+										type='button'
+										variant='ghost'
+										size='sm'
+										onClick={() => setShowDraftNotification(false)}
+										className='h-6 w-6 p-0'
+										aria-label='Dismiss notification'>
+										<X className='h-4 w-4' />
+									</Button>
+								</div>
 							</div>
 						</Alert>
 					)}
