@@ -179,7 +179,7 @@ export function PhotoCarousel({
           {showControls && sortedPhotos.length > 1 && (
             <>
               {/* Photo Counter Badge */}
-              <Badge className="absolute bottom-3 z-10 bg-white/95 text-gray-900 border-0 shadow-md">
+              <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 z-10 bg-white/95 text-gray-900 border-0 shadow-md">
                 {selectedIndex + 1}/{sortedPhotos.length}
               </Badge>
 

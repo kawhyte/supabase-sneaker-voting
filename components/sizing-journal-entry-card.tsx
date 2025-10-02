@@ -109,7 +109,7 @@ export function SizingJournalEntryCard({
 				)}
 
 				{/* Content Section */}
-				<CardContent className='flex-1 p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 md:border-l md:border-gray-200'>
+				<CardContent className='flex-1 p-4 sm:p-3 flex flex-col gap-2 sm:gap-3 md:border-l md:border-gray-200'>
 					{/* Brand */}
 					<div className='text-[10px] font-semibold uppercase tracking-widest text-gray-500'>
 						{entry.brand}
@@ -190,7 +190,7 @@ export function SizingJournalEntryCard({
 							{entry.store_name && (
 								<>
 									<div className='flex items-center gap-1'>
-										<MapPin className='h-3.5 w-3.5 text-gray-400' />
+										<MapPin className='h-2.5 w-2.5 text-gray-400' />
 										<span className='truncate max-w-[160px] sm:max-w-[200px]'>
 											{entry.store_name}
 										</span>
@@ -202,18 +202,18 @@ export function SizingJournalEntryCard({
 							)}
 
 							<div className='flex items-center gap-1'>
-								<Calendar className='h-3.5 w-3.5 text-gray-400' />
+								<Calendar className='h-2.5 w-2.5 text-gray-400' />
 								<span>{formatDate(entry.try_on_date)}</span>
 							</div>
 						</div>
 					</div>
 
 					{/* Notes */}
-					{entry.notes && (
-						<div className='mt-2 sm:mt-3 p-2.5 sm:p-3 bg-gray-50/50 rounded-lg text-xs text-gray-600 line-clamp-3 leading-relaxed'>
+					{entry.notes ? (
+						<div className='mt-2 sm:mt-3 p-2.5 sm:p-2 bg-gray-50/50 rounded-lg text-xs text-gray-600 line-clamp-3 leading-relaxed'>
 							{entry.notes}
 						</div>
-					)}
+					):<div className="mt-2 sm:mt-3 p-2.5 sm:p-2 bg-gray-50/50 rounded-lg text-xs text-gray-300 line-clamp-3 leading-relaxed italic"> No notes added.</div>}
 
 					{/* Footer */}
 					<div className='flex items-center gap-2 flex-wrap mt-auto pt-3 border-t border-gray-100'>
