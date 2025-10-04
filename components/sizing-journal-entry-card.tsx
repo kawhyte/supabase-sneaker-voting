@@ -9,6 +9,12 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
 	ThumbsUp,
 	Calendar,
 	MapPin,
@@ -18,7 +24,12 @@ import {
 	Image as ImageIcon,
 	MoreVertical,
 	Star,
+	SquareCheckBig,
 	Heart,
+	Bookmark,
+	Plus,
+	Archive,
+	ArchiveRestore
 } from "lucide-react";
 import { PhotoCarousel } from "./photo-carousel";
 import {
@@ -32,6 +43,11 @@ interface SizingJournalEntryCardProps {
 	onEdit: (entry: SizingJournalEntry) => void;
 	onDelete: (entry: SizingJournalEntry) => void;
 	onToggleCollection?: (entry: SizingJournalEntry) => void;
+	viewMode?: 'journal' | 'collection' | 'archive';
+	onIncrementWear?: (entry: SizingJournalEntry) => void;
+	onMoveToWatchlist?: (entry: SizingJournalEntry) => void;
+	onArchive?: (entry: SizingJournalEntry) => void;
+	onRestore?: (entry: SizingJournalEntry) => void;
 }
 
 export function SizingJournalEntryCard({
@@ -39,50 +55,132 @@ export function SizingJournalEntryCard({
 	onEdit,
 	onDelete,
 	onToggleCollection,
+	viewMode = 'journal',
+	onIncrementWear,
+	onMoveToWatchlist,
+	onArchive,
+	onRestore,
 }: SizingJournalEntryCardProps) {
 	const isTried = entry.interaction_type === "tried";
 	const fitInfo = getFitRatingInfo(entry.fit_rating);
 	const photos = preparePhotos(entry);
 
 	return (
-		<Card
-			className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full'
-			tabIndex={0}
-			role='article'
-			aria-label={`${entry.brand} ${entry.model}`}>
-			<div className='flex flex-col'>
-				{/* Collection Toggle & Kebab Menu */}
-				<div className='absolute top-2 right-2 z-50 flex items-center gap-1'>
-					{/* Collection Heart Toggle */}
-					{onToggleCollection && (
-						<button
-							onClick={() => onToggleCollection(entry)}
-							className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
-							type='button'
-							aria-label={entry.in_collection ? 'Remove from collection' : 'Add to collection'}>
-							<Heart
-								className={`h-5 w-5 transition-all ${
-									entry.in_collection
-										? 'fill-current'
-										: ''
-								}`}
-								style={{
-									color: entry.in_collection
-										? 'var(--color-primary-500)'
-										: 'var(--color-gray-500)',
-								}}
-							/>
-						</button>
-					)}
+		<TooltipProvider delayDuration={300}>
+			<Card
+				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full'
+				tabIndex={0}
+				role='article'
+				aria-label={`${entry.brand} ${entry.model}`}>
+				<div className='flex flex-col'>
+					{/* Collection Toggle & Kebab Menu */}
+					<div className='absolute right-2 z-50 flex items-center gap-1'>
+						{/* Collection Heart Toggle */}
+						{onToggleCollection && (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										onClick={() => onToggleCollection(entry)}
+										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
+										type='button'
+										aria-label={entry.in_collection ? 'Remove from collection' : 'Add to collection'}>
+										<SquareCheckBig
+											className={`h-3 w-3 transition-all ${
+												entry.in_collection
+													? ''
+													: ''
+											}`}
+											style={{
+												color: entry.in_collection
+													? 'var(--color-primary-500)'
+													: 'var(--color-gray-500)',
+											}}
+										/>
+									</button>
+								</TooltipTrigger>
+								<TooltipContent side="bottom" className="z-[9999]">
+									<p>{entry.in_collection ? 'Remove from collection' : 'Add to collection'}</p>
+								</TooltipContent>
+							</Tooltip>
+						)}
 
-					{/* Kebab Menu */}
-					<DropdownMenu modal={false}>
+						{/* Move to Watchlist Button - Collection Mode Only */}
+						{viewMode === 'collection' && onMoveToWatchlist && !entry.is_archived && (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										onClick={() => onMoveToWatchlist(entry)}
+										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-blue-50 active:bg-blue-100'
+										type='button'
+										aria-label='Move to watchlist'>
+										<Bookmark
+											className='h-3 w-3 transition-all'
+											style={{ color: 'var(--color-blue-500)' }}
+										/>
+									</button>
+								</TooltipTrigger>
+								<TooltipContent side="bottom" className="z-[9999]">
+									<p>Move to watchlist</p>
+								</TooltipContent>
+							</Tooltip>
+						)}
+
+						{/* Archive Button - Show in Journal/Collection, not in Archive view or if already archived */}
+						{!entry.is_archived && viewMode !== 'archive' && onArchive && (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										onClick={() => onArchive(entry)}
+										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
+										type='button'
+										aria-label='Archive sneaker'>
+										<Archive
+											className='h-3 w-3 transition-colors'
+											style={{ color: 'var(--color-gray-600)' }}
+											onMouseEnter={(e) => {
+												e.currentTarget.style.color = 'var(--color-gray-900)'
+											}}
+											onMouseLeave={(e) => {
+												e.currentTarget.style.color = 'var(--color-gray-600)'
+											}}
+										/>
+									</button>
+								</TooltipTrigger>
+								<TooltipContent side="bottom" className="z-[9999]">
+									<p>Archive sneaker</p>
+								</TooltipContent>
+							</Tooltip>
+						)}
+
+						{/* Restore Button - Only in Archive view for archived items */}
+						{viewMode === 'archive' && entry.is_archived && onRestore && (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										onClick={() => onRestore(entry)}
+										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-green-50 active:bg-green-100'
+										type='button'
+										aria-label='Restore to collection'>
+										<ArchiveRestore
+											className='h-3 w-3 transition-colors'
+											style={{ color: 'var(--color-green-500)' }}
+										/>
+									</button>
+								</TooltipTrigger>
+								<TooltipContent side="bottom" className="z-[9999]">
+									<p>Restore to collection</p>
+								</TooltipContent>
+							</Tooltip>
+						)}
+
+						{/* Kebab Menu */}
+						<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
 							<button
-								className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100 active:bg-gray-200'
+								className='h-3 w-3 sm:h-4 sm:w-4 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100 active:bg-gray-200'
 								type='button'
 								aria-label='Card actions'>
-								<MoreVertical className='h-5 w-5 text-gray-700' />
+								<MoreVertical className='h-3 w-3 text-gray-700' />
 							</button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align='end' className='w-48 z-50'>
@@ -102,23 +200,36 @@ export function SizingJournalEntryCard({
 					</DropdownMenu>
 				</div>
 
-				{/* In Collection Badge */}
-				{entry.in_collection && (
+				{/* In Collection Badge - Only show in journal view */}
+				{entry.in_collection && viewMode === 'journal' && (
 					<div
 						className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
 						style={{
 							backgroundColor: 'var(--color-primary-500)',
 							color: 'var(--color-black)',
 						}}>
-						<Heart className='h-3 w-3 fill-current' />
+						<Heart className='h-2 w-2 fill-current' />
 						In Collection
+					</div>
+				)}
+
+				{/* Archived Badge - Show when archived but not in archive view */}
+				{entry.is_archived && viewMode !== 'archive' && (
+					<div
+						className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
+						style={{
+							backgroundColor: 'var(--color-gray-200)',
+							color: 'var(--color-gray-700)',
+						}}>
+						<Archive className='h-2 w-2' />
+						Archived
 					</div>
 				)}
 
 				{/* Image Section */}
 				{photos.length > 0 ? (
 					<div className='relative w-full overflow-hidden'>
-						<div className='relative w-full aspect-[4/3] flex items-center justify-center p-4 sm:p-5 lg:p-6 transition-all duration-200 card-image-container'>
+						<div className='relative w-full aspect-[4/3] flex items-center justify-center p-2 sm:p-4 lg:p-5 transition-all duration-200 card-image-container'>
 							{photos.length === 1 ? (
 								<img
 									src={photos[0].image_url}
@@ -172,7 +283,7 @@ export function SizingJournalEntryCard({
 							{entry.size_tried && (
 								<>
 									<span className='badge-size-highlight'>
-										Ideal Size: {entry.size_tried}
+										{viewMode === 'collection' ? 'Size' : 'Ideal Size'}: {entry.size_tried}
 									</span>
 									{(fitInfo || entry.comfort_rating) && (
 										<span className='hidden sm:inline text-gray-300 mx-0.5'>
@@ -203,6 +314,41 @@ export function SizingJournalEntryCard({
 									<span className='text-gray-500'>Comfort:</span>
 									<span>{getComfortStars(entry.comfort_rating)}</span>
 								</div>
+							)}
+
+							{/* Wear Counter - Collection Mode Only */}
+							{viewMode === 'collection' && onIncrementWear && (
+								<>
+									{(fitInfo || entry.comfort_rating) && (
+										<span className='hidden sm:inline text-gray-300 mx-0.5'>
+											|
+										</span>
+									)}
+									<div className='flex items-center gap-1.5'>
+										<span className='text-gray-500 text-xs'>Wears:</span>
+										<span className='font-bold text-sm' style={{ color: 'var(--color-black-soft)' }}>
+											{entry.wears || 0}
+										</span>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<button
+													onClick={() => onIncrementWear(entry)}
+													className='h-5 w-5 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95'
+													style={{
+														backgroundColor: 'var(--color-green-500)',
+														color: 'white'
+													}}
+													type='button'
+													aria-label='Add one wear'>
+													<Plus className='h-3 w-3' />
+												</button>
+											</TooltipTrigger>
+											<TooltipContent side="top" className="z-[9999]">
+												<p>Add wear (+1)</p>
+											</TooltipContent>
+										</Tooltip>
+									</div>
+								</>
 							)}
 						</div>
 
@@ -245,6 +391,19 @@ export function SizingJournalEntryCard({
 								<Calendar className='h-2.5 w-2.5 text-gray-400' />
 								<span>{formatDate(entry.try_on_date)}</span>
 							</div>
+
+							{/* Last Worn Date - Collection Mode Only */}
+							{viewMode === 'collection' && entry.last_worn_date && (
+								<>
+									<span className='hidden sm:inline text-gray-300 mx-0.5'>
+										|
+									</span>
+									<div className='flex items-center gap-1'>
+										<Calendar className='h-2.5 w-2.5 text-gray-400' />
+										<span className='text-xs'>Last worn: {formatDate(entry.last_worn_date)}</span>
+									</div>
+								</>
+							)}
 						</div>
 					</div>
 
@@ -261,9 +420,34 @@ export function SizingJournalEntryCard({
 							{entry.user_name}
 						</Badge>
 
-						<span className={isTried ? "badge-tried" : "badge-not-tried"}>
-							{isTried ? "Tried On" : "Didnt Try"}
-						</span>
+						{/* Tried On/Not Tried Badge - Only show in journal view */}
+						{viewMode === 'journal' && (
+							<span className={isTried ? "badge-tried" : "badge-not-tried"}>
+								{isTried ? "Tried On" : "Didnt Try"}
+							</span>
+						)}
+
+						{/* Archive Metadata - Only show in archive view */}
+						{viewMode === 'archive' && entry.archive_reason && (
+							<>
+								<Badge
+									variant='outline'
+									className='text-[11px] sm:text-xs'
+									style={{
+										borderColor: 'var(--color-gray-300)',
+										backgroundColor: 'var(--color-gray-50)',
+										color: 'var(--color-gray-700)',
+									}}
+								>
+									{formatArchiveReason(entry.archive_reason)}
+								</Badge>
+								{entry.archived_at && (
+									<span className='text-xs' style={{ color: 'var(--color-gray-500)' }}>
+										{formatDate(entry.archived_at)}
+									</span>
+								)}
+							</>
+						)}
 
 						{/* {entry.would_recommend && isTried && (
               <ThumbsUp className="h-3 w-3 text-green-600" />
@@ -272,6 +456,7 @@ export function SizingJournalEntryCard({
 				</CardContent>
 			</div>
 		</Card>
+		</TooltipProvider>
 	);
 }
 
@@ -302,6 +487,16 @@ function formatDate(dateString: string) {
 		day: "numeric",
 		year: "numeric",
 	});
+}
+
+function formatArchiveReason(reason: string) {
+	const reasonMap: Record<string, string> = {
+		sold: 'Sold',
+		donated: 'Donated',
+		worn_out: 'Worn Out',
+		other: 'Other',
+	};
+	return reasonMap[reason] || reason;
 }
 
 function preparePhotos(entry: SizingJournalEntry): ItemPhoto[] {

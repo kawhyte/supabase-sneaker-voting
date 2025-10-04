@@ -5,6 +5,8 @@ export interface ItemPhoto {
   is_main_image: boolean
 }
 
+export type ArchiveReason = 'sold' | 'donated' | 'worn_out' | 'other'
+
 export interface SizingJournalEntry {
   id: string
   created_at: string
@@ -26,6 +28,11 @@ export interface SizingJournalEntry {
   cloudinary_id?: string
   sneaker_photos?: ItemPhoto[]
   in_collection?: boolean
+  wears?: number
+  last_worn_date?: string | null
+  is_archived?: boolean
+  archive_reason?: ArchiveReason | null
+  archived_at?: string | null
 }
 
 export interface FitRating {
