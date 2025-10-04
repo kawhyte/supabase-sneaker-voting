@@ -21,7 +21,7 @@ export default function DashboardPage() {
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
             <TabsTrigger value="collection" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-            Sizing Watchlist
+            Watchlist
             </TabsTrigger>
             <TabsTrigger value="insights" className="flex items-center gap-2 ">
               <Brain className="h-4 w-4" />
