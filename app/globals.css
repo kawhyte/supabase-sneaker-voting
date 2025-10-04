@@ -431,7 +431,7 @@ nav {
 }
 main {
   @apply max-w-[1920px] mx-auto;
-  margin-block: var(--space-xl);
+  margin-block: var(--space-sm);
 }
 p {
   margin-top: var(--space-md);

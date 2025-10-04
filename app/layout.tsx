@@ -49,7 +49,7 @@ export default function RootLayout({
 			<body className="min-h-screen text-primary">
 				<div className="min-h-screen bg-primary">
 					<Navbar />
-					<main className="  px-6 lg:px-8">
+					<main className=" lg:px-8">
 						{children}
 					</main>
 					<Toaster />

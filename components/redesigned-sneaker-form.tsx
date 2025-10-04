@@ -69,76 +69,101 @@ const sneakerSchema = z
 			required_error: "Please select whether you saw or tried on this sneaker",
 		}),
 		// Smart Import fields
-		productUrl: z.string()
-			.url('Please enter a valid URL (e.g., https://www.nike.com/...)')
-			.max(500, 'URL must be less than 500 characters')
+		productUrl: z
+			.string()
+			.url("Please enter a valid URL (e.g., https://www.nike.com/...)")
+			.max(500, "URL must be less than 500 characters")
 			.optional()
-			.or(z.literal('')),
-		targetPrice: z.string()
-			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 100 or 100.00)')
+			.or(z.literal("")),
+		targetPrice: z
+			.string()
+			.regex(
+				/^\d+(\.\d{1,2})?$/,
+				"Please enter a valid price (e.g., 100 or 100.00)"
+			)
 			.refine((val) => {
-				if (val === '') return true;
+				if (val === "") return true;
 				const price = parseFloat(val);
 				return price >= 0 && price <= 10000;
-			}, 'Target price must be between $0 and $10,000')
+			}, "Target price must be between $0 and $10,000")
 			.optional()
-			.or(z.literal('')),
+			.or(z.literal("")),
 		enableNotifications: z.boolean().default(false),
 		// Product fields
-		brand: z.string()
-			.min(1, 'Please select or enter a brand name')
-			.max(50, 'Brand name must be less than 50 characters')
+		brand: z
+			.string()
+			.min(1, "Please select or enter a brand name")
+			.max(50, "Brand name must be less than 50 characters")
 			.trim(),
-		model: z.string()
-			.min(2, 'Please enter the sneaker model (e.g., Air Jordan 1, Yeezy 350)')
-			.max(100, 'Model name must be less than 100 characters')
+		model: z
+			.string()
+			.min(2, "Please enter the sneaker model (e.g., Air Jordan 1, Yeezy 350)")
+			.max(100, "Model name must be less than 100 characters")
 			.trim(),
-		sku: z.string()
-			.max(50, 'SKU must be less than 50 characters')
-			.regex(/^[A-Za-z0-9-]*$/, 'SKU can only contain letters, numbers, and hyphens')
+		sku: z
+			.string()
+			.max(50, "SKU must be less than 50 characters")
+			.regex(
+				/^[A-Za-z0-9-]*$/,
+				"SKU can only contain letters, numbers, and hyphens"
+			)
 			.optional()
-			.or(z.literal('')),
-		colorway: z.string()
-			.max(100, 'Colorway must be less than 100 characters')
+			.or(z.literal("")),
+		colorway: z
+			.string()
+			.max(100, "Colorway must be less than 100 characters")
 			.trim()
 			.optional()
-			.or(z.literal('')),
+			.or(z.literal("")),
 		// Try-on specific (conditional)
 		sizeTried: z.string().optional(),
 		comfortRating: z.coerce.number().min(1).max(5).optional(),
 		// General fields
-		retailPrice: z.string()
-			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 170 or 170.00)')
+		retailPrice: z
+			.string()
+			.regex(
+				/^\d+(\.\d{1,2})?$/,
+				"Please enter a valid price (e.g., 170 or 170.00)"
+			)
 			.refine((val) => {
-				if (val === '') return true;
+				if (val === "") return true;
 				const price = parseFloat(val);
 				return price >= 0 && price <= 10000;
-			}, 'Price must be between $0 and $10,000')
+			}, "Price must be between $0 and $10,000")
 			.optional()
-			.or(z.literal('')),
-		salePrice: z.string()
-			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 120 or 120.00)')
+			.or(z.literal("")),
+		salePrice: z
+			.string()
+			.regex(
+				/^\d+(\.\d{1,2})?$/,
+				"Please enter a valid price (e.g., 120 or 120.00)"
+			)
 			.refine((val) => {
-				if (val === '') return true;
+				if (val === "") return true;
 				const price = parseFloat(val);
 				return price >= 0 && price <= 10000;
-			}, 'Price must be between $0 and $10,000')
+			}, "Price must be between $0 and $10,000")
 			.optional()
-			.or(z.literal('')),
-		idealPrice: z.string()
-			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 100 or 100.00)')
+			.or(z.literal("")),
+		idealPrice: z
+			.string()
+			.regex(
+				/^\d+(\.\d{1,2})?$/,
+				"Please enter a valid price (e.g., 100 or 100.00)"
+			)
 			.refine((val) => {
-				if (val === '') return true;
+				if (val === "") return true;
 				const price = parseFloat(val);
 				return price >= 0 && price <= 10000;
-			}, 'Price must be between $0 and $10,000')
+			}, "Price must be between $0 and $10,000")
 			.optional()
-			.or(z.literal('')),
-		notes: z.string()
-			.max(80, 'Notes must be less than 80 characters')
+			.or(z.literal("")),
+		notes: z
+			.string()
+			.max(80, "Notes must be less than 80 characters")
 			.trim()
 			.optional()
-			.or(z.literal('')),
+			.or(z.literal("")),
 	})
 	.refine(
 		(data) => {
@@ -149,7 +174,8 @@ const sneakerSchema = z
 			return true;
 		},
 		{
-			message: "Please select the size you tried on - this helps track your perfect fit",
+			message:
+				"Please select the size you tried on - this helps track your perfect fit",
 			path: ["sizeTried"],
 		}
 	)
@@ -157,7 +183,11 @@ const sneakerSchema = z
 		(data) => {
 			// Comfort rating is required when tried on
 			if (data.interactionType === "tried") {
-				return data.comfortRating !== undefined && data.comfortRating >= 1 && data.comfortRating <= 5;
+				return (
+					data.comfortRating !== undefined &&
+					data.comfortRating >= 1 &&
+					data.comfortRating <= 5
+				);
 			}
 			return true;
 		},
@@ -177,8 +207,8 @@ const sneakerSchema = z
 			return true;
 		},
 		{
-			message: 'Sale price cannot be higher than retail price',
-			path: ['salePrice'],
+			message: "Sale price cannot be higher than retail price",
+			path: ["salePrice"],
 		}
 	);
 
@@ -385,7 +415,10 @@ export function RedesignedSneakerForm({
 
 			if (error) {
 				// Silently handle error - fit recommendations are optional feature
-				console.warn("Could not load fit data for recommendations:", error.message || "Unknown error");
+				console.warn(
+					"Could not load fit data for recommendations:",
+					error.message || "Unknown error"
+				);
 				return;
 			}
 
@@ -610,7 +643,8 @@ export function RedesignedSneakerForm({
 					data.error?.includes("HTTP 403") ||
 					data.error?.includes("HTTP 401")
 				) {
-					errorMessage += "Website blocked auto-import. Please enter details manually below.";
+					errorMessage +=
+						"Website blocked auto-import. Please enter details manually below.";
 				} else if (data.error?.includes("timeout")) {
 					errorMessage += "Request timed out. Try again or enter manually.";
 				} else {
@@ -695,11 +729,13 @@ export function RedesignedSneakerForm({
 					// Determine filename and type
 					const urlObj = new URL(imageUrl);
 					const pathname = urlObj.pathname;
-					const extension = pathname.split('.').pop() || 'jpg';
+					const extension = pathname.split(".").pop() || "jpg";
 					const filename = `imported-image-${i + 1}.${extension}`;
 
 					// Create File from blob
-					const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+					const file = new File([blob], filename, {
+						type: blob.type || "image/jpeg",
+					});
 
 					// Create preview URL
 					const preview = URL.createObjectURL(file);
@@ -710,10 +746,12 @@ export function RedesignedSneakerForm({
 						file,
 						preview,
 						isMain: i === mainImageIndex,
-						order: i
+						order: i,
 					});
 
-					setUploadProgress(`📥 Downloaded ${i + 1}/${selectedImages.length} images...`);
+					setUploadProgress(
+						`📥 Downloaded ${i + 1}/${selectedImages.length} images...`
+					);
 				} catch (error) {
 					console.error(`Failed to download image ${i + 1}:`, error);
 					// Continue with other images
@@ -722,9 +760,15 @@ export function RedesignedSneakerForm({
 
 			if (photoItems.length > 0) {
 				setPhotos(photoItems);
-				setUploadProgress(`✅ ${photoItems.length} image${photoItems.length > 1 ? 's' : ''} imported!`);
+				setUploadProgress(
+					`✅ ${photoItems.length} image${
+						photoItems.length > 1 ? "s" : ""
+					} imported!`
+				);
 			} else {
-				setUploadProgress("❌ Failed to import images. Please upload manually.");
+				setUploadProgress(
+					"❌ Failed to import images. Please upload manually."
+				);
 			}
 
 			setTimeout(() => setUploadProgress(""), 3000);
@@ -799,7 +843,7 @@ export function RedesignedSneakerForm({
 						url: uploadResult.data.url,
 						cloudinaryId: uploadResult.data.publicId,
 						order: photo.order,
-						isMain: photo.isMain
+						isMain: photo.isMain,
 					});
 
 					// Keep track of main image for backward compatibility
@@ -809,7 +853,9 @@ export function RedesignedSneakerForm({
 					}
 
 					setUploadProgress(
-						`📤 Uploaded ${i + 1}/${photos.length} photo${photos.length > 1 ? "s" : ""}...`
+						`📤 Uploaded ${i + 1}/${photos.length} photo${
+							photos.length > 1 ? "s" : ""
+						}...`
 					);
 				}
 
@@ -858,12 +904,12 @@ export function RedesignedSneakerForm({
 
 			// Insert all photos into sneaker_photos table
 			if (uploadedPhotos.length > 0 && insertedSneaker) {
-				const photoRecords = uploadedPhotos.map(photo => ({
+				const photoRecords = uploadedPhotos.map((photo) => ({
 					sneaker_id: insertedSneaker.id,
 					image_url: photo.url,
 					cloudinary_id: photo.cloudinaryId,
 					image_order: photo.order,
-					is_main_image: photo.isMain
+					is_main_image: photo.isMain,
 				}));
 
 				const { error: photosError } = await supabase
@@ -888,11 +934,12 @@ export function RedesignedSneakerForm({
 			// Show success toast with sneaker context
 			const sneakerName = `${data.brand} ${data.model}`;
 			toast.success(`${sneakerName} added!`, {
-				description: data.interactionType === "tried"
-					? "Try-on experience saved to your journal"
-					: data.productUrl
-					? "Added with price monitoring enabled"
-					: "Added to your collection",
+				description:
+					data.interactionType === "tried"
+						? "Try-on experience saved to your journal"
+						: data.productUrl
+						? "Added with price monitoring enabled"
+						: "Added to your collection",
 				duration: 5000, // Persist during redirect and on dashboard
 			});
 
@@ -925,12 +972,21 @@ export function RedesignedSneakerForm({
 
 	return (
 		<div className='max-w-6xl mx-auto'>
-			<Card className='card-interactive shadow-lg' style={{ background: 'linear-gradient(135deg, var(--color-surface-primary), var(--color-gray-50), var(--color-blue-50))' }}>
+			<Card
+				className='card-interactive shadow-lg'
+				style={{
+					background:
+						"linear-gradient(135deg, var(--color-surface-primary), var(--color-gray-50), var(--color-blue-50))",
+				}}>
 				<CardHeader className='text-left pb-6'>
-					<CardTitle className='text-3xl flex flex-col justify-start' style={{ color: 'var(--color-black)' }}>
+					<CardTitle
+						className='text-3xl flex flex-col justify-start'
+						style={{ color: "var(--color-black)" }}>
 						<p className='-mb-2'> Track Your Sneakers</p>
 
-						<p className='text-sm' style={{ color: 'var(--color-text-secondary)' }}>
+						<p
+							className='text-sm'
+							style={{ color: "var(--color-text-secondary)" }}>
 							Import from URL or add manually
 						</p>
 					</CardTitle>
@@ -959,8 +1015,8 @@ export function RedesignedSneakerForm({
 											setScrapedImages([]);
 											setUrlData(null);
 											setShowDraftNotification(false);
-											toast.success('Draft cleared', {
-												description: 'Form has been reset to start fresh',
+											toast.success("Draft cleared", {
+												description: "Form has been reset to start fresh",
 												duration: 3000,
 											});
 										}}
@@ -1088,16 +1144,16 @@ export function RedesignedSneakerForm({
 						{/* Smart Import Section - Expanded by Default */}
 						{watchedUser && watchedInteractionType && (
 							<>
-								<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-200'>
+								<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border-2 border-blue-200'>
 									<button
 										type='button'
 										onClick={() => setSmartImportExpanded(!smartImportExpanded)}
-										className='w-full flex items-center justify-between mb-[var(--space-sm)]'>
-										<div className='flex items-center gap-[var(--space-md)]'>
-											<Rocket className='h-3 w-3 text-blue-600' />
-											<Label className='text-base font-semibold text-blue-800 cursor-pointer'>
-												Smart Import - Auto-fill from URL
-											</Label>
+										className='w-full flex items-center justify-between mb-4'>
+										<div className='flex items-center gap-3'>
+											<Rocket className='hidden  md:block h-5 w-5 text-blue-600' />
+											<span className='text-base font-semibold text-blue-800 cursor-pointer'>
+												Auto-fill from URL
+											</span>
 										</div>
 										{smartImportExpanded ? (
 											<ChevronUp className='h-3 w-3 text-blue-600' />
@@ -1107,18 +1163,18 @@ export function RedesignedSneakerForm({
 									</button>
 
 									{smartImportExpanded && (
-										<div className='space-y-[var(--space-base)]'>
+										<div className='space-y-4'>
 											{/* URL Input */}
 											<div>
-												<Label className='text-xs text-blue-700 mb-[var(--space-md)] block'>
+												<Label className='text-xs text-blue-700 mb-2 block'>
 													Paste product URL from Nike, Adidas, Foot Locker,
 													StockX, etc.
 												</Label>
-												<div className='flex gap-[var(--space-md)]'>
+												<div className='flex flex-col sm:flex-row gap-2 sm:gap-3'>
 													<Input
 														{...register("productUrl")}
 														placeholder='https://www.nike.com/t/...'
-														className='flex-1 h-6'
+														className='flex-1 h-8'
 														disabled={isScrapingUrl}
 														aria-label='Product URL'
 														aria-describedby='url-help-text'
@@ -1130,7 +1186,7 @@ export function RedesignedSneakerForm({
 														}
 														disabled={isScrapingUrl || !watch("productUrl")}
 														size='sm'
-														className='btn-primary rounded-lg px-6 py-3 font-semibold cursor-pointer '
+														className='btn-primary rounded-lg px-4 py-2 font-semibold cursor-pointer h-4'
 														aria-label={
 															isScrapingUrl
 																? "Scraping product data"
@@ -1139,16 +1195,14 @@ export function RedesignedSneakerForm({
 														aria-busy={isScrapingUrl}>
 														{isScrapingUrl ? (
 															<Loader2
-																className='h-4 w-4 animate-spin'
+																className='h-3 w-3 animate-spin'
 																aria-hidden='true'
 															/>
 														) : (
 															<Link className='h-3 w-3' aria-hidden='true' />
 														)}
-														<span className='sr-only'>
-															{isScrapingUrl
-																? "Loading product data"
-																: "Import product data from URL"}
+														<span className='ml-2'>
+															{isScrapingUrl ? "Loading..." : "Import"}
 														</span>
 													</Button>
 												</div>
@@ -1160,8 +1214,8 @@ export function RedesignedSneakerForm({
 
 											{/* Scraping Skeleton Loader */}
 											{isScrapingUrl && (
-												<div className='bg-white rounded-lg p-[var(--space-sm)] border-2 border-blue-300'>
-													<div className='flex items-start gap-[var(--space-sm)]'>
+												<div className='bg-white rounded-lg p-4 border-2 border-blue-300'>
+													<div className='flex items-start gap-3'>
 														<Skeleton className='w-16 h-16 rounded-lg' />
 														<div className='flex-1 space-y-2'>
 															<Skeleton className='h-4 w-3/4' />
@@ -1174,23 +1228,23 @@ export function RedesignedSneakerForm({
 
 											{/* URL Data Preview */}
 											{!isScrapingUrl && urlData && (
-												<div className='bg-white rounded-lg p-[var(--space-sm)] border-2 border-green-300 animate-in fade-in slide-in-from-top-[var(--space-md)] duration-300'>
-													<div className='flex items-start gap-[var(--space-sm)]'>
+												<div className='bg-white rounded-lg p-4 border-2 border-green-300 animate-in fade-in slide-in-from-top-4 duration-300'>
+													<div className='flex flex-col sm:flex-row sm:items-start gap-3'>
 														{urlData.image && (
 															<img
 																src={urlData.image}
 																alt='Product'
-																className='w-16 h-16 object-cover rounded-lg'
+																className='w-16 h-16 object-cover rounded-lg flex-shrink-0'
 															/>
 														)}
 														<div className='flex-1 min-w-0'>
-															<div className='flex items-center gap-[var(--space-md)]'>
-																<CheckCircle className='h-4 w-4 text-green-600' />
+															<div className='flex items-center gap-2'>
+																<CheckCircle className='h-4 w-4 text-green-600 flex-shrink-0' />
 																<h4 className='font-medium text-sm text-green-800 truncate'>
 																	{urlData.title || "Product Found"}
 																</h4>
 															</div>
-															<div className='flex gap-[var(--space-base)] mt-[var(--space-xs)]'>
+															<div className='flex flex-wrap items-center gap-2 mt-1'>
 																{urlData.price && (
 																	<span className='text-lg font-bold text-green-600'>
 																		${urlData.price}
@@ -1203,7 +1257,7 @@ export function RedesignedSneakerForm({
 																)}
 															</div>
 															{urlData.images && urlData.images.length > 1 && (
-																<div className='flex items-center gap-[var(--space-xs)] mt-[var(--space-xs)]'>
+																<div className='flex items-center gap-1 mt-1'>
 																	<Camera className='h-3 w-3 text-blue-600' />
 																	<p className='text-xs text-blue-600'>
 																		{urlData.images.length} images found
@@ -1237,8 +1291,8 @@ export function RedesignedSneakerForm({
 												</Alert>
 											)}
 
-											<div className='text-xs text-blue-700 bg-blue-100 p-[var(--space-md)] rounded flex items-center gap-[var(--space-md)]'>
-												<Lightbulb className='h-4 w-4' />
+											<div className='text-xs text-blue-700 bg-blue-100 p-3 rounded flex items-start gap-2'>
+												<Lightbulb className='h-4 w-4 hidden md:block flex-shrink-0 mt-0.5' />
 												<span>
 													Smart Import will automatically fill brand, model,
 													colorway, store, and price
@@ -1258,7 +1312,8 @@ export function RedesignedSneakerForm({
 										{/* Model */}
 										<div>
 											<Label className='text-sm font-medium text-gray-700'>
-												<span>Model</span> <span className='text-red-500'>*</span>
+												<span>Model</span>{" "}
+												<span className='text-red-500'>*</span>
 											</Label>
 											<Input
 												{...register("model")}
@@ -1283,7 +1338,8 @@ export function RedesignedSneakerForm({
 										{/* Brand */}
 										<div>
 											<Label className='text-sm font-medium text-gray-700'>
-												<span>Brand</span> <span className='text-red-500'>*</span>
+												<span>Brand</span>{" "}
+												<span className='text-red-500'>*</span>
 											</Label>
 											<div className='mt-[var(--space-md)] max-w-xs'>
 												<BrandCombobox
@@ -1328,8 +1384,7 @@ export function RedesignedSneakerForm({
 
 										{/* Colorway */}
 
-
-									<div>
+										<div>
 											<Label className='text-sm text-gray-600'>
 												Colorway (Optional)
 											</Label>
@@ -1339,9 +1394,6 @@ export function RedesignedSneakerForm({
 												className='mt-[var(--space-md)] h-6'
 											/>
 										</div>
-
-									
-										
 									</div>
 
 									{/* RIGHT COLUMN - Metadata */}
@@ -1370,27 +1422,42 @@ export function RedesignedSneakerForm({
 												</div>
 
 												{/* Sale Price Alert - Only if detected from scraper */}
-												{watchedSalePrice && watchedRetailPrice && parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
-													<div
-														className='mt-2 p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300'
-														style={{
-															backgroundColor: 'var(--color-green-50)',
-															borderColor: 'var(--color-green-200)'
-														}}
-														role="status"
-														aria-live="polite"
-													>
-														<Sparkles className='h-4 w-4 flex-shrink-0' style={{ color: 'var(--color-green-600)' }} aria-hidden="true" />
-														<div className='flex-1 min-w-0'>
-															<p className='text-sm font-semibold' style={{ color: 'var(--color-green-800)' }}>
-																Active sale detected: ${watchedSalePrice}
-															</p>
-															<p className='text-xs' style={{ color: 'var(--color-green-700)' }}>
-																Save ${(parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)).toFixed(2)} • {discountPercentage}% off
-															</p>
+												{watchedSalePrice &&
+													watchedRetailPrice &&
+													parseFloat(watchedSalePrice) <
+														parseFloat(watchedRetailPrice) && (
+														<div
+															className='mt-2 p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300'
+															style={{
+																backgroundColor: "var(--color-green-50)",
+																borderColor: "var(--color-green-200)",
+															}}
+															role='status'
+															aria-live='polite'>
+															<Sparkles
+																className='h-4 w-4 flex-shrink-0'
+																style={{ color: "var(--color-green-600)" }}
+																aria-hidden='true'
+															/>
+															<div className='flex-1 min-w-0'>
+																<p
+																	className='text-sm font-semibold'
+																	style={{ color: "var(--color-green-800)" }}>
+																	Active sale detected: ${watchedSalePrice}
+																</p>
+																<p
+																	className='text-xs'
+																	style={{ color: "var(--color-green-700)" }}>
+																	Save $
+																	{(
+																		parseFloat(watchedRetailPrice) -
+																		parseFloat(watchedSalePrice)
+																	).toFixed(2)}{" "}
+																	• {discountPercentage}% off
+																</p>
+															</div>
 														</div>
-													</div>
-												)}
+													)}
 											</div>
 
 											<div>
@@ -1414,116 +1481,105 @@ export function RedesignedSneakerForm({
 												</p>
 											</div>
 										</div>
-
-							
 									</div>
 								</div>
 
-
-
-
-			{/* Photos */}
-										<div>
-											<Label className='text-sm font-medium text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)]'>
-												<Camera className='h-4 w-4' />
-												<span>Photos</span> <span className='text-red-500'>*</span> <span className='text-xs text-gray-500'>(Min 1)</span>
-											</Label>
-											<MultiPhotoUpload
-												photos={photos}
-												onPhotosChange={setPhotos}
-												maxPhotos={5}
-											/>
-											{photos.length === 0 && (
-												<div className='flex items-center gap-[var(--space-xs)] mt-[var(--space-xs)]'>
-													<AlertTriangle className='h-3 w-3 text-orange-600' />
-													<p className='text-xs text-orange-600'>
-														At least one photo is required
-													</p>
-												</div>
-											)}
+								{/* Photos */}
+								<div>
+									<Label className='text-sm font-medium text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)]'>
+										<Camera className='h-4 w-4' />
+										<span>Photos</span> <span className='text-red-500'>*</span>{" "}
+										<span className='text-xs text-gray-500'>(Min 1)</span>
+									</Label>
+									<MultiPhotoUpload
+										photos={photos}
+										onPhotosChange={setPhotos}
+										maxPhotos={5}
+									/>
+									{photos.length === 0 && (
+										<div className='flex items-center gap-[var(--space-xs)] mt-[var(--space-xs)]'>
+											<AlertTriangle className='h-3 w-3 text-orange-600' />
+											<p className='text-xs text-orange-600'>
+												At least one photo is required
+											</p>
 										</div>
+									)}
+								</div>
 
+								<div>
+									<div className='flex items-center justify-between'>
+										<Label className='text-sm text-gray-600'>
+											Notes (Optional)
+										</Label>
+										{watch("notes") && (
+											<span className='text-xs text-gray-500'>
+												{watch("notes")?.length || 0} / 80
+											</span>
+										)}
+									</div>
+									<Textarea
+										{...register("notes")}
+										placeholder={
+											watchedInteractionType === "tried"
+												? "e.g., 'Tight on pinky toe', 'Great for walking', 'Runs small compared to other Nikes'"
+												: "e.g., 'Love the colorway', 'Perfect for summer', 'Saw on Instagram'"
+										}
+										className='mt-[var(--space-md)] resize-none'
+										rows={3}
+										maxLength={80}
+									/>
+									<div className='mt-[var(--space-md)] text-xs text-gray-500'>
+										💡 Quick tips:{" "}
+										{watchedInteractionType === "tried"
+											? "Mention fit issues, comfort level, or comparisons with other shoes"
+											: "Note where you saw them, what caught your eye, or styling ideas"}
+									</div>
+								</div>
 
+								{watchedInteractionType === "tried" && (
+									<div className='border-t pt-[var(--space-base)]'>
+										<h4 className='font-semibold text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)] mt-4'>
+											Try-On Details
+										</h4>
 
-	<div>
-											<div className='flex items-center justify-between'>
-												<Label className='text-sm text-gray-600'>
-													Notes (Optional)
+										<div className='flex justify-between gap-x-12 '>
+											{/* Size Selection */}
+											<div className='mb-4 mt-4 w-full'>
+												<Label className='text-sm font-medium text-gray-700'>
+													<span>Size Tried</span>{" "}
+													<span className='text-red-500'>*</span>
 												</Label>
-												{watch("notes") && (
-													<span className='text-xs text-gray-500'>
-														{watch("notes")?.length || 0} / 80
-													</span>
+												<div className='mt-[var(--space-md)] max-w-sm'>
+													<SizeCombobox
+														value={watch("sizeTried")}
+														onChange={(value) =>
+															setValue("sizeTried", value, {
+																shouldValidate: true,
+																shouldDirty: true,
+																shouldTouch: true,
+															})
+														}
+														disabled={isLoading}
+														preferredSize={sizePreferences[watchedBrand]}
+													/>
+												</div>
+												{errors.sizeTried && (
+													<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]'>
+														<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
+														<div>
+															<p className='text-xs font-semibold text-red-700'>
+																{errors.sizeTried.message}
+															</p>
+															<p className='text-xs text-red-600 mt-0.5'>
+																Select the US Men's size you tried on
+															</p>
+														</div>
+													</div>
 												)}
 											</div>
-											<Textarea
-												{...register("notes")}
-												placeholder={
-													watchedInteractionType === "tried"
-														? "e.g., 'Tight on pinky toe', 'Great for walking', 'Runs small compared to other Nikes'"
-														: "e.g., 'Love the colorway', 'Perfect for summer', 'Saw on Instagram'"
-												}
-												className='mt-[var(--space-md)] resize-none'
-												rows={3}
-												maxLength={80}
-											/>
-											<div className='mt-[var(--space-md)] text-xs text-gray-500'>
-												💡 Quick tips:{" "}
-												{watchedInteractionType === "tried"
-													? "Mention fit issues, comfort level, or comparisons with other shoes"
-													: "Note where you saw them, what caught your eye, or styling ideas"}
-											</div>
-										</div>
 
-
-
-
-{watchedInteractionType === "tried" && (
-											<div className='border-t pt-[var(--space-base)]'>
-												<h4 className='font-semibold text-gray-700 mb-[var(--space-sm)] flex items-center gap-[var(--space-md)] mt-4'>
-											
-													Try-On Details
-												</h4>
-
-
-                        <div className="flex justify-between gap-x-12 "> 
-
-												{/* Size Selection */}
-												<div className='mb-4 mt-4 w-full'>
-													<Label className='text-sm font-medium text-gray-700'>
-														<span>Size Tried</span> <span className='text-red-500'>*</span>
-													</Label>
-													<div className='mt-[var(--space-md)] max-w-sm'>
-														<SizeCombobox
-															value={watch("sizeTried")}
-															onChange={(value) =>
-																setValue("sizeTried", value, {
-																	shouldValidate: true,
-																	shouldDirty: true,
-																	shouldTouch: true,
-																})
-															}
-															disabled={isLoading}
-															preferredSize={sizePreferences[watchedBrand]}
-														/>
-													</div>
-													{errors.sizeTried && (
-														<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]'>
-															<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
-															<div>
-																<p className='text-xs font-semibold text-red-700'>
-																	{errors.sizeTried.message}
-																</p>
-																<p className='text-xs text-red-600 mt-0.5'>
-																	Select the US Men's size you tried on
-																</p>
-															</div>
-														</div>
-													)}
-												</div>
-
-												{/* Fit Rating */}
-												{/*<div className="mt-8">
+											{/* Fit Rating */}
+											{/*<div className="mt-8">
 													<Label className='text-sm font-medium text-gray-700'>
 														How did they fit? *
 													</Label>
@@ -1591,91 +1647,88 @@ export function RedesignedSneakerForm({
 													)}
 												</div>*/}
 
-												{/* Comfort Rating (Required) */}
-												<div className="mt-4 ">
-													<Label className='text-sm font-medium text-gray-700 '>
-														<span>How comfortable were they?</span> <span className='text-red-500'>*</span>
-													</Label>
-											
-													<div className='flex items-center gap-[var(--space-xs)] '>
-														{[1, 2, 3, 4, 5].map((rating) => (
-															<button
-																key={rating}
-																type='button'
-																onClick={() =>
-																	setValue("comfortRating", rating, {
-																		shouldValidate: true,
-																	})
-																}
-																className='group p-[var(--space-sm)] md:p-[var(--space-md)] hover:scale-110 transition-transform touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 rounded'
-																style={{ boxShadow: 'var(--color-focus-ring)' }}
-																title={`${rating} star${
-																	rating !== 1 ? "s" : ""
-																}`}
-																aria-label={`${rating} star${
-																	rating !== 1 ? "s" : ""
-																} comfort rating`}>
-																<Star
-																	className={cn(
-																		"h-4 w-4 md:h-4 md:w-4 transition-colors",
-																		watch("comfortRating") &&
-																			watch("comfortRating")! >= rating
-																			? "fill-yellow-400 text-yellow-400"
-																			: "text-gray-300 group-hover:text-gray-400"
-																	)}
-																	aria-hidden='true'
-																/>
-															</button>
-														))}
-														{watch("comfortRating") && (
-															<button
-																type='button'
-																onClick={() =>
-																	setValue("comfortRating", undefined)
-																}
-																className='ml-3 text-xs text-gray-500 hover:text-gray-700 underline min-h-[44px] flex items-center focus:ring-2 focus:ring-blue-300 rounded px-2'
-																aria-label='Clear comfort rating'>
-																Clear
-															</button>
-														)}
-													</div>
+											{/* Comfort Rating (Required) */}
+											<div className='mt-4 '>
+												<Label className='text-sm font-medium text-gray-700 '>
+													<span>How comfortable were they?</span>{" "}
+													<span className='text-red-500'>*</span>
+												</Label>
+
+												<div className='flex items-center gap-[var(--space-xs)] '>
+													{[1, 2, 3, 4, 5].map((rating) => (
+														<button
+															key={rating}
+															type='button'
+															onClick={() =>
+																setValue("comfortRating", rating, {
+																	shouldValidate: true,
+																})
+															}
+															className='group p-[var(--space-sm)] md:p-[var(--space-md)] hover:scale-110 transition-transform touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 rounded'
+															style={{ boxShadow: "var(--color-focus-ring)" }}
+															title={`${rating} star${rating !== 1 ? "s" : ""}`}
+															aria-label={`${rating} star${
+																rating !== 1 ? "s" : ""
+															} comfort rating`}>
+															<Star
+																className={cn(
+																	"h-4 w-4 md:h-4 md:w-4 transition-colors",
+																	watch("comfortRating") &&
+																		watch("comfortRating")! >= rating
+																		? "fill-yellow-400 text-yellow-400"
+																		: "text-gray-300 group-hover:text-gray-400"
+																)}
+																aria-hidden='true'
+															/>
+														</button>
+													))}
 													{watch("comfortRating") && (
-														<div className='mt-1 p-1 rounded' style={{ backgroundColor: 'var(--color-primary-50)', borderColor: 'var(--color-primary-200)', border: '1px solid' }}>
-															<p className='text-sm' style={{ color: 'var(--color-primary-900)' }}>
-																<span className='font-semibold'>
-																	{watch("comfortRating")} / 5 stars
-																</span>{" "}
-																-{" "}
-																{watch("comfortRating") === 1
-																	? "Very uncomfortable"
-																	: watch("comfortRating") === 2
-																	? "Uncomfortable"
-																	: watch("comfortRating") === 3
-																	? "Decent comfort"
-																	: watch("comfortRating") === 4
-																	? "Very comfortable"
-																	: "Extremely comfortable"}
-															</p>
-														</div>
+														<button
+															type='button'
+															onClick={() =>
+																setValue("comfortRating", undefined)
+															}
+															className='ml-3 text-xs text-gray-500 hover:text-gray-700 underline min-h-[44px] flex items-center focus:ring-2 focus:ring-blue-300 rounded px-2'
+															aria-label='Clear comfort rating'>
+															Clear
+														</button>
 													)}
-                          		<p className='text-xs text-gray-500 mt-1'>
-														Rate overall comfort - cushioning, support,
-														breathability
-													</p>
 												</div>
-
-                        </div>
+												{watch("comfortRating") && (
+													<div
+														className='mt-1 p-1 rounded'
+														style={{
+															backgroundColor: "var(--color-primary-50)",
+															borderColor: "var(--color-primary-200)",
+															border: "1px solid",
+														}}>
+														<p
+															className='text-sm'
+															style={{ color: "var(--color-primary-900)" }}>
+															<span className='font-semibold'>
+																{watch("comfortRating")} / 5 stars
+															</span>{" "}
+															-{" "}
+															{watch("comfortRating") === 1
+																? "Very uncomfortable"
+																: watch("comfortRating") === 2
+																? "Uncomfortable"
+																: watch("comfortRating") === 3
+																? "Decent comfort"
+																: watch("comfortRating") === 4
+																? "Very comfortable"
+																: "Extremely comfortable"}
+														</p>
+													</div>
+												)}
+												<p className='text-xs text-gray-500 mt-1'>
+													Rate overall comfort - cushioning, support,
+													breathability
+												</p>
 											</div>
-										)}
-
-
-
-
-
-
-
-
-
+										</div>
+									</div>
+								)}
 
 								<div className='flex items-center justify-end gap-3 mt-6'>
 									{/* Discard Button */}
@@ -1726,10 +1779,7 @@ export function RedesignedSneakerForm({
 													</>
 												) : (
 													<>
-														<Sparkles
-															className='h-4 w-4 mr-2'
-															aria-hidden='true'
-														/>
+														
 														Add
 													</>
 												)}
@@ -1739,15 +1789,6 @@ export function RedesignedSneakerForm({
 								</div>
 							</>
 						)}
-
-
-
-
-
-
-
-
-
 					</form>
 				</CardContent>
 			</Card>
