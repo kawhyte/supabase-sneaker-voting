@@ -39,6 +39,7 @@ import {
 	RefreshCw,
 	X,
 } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import {
 	calculateSizeRecommendations,
@@ -106,11 +107,6 @@ const sneakerSchema = z
 		sizeTried: z.string().optional(),
 		comfortRating: z.coerce.number().min(1).max(5).optional(),
 		// General fields
-		storeName: z.string()
-			.max(100, 'Store name must be less than 100 characters')
-			.trim()
-			.optional()
-			.or(z.literal('')),
 		retailPrice: z.string()
 			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 170 or 170.00)')
 			.refine((val) => {
@@ -555,15 +551,6 @@ export function RedesignedSneakerForm({
 						});
 					}
 
-					if (capitalizedStoreName) {
-						console.log("✅ Setting store name:", capitalizedStoreName);
-						setValue("storeName", capitalizedStoreName, {
-							shouldValidate: true,
-							shouldDirty: true,
-							shouldTouch: true,
-						});
-					}
-
 					if (data.retailPrice) {
 						console.log("✅ Setting retail price:", data.retailPrice);
 						setValue("retailPrice", data.retailPrice.toString(), {
@@ -849,7 +836,6 @@ export function RedesignedSneakerForm({
 				comfort_rating:
 					data.interactionType === "tried" ? data.comfortRating || null : null,
 				// Always optional fields
-				store_name: data.storeName || null,
 				retail_price: finalPrice,
 				ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
 				notes: data.notes || null,
@@ -899,15 +885,18 @@ export function RedesignedSneakerForm({
 				}
 			}
 
-			setSuccessMessage(
-				data.interactionType === "tried"
-					? "⚡ Try-on experience saved!"
+			// Show success toast with sneaker context
+			const sneakerName = `${data.brand} ${data.model}`;
+			toast.success(`${sneakerName} added!`, {
+				description: data.interactionType === "tried"
+					? "Try-on experience saved to your journal"
 					: data.productUrl
-					? "✨ Sneaker added with price monitoring!"
-					: "✨ Sneaker added to your collection!"
-			);
+					? "Added with price monitoring enabled"
+					: "Added to your collection",
+				duration: 5000, // Persist during redirect and on dashboard
+			});
 
-			// Clear form and draft after 3 seconds
+			// Clear form and redirect after 800ms (fast but readable)
 			setTimeout(() => {
 				reset();
 				setSuccessMessage("");
@@ -919,7 +908,7 @@ export function RedesignedSneakerForm({
 				clearDraft(); // Clear saved draft
 				setHasUnsavedChanges(false);
 				onSneakerAdded?.();
-			}, 3000);
+			}, 800);
 		} catch (error) {
 			console.error("Error saving:", error);
 			setSuccessMessage("");
@@ -948,15 +937,6 @@ export function RedesignedSneakerForm({
 				</CardHeader>
 
 				<CardContent>
-					{successMessage && (
-						<Alert className='mb-6 border-green-200 bg-green-50'>
-							<CheckCircle className='h-4 w-4 text-green-600' />
-							<AlertDescription className='text-green-800'>
-								{successMessage}
-							</AlertDescription>
-						</Alert>
-					)}
-
 					{/* Draft Restored Notification */}
 					{showDraftNotification && (
 						<Alert className='mb-6 border-blue-200 bg-blue-50'>
@@ -973,13 +953,16 @@ export function RedesignedSneakerForm({
 										variant='outline'
 										size='sm'
 										onClick={() => {
-											if (confirm('Clear draft and start fresh? This cannot be undone.')) {
-												clearDraft();
-												reset();
-												setPhotos([]);
-												setScrapedImages([]);
-												setUrlData(null);
-											}
+											clearDraft();
+											reset();
+											setPhotos([]);
+											setScrapedImages([]);
+											setUrlData(null);
+											setShowDraftNotification(false);
+											toast.success('Draft cleared', {
+												description: 'Form has been reset to start fresh',
+												duration: 3000,
+											});
 										}}
 										className='h-7 text-xs border-blue-300 text-blue-700 hover:bg-blue-100'
 										aria-label='Clear draft'>
@@ -1367,20 +1350,6 @@ export function RedesignedSneakerForm({
 											Additional Info
 										</h3>*/}
 
-						
-
-										{/* Store */}
-										<div>
-											<Label className='text-sm text-gray-600'>
-												Store (Optional)
-											</Label>
-											<Input
-												{...register("storeName")}
-												placeholder='Foot Locker, etc.'
-												className='mt-[var(--space-md)] h-6'
-											/>
-										</div>
-
 										{/* Pricing Section */}
 										<div className='space-y-[var(--space-sm)] '>
 											<div>
@@ -1399,45 +1368,30 @@ export function RedesignedSneakerForm({
 														className='pl-8 h-6'
 													/>
 												</div>
-											</div>
 
-											<div>
-												<Label className='text-sm text-gray-600'>
-													Sale Price (Optional)
-												</Label>
-												<div className='relative mt-[var(--space-md)]'>
-													<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'>
-														$
-													</span>
-													<Input
-														{...register("salePrice")}
-														placeholder='120.00'
-														type='number'
-														step='0.01'
-														className='pl-8 h-6'
-													/>
-												</div>
-											</div>
-
-											{/* Discount Display */}
-											{watchedRetailPrice &&
-												watchedSalePrice &&
-												parseFloat(watchedSalePrice) <
-													parseFloat(watchedRetailPrice) && (
-													<div className='bg-green-50 border border-green-200 rounded-lg p-[var(--space-sm)]'>
-														<div className='flex items-baseline gap-[var(--space-md)]'>
-															<span className='text-lg font-bold text-green-600'>
-																${watchedSalePrice}
-															</span>
-															<span className='text-sm text-gray-500 line-through'>
-																${watchedRetailPrice}
-															</span>
-															<span className='text-sm font-semibold text-green-700'>
-																({discountPercentage}% off)
-															</span>
+												{/* Sale Price Alert - Only if detected from scraper */}
+												{watchedSalePrice && watchedRetailPrice && parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
+													<div
+														className='mt-2 p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300'
+														style={{
+															backgroundColor: 'var(--color-green-50)',
+															borderColor: 'var(--color-green-200)'
+														}}
+														role="status"
+														aria-live="polite"
+													>
+														<Sparkles className='h-4 w-4 flex-shrink-0' style={{ color: 'var(--color-green-600)' }} aria-hidden="true" />
+														<div className='flex-1 min-w-0'>
+															<p className='text-sm font-semibold' style={{ color: 'var(--color-green-800)' }}>
+																Active sale detected: ${watchedSalePrice}
+															</p>
+															<p className='text-xs' style={{ color: 'var(--color-green-700)' }}>
+																Save ${(parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)).toFixed(2)} • {discountPercentage}% off
+															</p>
 														</div>
 													</div>
 												)}
+											</div>
 
 											<div>
 												<Label className='text-sm text-gray-600'>

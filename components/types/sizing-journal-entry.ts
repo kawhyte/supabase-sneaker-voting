@@ -25,6 +25,7 @@ export interface SizingJournalEntry {
   image_url?: string
   cloudinary_id?: string
   sneaker_photos?: ItemPhoto[]
+  in_collection?: boolean
 }
 
 export interface FitRating {

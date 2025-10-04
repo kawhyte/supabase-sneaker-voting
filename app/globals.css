@@ -424,7 +424,12 @@
   }
 }
 
-main, nav {
+nav {
+  @apply max-w-[1920px] mx-auto;
+  margin-block: var(--space-sm);
+
+}
+main {
   @apply max-w-[1920px] mx-auto;
   margin-block: var(--space-xl);
 }
@@ -836,12 +841,12 @@ h2 {
 
 /* Card image container background */
 .card-image-container {
-  background-color: #f5f5f7;
+  background-color: #eef0f2;
   transition: background-color 200ms ease;
 }
 
 .card-image-container:hover {
-  background-color: #eef0f2;
+  background-color: #f5f5f7; 
 }
 
 

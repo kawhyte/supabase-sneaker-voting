@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Search } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import { toast } from 'sonner'
 import { EditSneakerModal } from './edit-sneaker-modal'
 import { SizingJournalFilters } from './sizing-journal-filters'
 import { SizingJournalStats } from './sizing-journal-stats'
@@ -175,6 +176,48 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
     setDeletingEntry(null)
   }
 
+  const handleToggleCollection = async (entry: SizingJournalEntry) => {
+    const newCollectionStatus = !entry.in_collection
+
+    // Optimistic update
+    setJournalEntries(prev =>
+      prev.map(e => e.id === entry.id ? { ...e, in_collection: newCollectionStatus } : e)
+    )
+
+    try {
+      const { error } = await supabase
+        .from('sneakers')
+        .update({ in_collection: newCollectionStatus })
+        .eq('id', entry.id)
+
+      if (error) {
+        console.error('Error toggling collection status:', error)
+        // Revert optimistic update on error
+        setJournalEntries(prev =>
+          prev.map(e => e.id === entry.id ? { ...e, in_collection: !newCollectionStatus } : e)
+        )
+        toast.error('Failed to update collection')
+        return
+      }
+
+      // Show success toast
+      toast.success(
+        newCollectionStatus ? 'Added to collection' : 'Removed from collection',
+        {
+          description: `${entry.brand} ${entry.model}`,
+          duration: 3000,
+        }
+      )
+    } catch (error) {
+      console.error('Error:', error)
+      // Revert optimistic update on error
+      setJournalEntries(prev =>
+        prev.map(e => e.id === entry.id ? { ...e, in_collection: !newCollectionStatus } : e)
+      )
+      toast.error('Failed to update collection')
+    }
+  }
+
   // Computed values
   const filteredAndSortedEntries = sortJournalEntries(
     filterJournalEntries(journalEntries, searchTerm, selectedUser, selectedBrand),
@@ -223,6 +266,7 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
               entry={entry}
               onEdit={handleEditEntry}
               onDelete={handleDeleteEntry}
+              onToggleCollection={handleToggleCollection}
             />
           ))
         )}

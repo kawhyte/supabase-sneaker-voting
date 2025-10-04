@@ -17,6 +17,8 @@ import {
 	Trash2,
 	Image as ImageIcon,
 	MoreVertical,
+	Star,
+	Heart,
 } from "lucide-react";
 import { PhotoCarousel } from "./photo-carousel";
 import {
@@ -29,12 +31,14 @@ interface SizingJournalEntryCardProps {
 	entry: SizingJournalEntry;
 	onEdit: (entry: SizingJournalEntry) => void;
 	onDelete: (entry: SizingJournalEntry) => void;
+	onToggleCollection?: (entry: SizingJournalEntry) => void;
 }
 
 export function SizingJournalEntryCard({
 	entry,
 	onEdit,
 	onDelete,
+	onToggleCollection,
 }: SizingJournalEntryCardProps) {
 	const isTried = entry.interaction_type === "tried";
 	const fitInfo = getFitRatingInfo(entry.fit_rating);
@@ -47,8 +51,31 @@ export function SizingJournalEntryCard({
 			role='article'
 			aria-label={`${entry.brand} ${entry.model}`}>
 			<div className='flex flex-col'>
-				{/* Kebab Menu */}
-				<div className='absolute top-2 right-2 z-50'>
+				{/* Collection Toggle & Kebab Menu */}
+				<div className='absolute top-2 right-2 z-50 flex items-center gap-1'>
+					{/* Collection Heart Toggle */}
+					{onToggleCollection && (
+						<button
+							onClick={() => onToggleCollection(entry)}
+							className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
+							type='button'
+							aria-label={entry.in_collection ? 'Remove from collection' : 'Add to collection'}>
+							<Heart
+								className={`h-5 w-5 transition-all ${
+									entry.in_collection
+										? 'fill-current'
+										: ''
+								}`}
+								style={{
+									color: entry.in_collection
+										? 'var(--color-primary-500)'
+										: 'var(--color-gray-500)',
+								}}
+							/>
+						</button>
+					)}
+
+					{/* Kebab Menu */}
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
 							<button
@@ -74,6 +101,19 @@ export function SizingJournalEntryCard({
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
+
+				{/* In Collection Badge */}
+				{entry.in_collection && (
+					<div
+						className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
+						style={{
+							backgroundColor: 'var(--color-primary-500)',
+							color: 'var(--color-black)',
+						}}>
+						<Heart className='h-3 w-3 fill-current' />
+						In Collection
+					</div>
+				)}
 
 				{/* Image Section */}
 				{photos.length > 0 ? (
@@ -242,7 +282,18 @@ function getFitRatingInfo(rating: number | null) {
 }
 
 function getComfortStars(rating: number) {
-	return "⭐".repeat(rating);
+	return (
+		<div className="flex items-center gap-0.5">
+			{Array.from({ length: rating }, (_, i) => (
+				<Star
+					key={i}
+					className="h-2 w-2"
+					fill="currentColor"
+					style={{ color: 'var(--color-primary-500)' }}
+				/>
+			))}
+		</div>
+	);
 }
 
 function formatDate(dateString: string) {

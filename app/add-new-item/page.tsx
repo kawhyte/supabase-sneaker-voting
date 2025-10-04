@@ -8,9 +8,10 @@ export default function AddNewItemPage() {
 
   const handleSneakerAdded = () => {
     // Auto-redirect to dashboard after successful submission
+    // Short delay allows user to see success toast before transition
     setTimeout(() => {
       router.push('/dashboard')
-    }, 3000)
+    }, 100) // Minimal delay - form already waited 800ms
   }
 
   return (

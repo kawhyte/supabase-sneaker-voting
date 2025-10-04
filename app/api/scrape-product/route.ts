@@ -80,6 +80,8 @@ export async function POST(request: NextRequest) {
         productData = await scrapeWithTimeout(() => scrapeStockX(url))
       } else if (hostname.includes('shoepalace.com')) {
         productData = await scrapeWithTimeout(() => scrapeShoePalace(url))
+      } else if (hostname.includes('oldnavy.gap.com')) {
+        productData = await scrapeWithTimeout(() => scrapeOldNavy(url))
       } else {
         productData = await scrapeWithTimeout(() => scrapeGeneric(url))
       }
@@ -473,6 +475,93 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
     return {
       success: false,
       error: `Shoe Palace scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+    }
+  }
+}
+
+async function scrapeOldNavy(url: string): Promise<ProductData> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const html = await response.text()
+    const $ = cheerio.load(html)
+
+    // Extract title from h1 or page title
+    const title = cleanText($('h1[data-testid="product-title"]').text() ||
+                  $('title').text()?.replace(' | Old Navy', ''))
+
+    // Parse brand and model from title
+    const brand = title?.split(' ')[0] || 'Old Navy'
+    const model = title?.replace(brand, '').trim() || title
+
+    // Extract price - look for sale price first, then regular price
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    const salePriceText = cleanText($('.current-sale-price').first().text())
+    if (salePriceText) {
+      salePrice = extractPrice(salePriceText)
+    }
+
+    const regularPriceText = cleanText($('.regular-price-strike-through').first().text() ||
+                            $('.current-regular-price').first().text())
+    if (regularPriceText) {
+      retailPrice = extractPrice(regularPriceText)
+    }
+
+    // If we only have sale price, use it as retail
+    if (!retailPrice && salePrice) {
+      retailPrice = salePrice
+      salePrice = undefined
+    }
+
+    // Extract images from preload links
+    const images: string[] = []
+    $('link[rel="preload"][as="image"]').each((_, el) => {
+      if (images.length >= 5) return false
+      const href = $(el).attr('href')
+      if (href && !href.includes('logo') && !href.includes('icon')) {
+        const fullUrl = href.startsWith('http') ? href : `https://oldnavy.gap.com${href}`
+        if (!images.includes(fullUrl)) {
+          images.push(fullUrl)
+        }
+      }
+    })
+
+    // Fallback: extract from image srcset attributes
+    if (images.length === 0) {
+      $('img[src*="webcontent"]').each((_, el) => {
+        if (images.length >= 5) return false
+        const src = $(el).attr('src')
+        if (src && !images.includes(src)) {
+          const fullUrl = src.startsWith('http') ? src : `https://oldnavy.gap.com${src}`
+          images.push(fullUrl)
+        }
+      })
+    }
+
+    return {
+      brand: brand || undefined,
+      model: model || undefined,
+      colorway: undefined,
+      sku: undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      success: true
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Old Navy scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
     }
   }
 }
