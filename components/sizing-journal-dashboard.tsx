@@ -58,6 +58,7 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
             is_main_image
           )
         `)
+        .eq('is_archived', false)
         .order('created_at', { ascending: false })
 
       // If sneaker_photos table doesn't exist, fallback to basic query
@@ -65,6 +66,7 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
         const basicQuery = await supabase
           .from('sneakers')
           .select('*')
+          .eq('is_archived', false)
           .order('created_at', { ascending: false })
 
         data = basicQuery.data
@@ -178,6 +180,18 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
 
   const handleToggleCollection = async (entry: SizingJournalEntry) => {
     const newCollectionStatus = !entry.in_collection
+
+    // Validate price before adding to collection
+    if (newCollectionStatus && !entry.purchase_price && !entry.retail_price) {
+      toast.error('Please set a price before adding to collection', {
+        description: 'A price is required to track cost per wear',
+        action: {
+          label: 'Edit',
+          onClick: () => handleEditEntry(entry)
+        }
+      })
+      return
+    }
 
     // Optimistic update
     setJournalEntries(prev =>

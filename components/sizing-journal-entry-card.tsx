@@ -15,7 +15,6 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-	ThumbsUp,
 	Calendar,
 	MapPin,
 	DollarSign,
@@ -28,6 +27,7 @@ import {
 	Heart,
 	Bookmark,
 	Plus,
+	Minus,
 	Archive,
 	ArchiveRestore
 } from "lucide-react";
@@ -45,6 +45,7 @@ interface SizingJournalEntryCardProps {
 	onToggleCollection?: (entry: SizingJournalEntry) => void;
 	viewMode?: 'journal' | 'collection' | 'archive';
 	onIncrementWear?: (entry: SizingJournalEntry) => void;
+	onDecrementWear?: (entry: SizingJournalEntry) => void;
 	onMoveToWatchlist?: (entry: SizingJournalEntry) => void;
 	onArchive?: (entry: SizingJournalEntry) => void;
 	onRestore?: (entry: SizingJournalEntry) => void;
@@ -57,6 +58,7 @@ export function SizingJournalEntryCard({
 	onToggleCollection,
 	viewMode = 'journal',
 	onIncrementWear,
+	onDecrementWear,
 	onMoveToWatchlist,
 	onArchive,
 	onRestore,
@@ -76,7 +78,7 @@ export function SizingJournalEntryCard({
 					{/* Collection Toggle & Kebab Menu */}
 					<div className='absolute right-2 z-50 flex items-center gap-1'>
 						{/* Collection Heart Toggle */}
-						{onToggleCollection && (
+						{onToggleCollection && viewMode === 'journal' && (
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<button
@@ -84,7 +86,7 @@ export function SizingJournalEntryCard({
 										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
 										type='button'
 										aria-label={entry.in_collection ? 'Remove from collection' : 'Add to collection'}>
-										<SquareCheckBig
+										<Bookmark
 											className={`h-3 w-3 transition-all ${
 												entry.in_collection
 													? ''
@@ -317,7 +319,7 @@ export function SizingJournalEntryCard({
 							)}
 
 							{/* Wear Counter - Collection Mode Only */}
-							{viewMode === 'collection' && onIncrementWear && (
+							{viewMode === 'collection' && onIncrementWear && onDecrementWear && (
 								<>
 									{(fitInfo || entry.comfort_rating) && (
 										<span className='hidden sm:inline text-gray-300 mx-0.5'>
@@ -326,9 +328,30 @@ export function SizingJournalEntryCard({
 									)}
 									<div className='flex items-center gap-1.5'>
 										<span className='text-gray-500 text-xs'>Wears:</span>
+
+										{/* Decrement Button */}
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<button
+													onClick={() => onDecrementWear(entry)}
+													disabled={!entry.wears || entry.wears === 0}
+													className='h-5 w-5 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed'
+													type='button'
+													aria-label='Subtract one wear'>
+													<Minus className='h-3 w-3' style={{ color: 'var(--color-gray-600)' }} />
+												</button>
+											</TooltipTrigger>
+											<TooltipContent side="top" className="z-[9999]">
+												<p>Subtract wear (-1)</p>
+											</TooltipContent>
+										</Tooltip>
+
+										{/* Count Display */}
 										<span className='font-bold text-sm' style={{ color: 'var(--color-black-soft)' }}>
 											{entry.wears || 0}
 										</span>
+
+										{/* Increment Button */}
 										<Tooltip>
 											<TooltipTrigger asChild>
 												<button
@@ -347,23 +370,43 @@ export function SizingJournalEntryCard({
 												<p>Add wear (+1)</p>
 											</TooltipContent>
 										</Tooltip>
+
+										{/* Cost Per Wear */}
+										<span className='text-gray-300 mx-1'>•</span>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<span
+													className='text-xs font-medium cursor-help'
+													style={{ color: 'var(--color-gray-600)' }}
+												>
+													${calculateCostPerWear(entry.purchase_price, entry.retail_price, entry.wears)}/wear
+												</span>
+											</TooltipTrigger>
+											<TooltipContent side="top" className="z-[9999]">
+												<p className="text-xs">
+													{entry.purchase_price || entry.retail_price
+														? `$${entry.purchase_price || entry.retail_price} ÷ ${entry.wears || 0} wears`
+														: 'Set a price to calculate cost per wear'}
+												</p>
+											</TooltipContent>
+										</Tooltip>
 									</div>
 								</>
 							)}
 						</div>
 
 						{/* Divider line */}
-						{(entry.listed_price || entry.store_name) && (
+						{(entry.retail_price || entry.store_name) && (
 							<div className='metadata-divider'></div>
 						)}
 
 						{/* Row 2: Secondary metadata */}
 						<div className='flex items-center gap-2 text-xs flex-wrap text-gray-600'>
-							{entry.listed_price && (
+							{entry.retail_price && (
 								<>
 									<div className='flex items-center gap-1'>
 										<DollarSign className='h-3.5 w-3.5 text-gray-400' />
-										<span className='font-medium'>${entry.listed_price}</span>
+										<span className='font-medium'>${entry.retail_price}</span>
 									</div>
 									{(entry.store_name || entry.try_on_date) && (
 										<span className='hidden sm:inline text-gray-300 mx-0.5'>
@@ -497,6 +540,16 @@ function formatArchiveReason(reason: string) {
 		other: 'Other',
 	};
 	return reasonMap[reason] || reason;
+}
+
+function calculateCostPerWear(
+	purchasePrice: number | undefined,
+	listPrice: number | undefined,
+	wears: number | undefined
+): string {
+	const price = purchasePrice ?? listPrice;
+	if (!price || !wears || wears === 0) return 'N/A';
+	return (price / wears).toFixed(2);
 }
 
 function preparePhotos(entry: SizingJournalEntry): ItemPhoto[] {

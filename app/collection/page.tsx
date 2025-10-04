@@ -82,6 +82,38 @@ export default function CollectionPage() {
     }
   }
 
+  const handleDecrementWear = async (entry: SizingJournalEntry) => {
+    const currentWears = entry.wears || 0
+    if (currentWears === 0) return // Prevent negative values
+
+    const newWearCount = currentWears - 1
+    const lastWornDate = newWearCount === 0 ? null : entry.last_worn_date
+
+    // Optimistic update
+    setCollectionSneakers(prev =>
+      prev.map(sneaker =>
+        sneaker.id === entry.id
+          ? { ...sneaker, wears: newWearCount, last_worn_date: lastWornDate }
+          : sneaker
+      )
+    )
+
+    // Update in database
+    const { error } = await supabase
+      .from('sneakers')
+      .update({
+        wears: newWearCount,
+        last_worn_date: lastWornDate
+      })
+      .eq('id', entry.id)
+
+    if (error) {
+      console.error('Error updating wears:', error)
+      // Revert on error
+      fetchCollection()
+    }
+  }
+
   const handleMoveToWatchlist = async (entry: SizingJournalEntry) => {
     // Optimistic update - remove from view
     setCollectionSneakers(prev => prev.filter(sneaker => sneaker.id !== entry.id))
@@ -222,19 +254,7 @@ export default function CollectionPage() {
               </p>
             )}
           </div>
-          <Link href="/add-new-item">
-            <Button
-              size="lg"
-              className="font-semibold"
-              style={{
-                backgroundColor: 'var(--color-primary-500)',
-                color: 'var(--color-black)',
-              }}
-            >
-              
-              Add to Collection
-            </Button>
-          </Link>
+          
         </div>
 
         {/* Tabs for Active/Archived */}
@@ -346,6 +366,7 @@ export default function CollectionPage() {
                     onDelete={handleDelete}
                     onToggleCollection={handleToggleCollection}
                     onIncrementWear={handleIncrementWear}
+                    onDecrementWear={handleDecrementWear}
                     onMoveToWatchlist={handleMoveToWatchlist}
                     onArchive={handleArchive}
                     viewMode="collection"

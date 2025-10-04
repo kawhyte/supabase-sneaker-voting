@@ -21,7 +21,8 @@ export interface SizingJournalEntry {
   store_name?: string
   try_on_date: string
   notes?: string
-  listed_price?: number
+  retail_price?: number
+  purchase_price?: number
   would_recommend: boolean | null
   interested_in_buying: boolean
   image_url?: string

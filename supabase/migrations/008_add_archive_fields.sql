@@ -7,16 +7,20 @@
 -- ADD ARCHIVE FIELDS TO SNEAKERS TABLE
 -- ============================================================================
 
--- Add archive status fields
+-- Add archive status fields and collection tracking fields
 ALTER TABLE sneakers
   ADD COLUMN IF NOT EXISTS is_archived BOOLEAN DEFAULT FALSE,
   ADD COLUMN IF NOT EXISTS archive_reason VARCHAR(50),
-  ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ;
+  ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS wears INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS last_worn_date TIMESTAMPTZ;
 
 -- Add comment for documentation
 COMMENT ON COLUMN sneakers.is_archived IS 'Indicates if sneaker has been archived (sold/donated/worn out)';
 COMMENT ON COLUMN sneakers.archive_reason IS 'Reason for archiving: sold, donated, worn_out, other';
 COMMENT ON COLUMN sneakers.archived_at IS 'Timestamp when sneaker was archived';
+COMMENT ON COLUMN sneakers.wears IS 'Number of times the sneaker has been worn';
+COMMENT ON COLUMN sneakers.last_worn_date IS 'Last date the sneaker was worn';
 
 -- ============================================================================
 -- CREATE INDEX FOR EFFICIENT FILTERING
@@ -34,6 +38,9 @@ CREATE INDEX IF NOT EXISTS idx_sneakers_archived_at ON sneakers(archived_at DESC
 -- ============================================================================
 -- ADD CHECK CONSTRAINT FOR ARCHIVE REASON
 -- ============================================================================
+
+-- Drop existing constraint if it exists, then recreate it
+ALTER TABLE sneakers DROP CONSTRAINT IF EXISTS check_archive_reason;
 
 -- Ensure archive_reason is one of the valid values if archived
 ALTER TABLE sneakers

@@ -75,6 +75,15 @@ const sneakerSchema = z.object({
     }, 'Price must be between $0 and $10,000')
     .optional()
     .or(z.literal('')),
+  purchasePrice: z.string()
+    .regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 150 or 150.00)')
+    .refine((val) => {
+      if (val === '') return true;
+      const price = parseFloat(val);
+      return price >= 0 && price <= 10000;
+    }, 'Price must be between $0 and $10,000')
+    .optional()
+    .or(z.literal('')),
   notes: z.string()
     .max(80, 'Notes must be less than 80 characters')
     .trim()
@@ -222,6 +231,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         retailPrice: experience.retail_price?.toString() || '',
         salePrice: experience.sale_price?.toString() || '',
         idealPrice: experience.ideal_price?.toString() || '',
+        purchasePrice: experience.purchase_price?.toString() || '',
         notes: experience.notes || ''
       })
 
@@ -293,13 +303,6 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         setUploadProgress(`✅ ${photos.length} photo${photos.length > 1 ? 's' : ''} uploaded!`)
       }
 
-      // Use sale price if available, otherwise retail price
-      const finalPrice = data.salePrice
-        ? parseFloat(data.salePrice)
-        : data.retailPrice
-        ? parseFloat(data.retailPrice)
-        : null
-
       // Update the main entry data
       const experienceData = {
         user_name: data.userName,
@@ -310,7 +313,8 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         interaction_type: data.interactionType,
         size_tried: data.interactionType === 'tried' ? data.sizeTried : null,
         comfort_rating: data.interactionType === 'tried' ? (data.comfortRating || null) : null,
-        retail_price: finalPrice,
+        retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
+        purchase_price: data.purchasePrice ? parseFloat(data.purchasePrice) : null,
         ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
         notes: data.notes || null,
         interested_in_buying: true,
@@ -661,6 +665,21 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                         />
                       </div>
                       <p className="text-xs text-gray-500 mt-[var(--space-xs)]">Price you'd be willing to pay</p>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">Purchase Price (Optional)</Label>
+                      <div className="relative mt-[var(--space-md)]">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <Input
+                          {...register("purchasePrice")}
+                          placeholder="150.00"
+                          type="number"
+                          step="0.01"
+                          className="pl-8 h-6"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-[var(--space-xs)]">What you actually paid (for cost-per-wear tracking)</p>
                     </div>
                   </div>
                 </div>
