@@ -845,9 +845,9 @@ h2 {
   transition: background-color 200ms ease;
 }
 
-.card-image-container:hover {
+/* .card-image-container:hover {
   background-color: #f5f5f7; 
-}
+} */
 
 
 }
