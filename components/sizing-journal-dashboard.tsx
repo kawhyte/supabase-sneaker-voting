@@ -16,9 +16,10 @@ import { filterJournalEntries, sortJournalEntries, getUniqueBrands } from '@/lib
 
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
+  viewMode?: 'watchlist' | 'purchased'
 }
 
-export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps = {}) {
+export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: SizingJournalDashboardProps) {
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -40,18 +41,18 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
 
   useEffect(() => {
     loadJournalEntries()
-  }, [])
+  }, [viewMode])
 
   const loadJournalEntries = async () => {
     try {
       setIsLoading(true)
 
-      // Try to fetch with sneaker_photos, fallback to basic query if table doesn't exist
-      let { data, error } = await supabase
-        .from('sneakers')
+      // Build query based on viewMode
+      let query = supabase
+        .from('items')
         .select(`
           *,
-          sneaker_photos (
+          item_photos (
             id,
             image_url,
             image_order,
@@ -59,18 +60,35 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
           )
         `)
         .eq('is_archived', false)
-        .order('created_at', { ascending: false })
 
-      // If sneaker_photos table doesn't exist, fallback to basic query
-      if (error && error.message?.includes('sneaker_photos')) {
-        const basicQuery = await supabase
-          .from('sneakers')
+      // Filter based on view mode
+      if (viewMode === 'purchased') {
+        // Purchased tab: show non-shoe items that are purchased
+        query = query.eq('is_purchased', true).neq('category', 'shoes')
+      } else {
+        // Watchlist tab: show all items that are NOT purchased
+        // (shoes can't be purchased, and non-shoes that haven't been purchased yet)
+        query = query.or('category.eq.shoes,is_purchased.eq.false')
+      }
+
+      let { data, error } = await query.order('created_at', { ascending: false })
+
+      // Fallback to basic query if item_photos table doesn't exist
+      if (error && error.message?.includes('item_photos')) {
+        let basicQuery = supabase
+          .from('items')
           .select('*')
           .eq('is_archived', false)
-          .order('created_at', { ascending: false })
 
-        data = basicQuery.data
-        error = basicQuery.error
+        if (viewMode === 'purchased') {
+          basicQuery = basicQuery.eq('is_purchased', true).neq('category', 'shoes')
+        } else {
+          basicQuery = basicQuery.or('category.eq.shoes,is_purchased.eq.false')
+        }
+
+        const basicResult = await basicQuery.order('created_at', { ascending: false })
+        data = basicResult.data
+        error = basicResult.error
       }
 
       if (error) {
@@ -110,11 +128,11 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
 
     setIsDeleting(true)
     try {
-      // First, fetch all photos associated with this sneaker
+      // First, fetch all photos associated with this item
       const { data: photos, error: photosError } = await supabase
-        .from('sneaker_photos')
+        .from('item_photos')
         .select('cloudinary_id')
-        .eq('sneaker_id', deletingEntry.id)
+        .eq('item_id', deletingEntry.id)
 
       if (photosError) {
         console.warn('Error fetching sneaker photos:', photosError)
@@ -150,9 +168,9 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
         }
       }
 
-      // Delete the entry from database (cascade will delete sneaker_photos records)
+      // Delete the entry from database (cascade will delete item_photos records)
       const { error } = await supabase
-        .from('sneakers')
+        .from('items')
         .delete()
         .eq('id', deletingEntry.id)
 
@@ -179,56 +197,103 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
   }
 
   const handleToggleCollection = async (entry: SizingJournalEntry) => {
-    const newCollectionStatus = !entry.in_collection
+    // For shoes: toggle collection status
+    if (entry.category === 'shoes') {
+      const newCollectionStatus = !entry.in_collection
 
-    // Validate price before adding to collection
-    if (newCollectionStatus && !entry.purchase_price && !entry.retail_price) {
-      toast.error('Please set a price before adding to collection', {
-        description: 'A price is required to track cost per wear',
-        action: {
-          label: 'Edit',
-          onClick: () => handleEditEntry(entry)
+      // Validate price before adding to collection
+      if (newCollectionStatus && !entry.purchase_price && !entry.retail_price) {
+        toast.error('Please set a price before adding to collection', {
+          description: 'A price is required to track cost per wear',
+          action: {
+            label: 'Edit',
+            onClick: () => handleEditEntry(entry)
+          }
+        })
+        return
+      }
+
+      // Optimistic update
+      setJournalEntries(prev =>
+        prev.map(e => e.id === entry.id ? { ...e, in_collection: newCollectionStatus } : e)
+      )
+
+      try {
+        const { error } = await supabase
+          .from('items')
+          .update({ in_collection: newCollectionStatus })
+          .eq('id', entry.id)
+
+        if (error) {
+          console.error('Error toggling collection status:', error)
+          // Revert optimistic update on error
+          setJournalEntries(prev =>
+            prev.map(e => e.id === entry.id ? { ...e, in_collection: !newCollectionStatus } : e)
+          )
+          toast.error('Failed to update collection')
+          return
         }
-      })
-      return
-    }
 
-    // Optimistic update
-    setJournalEntries(prev =>
-      prev.map(e => e.id === entry.id ? { ...e, in_collection: newCollectionStatus } : e)
-    )
-
-    try {
-      const { error } = await supabase
-        .from('sneakers')
-        .update({ in_collection: newCollectionStatus })
-        .eq('id', entry.id)
-
-      if (error) {
-        console.error('Error toggling collection status:', error)
+        // Show success toast
+        toast.success(
+          newCollectionStatus ? 'Added to collection' : 'Removed from collection',
+          {
+            description: `${entry.brand} ${entry.model}`,
+            duration: 3000,
+          }
+        )
+      } catch (error) {
+        console.error('Error:', error)
         // Revert optimistic update on error
         setJournalEntries(prev =>
           prev.map(e => e.id === entry.id ? { ...e, in_collection: !newCollectionStatus } : e)
         )
         toast.error('Failed to update collection')
-        return
       }
+    } else {
+      // For non-shoes: toggle purchased status
+      const newPurchasedStatus = !entry.is_purchased
 
-      // Show success toast
-      toast.success(
-        newCollectionStatus ? 'Added to collection' : 'Removed from collection',
-        {
-          description: `${entry.brand} ${entry.model}`,
-          duration: 3000,
-        }
-      )
-    } catch (error) {
-      console.error('Error:', error)
-      // Revert optimistic update on error
+      // Optimistic update
       setJournalEntries(prev =>
-        prev.map(e => e.id === entry.id ? { ...e, in_collection: !newCollectionStatus } : e)
+        prev.map(e => e.id === entry.id ? { ...e, is_purchased: newPurchasedStatus } : e)
       )
-      toast.error('Failed to update collection')
+
+      try {
+        const { error } = await supabase
+          .from('items')
+          .update({ is_purchased: newPurchasedStatus })
+          .eq('id', entry.id)
+
+        if (error) {
+          console.error('Error toggling purchased status:', error)
+          // Revert optimistic update on error
+          setJournalEntries(prev =>
+            prev.map(e => e.id === entry.id ? { ...e, is_purchased: !newPurchasedStatus } : e)
+          )
+          toast.error('Failed to update purchased status')
+          return
+        }
+
+        // Show success toast
+        toast.success(
+          newPurchasedStatus ? 'Marked as purchased' : 'Unmarked as purchased',
+          {
+            description: `${entry.brand} ${entry.model}`,
+            duration: 3000,
+          }
+        )
+
+        // Reload entries to update the view (purchased items move to purchased tab)
+        loadJournalEntries()
+      } catch (error) {
+        console.error('Error:', error)
+        // Revert optimistic update on error
+        setJournalEntries(prev =>
+          prev.map(e => e.id === entry.id ? { ...e, is_purchased: !newPurchasedStatus } : e)
+        )
+        toast.error('Failed to update purchased status')
+      }
     }
   }
 
@@ -242,7 +307,7 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
   if (isLoading) {
     return (
       <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
-        <DashboardHeader />
+        <DashboardHeader viewMode={viewMode} />
         <LoadingSkeleton />
       </div>
     )
@@ -250,7 +315,7 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
 
   return (
     <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
-      <DashboardHeader />
+      <DashboardHeader viewMode={viewMode} />
 
       <SizingJournalFilters
         searchTerm={searchTerm}
@@ -308,12 +373,25 @@ export function SizingJournalDashboard({ onAddNew }: SizingJournalDashboardProps
 }
 
 // Sub-components
-function DashboardHeader() {
+function DashboardHeader({ viewMode }: { viewMode: 'watchlist' | 'purchased' }) {
+  const titles = {
+    watchlist: {
+      title: 'Personal Pricing Watchlist',
+      description: 'Track items you\'re interested in and monitor price changes'
+    },
+    purchased: {
+      title: 'Purchased Items',
+      description: 'Items you\'ve bought and own'
+    }
+  }
+
+  const { title, description } = titles[viewMode]
+
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">
       <div>
-        <h1 className="text-3xl font-bold"> Personal Pricing Watchlist</h1>
-        <p className="text-gray-600">Track your pricing sizing, fit, and comfort across brands</p>
+        <h1 className="text-3xl font-bold">{title}</h1>
+        <p className="text-gray-600">{description}</p>
       </div>
     </div>
   )

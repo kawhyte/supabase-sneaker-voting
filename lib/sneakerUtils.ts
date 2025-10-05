@@ -39,7 +39,7 @@ export function sneakerVote(
 		if (rating_data) {
 			const sneakerID = rating_data[0]?.id;
 			const { data, error } = await supabase
-				.from("sneakers")
+				.from("items")
 				.update({ rating_id: sneakerID })
 				.eq("id", sneaker.id)
 				.select();

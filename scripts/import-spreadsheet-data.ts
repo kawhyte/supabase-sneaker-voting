@@ -285,7 +285,7 @@ async function importData() {
       const batch = dbData.slice(i, i + batchSize)
 
       const { data, error } = await supabase
-        .from('sneakers')
+        .from('items')
         .insert(batch)
         .select()
 
@@ -302,7 +302,7 @@ async function importData() {
 
     // Show summary
     const { data: totalRecords, error: countError } = await supabase
-      .from('sneakers')
+      .from('items')
       .select('*', { count: 'exact' })
 
     if (!countError) {

@@ -328,7 +328,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
       }
 
       const { error: updateError } = await supabase
-        .from('sneakers')
+        .from('items')
         .update(experienceData)
         .eq('id', experience.id)
 
@@ -358,7 +358,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
 
         // Delete from DB
         const { error: deleteError } = await supabase
-          .from('sneaker_photos')
+          .from('item_photos')
           .delete()
           .in('id', photosToDelete)
 
@@ -370,7 +370,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
       // Update existing photos (main status and order)
       for (const existingPhoto of existingPhotos) {
         const { error: photoUpdateError } = await supabase
-          .from('sneaker_photos')
+          .from('item_photos')
           .update({
             is_main_image: existingPhoto.is_main_image,
             image_order: existingPhoto.image_order
@@ -385,7 +385,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
       // Insert new photos
       if (uploadedPhotos.length > 0) {
         const newPhotoRecords = uploadedPhotos.map(photo => ({
-          sneaker_id: experience.id,
+          item_id: experience.id,
           image_url: photo.url,
           cloudinary_id: photo.cloudinaryId,
           image_order: photo.order,
@@ -393,7 +393,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         }))
 
         const { error: insertError } = await supabase
-          .from('sneaker_photos')
+          .from('item_photos')
           .insert(newPhotoRecords)
 
         if (insertError) {

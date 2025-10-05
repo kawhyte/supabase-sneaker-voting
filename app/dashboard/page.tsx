@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
 import { InsightsDashboard } from '@/components/insights-dashboard'
-import { BarChart3, Brain } from 'lucide-react'
+import { BarChart3, Brain, ShoppingBag } from 'lucide-react'
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('collection')
@@ -18,10 +18,14 @@ export default function DashboardPage() {
         transition={{ duration: 0.5 }}
       >
         <Tabs defaultValue="collection" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8">
             <TabsTrigger value="collection" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
             Watchlist
+            </TabsTrigger>
+            <TabsTrigger value="purchased" className="flex items-center gap-2">
+              <ShoppingBag className="h-4 w-4" />
+              Purchased
             </TabsTrigger>
             <TabsTrigger value="insights" className="flex items-center gap-2 ">
               <Brain className="h-4 w-4" />
@@ -35,7 +39,17 @@ export default function DashboardPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <SizingJournalDashboard />
+              <SizingJournalDashboard viewMode="watchlist" />
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="purchased">
+            <motion.div
+              initial={{ opacity: 0, x: 0 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <SizingJournalDashboard viewMode="purchased" />
             </motion.div>
           </TabsContent>
 

@@ -29,7 +29,8 @@ import {
 	Plus,
 	Minus,
 	Archive,
-	ArchiveRestore
+	ArchiveRestore,
+	ShoppingBag
 } from "lucide-react";
 import { PhotoCarousel } from "./photo-carousel";
 import {
@@ -37,6 +38,12 @@ import {
 	ItemPhoto,
 	FIT_RATINGS,
 } from "./types/sizing-journal-entry";
+import {
+	getCategoryConfig,
+	canAddToCollection,
+	canTrackWears,
+	canMarkAsPurchased
+} from "./types/item-category";
 
 interface SizingJournalEntryCardProps {
 	entry: SizingJournalEntry;
@@ -66,6 +73,10 @@ export function SizingJournalEntryCard({
 	const isTried = entry.interaction_type === "tried";
 	const fitInfo = getFitRatingInfo(entry.fit_rating);
 	const photos = preparePhotos(entry);
+	const categoryConfig = getCategoryConfig(entry.category);
+	const isShoe = canAddToCollection(entry.category);
+	const canBePurchased = canMarkAsPurchased(entry.category);
+	const canTrack = canTrackWears(entry.category);
 
 	return (
 		<TooltipProvider delayDuration={300}>
@@ -75,9 +86,9 @@ export function SizingJournalEntryCard({
 				role='article'
 				aria-label={`${entry.brand} ${entry.model}`}>
 				<div className='flex flex-col'>
-					{/* Collection Toggle & Kebab Menu */}
+					{/* Collection/Purchase Toggle & Kebab Menu */}
 					<div className='absolute right-2 z-50 flex items-center gap-1'>
-						{/* Collection Heart Toggle */}
+						{/* Collection/Purchase Toggle */}
 						{onToggleCollection && viewMode === 'journal' && (
 							<Tooltip>
 								<TooltipTrigger asChild>
@@ -85,23 +96,39 @@ export function SizingJournalEntryCard({
 										onClick={() => onToggleCollection(entry)}
 										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
 										type='button'
-										aria-label={entry.in_collection ? 'Remove from collection' : 'Add to collection'}>
-										<Bookmark
-											className={`h-3 w-3 transition-all ${
-												entry.in_collection
-													? ''
-													: ''
-											}`}
-											style={{
-												color: entry.in_collection
-													? 'var(--color-primary-500)'
-													: 'var(--color-gray-500)',
-											}}
-										/>
+										aria-label={
+											isShoe
+												? (entry.in_collection ? 'Remove from collection' : 'Add to collection')
+												: (entry.is_purchased ? 'Unmark as purchased' : 'Mark as purchased')
+										}>
+										{isShoe ? (
+											<Bookmark
+												className='h-3 w-3 transition-all'
+												style={{
+													color: entry.in_collection
+														? 'var(--color-primary-500)'
+														: 'var(--color-gray-500)',
+												}}
+											/>
+										) : (
+											<ShoppingBag
+												className='h-3 w-3 transition-all'
+												style={{
+													color: entry.is_purchased
+														? 'var(--color-green-500)'
+														: 'var(--color-gray-500)',
+												}}
+											/>
+										)}
 									</button>
 								</TooltipTrigger>
 								<TooltipContent side="bottom" className="z-[9999]">
-									<p>{entry.in_collection ? 'Remove from collection' : 'Add to collection'}</p>
+									<p>
+										{isShoe
+											? (entry.in_collection ? 'Remove from collection' : 'Add to collection')
+											: (entry.is_purchased ? 'Unmark as purchased' : 'Mark as purchased')
+										}
+									</p>
 								</TooltipContent>
 							</Tooltip>
 						)}
@@ -202,16 +229,40 @@ export function SizingJournalEntryCard({
 					</DropdownMenu>
 				</div>
 
-				{/* In Collection Badge - Only show in journal view */}
-				{entry.in_collection && viewMode === 'journal' && (
+				{/* Category Badge */}
+				{categoryConfig && (
 					<div
 						className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
 						style={{
-							backgroundColor: 'var(--color-primary-500)',
+							backgroundColor: categoryConfig.bgColor,
+							borderColor: categoryConfig.borderColor,
+							color: categoryConfig.textColor,
+							border: '1px solid',
+						}}>
+						<categoryConfig.icon className='h-2 w-2' />
+						{categoryConfig.label}
+					</div>
+				)}
+
+				{/* In Collection / Purchased Badge - Only show in journal view when applicable */}
+				{viewMode === 'journal' && (isShoe ? entry.in_collection : entry.is_purchased) && (
+					<div
+						className='absolute top-11 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
+						style={{
+							backgroundColor: isShoe ? 'var(--color-primary-500)' : 'var(--color-green-500)',
 							color: 'var(--color-black)',
 						}}>
-						<Heart className='h-2 w-2 fill-current' />
-						In Collection
+						{isShoe ? (
+							<>
+								<Heart className='h-2 w-2 fill-current' />
+								In Collection
+							</>
+						) : (
+							<>
+								<ShoppingBag className='h-2 w-2' />
+								Purchased
+							</>
+						)}
 					</div>
 				)}
 
@@ -318,8 +369,8 @@ export function SizingJournalEntryCard({
 								</div>
 							)}
 
-							{/* Wear Counter - Collection Mode Only */}
-							{viewMode === 'collection' && onIncrementWear && onDecrementWear && (
+							{/* Wear Counter - Collection Mode Only (shoes only) */}
+							{viewMode === 'collection' && canTrack && onIncrementWear && onDecrementWear && (
 								<>
 									{(fitInfo || entry.comfort_rating) && (
 										<span className='hidden sm:inline text-gray-300 mx-0.5'>
@@ -435,8 +486,8 @@ export function SizingJournalEntryCard({
 								<span>{formatDate(entry.try_on_date)}</span>
 							</div>
 
-							{/* Last Worn Date - Collection Mode Only */}
-							{viewMode === 'collection' && entry.last_worn_date && (
+							{/* Last Worn Date - Collection Mode Only (shoes only) */}
+							{viewMode === 'collection' && canTrack && entry.last_worn_date && (
 								<>
 									<span className='hidden sm:inline text-gray-300 mx-0.5'>
 										|

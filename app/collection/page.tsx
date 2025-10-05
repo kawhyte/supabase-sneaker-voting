@@ -29,8 +29,9 @@ export default function CollectionPage() {
 
   const fetchCollection = async () => {
     const { data: collectionData, error } = await supabase
-      .from('sneakers')
+      .from('items')
       .select('*')
+      .eq('category', 'shoes')
       .eq('in_collection', true)
       .eq('is_archived', false)
       .order('created_at', { ascending: false })
@@ -45,8 +46,9 @@ export default function CollectionPage() {
 
   const fetchArchived = async () => {
     const { data: archivedData, error } = await supabase
-      .from('sneakers')
+      .from('items')
       .select('*')
+      .eq('category', 'shoes')
       .eq('is_archived', true)
       .order('archived_at', { ascending: false })
 
@@ -72,7 +74,7 @@ export default function CollectionPage() {
 
     // Update in database
     const { error } = await supabase
-      .from('sneakers')
+      .from('items')
       .update({ wears: newWearCount, last_worn_date: now })
       .eq('id', entry.id)
 
@@ -101,7 +103,7 @@ export default function CollectionPage() {
 
     // Update in database
     const { error } = await supabase
-      .from('sneakers')
+      .from('items')
       .update({
         wears: newWearCount,
         last_worn_date: lastWornDate
@@ -121,7 +123,7 @@ export default function CollectionPage() {
 
     // Update in database
     const { error } = await supabase
-      .from('sneakers')
+      .from('items')
       .update({ in_collection: false })
       .eq('id', entry.id)
 
@@ -157,7 +159,7 @@ export default function CollectionPage() {
 
     // Delete from database
     const { error } = await supabase
-      .from('sneakers')
+      .from('items')
       .delete()
       .eq('id', entry.id)
 
@@ -192,7 +194,7 @@ export default function CollectionPage() {
 
     // Update in database
     const { error } = await supabase
-      .from('sneakers')
+      .from('items')
       .update({
         is_archived: true,
         archive_reason: reason,
@@ -218,7 +220,7 @@ export default function CollectionPage() {
 
     // Update in database
     const { error } = await supabase
-      .from('sneakers')
+      .from('items')
       .update({
         is_archived: false,
         archive_reason: null,

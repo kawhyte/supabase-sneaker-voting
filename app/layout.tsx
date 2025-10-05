@@ -46,7 +46,7 @@ export default function RootLayout({
 				"light text-foreground",
 				GeistSans.className
 			)}>
-			<body className="min-h-screen text-primary">
+			<body className="min-h-screen text-primary" suppressHydrationWarning>
 				<div className="min-h-screen bg-primary">
 					<Navbar />
 					<main className=" lg:px-8">
