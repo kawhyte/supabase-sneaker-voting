@@ -216,13 +216,13 @@ export function SizingJournalEntryCard({
 							<DropdownMenuItem
 								onSelect={() => onEdit(entry)}
 								className='cursor-pointer'>
-								<Edit className='h-4 w-4 mr-2' />
+								<Edit className='h-3 w-3 mr-2' />
 								Edit
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								onSelect={() => onDelete(entry)}
 								className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
-								<Trash2 className='h-4 w-4 mr-2' />
+								<Trash2 className='h-3 w-3 mr-2' />
 								Delete
 							</DropdownMenuItem>
 						</DropdownMenuContent>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import * as cheerio from 'cheerio'
+import { ItemCategory } from '@/components/types/item-category'
 
 interface ProductData {
   brand?: string
@@ -9,6 +10,7 @@ interface ProductData {
   retailPrice?: number
   salePrice?: number
   images?: string[]
+  category?: ItemCategory
   success: boolean
   error?: string
 }
@@ -19,6 +21,113 @@ function cleanText(text: string): string {
     .replace(/[\n\t\r]/g, ' ')  // Replace newlines and tabs with spaces
     .replace(/\s+/g, ' ')        // Replace multiple spaces with single space
     .trim()                       // Remove leading/trailing whitespace
+}
+
+// Helper function to detect category from product title and URL
+function detectCategory(url: string, title: string, breadcrumbs: string = ''): ItemCategory {
+  const combined = `${url} ${title} ${breadcrumbs}`.toLowerCase()
+
+  // Shoes - check first
+  if (
+    combined.includes('shoe') ||
+    combined.includes('sneaker') ||
+    combined.includes('boot') ||
+    combined.includes('sandal') ||
+    combined.includes('slipper') ||
+    combined.includes('loafer') ||
+    combined.includes('heel') ||
+    combined.includes('footwear')
+  ) {
+    return 'shoes'
+  }
+
+  // Tops
+  if (
+    combined.includes('shirt') ||
+    combined.includes('blouse') ||
+    combined.includes('top') ||
+    combined.includes('sweater') ||
+    combined.includes('hoodie') ||
+    combined.includes('sweatshirt') ||
+    combined.includes('tee') ||
+    combined.includes('tank') ||
+    combined.includes('cardigan') ||
+    combined.includes('polo')
+  ) {
+    return 'tops'
+  }
+
+  // Bottoms
+  if (
+    combined.includes('pant') ||
+    combined.includes('jean') ||
+    combined.includes('short') ||
+    combined.includes('skirt') ||
+    combined.includes('trouser') ||
+    combined.includes('legging') ||
+    combined.includes('jogger')
+  ) {
+    return 'bottoms'
+  }
+
+  // Outerwear
+  if (
+    combined.includes('jacket') ||
+    combined.includes('coat') ||
+    combined.includes('blazer') ||
+    combined.includes('parka') ||
+    combined.includes('windbreaker') ||
+    combined.includes('bomber') ||
+    combined.includes('trench') ||
+    combined.includes('peacoat')
+  ) {
+    return 'outerwear'
+  }
+
+  // Jewelry
+  if (
+    combined.includes('jewelry') ||
+    combined.includes('necklace') ||
+    combined.includes('bracelet') ||
+    combined.includes('ring') ||
+    combined.includes('earring') ||
+    combined.includes('pendant')
+  ) {
+    return 'jewelry'
+  }
+
+  // Watches
+  if (
+    combined.includes('watch') ||
+    combined.includes('timepiece')
+  ) {
+    return 'watches'
+  }
+
+  // Accessories (catch-all for bags, hats, etc.)
+  if (
+    combined.includes('bag') ||
+    combined.includes('backpack') ||
+    combined.includes('purse') ||
+    combined.includes('wallet') ||
+    combined.includes('belt') ||
+    combined.includes('hat') ||
+    combined.includes('cap') ||
+    combined.includes('scarf') ||
+    combined.includes('glove') ||
+    combined.includes('sunglass') ||
+    combined.includes('accessory') ||
+    combined.includes('duffle') ||
+    combined.includes('weekender') ||
+    combined.includes('tote') ||
+    combined.includes('crossbody') ||
+    combined.includes('shoulder bag')
+  ) {
+    return 'accessories'
+  }
+
+  // Default to accessories for unknown items
+  return 'accessories'
 }
 
 export async function POST(request: NextRequest) {
@@ -80,8 +189,18 @@ export async function POST(request: NextRequest) {
         productData = await scrapeWithTimeout(() => scrapeStockX(url))
       } else if (hostname.includes('shoepalace.com')) {
         productData = await scrapeWithTimeout(() => scrapeShoePalace(url))
+      } else if (hostname.includes('bananarepublic.gap.com')) {
+        productData = await scrapeWithTimeout(() => scrapeGapFamily(url, 'Banana Republic'))
       } else if (hostname.includes('oldnavy.gap.com')) {
-        productData = await scrapeWithTimeout(() => scrapeOldNavy(url))
+        productData = await scrapeWithTimeout(() => scrapeGapFamily(url, 'Old Navy'))
+      } else if (hostname.includes('gap.com')) {
+        productData = await scrapeWithTimeout(() => scrapeGapFamily(url, 'Gap'))
+      } else if (hostname.includes('nordstrom.com')) {
+        productData = await scrapeWithTimeout(() => scrapeNordstrom(url))
+      } else if (hostname.includes('stance.com')) {
+        productData = await scrapeWithTimeout(() => scrapeStance(url))
+      } else if (hostname.includes('beistravel.com')) {
+        productData = await scrapeWithTimeout(() => scrapeBEIS(url))
       } else {
         productData = await scrapeWithTimeout(() => scrapeGeneric(url))
       }
@@ -167,6 +286,9 @@ async function scrapeSoleRetriever(url: string): Promise<ProductData> {
       }
     })
 
+    // Detect category
+    const category = detectCategory(url, rawTitle, '')
+
     return {
       brand: brand || undefined,
       model: model || undefined,
@@ -175,6 +297,7 @@ async function scrapeSoleRetriever(url: string): Promise<ProductData> {
       retailPrice,
       salePrice,
       images: images.length > 0 ? images : undefined,
+      category,
       success: true
     }
   } catch (error) {
@@ -246,6 +369,9 @@ async function scrapeNike(url: string): Promise<ProductData> {
       }
     })
 
+    // Detect category (Nike sells shoes and apparel)
+    const category = detectCategory(url, model, '')
+
     return {
       brand,
       model: model || undefined,
@@ -254,6 +380,7 @@ async function scrapeNike(url: string): Promise<ProductData> {
       retailPrice,
       salePrice,
       images: images.length > 0 ? images : undefined,
+      category,
       success: true
     }
   } catch (error) {
@@ -330,6 +457,9 @@ async function scrapeStockX(url: string): Promise<ProductData> {
       }
     })
 
+    // Detect category
+    const category = detectCategory(url, fullTitle, '')
+
     return {
       brand: brand || undefined,
       model: model || undefined,
@@ -338,6 +468,7 @@ async function scrapeStockX(url: string): Promise<ProductData> {
       retailPrice,
       salePrice,
       images: images.length > 0 ? images : undefined,
+      category,
       success: true
     }
   } catch (error) {
@@ -449,6 +580,9 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
       })
     }
 
+    // Detect category
+    const category = detectCategory(url, title, '')
+
     console.log('🔍 Shoe Palace (Shopify) scraper found:', {
       title,
       brand,
@@ -458,7 +592,8 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
       retailPrice,
       salePrice,
       imageCount: images.length,
-      images
+      images,
+      category
     })
 
     return {
@@ -469,6 +604,7 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
       retailPrice,
       salePrice,
       images: images.length > 0 ? images : undefined,
+      category,
       success: true
     }
   } catch (error) {
@@ -479,7 +615,8 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
   }
 }
 
-async function scrapeOldNavy(url: string): Promise<ProductData> {
+// Unified scraper for Gap family brands (Gap, Old Navy, Banana Republic)
+async function scrapeGapFamily(url: string, brandName: string): Promise<ProductData> {
   try {
     const response = await fetch(url, {
       headers: {
@@ -494,55 +631,91 @@ async function scrapeOldNavy(url: string): Promise<ProductData> {
     const html = await response.text()
     const $ = cheerio.load(html)
 
-    // Extract title from h1 or page title
-    const title = cleanText($('h1[data-testid="product-title"]').text() ||
-                  $('title').text()?.replace(' | Old Navy', ''))
+    // Extract title from h1
+    const title = cleanText(
+      $('h1[data-testid="product-title"]').text() ||
+      $('h1.product-title').text() ||
+      $('title').text()?.split('|')[0]
+    )
 
-    // Parse brand and model from title
-    const brand = title?.split(' ')[0] || 'Old Navy'
-    const model = title?.replace(brand, '').trim() || title
+    // Extract breadcrumbs for better category detection
+    const breadcrumbs = cleanText($('[aria-label="breadcrumb"]').text() || $('.breadcrumb').text())
 
-    // Extract price - look for sale price first, then regular price
+    // Use brand name or parse from title
+    const brand = brandName
+    const model = title
+
+    // Detect category
+    const category = detectCategory(url, title, breadcrumbs)
+
+    // Extract SKU/Style number
+    const sku = cleanText(
+      $('[data-testid="style-number"]').text() ||
+      $('.style-number').text() ||
+      $('meta[name="product:retailer_item_id"]').attr('content') ||
+      ''
+    )
+
+    // Extract colorway
+    const colorway = cleanText(
+      $('[data-testid="product-color"]').text() ||
+      $('.product-color').text() ||
+      $('.color-name').text() ||
+      ''
+    )
+
+    // Extract prices
     let retailPrice: number | undefined
     let salePrice: number | undefined
 
-    const salePriceText = cleanText($('.current-sale-price').first().text())
+    const salePriceText = cleanText(
+      $('[data-testid="product-price-sale"]').text() ||
+      $('.current-sale-price').first().text() ||
+      $('.sale-price').first().text()
+    )
     if (salePriceText) {
       salePrice = extractPrice(salePriceText)
     }
 
-    const regularPriceText = cleanText($('.regular-price-strike-through').first().text() ||
-                            $('.current-regular-price').first().text())
+    const regularPriceText = cleanText(
+      $('[data-testid="product-price-regular"]').text() ||
+      $('.regular-price-strike-through').first().text() ||
+      $('.current-regular-price').first().text() ||
+      $('.regular-price').first().text()
+    )
     if (regularPriceText) {
       retailPrice = extractPrice(regularPriceText)
     }
 
-    // If we only have sale price, use it as retail
+    // If only sale price exists, use it as retail
     if (!retailPrice && salePrice) {
       retailPrice = salePrice
       salePrice = undefined
     }
 
-    // Extract images from preload links
+    // Extract images
     const images: string[] = []
+    const hostname = new URL(url).hostname
+
+    // Try preload links first
     $('link[rel="preload"][as="image"]').each((_, el) => {
       if (images.length >= 5) return false
       const href = $(el).attr('href')
       if (href && !href.includes('logo') && !href.includes('icon')) {
-        const fullUrl = href.startsWith('http') ? href : `https://oldnavy.gap.com${href}`
+        const fullUrl = href.startsWith('http') ? href : `https://${hostname}${href}`
         if (!images.includes(fullUrl)) {
           images.push(fullUrl)
         }
       }
     })
 
-    // Fallback: extract from image srcset attributes
+    // Fallback: product images
     if (images.length === 0) {
-      $('img[src*="webcontent"]').each((_, el) => {
+      $('img[src*="webcontent"], img[class*="product"], img[data-testid*="image"]').each((_, el) => {
         if (images.length >= 5) return false
         const src = $(el).attr('src')
         if (src && !images.includes(src)) {
-          const fullUrl = src.startsWith('http') ? src : `https://oldnavy.gap.com${src}`
+          const fullUrl = src.startsWith('http') ? src : `https://${hostname}${src}`
           images.push(fullUrl)
         }
       })
@@ -551,17 +724,314 @@ async function scrapeOldNavy(url: string): Promise<ProductData> {
     return {
       brand: brand || undefined,
       model: model || undefined,
-      colorway: undefined,
-      sku: undefined,
+      colorway: colorway || undefined,
+      sku: sku || undefined,
       retailPrice,
       salePrice,
       images: images.length > 0 ? images : undefined,
+      category,
       success: true
     }
   } catch (error) {
     return {
       success: false,
-      error: `Old Navy scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      error: `${brandName} scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+    }
+  }
+}
+
+async function scrapeNordstrom(url: string): Promise<ProductData> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const html = await response.text()
+    const $ = cheerio.load(html)
+
+    // Extract product title
+    const title = cleanText(
+      $('h1[data-testid="product-title"]').text() ||
+      $('h1.product-title').text() ||
+      $('h1').first().text()
+    )
+
+    // Extract brand from title or meta tag
+    const brand = cleanText(
+      $('meta[property="product:brand"]').attr('content') ||
+      $('[data-testid="brand-name"]').text() ||
+      title.split(' ')[0]
+    )
+
+    const model = title.replace(brand, '').trim()
+
+    // Extract breadcrumbs for category detection
+    const breadcrumbs = cleanText($('[aria-label="breadcrumb"]').text() || $('.breadcrumb').text())
+
+    // Detect category
+    const category = detectCategory(url, title, breadcrumbs)
+
+    // Extract colorway
+    const colorway = cleanText(
+      $('[data-testid="color-name"]').text() ||
+      $('.color-name').text() ||
+      $('meta[property="product:color"]').attr('content') ||
+      ''
+    )
+
+    // Extract SKU
+    const sku = cleanText(
+      $('[data-testid="style-number"]').text() ||
+      $('.style-number').text() ||
+      $('meta[property="product:retailer_item_id"]').attr('content') ||
+      ''
+    )
+
+    // Extract prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    const salePriceText = cleanText(
+      $('[data-testid="sale-price"]').text() ||
+      $('.sale-price').first().text()
+    )
+    if (salePriceText) {
+      salePrice = extractPrice(salePriceText)
+    }
+
+    const regularPriceText = cleanText(
+      $('[data-testid="regular-price"]').text() ||
+      $('.regular-price').first().text() ||
+      $('[class*="price"]').first().text()
+    )
+    if (regularPriceText) {
+      retailPrice = extractPrice(regularPriceText)
+    }
+
+    if (!retailPrice && salePrice) {
+      retailPrice = salePrice
+      salePrice = undefined
+    }
+
+    // Extract images
+    const images: string[] = []
+    $('img[data-testid*="product-image"], img[class*="product"], picture img').each((_, el) => {
+      if (images.length >= 5) return false
+      const src = $(el).attr('src') || $(el).attr('data-src')
+      if (src && !src.includes('logo') && !images.includes(src)) {
+        const fullUrl = src.startsWith('http') ? src : `https://nordstrom.com${src}`
+        images.push(fullUrl)
+      }
+    })
+
+    return {
+      brand: brand || undefined,
+      model: model || undefined,
+      colorway: colorway || undefined,
+      sku: sku || undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      category,
+      success: true
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Nordstrom scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+    }
+  }
+}
+
+async function scrapeStance(url: string): Promise<ProductData> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const html = await response.text()
+    const $ = cheerio.load(html)
+
+    const brand = 'Stance'
+
+    // Extract product title
+    const title = cleanText(
+      $('h1.product-name').text() ||
+      $('h1[data-testid="product-title"]').text() ||
+      $('h1').first().text()
+    )
+
+    const model = title
+
+    // Extract breadcrumbs for category detection
+    const breadcrumbs = cleanText($('.breadcrumb').text() || $('[aria-label="breadcrumb"]').text())
+
+    // Detect category (Stance mostly sells socks, underwear, accessories)
+    const category = detectCategory(url, title, breadcrumbs)
+
+    // Extract colorway
+    const colorway = cleanText(
+      $('.product-color').text() ||
+      $('[data-color]').attr('data-color') ||
+      ''
+    )
+
+    // Extract SKU
+    const sku = cleanText(
+      $('.product-sku').text() ||
+      $('[data-sku]').attr('data-sku') ||
+      ''
+    )
+
+    // Extract prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    const salePriceText = cleanText($('.sale-price').first().text())
+    if (salePriceText) {
+      salePrice = extractPrice(salePriceText)
+    }
+
+    const regularPriceText = cleanText(
+      $('.regular-price').first().text() ||
+      $('.price').first().text()
+    )
+    if (regularPriceText) {
+      retailPrice = extractPrice(regularPriceText)
+    }
+
+    if (!retailPrice && salePrice) {
+      retailPrice = salePrice
+      salePrice = undefined
+    }
+
+    // Extract images
+    const images: string[] = []
+    $('img[class*="product"], .product-image img, picture img').each((_, el) => {
+      if (images.length >= 5) return false
+      const src = $(el).attr('src') || $(el).attr('data-src')
+      if (src && !src.includes('logo') && !images.includes(src)) {
+        const fullUrl = src.startsWith('http') ? src : `https://stance.com${src}`
+        images.push(fullUrl)
+      }
+    })
+
+    return {
+      brand,
+      model: model || undefined,
+      colorway: colorway || undefined,
+      sku: sku || undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      category,
+      success: true
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Stance scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+    }
+  }
+}
+
+async function scrapeBEIS(url: string): Promise<ProductData> {
+  try {
+    // BEIS is a Shopify store - try .json endpoint first
+    let jsonUrl = url.split('?')[0]
+    if (!jsonUrl.endsWith('.json')) {
+      jsonUrl += '.json'
+    }
+
+    const response = await fetch(jsonUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+    const product = data.product
+
+    if (!product) {
+      throw new Error('No product data found')
+    }
+
+    const brand = 'BEIS'
+    const title = cleanText(product.title || '')
+    const model = title
+
+    // BEIS sells travel accessories (bags, luggage, etc.)
+    const category = detectCategory(url, title, product.product_type || '')
+
+    // Extract colorway from variant or title
+    let colorway = ''
+    if (product.variants?.[0]) {
+      colorway = cleanText(product.variants[0].title || product.variants[0].option1 || '')
+    }
+
+    // SKU from variant
+    const sku = product.variants?.[0]?.sku || ''
+
+    // Extract prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    if (product.variants && product.variants.length > 0) {
+      const variant = product.variants[0]
+      const price = parseFloat(variant.price)
+      const compareAtPrice = variant.compare_at_price ? parseFloat(variant.compare_at_price) : 0
+
+      if (compareAtPrice > 0 && compareAtPrice > price) {
+        retailPrice = compareAtPrice
+        salePrice = price
+      } else {
+        retailPrice = price
+      }
+    }
+
+    // Extract images
+    const images: string[] = []
+    if (product.images && Array.isArray(product.images)) {
+      product.images.slice(0, 5).forEach((img: any) => {
+        if (img.src) {
+          const imgUrl = img.src.startsWith('http') ? img.src : `https:${img.src}`
+          images.push(imgUrl)
+        }
+      })
+    }
+
+    return {
+      brand,
+      model: model || undefined,
+      colorway: colorway || undefined,
+      sku: sku || undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      category,
+      success: true
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `BEIS scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
     }
   }
 }
@@ -622,6 +1092,9 @@ async function scrapeGeneric(url: string): Promise<ProductData> {
       }
     })
 
+    // Detect category
+    const category = detectCategory(url, title, '')
+
     return {
       brand: brand || undefined,
       model: model || undefined,
@@ -630,6 +1103,7 @@ async function scrapeGeneric(url: string): Promise<ProductData> {
       retailPrice,
       salePrice,
       images: images.length > 0 ? images : undefined,
+      category,
       success: true
     }
   } catch (error) {
