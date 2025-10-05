@@ -1,3 +1,5 @@
+import type { ItemCategory, SizeType } from "./item-category";
+
 export interface ItemPhoto {
   id: string
   image_url: string
@@ -14,6 +16,8 @@ export interface SizingJournalEntry {
   brand: string
   model: string
   colorway: string
+  category: ItemCategory // NEW: Item category
+  size_type: SizeType // NEW: Size measurement type
   interaction_type: 'seen' | 'tried'
   size_tried: string | null
   fit_rating: number | null
@@ -27,10 +31,11 @@ export interface SizingJournalEntry {
   interested_in_buying: boolean
   image_url?: string
   cloudinary_id?: string
-  sneaker_photos?: ItemPhoto[]
-  in_collection?: boolean
-  wears?: number
-  last_worn_date?: string | null
+  sneaker_photos?: ItemPhoto[] // Note: Will work for all item types
+  in_collection?: boolean // Only for shoes
+  is_purchased?: boolean // NEW: For non-shoe items
+  wears?: number // Only for shoes
+  last_worn_date?: string | null // Only for shoes
   is_archived?: boolean
   archive_reason?: ArchiveReason | null
   archived_at?: string | null
