@@ -49,7 +49,17 @@ import { MultiPhotoUpload } from "@/components/multi-photo-upload";
 import { ImageConfirmationModal } from "@/components/image-confirmation-modal";
 import { BrandCombobox } from "@/components/brand-combobox";
 import { SizeCombobox } from "@/components/size-combobox";
+import { ClothingSizeCombobox } from "@/components/clothing-size-combobox";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+	CATEGORY_CONFIGS,
+	type ItemCategory,
+	getCategoryConfig,
+	isSizeRequired,
+	isComfortRequired,
+	getSizeType
+} from "@/components/types/item-category";
+import { detectCategoryFromUrl } from "@/lib/item-utils";
 
 interface PhotoItem {
 	id: string;
@@ -63,10 +73,13 @@ interface PhotoItem {
 const sneakerSchema = z
 	.object({
 		userName: z.enum(["Kenny", "Rene"], {
-			required_error: "Please select who is tracking this sneaker",
+			required_error: "Please select who is tracking this item",
 		}),
 		interactionType: z.enum(["seen", "tried"], {
-			required_error: "Please select whether you saw or tried on this sneaker",
+			required_error: "Please select whether you saw or tried on this item",
+		}),
+		category: z.enum(["shoes", "tops", "bottoms", "outerwear", "accessories", "jewelry", "watches"], {
+			required_error: "Please select the item category",
 		}),
 		// Smart Import fields
 		productUrl: z
@@ -180,8 +193,9 @@ const sneakerSchema = z
 	})
 	.refine(
 		(data) => {
-			// Size is required when tried on
-			if (data.interactionType === "tried") {
+			// Size is required for categories that require it AND when tried on
+			const categoryConfig = CATEGORY_CONFIGS[data.category];
+			if (categoryConfig?.requiresSize && data.interactionType === "tried") {
 				return data.sizeTried && data.sizeTried.length > 0;
 			}
 			return true;
@@ -194,8 +208,9 @@ const sneakerSchema = z
 	)
 	.refine(
 		(data) => {
-			// Comfort rating is required when tried on
-			if (data.interactionType === "tried") {
+			// Comfort rating is required for shoes when tried on
+			const categoryConfig = CATEGORY_CONFIGS[data.category];
+			if (categoryConfig?.requiresComfort && data.interactionType === "tried") {
 				return (
 					data.comfortRating !== undefined &&
 					data.comfortRating >= 1 &&
@@ -205,7 +220,7 @@ const sneakerSchema = z
 			return true;
 		},
 		{
-			message: "Please rate the comfort - how did they feel on your feet?",
+			message: "Please rate the comfort - how did they feel?",
 			path: ["comfortRating"],
 		}
 	)
@@ -288,6 +303,7 @@ export function RedesignedSneakerForm({
 	const watchedUser = watch("userName");
 	const watchedBrand = watch("brand");
 	const watchedInteractionType = watch("interactionType");
+	const watchedCategory = watch("category");
 	const watchedRetailPrice = watch("retailPrice");
 	const watchedSalePrice = watch("salePrice");
 
@@ -420,8 +436,9 @@ export function RedesignedSneakerForm({
 	const loadFitData = async () => {
 		try {
 			const { data, error } = await supabase
-				.from("sneakers")
+				.from("items")
 				.select("user_name, brand, size_tried, fit_rating")
+				.eq("category", "shoes") // Only load fit data for shoes
 				.eq("interaction_type", "tried")
 				.not("size_tried", "is", null)
 				.not("fit_rating", "is", null);
@@ -538,6 +555,17 @@ export function RedesignedSneakerForm({
 							.replace(/\s+/g, " ")
 							.trim()
 					: "";
+
+				// Auto-detect category from URL
+				const detectedCategory = detectCategoryFromUrl(url);
+				if (detectedCategory) {
+					console.log("✅ Auto-detected category:", detectedCategory);
+					setValue("category", detectedCategory, {
+						shouldValidate: true,
+						shouldDirty: true,
+						shouldTouch: true,
+					});
+				}
 
 				// Extract store name from URL
 				const storeName = new URL(url).hostname
@@ -883,6 +911,8 @@ export function RedesignedSneakerForm({
 				model: data.model,
 				colorway: data.colorway || "Standard",
 				sku: data.sku || null,
+				category: data.category, // NEW: Item category
+				size_type: getSizeType(data.category), // NEW: Size type based on category
 				// Only include try-on specific fields if actually tried on
 				size_tried: data.interactionType === "tried" ? data.sizeTried : null,
 				comfort_rating:
@@ -899,7 +929,7 @@ export function RedesignedSneakerForm({
 			};
 
 			const { data: insertedSneaker, error } = await supabase
-				.from("sneakers")
+				.from("items")
 				.insert(experienceData)
 				.select()
 				.single();
@@ -909,10 +939,10 @@ export function RedesignedSneakerForm({
 				throw error;
 			}
 
-			// Insert all photos into sneaker_photos table
+			// Insert all photos into item_photos table
 			if (uploadedPhotos.length > 0 && insertedSneaker) {
 				const photoRecords = uploadedPhotos.map((photo) => ({
-					sneaker_id: insertedSneaker.id,
+					item_id: insertedSneaker.id,
 					image_url: photo.url,
 					cloudinary_id: photo.cloudinaryId,
 					image_order: photo.order,
@@ -920,7 +950,7 @@ export function RedesignedSneakerForm({
 				}));
 
 				const { error: photosError } = await supabase
-					.from("sneaker_photos")
+					.from("item_photos")
 					.insert(photoRecords);
 
 				if (photosError) {
@@ -938,15 +968,16 @@ export function RedesignedSneakerForm({
 				}
 			}
 
-			// Show success toast with sneaker context
-			const sneakerName = `${data.brand} ${data.model}`;
-			toast.success(`${sneakerName} added!`, {
+			// Show success toast with item context
+			const itemName = `${data.brand} ${data.model}`;
+			const categoryLabel = getCategoryConfig(data.category)?.label || "Item";
+			toast.success(`${itemName} added!`, {
 				description:
 					data.interactionType === "tried"
-						? "Try-on experience saved to your journal"
+						? `Try-on experience saved for this ${categoryLabel.toLowerCase()}`
 						: data.productUrl
 						? "Added with price monitoring enabled"
-						: "Added to your collection",
+						: `${categoryLabel} added to your watchlist`,
 				duration: 5000, // Persist during redirect and on dashboard
 			});
 
@@ -989,12 +1020,12 @@ export function RedesignedSneakerForm({
 					<CardTitle
 						className='text-3xl flex flex-col justify-start'
 						style={{ color: "var(--color-black)" }}>
-						<p className='-mb-2'> Track Your Sneakers</p>
+						<p className='-mb-2'> Track Your Items</p>
 
 						<p
 							className='text-sm'
 							style={{ color: "var(--color-text-secondary)" }}>
-							Import from URL or add manually
+							Shoes, clothing, accessories & more
 						</p>
 					</CardTitle>
 				</CardHeader>
@@ -1056,8 +1087,8 @@ export function RedesignedSneakerForm({
 					<form
 						onSubmit={handleSubmit(onSubmit)}
 						className='space-y-[var(--space-lg)]'>
-						{/* User and Experience Dropdowns - Required First */}
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-[var(--space-base)] pb-[var(--space-base)]'>
+						{/* User, Experience, and Category Dropdowns - Required First */}
+						<div className='grid grid-cols-1 md:grid-cols-3 gap-[var(--space-base)] pb-[var(--space-base)]'>
 							<div>
 								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]'>
 									{/* <User className='h-3 w-3 text-blue-600' /> */}
@@ -1146,10 +1177,53 @@ export function RedesignedSneakerForm({
 									</div>
 								)}
 							</div>
+
+							{/* Category Selector */}
+							<div>
+								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]'>
+									<span>Item Category</span>
+									<span className='text-red-500 -ml-1'>*</span>
+								</Label>
+								<Select
+									onValueChange={(value: ItemCategory) =>
+										setValue("category", value)
+									}
+									value={watchedCategory}>
+									<SelectTrigger className='h-4 mt-[var(--space-md)] max-w-sm'>
+										<SelectValue placeholder='Select category' />
+									</SelectTrigger>
+									<SelectContent>
+										{Object.values(CATEGORY_CONFIGS).map((config) => {
+											const IconComponent = config.icon;
+											return (
+												<SelectItem key={config.id} value={config.id}>
+													<div className='flex items-center gap-[var(--space-md)]'>
+														<IconComponent className='h-2 w-2' />
+														<span>{config.label}</span>
+													</div>
+												</SelectItem>
+											);
+										})}
+									</SelectContent>
+								</Select>
+								{errors.category && (
+									<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]'>
+										<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
+										<div>
+											<p className='text-xs font-semibold text-red-700'>
+												{errors.category.message}
+											</p>
+											<p className='text-xs text-red-600 mt-0.5'>
+												Select the type of item you're tracking
+											</p>
+										</div>
+									</div>
+								)}
+							</div>
 						</div>
 
 						{/* Smart Import Section - Expanded by Default */}
-						{watchedUser && watchedInteractionType && (
+						{watchedUser && watchedInteractionType && watchedCategory && (
 							<>
 								<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border-2 border-blue-200'>
 									<button
@@ -1572,40 +1646,60 @@ export function RedesignedSneakerForm({
 										</h4>
 
 										<div className='flex justify-between gap-x-12 '>
-											{/* Size Selection */}
-											<div className='mb-4 mt-4 w-full'>
-												<Label className='text-sm font-medium text-gray-700'>
-													<span>Size Tried</span>{" "}
-													<span className='text-red-500'>*</span>
-												</Label>
-												<div className='mt-[var(--space-md)] max-w-sm'>
-													<SizeCombobox
-														value={watch("sizeTried")}
-														onChange={(value) =>
-															setValue("sizeTried", value, {
-																shouldValidate: true,
-																shouldDirty: true,
-																shouldTouch: true,
-															})
-														}
-														disabled={isLoading}
-														preferredSize={sizePreferences[watchedBrand]}
-													/>
-												</div>
-												{errors.sizeTried && (
-													<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]'>
-														<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
-														<div>
-															<p className='text-xs font-semibold text-red-700'>
-																{errors.sizeTried.message}
-															</p>
-															<p className='text-xs text-red-600 mt-0.5'>
-																Select the US Men's size you tried on
-															</p>
-														</div>
+											{/* Size Selection - Conditional based on category */}
+											{isSizeRequired(watchedCategory) && (
+												<div className='mb-4 mt-4 w-full'>
+													<Label className='text-sm font-medium text-gray-700'>
+														<span>
+															{getCategoryConfig(watchedCategory)?.sizeLabel || "Size Tried"}
+														</span>{" "}
+														<span className='text-red-500'>*</span>
+													</Label>
+													<div className='mt-[var(--space-md)] max-w-sm'>
+														{watchedCategory === "shoes" ? (
+															<SizeCombobox
+																value={watch("sizeTried")}
+																onChange={(value) =>
+																	setValue("sizeTried", value, {
+																		shouldValidate: true,
+																		shouldDirty: true,
+																		shouldTouch: true,
+																	})
+																}
+																disabled={isLoading}
+																preferredSize={sizePreferences[watchedBrand]}
+															/>
+														) : (
+															<ClothingSizeCombobox
+																value={watch("sizeTried")}
+																onChange={(value) =>
+																	setValue("sizeTried", value, {
+																		shouldValidate: true,
+																		shouldDirty: true,
+																		shouldTouch: true,
+																	})
+																}
+																disabled={isLoading}
+															/>
+														)}
 													</div>
-												)}
-											</div>
+													{errors.sizeTried && (
+														<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]'>
+															<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
+															<div>
+																<p className='text-xs font-semibold text-red-700'>
+																	{errors.sizeTried.message}
+																</p>
+																<p className='text-xs text-red-600 mt-0.5'>
+																	{watchedCategory === "shoes"
+																		? "Select the shoe size you tried on"
+																		: "Select the clothing size you tried on"}
+																</p>
+															</div>
+														</div>
+													)}
+												</div>
+											)}
 
 											{/* Fit Rating */}
 											{/*<div className="mt-8">
@@ -1676,12 +1770,13 @@ export function RedesignedSneakerForm({
 													)}
 												</div>*/}
 
-											{/* Comfort Rating (Required) */}
-											<div className='mt-4 '>
-												<Label className='text-sm font-medium text-gray-700 '>
-													<span>How comfortable were they?</span>{" "}
-													<span className='text-red-500'>*</span>
-												</Label>
+											{/* Comfort Rating (Required for shoes only) */}
+											{isComfortRequired(watchedCategory) && (
+												<div className='mt-4 '>
+													<Label className='text-sm font-medium text-gray-700 '>
+														<span>How comfortable were they?</span>{" "}
+														<span className='text-red-500'>*</span>
+													</Label>
 
 												<div className='flex items-center gap-[var(--space-xs)] '>
 													{[1, 2, 3, 4, 5].map((rating) => (
@@ -1755,6 +1850,7 @@ export function RedesignedSneakerForm({
 													breathability
 												</p>
 											</div>
+											)}
 										</div>
 									</div>
 								)}
@@ -1785,10 +1881,10 @@ export function RedesignedSneakerForm({
 										disabled={isLoading || !isValid || photos.length === 0}
 										aria-label={
 											isLoading
-												? "Saving sneaker data"
+												? "Saving item data"
 												: watchedInteractionType === "tried"
 												? "Save try-on experience"
-												: "Add sneaker to collection"
+												: "Add item to watchlist"
 										}
 										aria-busy={isLoading}>
 										{isLoading ? (
@@ -1808,8 +1904,8 @@ export function RedesignedSneakerForm({
 													</>
 												) : (
 													<>
-														
-														Add
+
+														Add to Watchlist
 													</>
 												)}
 											</>
