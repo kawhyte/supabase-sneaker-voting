@@ -56,7 +56,7 @@ export default function TestFeaturesPage() {
       const result = await response.json()
       setCronTestResult(result.success ? 'Cron scheduling working! ✅' : `Cron test failed: ${result.error}`)
     } catch (error) {
-      setCronTestResult(`Cron test error: ${error.message}`)
+      setCronTestResult(`Cron test error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 

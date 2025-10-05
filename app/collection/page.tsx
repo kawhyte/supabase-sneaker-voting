@@ -5,20 +5,21 @@ import { SizingJournalEntry, ArchiveReason } from '@/components/types/sizing-jou
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ArchiveReasonDialog } from '@/components/archive-reason-dialog'
+import { EditSneakerModal } from '@/components/edit-sneaker-modal'
 import { Plus, Package, Archive } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function CollectionPage() {
   const supabase = createClient()
-  const router = useRouter()
   const [collectionSneakers, setCollectionSneakers] = useState<SizingJournalEntry[]>([])
   const [archivedSneakers, setArchivedSneakers] = useState<SizingJournalEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false)
   const [sneakerToArchive, setSneakerToArchive] = useState<SizingJournalEntry | null>(null)
+  const [editingEntry, setEditingEntry] = useState<SizingJournalEntry | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   // Fetch collection data
   useEffect(() => {
@@ -132,7 +133,18 @@ export default function CollectionPage() {
   }
 
   const handleEdit = (entry: SizingJournalEntry) => {
-    router.push(`/edit/${entry.id}`)
+    setEditingEntry(entry)
+    setIsEditModalOpen(true)
+  }
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false)
+    setEditingEntry(null)
+  }
+
+  const handleSaveEdit = () => {
+    fetchCollection()
+    fetchArchived()
   }
 
   const handleDelete = async (entry: SizingJournalEntry) => {
@@ -441,6 +453,16 @@ export default function CollectionPage() {
             onOpenChange={setArchiveDialogOpen}
             onConfirm={handleArchiveConfirm}
             sneakerName={`${sneakerToArchive.brand} ${sneakerToArchive.model}`}
+          />
+        )}
+
+        {/* Edit Modal */}
+        {editingEntry && (
+          <EditSneakerModal
+            experience={editingEntry}
+            isOpen={isEditModalOpen}
+            onClose={handleCloseEditModal}
+            onSave={handleSaveEdit}
           />
         )}
       </div>

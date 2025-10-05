@@ -487,7 +487,7 @@ export function RedesignedSneakerForm({
 	};
 
 	// URL scraping function with retry logic
-	const handleUrlScrape = async (url: string, retryCount: number = 0) => {
+	const handleUrlScrape = async (url: string, retryCount: number = 0): Promise<void> => {
 		if (!url.trim()) return;
 
 		const maxRetries = 2;

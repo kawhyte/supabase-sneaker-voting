@@ -133,7 +133,7 @@ export function EnhancedProductDetails({ productId, onBack, onComplete }: Enhanc
 
     } catch (error) {
       console.error('Error saving sizes:', error)
-      alert(`Failed to save sizes: ${error.message || 'Unknown error'}`)
+      alert(`Failed to save sizes: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsLoading(false)
     }

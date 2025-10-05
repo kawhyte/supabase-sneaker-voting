@@ -313,7 +313,7 @@ function DashboardHeader() {
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">
       <div>
         <h1 className="text-3xl font-bold"> Personal Pricing Watchlist</h1>
-        <p className="text-gray-600">Track your. pricing sizing, fit, and comfort across brands</p>
+        <p className="text-gray-600">Track your pricing sizing, fit, and comfort across brands</p>
       </div>
     </div>
   )

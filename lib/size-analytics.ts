@@ -162,7 +162,7 @@ export function generateFitInsights(userData: FitData[], userName: string): FitI
   const brandComparisons = analyzeBrandComparisons(userData, userName)
 
   // Generate size recommendations for each brand
-  const brands = [...new Set(userData.map(d => d.brand))]
+  const brands = Array.from(new Set(userData.map(d => d.brand)))
   const sizeRecommendations: Record<string, SizeRecommendation> = {}
 
   brands.forEach(brand => {

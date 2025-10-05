@@ -164,7 +164,7 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
       setSuccessMessage('')
       setUploadProgress('')
       // Show user-friendly error message
-      alert(`Failed to save product: ${error.message || 'Unknown error'}`)
+      alert(`Failed to save product: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsLoading(false)
     }

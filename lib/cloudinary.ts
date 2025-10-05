@@ -61,7 +61,7 @@ export async function uploadToCloudinary(
     }
   } catch (error) {
     console.error('Cloudinary upload error:', error)
-    throw new Error(`Failed to upload image: ${error.message || 'Unknown error'}`)
+    throw new Error(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 
@@ -91,7 +91,7 @@ export async function deleteFromCloudinary(publicId: string): Promise<void> {
     await cloudinary.uploader.destroy(publicId)
   } catch (error) {
     console.error('Cloudinary delete error:', error)
-    throw new Error(`Failed to delete image: ${error.message || 'Unknown error'}`)
+    throw new Error(`Failed to delete image: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 

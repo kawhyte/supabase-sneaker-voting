@@ -47,6 +47,11 @@ const sneakerSchema = z.object({
   // Try-on specific (conditional)
   sizeTried: z.string().optional(),
   comfortRating: z.coerce.number().min(1).max(5).optional(),
+  storeName: z.string()
+    .max(100, 'Store name must be less than 100 characters')
+    .trim()
+    .optional()
+    .or(z.literal('')),
   // General fields
   retailPrice: z.string()
     .regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 170 or 170.00)')

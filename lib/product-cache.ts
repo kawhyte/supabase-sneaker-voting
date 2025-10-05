@@ -75,7 +75,7 @@ class ProductCache {
   }
 
   clearByStore(storeId: string): void {
-    for (const [key, cached] of this.cache.entries()) {
+    for (const [key, cached] of Array.from(this.cache.entries())) {
       if (cached.storeId === storeId) {
         this.cache.delete(key)
       }
@@ -84,7 +84,7 @@ class ProductCache {
 
   private cleanup(): void {
     const now = Date.now()
-    for (const [key, cached] of this.cache.entries()) {
+    for (const [key, cached] of Array.from(this.cache.entries())) {
       if (now - cached.timestamp > this.CACHE_DURATION) {
         this.cache.delete(key)
       }
