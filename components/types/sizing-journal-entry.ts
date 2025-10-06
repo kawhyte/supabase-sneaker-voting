@@ -31,7 +31,7 @@ export interface SizingJournalEntry {
   interested_in_buying: boolean
   image_url?: string
   cloudinary_id?: string
-  sneaker_photos?: ItemPhoto[] // Note: Will work for all item types
+  item_photos?: ItemPhoto[] // Photos for all item types
   in_collection?: boolean // Only for shoes
   is_purchased?: boolean // NEW: For non-shoe items
   wears?: number // Only for shoes

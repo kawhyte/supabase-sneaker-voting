@@ -437,11 +437,11 @@ export function RedesignedSneakerForm({
 		try {
 			const { data, error } = await supabase
 				.from("items")
-				.select("user_name, brand, size_tried, fit_rating")
+				.select("user_name, brand, size_tried, comfort_rating")
 				.eq("category", "shoes") // Only load fit data for shoes
 				.eq("interaction_type", "tried")
 				.not("size_tried", "is", null)
-				.not("fit_rating", "is", null);
+				.not("comfort_rating", "is", null);
 
 			if (error) {
 				// Silently handle error - fit recommendations are optional feature
@@ -460,7 +460,7 @@ export function RedesignedSneakerForm({
 			// Transform to FitData format with frequency calculation
 			const transformedData: FitData[] = [];
 			const groupedData = data.reduce((acc, item) => {
-				const key = `${item.user_name}-${item.brand}-${item.size_tried}-${item.fit_rating}`;
+				const key = `${item.user_name}-${item.brand}-${item.size_tried}-${item.comfort_rating}`;
 				if (!acc[key]) {
 					acc[key] = { ...item, frequency: 0 };
 				}
@@ -473,7 +473,7 @@ export function RedesignedSneakerForm({
 					user_name: item.user_name,
 					brand: item.brand,
 					size_tried: item.size_tried,
-					fit_rating: item.fit_rating,
+					fit_rating: item.comfort_rating, // Map comfort_rating to fit_rating for compatibility
 					frequency: item.frequency,
 				});
 			});
@@ -556,15 +556,19 @@ export function RedesignedSneakerForm({
 							.trim()
 					: "";
 
-				// Auto-detect category from URL
-				const detectedCategory = detectCategoryFromUrl(url);
-				if (detectedCategory) {
-					console.log("✅ Auto-detected category:", detectedCategory);
-					setValue("category", detectedCategory, {
-						shouldValidate: true,
-						shouldDirty: true,
-						shouldTouch: true,
-					});
+				// Auto-detect category from URL (only if user hasn't selected one yet)
+				if (!watchedCategory) {
+					const detectedCategory = detectCategoryFromUrl(url);
+					if (detectedCategory) {
+						console.log("✅ Auto-detected category:", detectedCategory);
+						setValue("category", detectedCategory, {
+							shouldValidate: true,
+							shouldDirty: true,
+							shouldTouch: true,
+						});
+					}
+				} else {
+					console.log("ℹ️ User already selected category:", watchedCategory, "- skipping auto-detection");
 				}
 
 				// Extract store name from URL
@@ -755,13 +759,20 @@ export function RedesignedSneakerForm({
 		try {
 			const photoItems: PhotoItem[] = [];
 
-			// Convert each URL to a File object
+			// Convert each URL to a File object via proxy
 			for (let i = 0; i < selectedImages.length; i++) {
 				const imageUrl = selectedImages[i];
 
 				try {
-					// Fetch the image
-					const response = await fetch(imageUrl);
+					// Fetch the image via proxy API to avoid CORS issues
+					const response = await fetch("/api/proxy-image", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ imageUrl }),
+					});
+
 					if (!response.ok) throw new Error(`Failed to fetch image ${i + 1}`);
 
 					// Get the blob
@@ -926,6 +937,10 @@ export function RedesignedSneakerForm({
 				try_on_date: new Date().toISOString().split("T")[0],
 				image_url: mainImageUrl,
 				cloudinary_id: mainCloudinaryId,
+				// Explicitly set wears to null (only shoes can have wears tracking)
+				wears: null,
+				// Explicitly set in_collection to false (only shoes can be in collection)
+				in_collection: false,
 			};
 
 			const { data: insertedSneaker, error } = await supabase
@@ -941,6 +956,7 @@ export function RedesignedSneakerForm({
 
 			// Insert all photos into item_photos table
 			if (uploadedPhotos.length > 0 && insertedSneaker) {
+				console.log('📸 Saving', uploadedPhotos.length, 'photos to item_photos table...');
 				const photoRecords = uploadedPhotos.map((photo) => ({
 					item_id: insertedSneaker.id,
 					image_url: photo.url,
@@ -949,14 +965,25 @@ export function RedesignedSneakerForm({
 					is_main_image: photo.isMain,
 				}));
 
-				const { error: photosError } = await supabase
+				console.log('📸 Photo records to insert:', photoRecords);
+
+				const { data: insertedPhotos, error: photosError } = await supabase
 					.from("item_photos")
-					.insert(photoRecords);
+					.insert(photoRecords)
+					.select();
 
 				if (photosError) {
-					console.warn("Failed to save photos:", photosError);
-					// Don't throw - sneaker is already saved
+					console.error("❌ Failed to save photos:", photosError);
+					console.error("❌ Full error details:", JSON.stringify(photosError, null, 2));
+					toast.error('Photos uploaded but failed to link to item', {
+						description: photosError.message || 'Unknown error - check console',
+						duration: 5000
+					});
+				} else {
+					console.log('✅ Successfully saved', insertedPhotos?.length, 'photos to database');
 				}
+			} else {
+				console.log('⚠️ No photos to save. uploadedPhotos.length:', uploadedPhotos.length, 'insertedSneaker:', !!insertedSneaker);
 			}
 
 			// Create price monitor if URL provided
@@ -1255,7 +1282,7 @@ export function RedesignedSneakerForm({
 													<Input
 														{...register("productUrl")}
 														placeholder='https://www.nike.com/t/...'
-														className='flex-1 h-8'
+														className='flex-1 h-4'
 														disabled={isScrapingUrl}
 														aria-label='Product URL'
 														aria-describedby='url-help-text'
@@ -1280,7 +1307,7 @@ export function RedesignedSneakerForm({
 																aria-hidden='true'
 															/>
 														) : (
-															<Link className='h-3 w-3' aria-hidden='true' />
+															""
 														)}
 														<span className='ml-2'>
 															{isScrapingUrl ? "Loading..." : "Import"}
@@ -1393,7 +1420,7 @@ export function RedesignedSneakerForm({
 										{/* Model */}
 										<div>
 											<Label className='text-sm font-medium text-gray-700'>
-												<span>Model</span>{" "}
+												<span>Item Name</span>{" "}
 												<span className='text-red-500'>*</span>
 											</Label>
 											<Input
@@ -1467,7 +1494,7 @@ export function RedesignedSneakerForm({
 
 										<div>
 											<Label className='text-sm text-gray-600'>
-												Colorway (Optional)
+												Color (Optional)
 											</Label>
 											<Input
 												{...register("colorway")}

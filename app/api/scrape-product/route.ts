@@ -917,16 +917,42 @@ async function scrapeStance(url: string): Promise<ProductData> {
       salePrice = undefined
     }
 
-    // Extract images
+    // Extract images from primary-images div
     const images: string[] = []
-    $('img[class*="product"], .product-image img, picture img').each((_, el) => {
+
+    // First try to get images from primary-images div (main product images)
+    $('.primary-images img, .primary-images source').each((_, el) => {
       if (images.length >= 5) return false
-      const src = $(el).attr('src') || $(el).attr('data-src')
-      if (src && !src.includes('logo') && !images.includes(src)) {
+
+      // Try multiple image attributes (src, data-src, srcset, data-srcset)
+      const src = $(el).attr('data-src') || $(el).attr('src')
+      const srcset = $(el).attr('data-srcset') || $(el).attr('srcset')
+
+      // If srcset exists, extract the highest quality image
+      if (srcset) {
+        const srcsetUrls = srcset.split(',').map(s => s.trim().split(' ')[0])
+        const highestQualityUrl = srcsetUrls[srcsetUrls.length - 1]
+        if (highestQualityUrl && !images.includes(highestQualityUrl)) {
+          const fullUrl = highestQualityUrl.startsWith('http') ? highestQualityUrl : `https://stance.com${highestQualityUrl}`
+          images.push(fullUrl)
+        }
+      } else if (src && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
         const fullUrl = src.startsWith('http') ? src : `https://stance.com${src}`
         images.push(fullUrl)
       }
     })
+
+    // Fallback: try other product image selectors if primary-images didn't yield results
+    if (images.length === 0) {
+      $('img[class*="product"], .product-image img, picture img').each((_, el) => {
+        if (images.length >= 5) return false
+        const src = $(el).attr('data-src') || $(el).attr('src')
+        if (src && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
+          const fullUrl = src.startsWith('http') ? src : `https://stance.com${src}`
+          images.push(fullUrl)
+        }
+      })
+    }
 
     return {
       brand,

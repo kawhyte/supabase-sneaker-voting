@@ -240,9 +240,9 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         notes: experience.notes || ''
       })
 
-      // Load existing photos from sneaker_photos
-      if (experience.sneaker_photos && experience.sneaker_photos.length > 0) {
-        setExistingPhotos(experience.sneaker_photos)
+      // Load existing photos from item_photos
+      if (experience.item_photos && experience.item_photos.length > 0) {
+        setExistingPhotos(experience.item_photos)
       } else {
         setExistingPhotos([])
       }
@@ -340,7 +340,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
       // Delete photos marked for deletion from Cloudinary and DB
       if (photosToDelete.length > 0) {
         for (const photoId of photosToDelete) {
-          const photoToDelete = experience.sneaker_photos?.find((p: any) => p.id === photoId)
+          const photoToDelete = experience.item_photos?.find((p: any) => p.id === photoId)
 
           // Delete from Cloudinary if cloudinary_id exists
           if (photoToDelete?.cloudinary_id) {
@@ -557,7 +557,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                 <div className="space-y-[var(--space-base)]">
                   {/* Model */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Model <span className="text-red-500">*</span></Label>
+                    <Label className="text-sm font-medium text-gray-700">Item Name <span className="text-red-500">*</span></Label>
                     <Input
                       {...register("model")}
                       placeholder="Air Jordan 1, Air Max 90, etc."
@@ -607,7 +607,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
 
                   {/* Colorway */}
                   <div>
-                    <Label className="text-sm text-gray-600">Colorway (Optional)</Label>
+                    <Label className="text-sm text-gray-600">Color (Optional)</Label>
                     <Input
                       {...register("colorway")}
                       placeholder="Bred, Chicago, etc."

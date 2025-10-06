@@ -723,7 +723,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
 
               {/* Model */}
               <div>
-                <Label className="text-sm font-medium text-gray-700">Model</Label>
+                <Label className="text-sm font-medium text-gray-700">Item Name</Label>
                 <Input
                   {...register('model')}
                   placeholder="Air Jordan 1, Air Max 90, etc."
@@ -862,7 +862,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
               <div className="border-t pt-4">
                 <div className="grid grid-cols-2 gap-[var(--space-base)]">
                   <div>
-                    <Label className="text-sm text-gray-600">Colorway (Optional)</Label>
+                    <Label className="text-sm text-gray-600">Color (Optional)</Label>
                     <Input {...register('colorway')} placeholder="Bred, Chicago, etc." className="mt-[var(--space-xs)]" />
                   </div>
                   <div>

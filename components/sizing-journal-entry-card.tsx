@@ -30,7 +30,8 @@ import {
 	Minus,
 	Archive,
 	ArchiveRestore,
-	ShoppingBag
+	ShoppingBag,
+	BadgeCentIcon
 } from "lucide-react";
 import { PhotoCarousel } from "./photo-carousel";
 import {
@@ -230,7 +231,7 @@ export function SizingJournalEntryCard({
 				</div>
 
 				{/* Category Badge */}
-				{categoryConfig && (
+				{/* {categoryConfig && (
 					<div
 						className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
 						style={{
@@ -242,12 +243,12 @@ export function SizingJournalEntryCard({
 						<categoryConfig.icon className='h-2 w-2' />
 						{categoryConfig.label}
 					</div>
-				)}
+				)} */}
 
 				{/* In Collection / Purchased Badge - Only show in journal view when applicable */}
 				{viewMode === 'journal' && (isShoe ? entry.in_collection : entry.is_purchased) && (
 					<div
-						className='absolute top-11 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
+						className='absolute  top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
 						style={{
 							backgroundColor: isShoe ? 'var(--color-primary-500)' : 'var(--color-green-500)',
 							color: 'var(--color-black)',
@@ -514,12 +515,36 @@ export function SizingJournalEntryCard({
 							{entry.user_name}
 						</Badge>
 
+
+				
+
 						{/* Tried On/Not Tried Badge - Only show in journal view */}
 						{viewMode === 'journal' && (
-							<span className={isTried ? "badge-tried" : "badge-not-tried"}>
+							<Badge
+							
+								variant='outline'
+									
+							className={isTried ? "badge-tried" : "badge-not-tried"}>
 								{isTried ? "Tried On" : "Didnt Try"}
-							</span>
+							</Badge>
 						)}
+
+						{categoryConfig && (
+					<Badge
+					
+						variant='outline'
+									className='text-[11px] sm:text-xs'
+						
+						style={{
+							backgroundColor: categoryConfig.bgColor,
+							borderColor: categoryConfig.borderColor,
+							color: categoryConfig.textColor,
+							border: '1px solid',
+						}}>
+						<categoryConfig.icon className='h-2 w-2 mr-1' />
+						{categoryConfig.label}
+					</Badge>
+				)}
 
 						{/* Archive Metadata - Only show in archive view */}
 						{viewMode === 'archive' && entry.archive_reason && (
@@ -604,8 +629,8 @@ function calculateCostPerWear(
 }
 
 function preparePhotos(entry: SizingJournalEntry): ItemPhoto[] {
-	if (entry.sneaker_photos && entry.sneaker_photos.length > 0) {
-		return entry.sneaker_photos;
+	if (entry.item_photos && entry.item_photos.length > 0) {
+		return entry.item_photos;
 	}
 
 	if (entry.image_url) {

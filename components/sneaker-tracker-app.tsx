@@ -63,7 +63,7 @@ export function SneakerTrackerApp() {
                 >
                   <Zap className="h-4 w-4" />
                 </motion.div>
-                Add Sneaker
+                Add Item
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-teal-400/20 opacity-0 group-hover:opacity-100"
                   initial={{ x: -100 }}

@@ -6,6 +6,27 @@ import { Button } from '@/components/ui/button'
 import { CheckCircle, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+// Helper function to determine if we should use crossOrigin for an image
+// Only use crossOrigin for domains that support CORS (like Cloudinary)
+// External retailer images often block CORS requests
+function shouldUseCrossOrigin(imageUrl: string): boolean {
+  try {
+    const url = new URL(imageUrl)
+    const hostname = url.hostname.toLowerCase()
+
+    // Only use crossOrigin for domains we control or know support CORS
+    const corsSupportedDomains = [
+      'res.cloudinary.com',
+      'images.unsplash.com',
+      'localhost',
+    ]
+
+    return corsSupportedDomains.some(domain => hostname.includes(domain))
+  } catch {
+    return false
+  }
+}
+
 interface ImageConfirmationModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -81,10 +102,16 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
                   src={image}
                   alt={`Product ${index + 1}`}
                   className="w-full h-40 object-cover"
-                  crossOrigin="anonymous"
+                  {...(shouldUseCrossOrigin(image) ? { crossOrigin: "anonymous" as const } : {})}
                   onError={(e) => {
                     console.error('Image failed to load:', image)
-                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3EImage unavailable%3C/text%3E%3C/svg%3E'
+                    // Try removing crossOrigin on error and retry once
+                    if (e.currentTarget.crossOrigin) {
+                      e.currentTarget.crossOrigin = ''
+                      e.currentTarget.src = image
+                    } else {
+                      e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3EImage unavailable%3C/text%3E%3C/svg%3E'
+                    }
                   }}
                 />
 

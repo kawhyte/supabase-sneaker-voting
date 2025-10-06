@@ -60,6 +60,7 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: Siz
           )
         `)
         .eq('is_archived', false)
+        .order('image_order', { foreignTable: 'item_photos', ascending: true })
 
       // Filter based on view mode
       if (viewMode === 'purchased') {

@@ -14,7 +14,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/add-new-item', label: 'Add Sneaker' },
+    { href: '/add-new-item', label: 'Add New Item' },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/collection', label: 'Collection' },
   ]
