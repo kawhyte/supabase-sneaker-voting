@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import * as cheerio from 'cheerio'
 import { ItemCategory } from '@/components/types/item-category'
+import { fetchWithBrowserCached, isBrowserlessAvailable } from '@/lib/browserless'
 
 interface ProductData {
   brand?: string
@@ -16,7 +17,9 @@ interface ProductData {
 }
 
 // Helper function to clean text
-function cleanText(text: string): string {
+function cleanText(text: string | undefined | null): string {
+  if (!text) return ''
+
   return text
     .replace(/[\n\t\r]/g, ' ')  // Replace newlines and tabs with spaces
     .replace(/\s+/g, ' ')        // Replace multiple spaces with single space
@@ -130,6 +133,182 @@ function detectCategory(url: string, title: string, breadcrumbs: string = ''): I
   return 'accessories'
 }
 
+// Helper to retry scraping with Browserless if initial attempt fails
+async function scrapeWithFallback(
+  url: string,
+  scraperFn: (url: string) => Promise<ProductData>,
+  siteName: string
+): Promise<ProductData> {
+  // First attempt: Regular fetch + cheerio
+  console.log(`📡 Attempting cheerio scrape for ${siteName}...`)
+  const firstAttempt = await scraperFn(url)
+
+  // If successful, return immediately
+  if (firstAttempt.success && firstAttempt.brand && firstAttempt.retailPrice) {
+    console.log(`✅ Cheerio scrape successful for ${siteName}`)
+    return firstAttempt
+  }
+
+  // If cheerio failed and Browserless is available, try with browser automation
+  if (!isBrowserlessAvailable()) {
+    console.log(`⚠️ Cheerio failed for ${siteName} and Browserless not configured`)
+    return {
+      ...firstAttempt,
+      error: firstAttempt.error
+        ? `${firstAttempt.error} Browserless is not configured. Add BROWSERLESS_API_KEY to enable browser automation for dynamic sites.`
+        : 'Scraping failed and Browserless is not configured.'
+    }
+  }
+
+  // Try with Browserless
+  console.log(`🌐 Cheerio failed for ${siteName}, attempting Browserless fallback...`)
+
+  try {
+    const browserResult = await fetchWithBrowserCached(url)
+
+    if (!browserResult.success || !browserResult.html) {
+      return {
+        success: false,
+        error: `Both cheerio and Browserless failed. ${browserResult.error || 'Unknown error'}`
+      }
+    }
+
+    // Parse the browser-rendered HTML with cheerio
+    console.log(`🔍 Parsing Browserless HTML for ${siteName}...`)
+    const $ = cheerio.load(browserResult.html)
+
+    // Re-run the scraper logic with the browser-rendered HTML
+    // Extract data using generic selectors from browser-rendered content
+    const productData = extractProductDataFromHtml($, url, siteName)
+
+    if (productData.success) {
+      console.log(`✅ Browserless scrape successful for ${siteName}`)
+    }
+
+    return productData
+
+  } catch (browserError) {
+    console.error(`❌ Browserless error for ${siteName}:`, browserError)
+    return {
+      success: false,
+      error: `Browserless automation failed: ${browserError instanceof Error ? browserError.message : 'Unknown error'}`
+    }
+  }
+}
+
+// Extract product data from cheerio instance (works with both regular and Browserless HTML)
+function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: string): ProductData {
+  try {
+    // Extract title
+    const title = cleanText(
+      $('h1').first().text() ||
+      $('meta[property="og:title"]').attr('content') ||
+      $('meta[name="twitter:title"]').attr('content') ||
+      $('.product-title, [class*="product-title"], [class*="productTitle"]').first().text()
+    )
+
+    if (!title) {
+      return {
+        success: false,
+        error: `Could not extract product title from ${siteName} even with browser automation. The page structure may have changed.`
+      }
+    }
+
+    // Extract brand (first word of title or from meta)
+    const brand = cleanText(
+      $('meta[property="product:brand"]').attr('content') ||
+      title.split(' ')[0]
+    )
+
+    // Extract prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    // Try JSON-LD first
+    const jsonLdScript = $('script[type="application/ld+json"]').html()
+    if (jsonLdScript) {
+      try {
+        const jsonLd = JSON.parse(jsonLdScript)
+        if (jsonLd.offers) {
+          const offers = Array.isArray(jsonLd.offers) ? jsonLd.offers[0] : jsonLd.offers
+          retailPrice = parseFloat(offers.price || offers.highPrice)
+          salePrice = offers.lowPrice ? parseFloat(offers.lowPrice) : undefined
+        }
+      } catch (e) {
+        // JSON-LD parsing failed
+      }
+    }
+
+    // Fallback to HTML selectors
+    if (!retailPrice) {
+      const priceText = cleanText(
+        $('.price, [class*="price"], [class*="Price"]').first().text() ||
+        $('meta[property="product:price:amount"]').attr('content')
+      )
+      retailPrice = extractPrice(priceText)
+    }
+
+    // Extract images
+    const images: string[] = []
+    const ogImage = $('meta[property="og:image"]').attr('content')
+    if (ogImage) {
+      images.push(ogImage)
+    }
+
+    $('img[src*="product"], img[class*="product"], picture img').each((_, el) => {
+      if (images.length >= 5) return false
+      const src = $(el).attr('src') || $(el).attr('data-src')
+      if (src && !src.includes('logo') && !images.includes(src)) {
+        const fullUrl = src.startsWith('http') ? src : new URL(src, url).href
+        images.push(fullUrl)
+      }
+    })
+
+    // Extract colorway
+    const colorway = cleanText(
+      $('[class*="color"], [class*="Color"]').first().text() ||
+      $('meta[property="product:color"]').attr('content')
+    )
+
+    // Detect category
+    const category = detectCategory(url, title, '')
+
+    const productData: ProductData = {
+      brand: brand || undefined,
+      model: title || undefined,
+      colorway: colorway || undefined,
+      sku: undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      category,
+      success: true
+    }
+
+    // Validate
+    const validation = validateProductData(productData, siteName)
+    if (!validation.isValid) {
+      console.warn(`${siteName} Browserless extraction validation issues:`, validation.issues)
+      if (productData.brand || productData.model) {
+        productData.error = `Partial data extracted via browser automation. Issues: ${validation.issues.join(', ')}`
+      } else {
+        return {
+          success: false,
+          error: `Browser automation failed to extract sufficient data. Issues: ${validation.issues.join(', ')}`
+        }
+      }
+    }
+
+    return productData
+
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to parse browser-rendered HTML: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { url } = await request.json()
@@ -175,10 +354,19 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      if (hostname.includes('soleretriever.com')) {
-        productData = await scrapeWithTimeout(() => scrapeSoleRetriever(url))
+      // Sites that work well with cheerio (no fallback needed)
+      if (hostname.includes('shoepalace.com') || hostname.includes('beistravel.com')) {
+        if (hostname.includes('shoepalace.com')) {
+          productData = await scrapeWithTimeout(() => scrapeShoePalace(url))
+        } else {
+          productData = await scrapeWithTimeout(() => scrapeBEIS(url))
+        }
+      }
+      // Sites that likely need Browserless fallback
+      else if (hostname.includes('soleretriever.com')) {
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeSoleRetriever, 'SoleRetriever'))
       } else if (hostname.includes('nike.com')) {
-        productData = await scrapeWithTimeout(() => scrapeNike(url))
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNike, 'Nike'), 20000)
       } else if (hostname.includes('adidas.com')) {
         // Adidas has strong bot protection - skip scraping
         return NextResponse.json({
@@ -186,23 +374,22 @@ export async function POST(request: NextRequest) {
           error: 'Adidas auto-import is currently unavailable due to bot protection. Please enter product details manually or use an alternative source like SoleRetriever.com or ShoePalace.com'
         })
       } else if (hostname.includes('stockx.com')) {
-        productData = await scrapeWithTimeout(() => scrapeStockX(url))
-      } else if (hostname.includes('shoepalace.com')) {
-        productData = await scrapeWithTimeout(() => scrapeShoePalace(url))
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeStockX, 'StockX'))
       } else if (hostname.includes('bananarepublic.gap.com')) {
-        productData = await scrapeWithTimeout(() => scrapeGapFamily(url, 'Banana Republic'))
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, (u) => scrapeGapFamily(u, 'Banana Republic'), 'Banana Republic'), 20000)
       } else if (hostname.includes('oldnavy.gap.com')) {
-        productData = await scrapeWithTimeout(() => scrapeGapFamily(url, 'Old Navy'))
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, (u) => scrapeGapFamily(u, 'Old Navy'), 'Old Navy'), 20000)
       } else if (hostname.includes('gap.com')) {
-        productData = await scrapeWithTimeout(() => scrapeGapFamily(url, 'Gap'))
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, (u) => scrapeGapFamily(u, 'Gap'), 'Gap'), 20000)
       } else if (hostname.includes('nordstrom.com')) {
-        productData = await scrapeWithTimeout(() => scrapeNordstrom(url))
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNordstrom, 'Nordstrom'))
       } else if (hostname.includes('stance.com')) {
-        productData = await scrapeWithTimeout(() => scrapeStance(url))
-      } else if (hostname.includes('beistravel.com')) {
-        productData = await scrapeWithTimeout(() => scrapeBEIS(url))
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeStance, 'Stance'))
+      } else if (hostname.includes('bathandbodyworks.com')) {
+        // Bath & Body Works - definitely needs Browserless
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Bath & Body Works'), 20000)
       } else {
-        productData = await scrapeWithTimeout(() => scrapeGeneric(url))
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Generic'))
       }
     } catch (timeoutError) {
       const errorMessage = timeoutError instanceof Error ? timeoutError.message : 'Request timeout'
@@ -746,14 +933,22 @@ async function scrapeGapFamily(url: string, brandName: string): Promise<ProductD
     const $ = cheerio.load(html)
 
     // Extract title - try multiple methods including meta tags
-    let title = cleanText(
-      $('h1[data-testid="product-title"]').text() ||
-      $('h1.product-title').text() ||
-      $('h1').first().text() ||
-      $('meta[property="og:title"]').attr('content') ||
-      $('meta[name="twitter:title"]').attr('content') ||
-      $('title').text()?.split('|')[0]
-    )
+    const titleText = $('h1[data-testid="product-title"]').text() ||
+                      $('h1.product-title').text() ||
+                      $('h1').first().text() ||
+                      $('meta[property="og:title"]').attr('content') ||
+                      $('meta[name="twitter:title"]').attr('content') ||
+                      ($('title').text() || '').split('|')[0]
+
+    const title = cleanText(titleText)
+
+    // Check if we got any meaningful HTML - if title is empty, page is likely JS-rendered
+    if (!title) {
+      return {
+        success: false,
+        error: `${brandName} page appears to be JavaScript-rendered with no static content. Browser automation (Browserless) is required for this site.`
+      }
+    }
 
     // Extract breadcrumbs for better category detection
     const breadcrumbs = cleanText(
