@@ -289,7 +289,7 @@ async function scrapeSoleRetriever(url: string): Promise<ProductData> {
     // Detect category
     const category = detectCategory(url, rawTitle, '')
 
-    return {
+    const productData: ProductData = {
       brand: brand || undefined,
       model: model || undefined,
       colorway: colorway !== 'Standard' ? colorway : undefined,
@@ -300,6 +300,17 @@ async function scrapeSoleRetriever(url: string): Promise<ProductData> {
       category,
       success: true
     }
+
+    // Validate the scraped data
+    const validation = validateProductData(productData, 'SoleRetriever')
+    if (!validation.isValid) {
+      console.warn('SoleRetriever scraping validation issues:', validation.issues)
+      if (productData.brand || productData.model) {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      }
+    }
+
+    return productData
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return {
@@ -313,7 +324,10 @@ async function scrapeNike(url: string): Promise<ProductData> {
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Referer': 'https://www.google.com/'
       }
     })
 
@@ -325,57 +339,111 @@ async function scrapeNike(url: string): Promise<ProductData> {
     const $ = cheerio.load(html)
 
     const brand = 'Nike'
-    const model = cleanText($('h1[data-qa="product-title"]').text() ||
-                  $('#pdp_product_title').text() ||
-                  $('h1').first().text())
 
-    const colorway = cleanText($('[data-qa="product-subtitle"]').text() ||
-                     $('.product-subtitle').text() ||
-                     $('[class*="subtitle"]').text() ||
-                     'Standard')
+    // Extract model - enhanced with meta tags
+    const model = cleanText(
+      $('h1[data-qa="product-title"]').text() ||
+      $('#pdp_product_title').text() ||
+      $('h1#pdp_product_title').text() ||
+      $('h1').first().text() ||
+      $('meta[property="og:title"]').attr('content') ||
+      $('meta[name="twitter:title"]').attr('content') ||
+      $('.product-title').text()
+    )
 
-    // SKU extraction - Nike uses style code
-    const sku = cleanText($('[class*="style"]').text() ||
-                $('[class*="product-code"]').text() ||
-                $('[class*="sku"]').text() ||
-                '')
+    // Extract colorway - enhanced selectors
+    const colorway = cleanText(
+      $('[data-qa="product-subtitle"]').text() ||
+      $('.product-subtitle').text() ||
+      $('[class*="subtitle"]').first().text() ||
+      $('[class*="colorway"]').text() ||
+      $('meta[property="product:color"]').attr('content') ||
+      ''
+    )
 
-    // Price extraction - look for sale and retail prices
+    // SKU extraction - Nike uses style code, enhanced selectors
+    const sku = cleanText(
+      $('[data-qa="product-style"]').text() ||
+      $('.product-style').text() ||
+      $('[class*="style-color"]').text() ||
+      $('[class*="style"]').text() ||
+      $('[class*="product-code"]').text() ||
+      $('[class*="sku"]').text() ||
+      $('meta[property="product:retailer_item_id"]').attr('content') ||
+      ''
+    )
+
+    // Price extraction - enhanced with JSON-LD and meta tags
     let retailPrice: number | undefined
     let salePrice: number | undefined
 
-    const salePriceText = cleanText($('[class*="sale"], [class*="discount"]').first().text())
-    if (salePriceText) {
-      salePrice = extractPrice(salePriceText)
+    // Try JSON-LD structured data first
+    const jsonLdScript = $('script[type="application/ld+json"]').html()
+    if (jsonLdScript) {
+      try {
+        const jsonLd = JSON.parse(jsonLdScript)
+        if (jsonLd.offers) {
+          const offers = Array.isArray(jsonLd.offers) ? jsonLd.offers[0] : jsonLd.offers
+          retailPrice = parseFloat(offers.price || offers.highPrice)
+          salePrice = offers.lowPrice ? parseFloat(offers.lowPrice) : undefined
+        }
+      } catch (e) {
+        // JSON-LD parsing failed, continue with HTML scraping
+      }
     }
 
-    const retailPriceText = cleanText($('[data-qa="product-price"]').text() ||
-                      $('.product-price').text() ||
-                      $('[class*="price"]').first().text())
-    retailPrice = extractPrice(retailPriceText)
+    // Fallback to HTML selectors
+    if (!retailPrice && !salePrice) {
+      const salePriceText = cleanText(
+        $('[class*="sale"]').first().text() ||
+        $('[class*="discount"]').first().text() ||
+        $('.sale-price').first().text()
+      )
+      if (salePriceText) {
+        salePrice = extractPrice(salePriceText)
+      }
+
+      const retailPriceText = cleanText(
+        $('[data-qa="product-price"]').text() ||
+        $('.product-price').text() ||
+        $('[class*="currentPrice"]').first().text() ||
+        $('[class*="price"]').first().text() ||
+        $('meta[property="product:price:amount"]').attr('content')
+      )
+      retailPrice = extractPrice(retailPriceText)
+    }
 
     if (!retailPrice && salePrice) {
       retailPrice = salePrice
       salePrice = undefined
     }
 
-    // Image extraction - limit to 5
+    // Image extraction - enhanced with meta tags
     const images: string[] = []
-    $('img[src*="static.nike.com"], .product-image img, [class*="product-image"] img').each((_, el) => {
+
+    // Try meta tags first
+    const ogImage = $('meta[property="og:image"]').attr('content')
+    if (ogImage) {
+      images.push(ogImage.startsWith('http') ? ogImage : `https://static.nike.com${ogImage}`)
+    }
+
+    // Try Nike-specific image selectors
+    $('img[src*="static.nike.com"], img[src*="secure-images.nike.com"], .product-image img, [class*="product-image"] img, picture img').each((_, el) => {
       if (images.length >= 5) return false
-      const src = $(el).attr('src')
-      if (src && !images.includes(src)) {
-        images.push(src.startsWith('http') ? src : `https://static.nike.com${src}`)
+      const src = $(el).attr('src') || $(el).attr('data-src')
+      if (src && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
+        const fullUrl = src.startsWith('http') ? src : `https://static.nike.com${src}`
+        images.push(fullUrl)
       }
     })
 
-    // Detect category (Nike sells shoes and apparel)
+    // Detect category (Nike sells shoes, apparel, accessories)
     const category = detectCategory(url, model, '')
 
-    return {
+    const productData: ProductData = {
       brand,
       model: model || undefined,
-      colorway: colorway !== 'Standard' ? colorway : undefined,
+      colorway: colorway || undefined,
       sku: sku || undefined,
       retailPrice,
       salePrice,
@@ -383,10 +451,26 @@ async function scrapeNike(url: string): Promise<ProductData> {
       category,
       success: true
     }
+
+    // Validate the scraped data
+    const validation = validateProductData(productData, 'Nike')
+    if (!validation.isValid) {
+      console.warn('Nike scraping validation issues:', validation.issues)
+      if (productData.brand || productData.model) {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      } else {
+        return {
+          success: false,
+          error: `Nike scraping incomplete: ${validation.issues.join(', ')}. This may be a dynamic site requiring browser automation.`
+        }
+      }
+    }
+
+    return productData
   } catch (error) {
     return {
       success: false,
-      error: `Nike scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      error: `Nike scraping failed: ${error instanceof Error ? error.message : "Unknown error"}. This site may require browser automation for dynamic content.`
     }
   }
 }
@@ -460,7 +544,7 @@ async function scrapeStockX(url: string): Promise<ProductData> {
     // Detect category
     const category = detectCategory(url, fullTitle, '')
 
-    return {
+    const productData: ProductData = {
       brand: brand || undefined,
       model: model || undefined,
       colorway: colorway !== 'Standard' ? colorway : undefined,
@@ -471,10 +555,21 @@ async function scrapeStockX(url: string): Promise<ProductData> {
       category,
       success: true
     }
+
+    // Validate the scraped data
+    const validation = validateProductData(productData, 'StockX')
+    if (!validation.isValid) {
+      console.warn('StockX scraping validation issues:', validation.issues)
+      if (productData.brand || productData.model) {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      }
+    }
+
+    return productData
   } catch (error) {
     return {
       success: false,
-      error: `StockX scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      error: `StockX scraping failed: ${error instanceof Error ? error.message : "Unknown error"}. This site may require browser automation for dynamic content.`
     }
   }
 }
@@ -583,20 +678,7 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
     // Detect category
     const category = detectCategory(url, title, '')
 
-    console.log('🔍 Shoe Palace (Shopify) scraper found:', {
-      title,
-      brand,
-      model,
-      colorway,
-      sku,
-      retailPrice,
-      salePrice,
-      imageCount: images.length,
-      images,
-      category
-    })
-
-    return {
+    const productData: ProductData = {
       brand: brand || undefined,
       model: model || undefined,
       colorway: colorway !== 'Standard' ? colorway : undefined,
@@ -607,6 +689,35 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
       category,
       success: true
     }
+
+    // Validate the scraped data
+    const validation = validateProductData(productData, 'Shoe Palace')
+    if (!validation.isValid) {
+      console.warn('Shoe Palace scraping validation issues:', validation.issues)
+      if (productData.brand || productData.model) {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      } else {
+        return {
+          success: false,
+          error: `Shoe Palace scraping incomplete: ${validation.issues.join(', ')}`
+        }
+      }
+    }
+
+    console.log('🔍 Shoe Palace (Shopify) scraper found:', {
+      title,
+      brand,
+      model,
+      colorway,
+      sku,
+      retailPrice,
+      salePrice,
+      imageCount: images.length,
+      category,
+      validated: validation.isValid
+    })
+
+    return productData
   } catch (error) {
     return {
       success: false,
@@ -620,7 +731,10 @@ async function scrapeGapFamily(url: string, brandName: string): Promise<ProductD
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Referer': 'https://www.google.com/'
       }
     })
 
@@ -631,15 +745,22 @@ async function scrapeGapFamily(url: string, brandName: string): Promise<ProductD
     const html = await response.text()
     const $ = cheerio.load(html)
 
-    // Extract title from h1
-    const title = cleanText(
+    // Extract title - try multiple methods including meta tags
+    let title = cleanText(
       $('h1[data-testid="product-title"]').text() ||
       $('h1.product-title').text() ||
+      $('h1').first().text() ||
+      $('meta[property="og:title"]').attr('content') ||
+      $('meta[name="twitter:title"]').attr('content') ||
       $('title').text()?.split('|')[0]
     )
 
     // Extract breadcrumbs for better category detection
-    const breadcrumbs = cleanText($('[aria-label="breadcrumb"]').text() || $('.breadcrumb').text())
+    const breadcrumbs = cleanText(
+      $('[aria-label="breadcrumb"]').text() ||
+      $('.breadcrumb').text() ||
+      $('nav[role="navigation"] a').map((_, el) => $(el).text()).get().join(' ')
+    )
 
     // Use brand name or parse from title
     const brand = brandName
@@ -648,43 +769,68 @@ async function scrapeGapFamily(url: string, brandName: string): Promise<ProductD
     // Detect category
     const category = detectCategory(url, title, breadcrumbs)
 
-    // Extract SKU/Style number
+    // Extract SKU/Style number - enhanced with meta tags
     const sku = cleanText(
       $('[data-testid="style-number"]').text() ||
       $('.style-number').text() ||
+      $('[class*="styleNumber"]').text() ||
       $('meta[name="product:retailer_item_id"]').attr('content') ||
+      $('meta[property="product:retailer_item_id"]').attr('content') ||
       ''
     )
 
-    // Extract colorway
+    // Extract colorway - enhanced selectors
     const colorway = cleanText(
       $('[data-testid="product-color"]').text() ||
       $('.product-color').text() ||
       $('.color-name').text() ||
+      $('[class*="colorName"]').text() ||
+      $('meta[property="product:color"]').attr('content') ||
       ''
     )
 
-    // Extract prices
+    // Extract prices - enhanced with meta tags and JSON-LD
     let retailPrice: number | undefined
     let salePrice: number | undefined
 
-    const salePriceText = cleanText(
-      $('[data-testid="product-price-sale"]').text() ||
-      $('.current-sale-price').first().text() ||
-      $('.sale-price').first().text()
-    )
-    if (salePriceText) {
-      salePrice = extractPrice(salePriceText)
+    // Try JSON-LD structured data first
+    const jsonLdScript = $('script[type="application/ld+json"]').html()
+    if (jsonLdScript) {
+      try {
+        const jsonLd = JSON.parse(jsonLdScript)
+        if (jsonLd.offers) {
+          const offers = Array.isArray(jsonLd.offers) ? jsonLd.offers[0] : jsonLd.offers
+          retailPrice = parseFloat(offers.price || offers.highPrice)
+          salePrice = offers.lowPrice ? parseFloat(offers.lowPrice) : undefined
+        }
+      } catch (e) {
+        // JSON-LD parsing failed, continue with HTML scraping
+      }
     }
 
-    const regularPriceText = cleanText(
-      $('[data-testid="product-price-regular"]').text() ||
-      $('.regular-price-strike-through').first().text() ||
-      $('.current-regular-price').first().text() ||
-      $('.regular-price').first().text()
-    )
-    if (regularPriceText) {
-      retailPrice = extractPrice(regularPriceText)
+    // Fallback to HTML selectors
+    if (!retailPrice && !salePrice) {
+      const salePriceText = cleanText(
+        $('[data-testid="product-price-sale"]').text() ||
+        $('.current-sale-price').first().text() ||
+        $('.sale-price').first().text() ||
+        $('[class*="salePrice"]').first().text()
+      )
+      if (salePriceText) {
+        salePrice = extractPrice(salePriceText)
+      }
+
+      const regularPriceText = cleanText(
+        $('[data-testid="product-price-regular"]').text() ||
+        $('.regular-price-strike-through').first().text() ||
+        $('.current-regular-price').first().text() ||
+        $('.regular-price').first().text() ||
+        $('[class*="regularPrice"]').first().text() ||
+        $('meta[property="product:price:amount"]').attr('content')
+      )
+      if (regularPriceText) {
+        retailPrice = extractPrice(regularPriceText)
+      }
     }
 
     // If only sale price exists, use it as retail
@@ -693,11 +839,18 @@ async function scrapeGapFamily(url: string, brandName: string): Promise<ProductD
       salePrice = undefined
     }
 
-    // Extract images
+    // Extract images - enhanced with meta tags
     const images: string[] = []
     const hostname = new URL(url).hostname
 
-    // Try preload links first
+    // Try meta tags first (often have high-quality images)
+    const ogImage = $('meta[property="og:image"]').attr('content')
+    if (ogImage) {
+      const fullUrl = ogImage.startsWith('http') ? ogImage : `https://${hostname}${ogImage}`
+      images.push(fullUrl)
+    }
+
+    // Try preload links
     $('link[rel="preload"][as="image"]').each((_, el) => {
       if (images.length >= 5) return false
       const href = $(el).attr('href')
@@ -710,18 +863,18 @@ async function scrapeGapFamily(url: string, brandName: string): Promise<ProductD
     })
 
     // Fallback: product images
-    if (images.length === 0) {
-      $('img[src*="webcontent"], img[class*="product"], img[data-testid*="image"]').each((_, el) => {
+    if (images.length < 5) {
+      $('img[src*="webcontent"], img[class*="product"], img[data-testid*="image"], picture img').each((_, el) => {
         if (images.length >= 5) return false
-        const src = $(el).attr('src')
-        if (src && !images.includes(src)) {
+        const src = $(el).attr('src') || $(el).attr('data-src')
+        if (src && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
           const fullUrl = src.startsWith('http') ? src : `https://${hostname}${src}`
           images.push(fullUrl)
         }
       })
     }
 
-    return {
+    const productData: ProductData = {
       brand: brand || undefined,
       model: model || undefined,
       colorway: colorway || undefined,
@@ -732,10 +885,27 @@ async function scrapeGapFamily(url: string, brandName: string): Promise<ProductD
       category,
       success: true
     }
+
+    // Validate the scraped data
+    const validation = validateProductData(productData, brandName)
+    if (!validation.isValid) {
+      console.warn(`${brandName} scraping validation issues:`, validation.issues)
+      // Return with warning in error field but still mark as success if we got some data
+      if (productData.brand || productData.model) {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      } else {
+        return {
+          success: false,
+          error: `${brandName} scraping incomplete: ${validation.issues.join(', ')}. This may be a dynamic site requiring browser automation.`
+        }
+      }
+    }
+
+    return productData
   } catch (error) {
     return {
       success: false,
-      error: `${brandName} scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      error: `${brandName} scraping failed: ${error instanceof Error ? error.message : "Unknown error"}. This site may require browser automation for dynamic content.`
     }
   }
 }
@@ -830,7 +1000,7 @@ async function scrapeNordstrom(url: string): Promise<ProductData> {
       }
     })
 
-    return {
+    const productData: ProductData = {
       brand: brand || undefined,
       model: model || undefined,
       colorway: colorway || undefined,
@@ -841,10 +1011,21 @@ async function scrapeNordstrom(url: string): Promise<ProductData> {
       category,
       success: true
     }
+
+    // Validate the scraped data
+    const validation = validateProductData(productData, 'Nordstrom')
+    if (!validation.isValid) {
+      console.warn('Nordstrom scraping validation issues:', validation.issues)
+      if (productData.brand || productData.model) {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      }
+    }
+
+    return productData
   } catch (error) {
     return {
       success: false,
-      error: `Nordstrom scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      error: `Nordstrom scraping failed: ${error instanceof Error ? error.message : "Unknown error"}. This site may require browser automation for dynamic content.`
     }
   }
 }
@@ -853,7 +1034,10 @@ async function scrapeStance(url: string): Promise<ProductData> {
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Referer': 'https://www.google.com/'
       }
     })
 
@@ -866,50 +1050,86 @@ async function scrapeStance(url: string): Promise<ProductData> {
 
     const brand = 'Stance'
 
-    // Extract product title
+    // Extract product title - enhanced with meta tags
     const title = cleanText(
       $('h1.product-name').text() ||
       $('h1[data-testid="product-title"]').text() ||
-      $('h1').first().text()
+      $('h1').first().text() ||
+      $('meta[property="og:title"]').attr('content') ||
+      $('.product-title').text()
     )
 
     const model = title
 
     // Extract breadcrumbs for category detection
-    const breadcrumbs = cleanText($('.breadcrumb').text() || $('[aria-label="breadcrumb"]').text())
+    const breadcrumbs = cleanText(
+      $('.breadcrumb').text() ||
+      $('[aria-label="breadcrumb"]').text() ||
+      $('nav[role="navigation"] a').map((_, el) => $(el).text()).get().join(' ')
+    )
 
-    // Detect category (Stance mostly sells socks, underwear, accessories)
+    // Detect category (Stance sells socks, underwear, apparel, accessories)
     const category = detectCategory(url, title, breadcrumbs)
 
-    // Extract colorway
+    // Extract colorway - enhanced selectors
     const colorway = cleanText(
       $('.product-color').text() ||
       $('[data-color]').attr('data-color') ||
+      $('.color-name').text() ||
+      $('[class*="color"]').first().text() ||
+      $('meta[property="product:color"]').attr('content') ||
       ''
     )
 
-    // Extract SKU
+    // Extract SKU - enhanced selectors
     const sku = cleanText(
       $('.product-sku').text() ||
       $('[data-sku]').attr('data-sku') ||
+      $('[class*="sku"]').text() ||
+      $('meta[property="product:retailer_item_id"]').attr('content') ||
       ''
     )
 
-    // Extract prices
+    // Extract prices - enhanced with JSON-LD and meta tags
     let retailPrice: number | undefined
     let salePrice: number | undefined
 
-    const salePriceText = cleanText($('.sale-price').first().text())
-    if (salePriceText) {
-      salePrice = extractPrice(salePriceText)
+    // Try JSON-LD structured data first
+    const jsonLdScript = $('script[type="application/ld+json"]').html()
+    if (jsonLdScript) {
+      try {
+        const jsonLd = JSON.parse(jsonLdScript)
+        if (jsonLd.offers) {
+          const offers = Array.isArray(jsonLd.offers) ? jsonLd.offers[0] : jsonLd.offers
+          retailPrice = parseFloat(offers.price || offers.highPrice)
+          salePrice = offers.lowPrice ? parseFloat(offers.lowPrice) : undefined
+        }
+      } catch (e) {
+        // JSON-LD parsing failed, continue with HTML scraping
+      }
     }
 
-    const regularPriceText = cleanText(
-      $('.regular-price').first().text() ||
-      $('.price').first().text()
-    )
-    if (regularPriceText) {
-      retailPrice = extractPrice(regularPriceText)
+    // Fallback to HTML selectors
+    if (!retailPrice && !salePrice) {
+      const salePriceText = cleanText(
+        $('.sale-price').first().text() ||
+        $('[class*="salePrice"]').first().text() ||
+        $('.price-sales').first().text()
+      )
+      if (salePriceText) {
+        salePrice = extractPrice(salePriceText)
+      }
+
+      const regularPriceText = cleanText(
+        $('.regular-price').first().text() ||
+        $('.price').first().text() ||
+        $('[class*="regularPrice"]').first().text() ||
+        $('.price-standard').first().text() ||
+        $('meta[property="product:price:amount"]').attr('content')
+      )
+      if (regularPriceText) {
+        retailPrice = extractPrice(regularPriceText)
+      }
     }
 
     if (!retailPrice && salePrice) {
@@ -917,11 +1137,18 @@ async function scrapeStance(url: string): Promise<ProductData> {
       salePrice = undefined
     }
 
-    // Extract images from primary-images div
+    // Extract images - enhanced with multiple fallbacks
     const images: string[] = []
 
-    // First try to get images from primary-images div (main product images)
-    $('.primary-images img, .primary-images source').each((_, el) => {
+    // Try meta tags first
+    const ogImage = $('meta[property="og:image"]').attr('content')
+    if (ogImage) {
+      const fullUrl = ogImage.startsWith('http') ? ogImage : `https://stance.com${ogImage}`
+      images.push(fullUrl)
+    }
+
+    // Try primary-images div (main product images)
+    $('.primary-images img, .primary-images source, [class*="primaryImage"] img').each((_, el) => {
       if (images.length >= 5) return false
 
       // Try multiple image attributes (src, data-src, srcset, data-srcset)
@@ -942,9 +1169,9 @@ async function scrapeStance(url: string): Promise<ProductData> {
       }
     })
 
-    // Fallback: try other product image selectors if primary-images didn't yield results
-    if (images.length === 0) {
-      $('img[class*="product"], .product-image img, picture img').each((_, el) => {
+    // Fallback: try other product image selectors
+    if (images.length < 5) {
+      $('img[class*="product"], .product-image img, picture img, [data-testid*="image"] img').each((_, el) => {
         if (images.length >= 5) return false
         const src = $(el).attr('data-src') || $(el).attr('src')
         if (src && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
@@ -954,7 +1181,7 @@ async function scrapeStance(url: string): Promise<ProductData> {
       })
     }
 
-    return {
+    const productData: ProductData = {
       brand,
       model: model || undefined,
       colorway: colorway || undefined,
@@ -965,10 +1192,26 @@ async function scrapeStance(url: string): Promise<ProductData> {
       category,
       success: true
     }
+
+    // Validate the scraped data
+    const validation = validateProductData(productData, 'Stance')
+    if (!validation.isValid) {
+      console.warn('Stance scraping validation issues:', validation.issues)
+      if (productData.brand || productData.model) {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      } else {
+        return {
+          success: false,
+          error: `Stance scraping incomplete: ${validation.issues.join(', ')}. This may be a dynamic site requiring browser automation.`
+        }
+      }
+    }
+
+    return productData
   } catch (error) {
     return {
       success: false,
-      error: `Stance scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      error: `Stance scraping failed: ${error instanceof Error ? error.message : "Unknown error"}. This site may require browser automation for dynamic content.`
     }
   }
 }
@@ -1043,7 +1286,7 @@ async function scrapeBEIS(url: string): Promise<ProductData> {
       })
     }
 
-    return {
+    const productData: ProductData = {
       brand,
       model: model || undefined,
       colorway: colorway || undefined,
@@ -1054,6 +1297,17 @@ async function scrapeBEIS(url: string): Promise<ProductData> {
       category,
       success: true
     }
+
+    // Validate the scraped data
+    const validation = validateProductData(productData, 'BEIS')
+    if (!validation.isValid) {
+      console.warn('BEIS scraping validation issues:', validation.issues)
+      if (productData.brand || productData.model) {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      }
+    }
+
+    return productData
   } catch (error) {
     return {
       success: false,
@@ -1121,7 +1375,7 @@ async function scrapeGeneric(url: string): Promise<ProductData> {
     // Detect category
     const category = detectCategory(url, title, '')
 
-    return {
+    const productData: ProductData = {
       brand: brand || undefined,
       model: model || undefined,
       colorway: undefined,
@@ -1132,10 +1386,23 @@ async function scrapeGeneric(url: string): Promise<ProductData> {
       category,
       success: true
     }
+
+    // Validate the scraped data
+    const validation = validateProductData(productData, 'Generic')
+    if (!validation.isValid) {
+      console.warn('Generic scraping validation issues:', validation.issues)
+      // For generic scraper, always return error if validation fails
+      return {
+        success: false,
+        error: `Unable to extract product data from this site. Issues: ${validation.issues.join(', ')}. This site may require browser automation or a custom scraper.`
+      }
+    }
+
+    return productData
   } catch (error) {
     return {
       success: false,
-      error: `Generic scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      error: `Generic scraping failed: ${error instanceof Error ? error.message : "Unknown error"}. This site may require browser automation or a custom scraper.`
     }
   }
 }
@@ -1150,4 +1417,57 @@ function extractPrice(priceText: string): number | undefined {
   }
 
   return undefined
+}
+
+// Helper function to validate scraped product data
+function validateProductData(data: Partial<ProductData>, _siteName: string): { isValid: boolean; issues: string[] } {
+  const issues: string[] = []
+
+  // Check if we got at least a brand or model
+  if (!data.brand && !data.model) {
+    issues.push('Missing both brand and model name')
+  }
+
+  // Check if we got at least one price
+  if (!data.retailPrice && !data.salePrice) {
+    issues.push('No price information found')
+  }
+
+  // Validate price values are reasonable
+  if (data.retailPrice && (data.retailPrice < 0 || data.retailPrice > 10000)) {
+    issues.push(`Retail price seems invalid: $${data.retailPrice}`)
+  }
+  if (data.salePrice && (data.salePrice < 0 || data.salePrice > 10000)) {
+    issues.push(`Sale price seems invalid: $${data.salePrice}`)
+  }
+
+  // Check if sale price is actually less than retail
+  if (data.retailPrice && data.salePrice && data.salePrice >= data.retailPrice) {
+    // Swap them - probably extracted in wrong order
+    const temp = data.retailPrice
+    data.retailPrice = data.salePrice
+    data.salePrice = temp
+  }
+
+  // Check if we got at least one image
+  if (!data.images || data.images.length === 0) {
+    issues.push('No product images found')
+  }
+
+  // Validate image URLs
+  if (data.images) {
+    data.images = data.images.filter(img => {
+      try {
+        new URL(img)
+        return true
+      } catch {
+        return false
+      }
+    })
+  }
+
+  return {
+    isValid: issues.length === 0,
+    issues
+  }
 }
