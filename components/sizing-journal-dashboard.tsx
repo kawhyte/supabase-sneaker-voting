@@ -19,9 +19,10 @@ interface SizingJournalDashboardProps {
   onAddNew?: () => void
   viewMode?: 'watchlist' | 'purchased'
   selectedCategories?: ItemCategory[]
+  onCategoriesChange?: (categories: ItemCategory[]) => void
 }
 
-export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selectedCategories = [] }: SizingJournalDashboardProps) {
+export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selectedCategories = [], onCategoriesChange }: SizingJournalDashboardProps) {
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -330,6 +331,8 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
         sortBy={sortBy}
         onSortChange={setSortBy}
         availableBrands={availableBrands}
+        selectedCategories={selectedCategories}
+        onCategoriesChange={onCategoriesChange || (() => {})}
       />
 
       <SizingJournalStats journalEntries={journalEntries} />
