@@ -1,10 +1,12 @@
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import { type ItemCategory } from '@/components/types/item-category'
 
 export function filterJournalEntries(
   entries: SizingJournalEntry[],
   searchTerm: string,
   selectedUser: string,
-  selectedBrand: string
+  selectedBrand: string,
+  selectedCategories: ItemCategory[] = []
 ): SizingJournalEntry[] {
   return entries.filter(entry => {
     const matchesSearch = searchTerm === '' ||
@@ -14,8 +16,10 @@ export function filterJournalEntries(
 
     const matchesUser = selectedUser === 'all' || entry.user_name === selectedUser
     const matchesBrand = selectedBrand === 'all' || entry.brand === selectedBrand
+    const matchesCategory = selectedCategories.length === 0 ||
+      selectedCategories.includes(entry.category as ItemCategory)
 
-    return matchesSearch && matchesUser && matchesBrand
+    return matchesSearch && matchesUser && matchesBrand && matchesCategory
   })
 }
 

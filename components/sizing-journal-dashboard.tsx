@@ -13,13 +13,15 @@ import { SizingJournalEntryCard } from './sizing-journal-entry-card'
 import { DeleteConfirmDialog } from './delete-confirm-dialog'
 import { SizingJournalEntry } from './types/sizing-journal-entry'
 import { filterJournalEntries, sortJournalEntries, getUniqueBrands } from '@/lib/sizing-journal-utils'
+import { type ItemCategory } from '@/components/types/item-category'
 
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
   viewMode?: 'watchlist' | 'purchased'
+  selectedCategories?: ItemCategory[]
 }
 
-export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: SizingJournalDashboardProps) {
+export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selectedCategories = [] }: SizingJournalDashboardProps) {
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -300,7 +302,7 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: Siz
 
   // Computed values
   const filteredAndSortedEntries = sortJournalEntries(
-    filterJournalEntries(journalEntries, searchTerm, selectedUser, selectedBrand),
+    filterJournalEntries(journalEntries, searchTerm, selectedUser, selectedBrand, selectedCategories),
     sortBy
   )
   const availableBrands = getUniqueBrands(journalEntries)
