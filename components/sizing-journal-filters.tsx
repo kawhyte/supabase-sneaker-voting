@@ -64,6 +64,7 @@ export function SizingJournalFilters({
               {selectedCategories.length === Object.keys(CATEGORY_CONFIGS).length ? 'Deselect All' : 'Select All'}
             </button>
           </div>
+          
           <div className="flex flex-wrap gap-3">
             {Object.values(CATEGORY_CONFIGS).map((config) => {
               const IconComponent = config.icon
