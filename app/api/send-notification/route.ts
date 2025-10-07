@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import webpush from 'web-push'
 
-// Configure web-push (you'll need to set these environment variables)
+// TODO: Configure web-push when implementing push notifications
+// Currently commented out to prevent build errors without proper VAPID keys
+// Uncomment and configure with valid environment variables when ready to implement:
+// - NEXT_PUBLIC_VAPID_PUBLIC_KEY
+// - VAPID_PRIVATE_KEY
+/*
 webpush.setVapidDetails(
   'mailto:your-email@example.com',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 'BEl62iUYgUivxIkv69yViEuiBIa40HI80NM9YFiNXlnJFGP1-JM8vRyGgbMQwqQ6L1-8KK4VvwWKKhH8R_a7j9k',
-  process.env.VAPID_PRIVATE_KEY || 'placeholder-private-key'
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
+  process.env.VAPID_PRIVATE_KEY || ''
 )
+*/
 
 export async function POST(request: NextRequest) {
+  // TODO: Implement push notification functionality
+  // Currently disabled until VAPID keys are properly configured
+  return NextResponse.json(
+    { success: false, error: 'Push notifications are not yet configured' },
+    { status: 501 }
+  )
+
+  /* Commented out until VAPID keys are configured
   try {
     const {
       subscription,
@@ -92,12 +106,13 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+  */
 }
 
 // Test endpoint for sending sample notifications
 export async function GET() {
   return NextResponse.json({
-    message: 'Send Notification API is ready',
-    vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 'BEl62iUYgUivxIkv69yViEuiBIa40HI80NM9YFiNXlnJFGP1-JM8vRyGgbMQwqQ6L1-8KK4VvwWKKhH8R_a7j9k'
+    message: 'Push notifications are not yet configured. Please set up VAPID keys to enable this feature.',
+    configured: false
   })
 }

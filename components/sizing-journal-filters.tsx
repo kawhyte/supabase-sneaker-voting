@@ -79,7 +79,7 @@ export function SizingJournalFilters({
                     htmlFor={`category-${config.id}`}
                     className="text-sm font-normal cursor-pointer flex items-center gap-1.5"
                   >
-                    <IconComponent className="h-3.5 w-3.5" style={{ color: config.color }} />
+                    <IconComponent className="h-3 w-3" style={{ color: config.color }} />
                     {config.label}
                   </Label>
                 </div>
