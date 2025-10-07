@@ -17,6 +17,7 @@ import { MultiPhotoUpload } from './multi-photo-upload'
 import { BrandCombobox } from './brand-combobox'
 import { SizeCombobox } from './size-combobox'
 import { cn } from '@/lib/utils'
+import { CATEGORY_CONFIGS, type ItemCategory } from '@/components/types/item-category'
 
 // Schema for journal entry editing
 const sneakerSchema = z.object({
@@ -25,6 +26,9 @@ const sneakerSchema = z.object({
   }),
   interactionType: z.enum(['seen', 'tried'], {
     required_error: 'Please select whether you saw or tried on this sneaker'
+  }),
+  category: z.enum(['shoes', 'tops', 'bottoms', 'outerwear', 'accessories', 'jewelry', 'watches'], {
+    required_error: 'Please select the item category'
   }),
   brand: z.string()
     .min(1, 'Please select or enter a brand name')
@@ -178,6 +182,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
   const watchedUser = watch('userName')
   const watchedBrand = watch('brand')
   const watchedInteractionType = watch('interactionType')
+  const watchedCategory = watch('category')
   const watchedRetailPrice = watch('retailPrice')
   const watchedSalePrice = watch('salePrice')
 
@@ -226,6 +231,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
       reset({
         userName: experience.user_name,
         interactionType: experience.interaction_type || 'seen',
+        category: experience.category || 'shoes',
         brand: experience.brand,
         model: experience.model,
         sku: experience.sku || '',
@@ -315,6 +321,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         model: data.model,
         colorway: data.colorway || 'Standard',
         sku: data.sku || null,
+        category: data.category,
         interaction_type: data.interactionType,
         size_tried: data.interactionType === 'tried' ? data.sizeTried : null,
         comfort_rating: data.interactionType === 'tried' ? (data.comfortRating || null) : null,
@@ -486,9 +493,9 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-[var(--space-lg)]">
-              {/* User and Experience Dropdowns */}
+              {/* User, Experience, and Category Dropdowns */}
               {isFormReady && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-base)] pb-[var(--space-base)]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--space-base)] pb-[var(--space-base)]">
                   <div>
                     <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
                       {/* <User className="h-3 w-3 text-blue-600" /> */}
@@ -544,6 +551,39 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                       <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
                         <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
                         <p className="text-xs font-semibold text-red-700">{errors.interactionType.message}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
+                      Item Category <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      onValueChange={(value: ItemCategory) => setValue("category", value, { shouldValidate: true })}
+                      value={watchedCategory}
+                    >
+                      <SelectTrigger className="h-4 mt-[var(--space-md)] max-w-sm">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(CATEGORY_CONFIGS).map((config) => {
+                          const IconComponent = config.icon
+                          return (
+                            <SelectItem key={config.id} value={config.id}>
+                              <div className="flex items-center gap-[var(--space-md)]">
+                                <IconComponent className="h-2 w-2" />
+                                <span>{config.label}</span>
+                              </div>
+                            </SelectItem>
+                          )
+                        })}
+                      </SelectContent>
+                    </Select>
+                    {errors.category && (
+                      <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
+                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs font-semibold text-red-700">{errors.category.message}</p>
                       </div>
                     )}
                   </div>

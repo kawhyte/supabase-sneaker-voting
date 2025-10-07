@@ -19,6 +19,7 @@ export interface BrowserlessConfig {
     selector?: string // Wait for specific CSS selector
     timeout?: number // Wait timeout in milliseconds
   }
+  endpoint?: 'unblock' | 'content' // Which Browserless endpoint to use
 }
 
 export interface BrowserlessResult {
@@ -43,24 +44,52 @@ export async function fetchWithBrowser(url: string, config?: Partial<Browserless
   }
 
   try {
-    // Browserless.io /unblock endpoint - uses residential proxies to bypass bot protection
-    const browserlessUrl = `https://production-sfo.browserless.io/unblock?token=${apiKey}&proxy=residential`
+    // Choose endpoint: /content (full control) or /unblock (bot bypass)
+    const endpoint = config?.endpoint || 'content' // Default to /content for better JS rendering
+    const useResidentialProxy = endpoint === 'unblock'
 
-    console.log(`🌐 Browserless: Attempting to unblock ${url}...`)
+    const browserlessUrl = `https://production-sfo.browserless.io/${endpoint}?token=${apiKey}${useResidentialProxy ? '&proxy=residential' : ''}`
 
-    // Build request body for /unblock endpoint
-    // Note: /unblock endpoint has limited options - it automatically handles waiting
-    const requestBody: any = {
-      url,
-      browserWSEndpoint: false,
-      cookies: false,
-      content: true,
-      screenshot: false
-    }
+    console.log(`🌐 Browserless: Using /${endpoint} endpoint for ${url}...`)
 
-    // Log if wait config was provided (but /unblock doesn't support it)
-    if (config?.waitFor?.selector) {
-      console.log(`ℹ️ Note: /unblock endpoint automatically waits for page load (waitFor selector ignored)`)
+    // Build request body based on endpoint
+    let requestBody: any
+
+    if (endpoint === 'content') {
+      // /content endpoint supports full Puppeteer options including waitFor
+      requestBody = {
+        url,
+        gotoOptions: {
+          waitUntil: 'networkidle2', // Wait for network to be mostly idle
+          timeout: config?.timeout || 30000
+        }
+      }
+
+      // Add waitForSelector if specified (waits for specific element to appear)
+      if (config?.waitFor?.selector) {
+        requestBody.waitForSelector = {
+          selector: config.waitFor.selector,
+          timeout: config.waitFor.timeout || 15000
+        }
+        console.log(`⏳ Waiting for selector: ${config.waitFor.selector}`)
+      }
+
+      // Add waitForTimeout to ensure JS has time to execute (2 seconds after network idle)
+      requestBody.waitForTimeout = 2000
+
+    } else {
+      // /unblock endpoint has limited options but better bot bypass
+      requestBody = {
+        url,
+        browserWSEndpoint: false,
+        cookies: false,
+        content: true,
+        screenshot: false
+      }
+
+      if (config?.waitFor?.selector) {
+        console.log(`ℹ️ Note: /unblock endpoint doesn't support waitFor (selector ignored)`)
+      }
     }
 
     const response = await fetch(browserlessUrl, {

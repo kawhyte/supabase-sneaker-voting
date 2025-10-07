@@ -21,17 +21,19 @@ Our scraper uses a **smart tiered approach**:
 2. **Fallback:** If cheerio fails, automatically use Browserless browser automation
 
 ### Sites that Need Browserless:
-- ✅ **Old Navy** (oldnavy.gap.com) - Heavily JavaScript-rendered
-- ✅ **Gap** (gap.com) - Dynamic content loading
-- ✅ **Banana Republic** (bananarepublic.gap.com) - Similar to Gap/Old Navy
-- ✅ **Bath & Body Works** (bathandbodyworks.com) - Bot protection + dynamic
-- ⚠️ **Nike** (nike.com) - May need it for some pages
+- ⚠️ **Old Navy** (oldnavy.gap.com) - **BLOCKED by bot detection** (~0% success rate)
+- ⚠️ **Gap** (gap.com) - **BLOCKED by bot detection** (~0% success rate)
+- ⚠️ **Banana Republic** (bananarepublic.gap.com) - **BLOCKED by bot detection** (~0% success rate)
+- ⚠️ **Bath & Body Works** (bathandbodyworks.com) - Strong bot protection (not tested yet)
+- 🟡 **Nike** (nike.com) - Partial support (50-70% success rate)
+
+**Note**: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection that blocks both `/unblock` and `/content` endpoints. Recommend using manual entry or alternative sources like SoleRetriever.
 
 ### Sites that Work Without Browserless:
-- ✅ **Shoe Palace** (shoepalace.com) - Shopify JSON API
-- ✅ **BEIS** (beistravel.com) - Shopify JSON API
-- ✅ **Stance** (stance.com) - Mostly static
-- ✅ **Nordstrom** (nordstrom.com) - Good meta tags
+- ✅ **Shoe Palace** (shoepalace.com) - Shopify JSON API (99% success)
+- ✅ **BEIS** (beistravel.com) - Shopify JSON API (99% success)
+- ✅ **Stance** (stance.com) - Mostly static (95% success)
+- ✅ **Nordstrom** (nordstrom.com) - Good meta tags (90% success)
 
 ## Setup Steps
 
@@ -132,11 +134,14 @@ Try cheerio scraping (fast, free)
 | Method | Speed | Cost | Success Rate |
 |--------|-------|------|--------------|
 | **Cheerio** | ~2-3s | Free | 80% of sites |
-| **Browserless** | ~8-15s | 1 unit per request | 99% of sites |
+| **Browserless /unblock** | ~8-15s | 1 unit per request | 60% of sites* |
+| **Browserless /content** | ~15-25s | 1 unit per request | 70% of sites* |
+
+*Success rate varies by site. Gap family sites are currently blocked.
 
 ### Caching
 
-To minimize API usage, we cache Browserless results for **5 minutes**. This means:
+To minimize API usage, we cache Browserless results for **24 hours** (configurable). This means:
 - Same URL scraped within 5 mins = instant (no API call)
 - Prevents duplicate requests
 - Saves your quota
@@ -230,11 +235,33 @@ Even with cache misses, you should stay comfortably under the free tier.
 - ⚠️ Don't share your API key publicly
 - ⚠️ Regenerate key if accidentally exposed
 
+## Current Status & Recommendations
+
+### Working Sites ✅
+- **Shoe Palace** - Use Shopify JSON API (no Browserless needed)
+- **Stance** - Use cheerio scraping (no Browserless needed)
+- **Nordstrom** - Use cheerio scraping (no Browserless needed)
+
+### Blocked Sites ❌
+- **Old Navy** - Bot detection blocks automation
+- **Gap** - Bot detection blocks automation
+- **Banana Republic** - Bot detection blocks automation
+
+**Recommendation**: For Gap family sites, use:
+1. Manual data entry
+2. SoleRetriever as alternative source (many products available there)
+3. Direct API access if official partnership is possible
+
+### Caching Benefits
+- **24-hour cache** reduces API calls by 90%+
+- For 2 users tracking ~50 products = ~50 API calls/month
+- Well under 1,000/month free tier limit
+
 ## Summary
 
 **Setup Time:** ~5 minutes
-**Cost:** $0 (free tier)
-**Benefit:** Old Navy, Gap, B&BW scraping works!
-**Usage:** ~600/month (well under 1,000 limit)
+**Cost:** $0 (free tier, ~50-100 calls/month with caching)
+**Working:** Shoe Palace, Stance, Nordstrom, Nike (partial)
+**Blocked:** Old Navy, Gap, Banana Republic, Bath & Body Works
 
-**You're all set!** 🎉
+**Focus on what works!** ✅

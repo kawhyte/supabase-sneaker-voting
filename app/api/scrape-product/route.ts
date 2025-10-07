@@ -20,10 +20,31 @@ interface ProductData {
 function cleanText(text: string | undefined | null): string {
   if (!text) return ''
 
-  return text
+  let cleaned = text
     .replace(/[\n\t\r]/g, ' ')  // Replace newlines and tabs with spaces
     .replace(/\s+/g, ' ')        // Replace multiple spaces with single space
     .trim()                       // Remove leading/trailing whitespace
+
+  // Remove common cookie/privacy banner text patterns
+  const bannersToRemove = [
+    /this website uses cookies.*/gi,
+    /we use cookies.*/gi,
+    /by using this site.*/gi,
+    /accept.*cookies.*/gi,
+    /cookie.*policy.*/gi,
+    /privacy.*policy.*/gi,
+    /preferences.*reject.*accept/gi,
+    /cookie.*settings/gi,
+  ]
+
+  bannersToRemove.forEach(pattern => {
+    cleaned = cleaned.replace(pattern, '')
+  })
+
+  // Clean up any resulting extra spaces
+  cleaned = cleaned.replace(/\s+/g, ' ').trim()
+
+  return cleaned
 }
 
 // Helper function to detect category from product title and URL
@@ -141,6 +162,7 @@ async function scrapeWithFallback(
   options?: {
     skipCheerio?: boolean, // Skip cheerio attempt and go straight to Browserless
     browserlessConfig?: {
+      endpoint?: 'unblock' | 'content' // Which Browserless endpoint to use
       waitFor?: { selector: string; timeout?: number }
       timeout?: number
     },
@@ -407,6 +429,10 @@ export async function POST(request: NextRequest) {
       } else if (hostname.includes('stockx.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeStockX, 'StockX'))
       } else if (hostname.includes('bananarepublic.gap.com')) {
+        // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
+        // that blocks automation. Both /unblock and /content endpoints are blocked.
+        // Current implementation attempts scraping but success rate is very low (~0-10%).
+        // RECOMMENDATION: Use manual entry or alternative sources (SoleRetriever) for these sites.
         productData = await scrapeWithTimeout(() => scrapeWithFallback(
           url,
           (u) => scrapeGapFamily(u, 'Banana Republic'),
@@ -414,13 +440,18 @@ export async function POST(request: NextRequest) {
           {
             skipCheerio: true, // Skip cheerio, go straight to Browserless
             browserlessConfig: {
-              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 10000 },
-              timeout: 20000
+              endpoint: 'content', // Use /content for better JS rendering
+              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 15000 },
+              timeout: 30000
             },
             customExtractor: (html, u) => extractGapFamilyData(html, u, 'Banana Republic')
           }
-        ), 25000)
+        ), 35000)
       } else if (hostname.includes('oldnavy.gap.com')) {
+        // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
+        // that blocks automation. Both /unblock and /content endpoints are blocked.
+        // Current implementation attempts scraping but success rate is very low (~0-10%).
+        // RECOMMENDATION: Use manual entry or alternative sources (SoleRetriever) for these sites.
         productData = await scrapeWithTimeout(() => scrapeWithFallback(
           url,
           (u) => scrapeGapFamily(u, 'Old Navy'),
@@ -428,13 +459,18 @@ export async function POST(request: NextRequest) {
           {
             skipCheerio: true, // Skip cheerio, go straight to Browserless
             browserlessConfig: {
-              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 10000 },
-              timeout: 20000
+              endpoint: 'content', // Use /content for better JS rendering
+              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 15000 },
+              timeout: 30000
             },
             customExtractor: (html, u) => extractGapFamilyData(html, u, 'Old Navy')
           }
-        ), 25000)
+        ), 35000)
       } else if (hostname.includes('gap.com')) {
+        // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
+        // that blocks automation. Both /unblock and /content endpoints are blocked.
+        // Current implementation attempts scraping but success rate is very low (~0-10%).
+        // RECOMMENDATION: Use manual entry or alternative sources (SoleRetriever) for these sites.
         productData = await scrapeWithTimeout(() => scrapeWithFallback(
           url,
           (u) => scrapeGapFamily(u, 'Gap'),
@@ -442,12 +478,13 @@ export async function POST(request: NextRequest) {
           {
             skipCheerio: true, // Skip cheerio, go straight to Browserless
             browserlessConfig: {
-              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 10000 },
-              timeout: 20000
+              endpoint: 'content', // Use /content for better JS rendering
+              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 15000 },
+              timeout: 30000
             },
             customExtractor: (html, u) => extractGapFamilyData(html, u, 'Gap')
           }
-        ), 25000)
+        ), 35000)
       } else if (hostname.includes('nordstrom.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNordstrom, 'Nordstrom'))
       } else if (hostname.includes('stance.com')) {

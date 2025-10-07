@@ -1901,6 +1901,57 @@ export function RedesignedSneakerForm({
 										Discard
 									</Button>*/}
 
+									{/* Validation Summary - Show what's blocking submission */}
+									{(!isValid || photos.length === 0) && !isLoading && (
+										<Alert className="border-yellow-500 bg-yellow-50">
+											<AlertTriangle className="h-4 w-4 text-yellow-600" />
+											<AlertDescription className="text-yellow-800">
+												<div className="font-semibold mb-2">Please complete the following before saving:</div>
+												<ul className="list-disc list-inside space-y-1 text-sm">
+													{photos.length === 0 && (
+														<li>Upload at least one product photo</li>
+													)}
+													{errors.userName && (
+														<li>{errors.userName.message}</li>
+													)}
+													{errors.interactionType && (
+														<li>{errors.interactionType.message}</li>
+													)}
+													{errors.category && (
+														<li>{errors.category.message}</li>
+													)}
+													{errors.brand && (
+														<li>{errors.brand.message}</li>
+													)}
+													{errors.model && (
+														<li>{errors.model.message}</li>
+													)}
+													{errors.sizeTried && (
+														<li>{errors.sizeTried.message}</li>
+													)}
+													{errors.comfortRating && (
+														<li>{errors.comfortRating.message}</li>
+													)}
+													{errors.retailPrice && (
+														<li>{errors.retailPrice.message}</li>
+													)}
+													{errors.salePrice && (
+														<li>{errors.salePrice.message}</li>
+													)}
+													{errors.purchasePrice && (
+														<li>{errors.purchasePrice.message}</li>
+													)}
+													{errors.idealPrice && (
+														<li>{errors.idealPrice.message}</li>
+													)}
+													{errors.targetPrice && (
+														<li>{errors.targetPrice.message}</li>
+													)}
+												</ul>
+											</AlertDescription>
+										</Alert>
+									)}
+
 									{/* Submit Button */}
 									<Button
 										type='submit'
