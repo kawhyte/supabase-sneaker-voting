@@ -17,6 +17,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	CheckCircle,
@@ -285,6 +286,10 @@ export function RedesignedSneakerForm({
 	} = useForm<SneakerFormData>({
 		resolver: zodResolver(sneakerSchema),
 		mode: "onChange",
+		defaultValues: {
+			userName: "Kenny",
+			interactionType: "seen",
+		},
 	});
 
 	const watchedUser = watch("userName");
@@ -1100,93 +1105,76 @@ export function RedesignedSneakerForm({
 					<form
 						onSubmit={handleSubmit(onSubmit)}
 						className='space-y-[var(--space-lg)]'>
-						{/* User, Experience, and Category Dropdowns - Required First */}
+						{/* User, Experience, and Category - Required First */}
 						<div className='grid grid-cols-1 md:grid-cols-3 gap-[var(--space-base)] pb-[var(--space-base)]'>
 							<div>
-								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]'>
-									{/* <User className='h-3 w-3 text-blue-600' /> */}
+								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)] mb-3'>
 									<span>Who's tracking?</span>
 									<span className='text-red-500 -ml-1'>*</span>
 								</Label>
-								<Select
+								<RadioGroup
+									value={watchedUser}
 									onValueChange={(value: "Kenny" | "Rene") =>
-										setValue("userName", value)
+										setValue("userName", value, { shouldValidate: true })
 									}
-									value={watchedUser}>
-									<SelectTrigger className='h-4 mt-[var(--space-md)] max-w-xs'>
-										<SelectValue placeholder='Select user' />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value='Kenny'>
-											<div className='flex items-center gap-[var(--space-md)]'>
-												<UserCircle className='h-2 w-2' />
-												<span>Kenny</span>
-											</div>
-										</SelectItem>
-										<SelectItem value='Rene'>
-											<div className='flex items-center gap-[var(--space-md)]'>
-												<UserCircle className='h-2 w-2' />
-												<span>Rene</span>
-											</div>
-										</SelectItem>
-									</SelectContent>
-								</Select>
+									className='flex gap-4'>
+									<div className='flex items-center space-x-2'>
+										<RadioGroupItem value='Kenny' id='user-kenny' />
+										<Label htmlFor='user-kenny' className='font-normal cursor-pointer flex items-center gap-2'>
+											<UserCircle className='h-4 w-4 text-blue-600' />
+											Kenny
+										</Label>
+									</div>
+									<div className='flex items-center space-x-2'>
+										<RadioGroupItem value='Rene' id='user-rene' />
+										<Label htmlFor='user-rene' className='font-normal cursor-pointer flex items-center gap-2'>
+											<UserCircle className='h-4 w-4 text-purple-600' />
+											Rene
+										</Label>
+									</div>
+								</RadioGroup>
 								{errors.userName && (
 									<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]'>
 										<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
-										<div>
-											<p className='text-xs font-semibold text-red-700'>
-												{errors.userName.message}
-											</p>
-											<p className='text-xs text-red-600 mt-0.5'>
-												Please select who is tracking this sneaker
-											</p>
-										</div>
+										<p className='text-xs font-semibold text-red-700'>
+											{errors.userName.message}
+										</p>
 									</div>
 								)}
 							</div>
 
 							<div>
-								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]'>
-									{/*<Eye className='h-3 w-3 text-teal-600' />*/}
+								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)] mb-3'>
 									<span>Experience</span>
 									<span className='text-red-500 -ml-1'>*</span>
 								</Label>
-								<Select
+								<RadioGroup
+									value={watchedInteractionType}
 									onValueChange={(value: "seen" | "tried") =>
-										setValue("interactionType", value)
+										setValue("interactionType", value, { shouldValidate: true })
 									}
-									value={watchedInteractionType}>
-									<SelectTrigger className='h-4 mt-[var(--space-md)] max-w-sm'>
-										<SelectValue placeholder='Select experience type' />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value='seen'>
-											<div className='flex items-center gap-[var(--space-md)]'>
-												<Eye className='h-2 w-2' />
-												<span>Seen - Online or in store</span>
-											</div>
-										</SelectItem>
-										<SelectItem value='tried'>
-											<div className='flex items-center gap-[var(--space-md)]'>
-												<Footprints className='h-2 w-2' />
-												<span>Tried On - Worn & tested</span>
-											</div>
-										</SelectItem>
-									</SelectContent>
-								</Select>
+									className='flex gap-4'>
+									<div className='flex items-center space-x-2'>
+										<RadioGroupItem value='seen' id='exp-seen' />
+										<Label htmlFor='exp-seen' className='font-normal cursor-pointer flex items-center gap-2'>
+											<Eye className='h-4 w-4 text-teal-600' />
+											Seen
+										</Label>
+									</div>
+									<div className='flex items-center space-x-2'>
+										<RadioGroupItem value='tried' id='exp-tried' />
+										<Label htmlFor='exp-tried' className='font-normal cursor-pointer flex items-center gap-2'>
+											<Footprints className='h-4 w-4 text-orange-600' />
+											Tried On
+										</Label>
+									</div>
+								</RadioGroup>
 								{errors.interactionType && (
 									<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]'>
 										<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
-										<div>
-											<p className='text-xs font-semibold text-red-700'>
-												{errors.interactionType.message}
-											</p>
-											<p className='text-xs text-red-600 mt-0.5'>
-												Choose "Seen" if viewed online/in-store, or "Tried On"
-												if you've worn them
-											</p>
-										</div>
+										<p className='text-xs font-semibold text-red-700'>
+											{errors.interactionType.message}
+										</p>
 									</div>
 								)}
 							</div>

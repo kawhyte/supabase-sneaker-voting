@@ -10,8 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle, Loader2, Upload, X, Camera, User, Eye, Footprints, AlertTriangle, Star, Sparkles } from 'lucide-react'
+import { CheckCircle, Loader2, Upload, X, Camera, UserCircle, Eye, Footprints, AlertTriangle, Star, Sparkles } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { MultiPhotoUpload } from './multi-photo-upload'
 import { BrandCombobox } from './brand-combobox'
@@ -493,26 +494,33 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-[var(--space-lg)]">
-              {/* User, Experience, and Category Dropdowns */}
+              {/* User, Experience, and Category */}
               {isFormReady && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--space-base)] pb-[var(--space-base)]">
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
-                      {/* <User className="h-3 w-3 text-blue-600" /> */}
+                    <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)] mb-3">
                       Who's tracking? <span className="text-red-500">*</span>
                     </Label>
-                    <Select
-                      onValueChange={(value: "Kenny" | "Rene") => setValue("userName", value, { shouldValidate: true })}
+                    <RadioGroup
                       value={watchedUser}
+                      onValueChange={(value: "Kenny" | "Rene") => setValue("userName", value, { shouldValidate: true })}
+                      className="flex gap-4"
                     >
-                      <SelectTrigger className="h-4 mt-[var(--space-md)] max-w-xs">
-                        <SelectValue placeholder="Select user" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Kenny">Kenny</SelectItem>
-                        <SelectItem value="Rene">Rene</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Kenny" id="edit-user-kenny" />
+                        <Label htmlFor="edit-user-kenny" className="font-normal cursor-pointer flex items-center gap-2">
+                          <UserCircle className="h-4 w-4 text-blue-600" />
+                          Kenny
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Rene" id="edit-user-rene" />
+                        <Label htmlFor="edit-user-rene" className="font-normal cursor-pointer flex items-center gap-2">
+                          <UserCircle className="h-4 w-4 text-purple-600" />
+                          Rene
+                        </Label>
+                      </div>
+                    </RadioGroup>
                     {errors.userName && (
                       <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
                         <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
@@ -522,31 +530,29 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)]">
+                    <Label className="text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)] mb-3">
                       Experience <span className="text-red-500">*</span>
                     </Label>
-                    <Select
-                      onValueChange={(value: "seen" | "tried") => setValue("interactionType", value, { shouldValidate: true })}
+                    <RadioGroup
                       value={watchedInteractionType}
+                      onValueChange={(value: "seen" | "tried") => setValue("interactionType", value, { shouldValidate: true })}
+                      className="flex gap-4"
                     >
-                      <SelectTrigger className="h-4 mt-[var(--space-md)] max-w-sm">
-                        <SelectValue placeholder="Select experience type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="seen">
-                          <div className="flex items-center gap-[var(--space-md)]">
-                            <Eye className="h-2 w-2" />
-                            <span>Seen - Online or in store</span>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="tried">
-                          <div className="flex items-center gap-[var(--space-md)]">
-                            <Footprints className="h-2 w-2" />
-                            <span>Tried On - Worn & tested</span>
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="seen" id="edit-exp-seen" />
+                        <Label htmlFor="edit-exp-seen" className="font-normal cursor-pointer flex items-center gap-2">
+                          <Eye className="h-4 w-4 text-teal-600" />
+                          Seen
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="tried" id="edit-exp-tried" />
+                        <Label htmlFor="edit-exp-tried" className="font-normal cursor-pointer flex items-center gap-2">
+                          <Footprints className="h-4 w-4 text-orange-600" />
+                          Tried On
+                        </Label>
+                      </div>
+                    </RadioGroup>
                     {errors.interactionType && (
                       <div className="mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]">
                         <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
