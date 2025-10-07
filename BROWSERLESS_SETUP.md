@@ -6,6 +6,8 @@ This guide explains how to set up Browserless.io for scraping dynamic JavaScript
 
 Browserless.io provides browser automation in the cloud, allowing us to scrape websites that require JavaScript execution (like Old Navy, Gap, Bath & Body Works).
 
+**API Endpoint:** We use the production REST API at `https://production-sfo.browserless.io`
+
 **Free Tier:**
 - 1,000 requests/month
 - No credit card required

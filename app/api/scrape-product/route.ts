@@ -137,49 +137,64 @@ function detectCategory(url: string, title: string, breadcrumbs: string = ''): I
 async function scrapeWithFallback(
   url: string,
   scraperFn: (url: string) => Promise<ProductData>,
-  siteName: string
+  siteName: string,
+  options?: {
+    skipCheerio?: boolean, // Skip cheerio attempt and go straight to Browserless
+    browserlessConfig?: {
+      waitFor?: { selector: string; timeout?: number }
+      timeout?: number
+    },
+    customExtractor?: (html: string, url: string) => ProductData // Custom HTML extractor
+  }
 ): Promise<ProductData> {
-  // First attempt: Regular fetch + cheerio
-  console.log(`📡 Attempting cheerio scrape for ${siteName}...`)
-  const firstAttempt = await scraperFn(url)
+  // Option to skip cheerio and go straight to Browserless (for known JS-heavy sites)
+  if (!options?.skipCheerio) {
+    // First attempt: Regular fetch + cheerio
+    console.log(`📡 Attempting cheerio scrape for ${siteName}...`)
+    const firstAttempt = await scraperFn(url)
 
-  // If successful, return immediately
-  if (firstAttempt.success && firstAttempt.brand && firstAttempt.retailPrice) {
-    console.log(`✅ Cheerio scrape successful for ${siteName}`)
-    return firstAttempt
+    // If successful, return immediately
+    if (firstAttempt.success && firstAttempt.brand && firstAttempt.retailPrice) {
+      console.log(`✅ Cheerio scrape successful for ${siteName}`)
+      return firstAttempt
+    }
+    console.log(`⚠️ Cheerio failed for ${siteName}, will try Browserless...`)
+  } else {
+    console.log(`⏭️ Skipping cheerio for ${siteName}, using Browserless directly...`)
   }
 
   // If cheerio failed and Browserless is available, try with browser automation
   if (!isBrowserlessAvailable()) {
-    console.log(`⚠️ Cheerio failed for ${siteName} and Browserless not configured`)
+    console.log(`⚠️ Browserless not configured for ${siteName}`)
     return {
-      ...firstAttempt,
-      error: firstAttempt.error
-        ? `${firstAttempt.error} Browserless is not configured. Add BROWSERLESS_API_KEY to enable browser automation for dynamic sites.`
-        : 'Scraping failed and Browserless is not configured.'
+      success: false,
+      error: 'Browserless is not configured. Add BROWSERLESS_API_KEY to enable browser automation for dynamic sites.'
     }
   }
 
   // Try with Browserless
-  console.log(`🌐 Cheerio failed for ${siteName}, attempting Browserless fallback...`)
+  console.log(`🌐 Fetching ${siteName} with Browserless automation...`)
 
   try {
-    const browserResult = await fetchWithBrowserCached(url)
+    const browserResult = await fetchWithBrowserCached(url, options?.browserlessConfig)
 
     if (!browserResult.success || !browserResult.html) {
       return {
         success: false,
-        error: `Both cheerio and Browserless failed. ${browserResult.error || 'Unknown error'}`
+        error: `Browserless failed: ${browserResult.error || 'Unknown error'}`
       }
     }
 
-    // Parse the browser-rendered HTML with cheerio
-    console.log(`🔍 Parsing Browserless HTML for ${siteName}...`)
-    const $ = cheerio.load(browserResult.html)
+    console.log(`🔍 Parsing Browserless HTML for ${siteName}... (${browserResult.html.length} chars)`)
 
-    // Re-run the scraper logic with the browser-rendered HTML
-    // Extract data using generic selectors from browser-rendered content
-    const productData = extractProductDataFromHtml($, url, siteName)
+    // Use custom extractor if provided, otherwise use generic one
+    let productData: ProductData
+    if (options?.customExtractor) {
+      productData = options.customExtractor(browserResult.html, url)
+    } else {
+      const $ = cheerio.load(browserResult.html)
+      productData = extractProductDataFromHtml($, url, siteName)
+    }
 
     if (productData.success) {
       console.log(`✅ Browserless scrape successful for ${siteName}`)
@@ -199,6 +214,8 @@ async function scrapeWithFallback(
 // Extract product data from cheerio instance (works with both regular and Browserless HTML)
 function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: string): ProductData {
   try {
+    console.log(`🔍 Extracting product data from ${siteName} HTML...`)
+
     // Extract title
     const title = cleanText(
       $('h1').first().text() ||
@@ -207,7 +224,10 @@ function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: stri
       $('.product-title, [class*="product-title"], [class*="productTitle"]').first().text()
     )
 
+    console.log(`📌 Extracted title: "${title}"`)
+
     if (!title) {
+      console.error(`❌ No title found for ${siteName}`)
       return {
         success: false,
         error: `Could not extract product title from ${siteName} even with browser automation. The page structure may have changed.`
@@ -245,7 +265,9 @@ function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: stri
         $('.price, [class*="price"], [class*="Price"]').first().text() ||
         $('meta[property="product:price:amount"]').attr('content')
       )
+      console.log(`💰 Price text found: "${priceText}"`)
       retailPrice = extractPrice(priceText)
+      console.log(`💰 Extracted retail price: $${retailPrice}`)
     }
 
     // Extract images
@@ -288,7 +310,7 @@ function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: stri
     // Validate
     const validation = validateProductData(productData, siteName)
     if (!validation.isValid) {
-      console.warn(`${siteName} Browserless extraction validation issues:`, validation.issues)
+      console.warn(`⚠️ ${siteName} Browserless extraction validation issues:`, validation.issues)
       if (productData.brand || productData.model) {
         productData.error = `Partial data extracted via browser automation. Issues: ${validation.issues.join(', ')}`
       } else {
@@ -298,6 +320,15 @@ function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: stri
         }
       }
     }
+
+    console.log(`✅ ${siteName} product data extracted:`, {
+      brand: productData.brand,
+      model: productData.model?.substring(0, 50),
+      retailPrice: productData.retailPrice,
+      salePrice: productData.salePrice,
+      imageCount: productData.images?.length,
+      category: productData.category
+    })
 
     return productData
 
@@ -376,11 +407,47 @@ export async function POST(request: NextRequest) {
       } else if (hostname.includes('stockx.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeStockX, 'StockX'))
       } else if (hostname.includes('bananarepublic.gap.com')) {
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, (u) => scrapeGapFamily(u, 'Banana Republic'), 'Banana Republic'), 20000)
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(
+          url,
+          (u) => scrapeGapFamily(u, 'Banana Republic'),
+          'Banana Republic',
+          {
+            skipCheerio: true, // Skip cheerio, go straight to Browserless
+            browserlessConfig: {
+              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 10000 },
+              timeout: 20000
+            },
+            customExtractor: (html, u) => extractGapFamilyData(html, u, 'Banana Republic')
+          }
+        ), 25000)
       } else if (hostname.includes('oldnavy.gap.com')) {
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, (u) => scrapeGapFamily(u, 'Old Navy'), 'Old Navy'), 20000)
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(
+          url,
+          (u) => scrapeGapFamily(u, 'Old Navy'),
+          'Old Navy',
+          {
+            skipCheerio: true, // Skip cheerio, go straight to Browserless
+            browserlessConfig: {
+              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 10000 },
+              timeout: 20000
+            },
+            customExtractor: (html, u) => extractGapFamilyData(html, u, 'Old Navy')
+          }
+        ), 25000)
       } else if (hostname.includes('gap.com')) {
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, (u) => scrapeGapFamily(u, 'Gap'), 'Gap'), 20000)
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(
+          url,
+          (u) => scrapeGapFamily(u, 'Gap'),
+          'Gap',
+          {
+            skipCheerio: true, // Skip cheerio, go straight to Browserless
+            browserlessConfig: {
+              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 10000 },
+              timeout: 20000
+            },
+            customExtractor: (html, u) => extractGapFamilyData(html, u, 'Gap')
+          }
+        ), 25000)
       } else if (hostname.includes('nordstrom.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNordstrom, 'Nordstrom'))
       } else if (hostname.includes('stance.com')) {
@@ -605,24 +672,48 @@ async function scrapeNike(url: string): Promise<ProductData> {
       salePrice = undefined
     }
 
-    // Image extraction - enhanced with meta tags
+    // Image extraction - check ImageCarousel first
     const images: string[] = []
 
-    // Try meta tags first
-    const ogImage = $('meta[property="og:image"]').attr('content')
-    if (ogImage) {
-      images.push(ogImage.startsWith('http') ? ogImage : `https://static.nike.com${ogImage}`)
-    }
-
-    // Try Nike-specific image selectors
-    $('img[src*="static.nike.com"], img[src*="secure-images.nike.com"], .product-image img, [class*="product-image"] img, picture img').each((_, el) => {
-      if (images.length >= 5) return false
+    // Try Nike ImageCarousel hero images first (higher quality)
+    $('[data-testid="ImageCarousel"] img[data-testid="HeroImg"]').each((_, el) => {
       const src = $(el).attr('src') || $(el).attr('data-src')
       if (src && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
         const fullUrl = src.startsWith('http') ? src : `https://static.nike.com${src}`
         images.push(fullUrl)
       }
     })
+
+    // Fallback to thumbnail images if no hero images found
+    if (images.length === 0) {
+      $('[data-testid="ImageCarousel"] img[data-testid^="Thumbnail-Img-"]').each((_, el) => {
+        const src = $(el).attr('src') || $(el).attr('data-src')
+        if (src && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
+          const fullUrl = src.startsWith('http') ? src : `https://static.nike.com${src}`
+          images.push(fullUrl)
+        }
+      })
+    }
+
+    // Fallback to meta tags if no carousel images
+    if (images.length === 0) {
+      const ogImage = $('meta[property="og:image"]').attr('content')
+      if (ogImage) {
+        images.push(ogImage.startsWith('http') ? ogImage : `https://static.nike.com${ogImage}`)
+      }
+    }
+
+    // Final fallback to other Nike selectors
+    if (images.length === 0) {
+      $('img[src*="static.nike.com"], img[src*="secure-images.nike.com"], .product-image img, [class*="product-image"] img, picture img').each((_, el) => {
+        if (images.length >= 5) return false
+        const src = $(el).attr('src') || $(el).attr('data-src')
+        if (src && !src.includes('logo') && !src.includes('icon') && !images.includes(src)) {
+          const fullUrl = src.startsWith('http') ? src : `https://static.nike.com${src}`
+          images.push(fullUrl)
+        }
+      })
+    }
 
     // Detect category (Nike sells shoes, apparel, accessories)
     const category = detectCategory(url, model, '')
@@ -909,6 +1000,203 @@ async function scrapeShoePalace(url: string): Promise<ProductData> {
     return {
       success: false,
       error: `Shoe Palace scraping failed: ${error instanceof Error ? error.message : "Unknown error"}`
+    }
+  }
+}
+
+// Custom extractor for Gap family sites (Old Navy, Gap, Banana Republic)
+// Optimized for their Next.js/React structure
+function extractGapFamilyData(html: string, url: string, brandName: string): ProductData {
+  try {
+    const $ = cheerio.load(html)
+
+    console.log(`🔍 Extracting Gap family data for ${brandName}...`)
+
+    // Gap family uses specific data attributes and structure
+    // Try multiple selector strategies
+
+    // Strategy 1: Look for product title in multiple locations
+    const title = cleanText(
+      $('h1[data-testid="product-title"]').text() ||
+      $('h1[itemprop="name"]').text() ||
+      $('.product-title h1').text() ||
+      $('h1.product-name').text() ||
+      $('h1').first().text() ||
+      $('meta[property="og:title"]').attr('content') ||
+      $('meta[name="twitter:title"]').attr('content') ||
+      ''
+    )
+
+    console.log(`📌 Title extracted: "${title}"`)
+
+    if (!title || title.length < 3) {
+      console.error(`❌ No valid title found for ${brandName}`)
+      return {
+        success: false,
+        error: `Could not extract product title from ${brandName}. The page may not have loaded completely.`
+      }
+    }
+
+    // Strategy 2: Extract breadcrumbs for better category detection
+    const breadcrumbs = cleanText(
+      $('[aria-label="breadcrumb"]').text() ||
+      $('.breadcrumb').text() ||
+      $('nav[role="navigation"] a').map((_, el) => $(el).text()).get().join(' ') ||
+      ''
+    )
+
+    // Strategy 3: Extract prices from JSON-LD or meta tags first, then HTML
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    // Try JSON-LD structured data (most reliable)
+    $('script[type="application/ld+json"]').each((_, el) => {
+      try {
+        const jsonLd = JSON.parse($(el).html() || '{}')
+        if (jsonLd.offers) {
+          const offers = Array.isArray(jsonLd.offers) ? jsonLd.offers[0] : jsonLd.offers
+          if (offers.price) {
+            retailPrice = parseFloat(offers.price)
+          }
+          if (offers.lowPrice && offers.highPrice) {
+            salePrice = parseFloat(offers.lowPrice)
+            retailPrice = parseFloat(offers.highPrice)
+          }
+        }
+      } catch (e) {
+        // Continue to next script tag
+      }
+    })
+
+    // Fallback to meta tags
+    if (!retailPrice) {
+      const metaPrice = $('meta[property="product:price:amount"]').attr('content')
+      if (metaPrice) {
+        retailPrice = parseFloat(metaPrice)
+      }
+    }
+
+    // Fallback to HTML selectors (less reliable for Gap family)
+    if (!retailPrice && !salePrice) {
+      const priceContainers = [
+        '[data-testid="product-price"]',
+        '.product-price',
+        '[class*="price"]',
+        '[class*="Price"]'
+      ]
+
+      for (const selector of priceContainers) {
+        const priceText = cleanText($(selector).first().text())
+        if (priceText) {
+          const price = extractPrice(priceText)
+          if (price) {
+            if (!retailPrice) {
+              retailPrice = price
+            } else if (price < retailPrice) {
+              salePrice = price
+            }
+          }
+        }
+      }
+    }
+
+    console.log(`💰 Prices: retail=$${retailPrice}, sale=$${salePrice}`)
+
+    // Strategy 4: Extract images from multiple sources
+    const images: string[] = []
+    const hostname = new URL(url).hostname
+
+    // Try meta tags first (highest quality)
+    const ogImage = $('meta[property="og:image"]').attr('content')
+    if (ogImage) {
+      const fullUrl = ogImage.startsWith('http') ? ogImage : `https://${hostname}${ogImage}`
+      images.push(fullUrl)
+    }
+
+    // Try preload images
+    $('link[rel="preload"][as="image"]').each((_, el) => {
+      if (images.length >= 5) return false
+      const href = $(el).attr('href')
+      if (href && !href.includes('logo') && !href.includes('icon')) {
+        const fullUrl = href.startsWith('http') ? href : `https://${hostname}${href}`
+        if (!images.includes(fullUrl)) {
+          images.push(fullUrl)
+        }
+      }
+    })
+
+    // Try product images
+    $('img[data-testid*="image"], img[class*="product"], picture img').each((_, el) => {
+      if (images.length >= 5) return false
+      const src = $(el).attr('src') || $(el).attr('data-src')
+      if (src && !src.includes('logo') && !src.includes('icon')) {
+        const fullUrl = src.startsWith('http') ? src : `https://${hostname}${src}`
+        if (!images.includes(fullUrl)) {
+          images.push(fullUrl)
+        }
+      }
+    })
+
+    console.log(`🖼️ Found ${images.length} images`)
+
+    // Strategy 5: Extract other metadata
+    const colorway = cleanText(
+      $('[data-testid="product-color"]').text() ||
+      $('.color-name').text() ||
+      $('meta[property="product:color"]').attr('content') ||
+      ''
+    )
+
+    const sku = cleanText(
+      $('[data-testid="style-number"]').text() ||
+      $('.style-number').text() ||
+      $('meta[property="product:retailer_item_id"]').attr('content') ||
+      ''
+    )
+
+    // Detect category
+    const category = detectCategory(url, title, breadcrumbs)
+
+    const productData: ProductData = {
+      brand: brandName,
+      model: title,
+      colorway: colorway || undefined,
+      sku: sku || undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      category,
+      success: true
+    }
+
+    // Validate
+    const validation = validateProductData(productData, brandName)
+    if (!validation.isValid) {
+      console.warn(`⚠️ ${brandName} validation issues:`, validation.issues)
+      if (productData.brand && productData.model) {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      } else {
+        return {
+          success: false,
+          error: `Failed to extract sufficient data from ${brandName}. Issues: ${validation.issues.join(', ')}`
+        }
+      }
+    }
+
+    console.log(`✅ ${brandName} extraction complete:`, {
+      hasTitle: !!productData.model,
+      hasPrice: !!productData.retailPrice,
+      imageCount: productData.images?.length,
+      category: productData.category
+    })
+
+    return productData
+
+  } catch (error) {
+    console.error(`❌ Error extracting ${brandName} data:`, error)
+    return {
+      success: false,
+      error: `Failed to parse ${brandName} HTML: ${error instanceof Error ? error.message : 'Unknown error'}`
     }
   }
 }
