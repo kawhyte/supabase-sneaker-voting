@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { AddItemForm } from './add-item-form'
 import { SizingJournalDashboard } from './sizing-journal-dashboard'
-import { InsightsDashboard } from './insights-dashboard'
+import { FitProfileDashboard } from './fit-profile-dashboard'
 import { Zap, BarChart3, Brain } from 'lucide-react'
 
 type ViewMode = 'entry' | 'dashboard' | 'insights'
@@ -166,7 +166,7 @@ export function ItemTrackerApp() {
             ) : currentView === 'dashboard' ? (
               <SizingJournalDashboard onAddNew={handleAddNew} />
             ) : (
-              <InsightsDashboard onGoBack={() => setCurrentView('dashboard')} />
+              <FitProfileDashboard onGoBack={() => setCurrentView('dashboard')} />
             )}
           </motion.div>
         </AnimatePresence>

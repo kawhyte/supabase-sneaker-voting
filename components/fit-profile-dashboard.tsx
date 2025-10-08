@@ -16,11 +16,11 @@ import {
   type FitInsights
 } from '@/lib/size-analytics'
 
-interface InsightsDashboardProps {
+interface FitProfileDashboardProps {
   onGoBack?: () => void
 }
 
-export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
+export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
   const [selectedUser, setSelectedUser] = useState<'Kenny' | 'Rene' | 'both'>('Kenny')
   const [insights, setInsights] = useState<FitInsights | null>(null)
   const [loading, setLoading] = useState(true)
@@ -142,9 +142,9 @@ export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Brain className="h-8 w-8 text-teal-600" />
-            Fit Insights
+            My Fit Profile
           </h1>
-          <p className="text-gray-600">AI-powered size recommendations and fit analysis</p>
+          <p className="text-gray-600">Your personalized size recommendations and fit insights</p>
         </div>
         <div className="flex gap-2">
           <Select value={selectedUser} onValueChange={(value: any) => setSelectedUser(value)}>
@@ -238,7 +238,7 @@ export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Ruler className="h-5 w-5" />
-                  Brand Sizing Analysis
+                  Your Recommended Sizes by Brand
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -298,7 +298,7 @@ export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Lightbulb className="h-5 w-5" />
-                  Smart Size Recommendations
+                  Your Size Predictions
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -337,7 +337,7 @@ export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  Fit Consistency Analysis
+                  Your Fit Consistency
                 </CardTitle>
               </CardHeader>
               <CardContent>
