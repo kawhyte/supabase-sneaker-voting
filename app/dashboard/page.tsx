@@ -6,13 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
 import { InsightsDashboard } from '@/components/insights-dashboard'
 import { BarChart3, Brain, ShoppingBag } from 'lucide-react'
-import { CATEGORY_CONFIGS, type ItemCategory } from '@/components/types/item-category'
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('collection')
-  const [selectedCategories, setSelectedCategories] = useState<ItemCategory[]>(
-    Object.keys(CATEGORY_CONFIGS) as ItemCategory[]
-  )
 
   return (
     <div className="w-full py-8">
@@ -45,8 +41,6 @@ export default function DashboardPage() {
             >
               <SizingJournalDashboard
                 viewMode="watchlist"
-                selectedCategories={selectedCategories}
-                onCategoriesChange={setSelectedCategories}
               />
             </motion.div>
           </TabsContent>
@@ -59,8 +53,6 @@ export default function DashboardPage() {
             >
               <SizingJournalDashboard
                 viewMode="purchased"
-                selectedCategories={selectedCategories}
-                onCategoriesChange={setSelectedCategories}
               />
             </motion.div>
           </TabsContent>

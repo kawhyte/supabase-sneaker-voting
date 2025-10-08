@@ -5,7 +5,7 @@
 @plugin 'tailwindcss-animate';
 
 @custom-variant dark (&:is(.dark *));
-
+ 
 @layer base {
   :root {
     /* ============================================
