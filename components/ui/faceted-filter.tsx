@@ -30,14 +30,14 @@ interface FacetedFilterProps {
     value: string
     icon?: React.ComponentType<{ className?: string }>
   }[]
-  selectedValues: Set<string>
+  selectedValues?: Set<string> // Made prop optional to reflect default
   onValueChange: (selected: Set<string>) => void
 }
 
 export function FacetedFilter({
   title,
   options,
-  selectedValues,
+  selectedValues = new Set(), // <<<< THE FIX IS HERE
   onValueChange,
 }: FacetedFilterProps) {
   return (
@@ -46,7 +46,7 @@ export function FacetedFilter({
         <Button variant="outline" size="sm" className="h-10 border-dashed">
           <PlusCircle className="mr-2 h-4 w-4" />
           {title}
-          {selectedValues.size > 0 && (
+          {selectedValues.size > 0 && ( // This line will no longer error out
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
               <Badge

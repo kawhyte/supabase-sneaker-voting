@@ -18,20 +18,22 @@ import { type ItemCategory } from '@/components/types/item-category'
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
   viewMode?: 'watchlist' | 'purchased'
-  selectedCategories?: ItemCategory[]
-  onCategoriesChange?: (categories: ItemCategory[]) => void
+  // We no longer need to pass category state in, this component will handle it.
+  // selectedCategories?: ItemCategory[] 
+  // onCategoriesChange?: (categories: ItemCategory[]) => void
 }
 
-export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selectedCategories = [], onCategoriesChange }: SizingJournalDashboardProps) {
+export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: SizingJournalDashboardProps) {
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // State - Filters
+  // State - Filters (UPDATED)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedUser, setSelectedUser] = useState<string>('all')
-  const [selectedBrand, setSelectedBrand] = useState<string>('all')
+  const [selectedUsers, setSelectedUsers] = useState(new Set<string>())
+  const [selectedBrands, setSelectedBrands] = useState(new Set<string>())
   const [sortBy, setSortBy] = useState<string>('date-desc')
+  const [selectedCategories, setSelectedCategories] = useState<ItemCategory[]>([])
 
   // State - Modals
   const [editingEntry, setEditingEntry] = useState<SizingJournalEntry | null>(null)
@@ -47,59 +49,38 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
   }, [viewMode])
 
   const loadJournalEntries = async () => {
+    // ... (rest of this function is unchanged)
     try {
       setIsLoading(true)
-
-      // Build query based on viewMode
       let query = supabase
         .from('items')
-        .select(`
-          *,
-          item_photos (
-            id,
-            image_url,
-            image_order,
-            is_main_image
-          )
-        `)
+        .select(`*, item_photos (id, image_url, image_order, is_main_image)`)
         .eq('is_archived', false)
         .order('image_order', { foreignTable: 'item_photos', ascending: true })
-
-      // Filter based on view mode
       if (viewMode === 'purchased') {
-        // Purchased tab: show non-shoe items that are purchased
         query = query.eq('is_purchased', true).neq('category', 'shoes')
       } else {
-        // Watchlist tab: show all items that are NOT purchased
-        // (shoes can't be purchased, and non-shoes that haven't been purchased yet)
         query = query.or('category.eq.shoes,is_purchased.eq.false')
       }
-
       let { data, error } = await query.order('created_at', { ascending: false })
-
-      // Fallback to basic query if item_photos table doesn't exist
       if (error && error.message?.includes('item_photos')) {
         let basicQuery = supabase
           .from('items')
           .select('*')
           .eq('is_archived', false)
-
         if (viewMode === 'purchased') {
           basicQuery = basicQuery.eq('is_purchased', true).neq('category', 'shoes')
         } else {
           basicQuery = basicQuery.or('category.eq.shoes,is_purchased.eq.false')
         }
-
         const basicResult = await basicQuery.order('created_at', { ascending: false })
         data = basicResult.data
         error = basicResult.error
       }
-
       if (error) {
         console.error('Error loading journal entries:', error)
         return
       }
-
       setJournalEntries(data || [])
     } catch (error) {
       console.error('Error:', error)
@@ -107,8 +88,8 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
       setIsLoading(false)
     }
   }
-
-  const handleEditEntry = (entry: SizingJournalEntry) => {
+  // ... (handleEditEntry, handleDeleteEntry, handleToggleCollection, etc. are unchanged)
+    const handleEditEntry = (entry: SizingJournalEntry) => {
     setEditingEntry(entry)
     setIsEditModalOpen(true)
   }
@@ -132,7 +113,6 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
 
     setIsDeleting(true)
     try {
-      // First, fetch all photos associated with this item
       const { data: photos, error: photosError } = await supabase
         .from('item_photos')
         .select('cloudinary_id')
@@ -142,7 +122,6 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
         console.warn('Error fetching sneaker photos:', photosError)
       }
 
-      // Delete all carousel images from Cloudinary
       if (photos && photos.length > 0) {
         for (const photo of photos) {
           if (photo.cloudinary_id) {
@@ -159,7 +138,6 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
         }
       }
 
-      // Delete main image from Cloudinary if it exists
       if (deletingEntry.cloudinary_id) {
         try {
           await fetch('/api/delete-image', {
@@ -172,7 +150,6 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
         }
       }
 
-      // Delete the entry from database (cascade will delete item_photos records)
       const { error } = await supabase
         .from('items')
         .delete()
@@ -201,11 +178,8 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
   }
 
   const handleToggleCollection = async (entry: SizingJournalEntry) => {
-    // For shoes: toggle collection status
     if (entry.category === 'shoes') {
       const newCollectionStatus = !entry.in_collection
-
-      // Validate price before adding to collection
       if (newCollectionStatus && !entry.purchase_price && !entry.retail_price) {
         toast.error('Please set a price before adding to collection', {
           description: 'A price is required to track cost per wear',
@@ -216,29 +190,22 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
         })
         return
       }
-
-      // Optimistic update
       setJournalEntries(prev =>
         prev.map(e => e.id === entry.id ? { ...e, in_collection: newCollectionStatus } : e)
       )
-
       try {
         const { error } = await supabase
           .from('items')
           .update({ in_collection: newCollectionStatus })
           .eq('id', entry.id)
-
         if (error) {
           console.error('Error toggling collection status:', error)
-          // Revert optimistic update on error
           setJournalEntries(prev =>
             prev.map(e => e.id === entry.id ? { ...e, in_collection: !newCollectionStatus } : e)
           )
           toast.error('Failed to update collection')
           return
         }
-
-        // Show success toast
         toast.success(
           newCollectionStatus ? 'Added to collection' : 'Removed from collection',
           {
@@ -248,38 +215,29 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
         )
       } catch (error) {
         console.error('Error:', error)
-        // Revert optimistic update on error
         setJournalEntries(prev =>
           prev.map(e => e.id === entry.id ? { ...e, in_collection: !newCollectionStatus } : e)
         )
         toast.error('Failed to update collection')
       }
     } else {
-      // For non-shoes: toggle purchased status
       const newPurchasedStatus = !entry.is_purchased
-
-      // Optimistic update
       setJournalEntries(prev =>
         prev.map(e => e.id === entry.id ? { ...e, is_purchased: newPurchasedStatus } : e)
       )
-
       try {
         const { error } = await supabase
           .from('items')
           .update({ is_purchased: newPurchasedStatus })
           .eq('id', entry.id)
-
         if (error) {
           console.error('Error toggling purchased status:', error)
-          // Revert optimistic update on error
           setJournalEntries(prev =>
             prev.map(e => e.id === entry.id ? { ...e, is_purchased: !newPurchasedStatus } : e)
           )
           toast.error('Failed to update purchased status')
           return
         }
-
-        // Show success toast
         toast.success(
           newPurchasedStatus ? 'Marked as purchased' : 'Unmarked as purchased',
           {
@@ -287,12 +245,9 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
             duration: 3000,
           }
         )
-
-        // Reload entries to update the view (purchased items move to purchased tab)
         loadJournalEntries()
       } catch (error) {
         console.error('Error:', error)
-        // Revert optimistic update on error
         setJournalEntries(prev =>
           prev.map(e => e.id === entry.id ? { ...e, is_purchased: !newPurchasedStatus } : e)
         )
@@ -301,9 +256,9 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
     }
   }
 
-  // Computed values
+  // Computed values (UPDATED)
   const filteredAndSortedEntries = sortJournalEntries(
-    filterJournalEntries(journalEntries, searchTerm, selectedUser, selectedBrand, selectedCategories),
+    filterJournalEntries(journalEntries, searchTerm, selectedUsers, selectedBrands, selectedCategories),
     sortBy
   )
   const availableBrands = getUniqueBrands(journalEntries)
@@ -321,23 +276,23 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
     <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
       <DashboardHeader viewMode={viewMode} />
 
+      {/* SizingJournalFilters props are now fully updated */}
       <SizingJournalFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        selectedUser={selectedUser}
-        onUserChange={setSelectedUser}
-        selectedBrand={selectedBrand}
-        onBrandChange={setSelectedBrand}
+        selectedUsers={selectedUsers}
+        onUserChange={setSelectedUsers}
+        selectedBrands={selectedBrands}
+        onBrandChange={setSelectedBrands}
         sortBy={sortBy}
         onSortChange={setSortBy}
         availableBrands={availableBrands}
         selectedCategories={selectedCategories}
-        onCategoriesChange={onCategoriesChange || (() => {})}
+        onCategoriesChange={setSelectedCategories}
       />
 
       <SizingJournalStats journalEntries={journalEntries} />
 
-      {/* Journal Entries List */}
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-6">
         {filteredAndSortedEntries.length === 0 ? (
           <EmptyState
@@ -357,7 +312,6 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
         )}
       </div>
 
-      {/* Modals */}
       {editingEntry && (
         <EditSneakerModal
           experience={editingEntry}
@@ -378,9 +332,10 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist', selec
   )
 }
 
-// Sub-components
+// Sub-components (unchanged)
 function DashboardHeader({ viewMode }: { viewMode: 'watchlist' | 'purchased' }) {
-  const titles = {
+    // ...
+    const titles = {
     watchlist: {
       title: 'Personal Pricing Watchlist',
       description: 'Track items you\'re interested in and monitor price changes'
@@ -404,7 +359,8 @@ function DashboardHeader({ viewMode }: { viewMode: 'watchlist' | 'purchased' }) 
 }
 
 function LoadingSkeleton() {
-  return (
+    // ...
+      return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-[var(--space-xl)]">
       {[...Array(6)].map((_, i) => (
         <Card key={i} className="overflow-hidden flex flex-col md:flex-row animate-pulse">
@@ -430,7 +386,8 @@ interface EmptyStateProps {
 }
 
 function EmptyState({ hasEntries, onAddNew }: EmptyStateProps) {
-  return (
+    // ...
+      return (
     <div className="col-span-1 xl:col-span-2">
       <Card>
         <CardContent className="p-8 text-center">

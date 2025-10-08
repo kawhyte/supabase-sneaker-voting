@@ -4,8 +4,8 @@ import { type ItemCategory } from '@/components/types/item-category'
 export function filterJournalEntries(
   entries: SizingJournalEntry[],
   searchTerm: string,
-  selectedUser: string,
-  selectedBrand: string,
+  selectedUsers: Set<string>,
+  selectedBrands: Set<string>,
   selectedCategories: ItemCategory[] = []
 ): SizingJournalEntry[] {
   return entries.filter(entry => {
@@ -14,8 +14,8 @@ export function filterJournalEntries(
       entry.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.colorway.toLowerCase().includes(searchTerm.toLowerCase())
 
-    const matchesUser = selectedUser === 'all' || entry.user_name === selectedUser
-    const matchesBrand = selectedBrand === 'all' || entry.brand === selectedBrand
+    const matchesUser = selectedUsers.size === 0 || selectedUsers.has(entry.user_name)
+    const matchesBrand = selectedBrands.size === 0 || selectedBrands.has(entry.brand)
     const matchesCategory = selectedCategories.length === 0 ||
       selectedCategories.includes(entry.category as ItemCategory)
 
