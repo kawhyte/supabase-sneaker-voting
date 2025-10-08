@@ -39,6 +39,19 @@ export interface SizingJournalEntry {
   is_archived?: boolean
   archive_reason?: ArchiveReason | null
   archived_at?: string | null
+
+  // NEW SCHEMA FIELDS (Phase 1: Parallel Change)
+  status?: 'owned' | 'wishlisted' | 'journaled' // Replaces: in_collection, is_purchased, interested_in_buying
+  has_been_tried?: boolean // Replaces: interaction_type === 'tried'
+  target_price?: number // Replaces: would_buy_at_price (legacy field)
+
+  // OLD SCHEMA FIELDS (To be deprecated in Phase 2)
+  // These are kept for backward compatibility during the parallel change phase
+  // interested_in_buying: boolean - already listed above
+  // in_collection: boolean - already listed above
+  // is_purchased: boolean - already listed above
+  // interaction_type: 'seen' | 'tried' - already listed above
+  would_buy_at_price?: number // Legacy field, use target_price instead
 }
 
 export interface FitRating {

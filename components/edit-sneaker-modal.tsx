@@ -323,16 +323,24 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         colorway: data.colorway || 'Standard',
         sku: data.sku || null,
         category: data.category,
-        interaction_type: data.interactionType,
         size_tried: data.interactionType === 'tried' ? data.sizeTried : null,
         comfort_rating: data.interactionType === 'tried' ? (data.comfortRating || null) : null,
         retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
         purchase_price: data.purchasePrice ? parseFloat(data.purchasePrice) : null,
-        ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
         notes: data.notes || null,
-        interested_in_buying: true,
         // Keep existing main image if no new main was uploaded
-        ...(mainImageUrl && { image_url: mainImageUrl, cloudinary_id: mainCloudinaryId })
+        ...(mainImageUrl && { image_url: mainImageUrl, cloudinary_id: mainCloudinaryId }),
+
+        // PHASE 1: DUAL-WRITE to both old and new columns
+        // OLD COLUMNS (maintain for backward compatibility)
+        interested_in_buying: true,
+        interaction_type: data.interactionType,
+        would_buy_at_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
+
+        // NEW COLUMNS (future schema)
+        status: 'wishlisted' as const,
+        has_been_tried: data.interactionType === 'tried',
+        target_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
       }
 
       const { error: updateError } = await supabase

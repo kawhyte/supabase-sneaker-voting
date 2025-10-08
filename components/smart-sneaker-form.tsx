@@ -369,12 +369,21 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         // Always optional fields
         store_name: data.storeName || null,
         retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
-        ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
         notes: data.notes || null,
-        interested_in_buying: true, // If they're adding it, they're interested
         try_on_date: new Date().toISOString().split('T')[0],
         image_url: mainImageUrl,
-        cloudinary_id: mainCloudinaryId
+        cloudinary_id: mainCloudinaryId,
+
+        // PHASE 1: DUAL-WRITE to both old and new columns
+        // OLD COLUMNS (maintain for backward compatibility)
+        interested_in_buying: true,
+        interaction_type: data.interactionType,
+        would_buy_at_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
+
+        // NEW COLUMNS (future schema)
+        status: 'wishlisted' as const,
+        has_been_tried: data.interactionType === 'tried',
+        target_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
       }
 
       const { error } = await supabase

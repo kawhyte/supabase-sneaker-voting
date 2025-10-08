@@ -924,14 +924,23 @@ export function RedesignedSneakerForm({
 				retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
 				ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
 				notes: data.notes || null,
-				interested_in_buying: true,
 				try_on_date: new Date().toISOString().split("T")[0],
 				image_url: mainImageUrl,
 				cloudinary_id: mainCloudinaryId,
 				// Explicitly set wears to null (only shoes can have wears tracking)
 				wears: null,
-				// Explicitly set in_collection to false (only shoes can be in collection)
+
+				// PHASE 1: DUAL-WRITE to both old and new columns
+				// OLD COLUMNS (maintain for backward compatibility)
+				interested_in_buying: true,
 				in_collection: false,
+				interaction_type: data.interactionType,
+				would_buy_at_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
+
+				// NEW COLUMNS (future schema)
+				status: 'wishlisted' as const, // User is adding to wishlist when interested_in_buying is true
+				has_been_tried: data.interactionType === 'tried',
+				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 			};
 
 			const { data: insertedSneaker, error } = await supabase
