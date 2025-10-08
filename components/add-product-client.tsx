@@ -1,6 +1,6 @@
 'use client'
 
-import { ManualProductEntry } from './manual-product-entry'
+import { AddItemForm } from './add-item-form'
 
 export function AddProductClient() {
   const handleProductAdded = () => {
@@ -8,5 +8,5 @@ export function AddProductClient() {
     console.log('Product added successfully!')
   }
 
-  return <ManualProductEntry onProductAdded={handleProductAdded} />
+  return <AddItemForm onItemAdded={handleProductAdded} mode="create" />
 }

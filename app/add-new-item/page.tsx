@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { RedesignedItemForm } from '@/components/redesigned-item-form'
+import { AddItemForm } from '@/components/add-item-form'
 
 export default function AddNewItemPage() {
   const router = useRouter()
@@ -16,7 +16,7 @@ export default function AddNewItemPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <RedesignedItemForm onItemAdded={handleItemAdded} />
+      <AddItemForm onItemAdded={handleItemAdded} mode="create" />
     </div>
   )
 }

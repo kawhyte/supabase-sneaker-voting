@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { UrlParser } from '@/components/url-parser'
-import { ManualProductEntry } from '@/components/manual-product-entry'
+import { AddItemForm } from '@/components/add-item-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Link, FileEdit } from 'lucide-react'
@@ -44,7 +44,7 @@ export function ProductDataManager() {
             </TabsContent>
 
             <TabsContent value="manual-entry" className="mt-6">
-              <ManualProductEntry onProductAdded={handleProductAdded} />
+              <AddItemForm onItemAdded={handleProductAdded} mode="create" />
             </TabsContent>
           </Tabs>
         </CardContent>

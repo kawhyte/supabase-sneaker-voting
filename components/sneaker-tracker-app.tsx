@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { SmartItemForm } from './smart-item-form'
+import { AddItemForm } from './add-item-form'
 import { SizingJournalDashboard } from './sizing-journal-dashboard'
 import { InsightsDashboard } from './insights-dashboard'
 import { Zap, BarChart3, Brain } from 'lucide-react'
@@ -161,7 +161,7 @@ export function ItemTrackerApp() {
           >
             {currentView === 'entry' ? (
               <div className="flex justify-center">
-                <SmartItemForm onItemAdded={handleItemAdded} />
+                <AddItemForm onItemAdded={handleItemAdded} mode="create" />
               </div>
             ) : currentView === 'dashboard' ? (
               <SizingJournalDashboard onAddNew={handleAddNew} />

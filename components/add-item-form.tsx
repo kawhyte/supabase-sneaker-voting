@@ -244,13 +244,17 @@ const FIT_RATINGS = [
 	{ value: 5, label: "Too Big", icon: "🔴", description: "Swimming in them" },
 ];
 
-interface RedesignedItemFormProps {
+interface AddItemFormProps {
 	onItemAdded?: () => void;
+	initialData?: any; // The existing item data for edit mode
+	mode?: 'create' | 'edit';
 }
 
-export function RedesignedItemForm({
+export function AddItemForm({
 	onItemAdded,
-}: RedesignedItemFormProps = {}) {
+	initialData,
+	mode = 'create' as 'create' | 'edit',
+}: AddItemFormProps = {}) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [successMessage, setSuccessMessage] = useState("");
 	const [sizePreferences, setSizePreferences] = useState<
@@ -286,7 +290,24 @@ export function RedesignedItemForm({
 	} = useForm<ItemFormData>({
 		resolver: zodResolver(itemSchema),
 		mode: "onChange",
-		defaultValues: {
+		defaultValues: initialData ? {
+			userName: initialData.user_name || "Kenny",
+			interactionType: initialData.interaction_type || "seen",
+			category: initialData.category || "shoes",
+			brand: initialData.brand || "",
+			model: initialData.model || "",
+			sku: initialData.sku || "",
+			color: initialData.color || "",
+			sizeTried: initialData.size_tried || "",
+			comfortRating: initialData.comfort_rating || undefined,
+			retailPrice: initialData.retail_price?.toString() || "",
+			salePrice: initialData.sale_price?.toString() || "",
+			idealPrice: initialData.ideal_price?.toString() || "",
+			targetPrice: initialData.target_price?.toString() || "",
+			notes: initialData.notes || "",
+			productUrl: "",
+			enableNotifications: false,
+		} : {
 			userName: "Kenny",
 			interactionType: "seen",
 		},
@@ -309,11 +330,29 @@ export function RedesignedItemForm({
 			  )
 			: 0;
 
-	// Load fit data on component mount
+	// Load fit data on component mount and load existing photos in edit mode
 	useEffect(() => {
 		loadFitData();
-		restoreDraft();
-	}, []);
+
+		// Skip draft restoration in edit mode
+		if (mode === 'create') {
+			restoreDraft();
+		}
+
+		// Load existing photos in edit mode
+		if (mode === 'edit' && initialData?.item_photos && initialData.item_photos.length > 0) {
+			// Convert existing photos to PhotoItem format for display
+			// Note: These are already uploaded, so we just show them as previews
+			const existingPhotoItems: PhotoItem[] = initialData.item_photos.map((photo: any, index: number) => ({
+				id: photo.id || `existing-${index}`,
+				file: new File([], ''), // Empty file object since photo is already uploaded
+				preview: photo.image_url,
+				isMain: photo.is_main_image || false,
+				order: photo.image_order || index,
+			}));
+			setPhotos(existingPhotoItems);
+		}
+	}, [mode, initialData]);
 
 	// Track unsaved changes
 	useEffect(() => {
@@ -943,22 +982,42 @@ export function RedesignedItemForm({
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 			};
 
-			const { data: insertedItem, error } = await supabase
-				.from("items")
-				.insert(experienceData)
-				.select()
-				.single();
+			let resultItem: any = null;
+			let dbError: any = null;
 
-			if (error) {
-				console.error("Database error:", error);
-				throw error;
+			if (mode === 'edit' && initialData?.id) {
+				// UPDATE existing item
+				const { data: updatedItem, error } = await supabase
+					.from("items")
+					.update(experienceData)
+					.eq('id', initialData.id)
+					.select()
+					.single();
+
+				resultItem = updatedItem;
+				dbError = error;
+			} else {
+				// INSERT new item
+				const { data: insertedItem, error } = await supabase
+					.from("items")
+					.insert(experienceData)
+					.select()
+					.single();
+
+				resultItem = insertedItem;
+				dbError = error;
+			}
+
+			if (dbError) {
+				console.error("Database error:", dbError);
+				throw dbError;
 			}
 
 			// Insert all photos into item_photos table
-			if (uploadedPhotos.length > 0 && insertedItem) {
+			if (uploadedPhotos.length > 0 && resultItem) {
 				console.log('📸 Saving', uploadedPhotos.length, 'photos to item_photos table...');
 				const photoRecords = uploadedPhotos.map((photo) => ({
-					item_id: insertedItem.id,
+					item_id: resultItem.id,
 					image_url: photo.url,
 					cloudinary_id: photo.cloudinaryId,
 					image_order: photo.order,
@@ -983,7 +1042,7 @@ export function RedesignedItemForm({
 					console.log('✅ Successfully saved', insertedPhotos?.length, 'photos to database');
 				}
 			} else {
-				console.log('⚠️ No photos to save. uploadedPhotos.length:', uploadedPhotos.length, 'insertedItem:', !!insertedItem);
+				console.log('⚠️ No photos to save. uploadedPhotos.length:', uploadedPhotos.length, 'resultItem:', !!resultItem);
 			}
 
 			// Create price monitor if URL provided
@@ -998,15 +1057,23 @@ export function RedesignedItemForm({
 			// Show success toast with item context
 			const itemName = `${data.brand} ${data.model}`;
 			const categoryLabel = getCategoryConfig(data.category)?.label || "Item";
-			toast.success(`${itemName} added!`, {
-				description:
-					data.interactionType === "tried"
-						? `Try-on experience saved for this ${categoryLabel.toLowerCase()}`
-						: data.productUrl
-						? "Added with price monitoring enabled"
-						: `${categoryLabel} added to your watchlist`,
-				duration: 5000, // Persist during redirect and on dashboard
-			});
+
+			if (mode === 'edit') {
+				toast.success(`${itemName} updated!`, {
+					description: "Your changes have been saved",
+					duration: 5000,
+				});
+			} else {
+				toast.success(`${itemName} added!`, {
+					description:
+						data.interactionType === "tried"
+							? `Try-on experience saved for this ${categoryLabel.toLowerCase()}`
+							: data.productUrl
+							? "Added with price monitoring enabled"
+							: `${categoryLabel} added to your watchlist`,
+					duration: 5000, // Persist during redirect and on dashboard
+				});
+			}
 
 			// Clear form and redirect after 800ms (fast but readable)
 			setTimeout(() => {
@@ -1031,10 +1098,6 @@ export function RedesignedItemForm({
 		}
 	};
 
-	const getFitRatingInfo = (rating: number) => {
-		return FIT_RATINGS.find((r) => r.value === rating);
-	};
-
 	return (
 		<div className='max-w-6xl mx-auto'>
 			<Card
@@ -1047,12 +1110,12 @@ export function RedesignedItemForm({
 					<CardTitle
 						className='text-3xl flex flex-col justify-start'
 						style={{ color: "var(--color-black)" }}>
-						<p className='-mb-2'> Track Your Items</p>
+						<p className='-mb-2'>{mode === 'edit' ? 'Edit Item' : 'Track Your Items'}</p>
 
 						<p
 							className='text-sm'
 							style={{ color: "var(--color-text-secondary)" }}>
-							Shoes, clothing, accessories & more
+							{mode === 'edit' ? 'Update item details' : 'Shoes, clothing, accessories & more'}
 						</p>
 					</CardTitle>
 				</CardHeader>
@@ -1232,8 +1295,8 @@ export function RedesignedItemForm({
 							</div>
 						</div>
 
-						{/* Smart Import Section - Expanded by Default */}
-						{watchedUser && watchedInteractionType && watchedCategory && (
+						{/* Smart Import Section - Only show in create mode */}
+						{mode === 'create' && watchedUser && watchedInteractionType && watchedCategory && (
 							<>
 								<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border-2 border-blue-200'>
 									<button
@@ -1933,14 +1996,18 @@ export function RedesignedItemForm({
 											</>
 										) : (
 											<>
-												{watchedInteractionType === "tried" ? (
+												{(mode as 'create' | 'edit') === 'edit' ? (
+													<>
+														<Zap className='h-4 w-4 mr-2' aria-hidden='true' />
+														Update Item
+													</>
+												) : watchedInteractionType === "tried" ? (
 													<>
 														<Zap className='h-4 w-4 mr-2' aria-hidden='true' />
 														Save
 													</>
 												) : (
 													<>
-
 														Add to Watchlist
 													</>
 												)}
