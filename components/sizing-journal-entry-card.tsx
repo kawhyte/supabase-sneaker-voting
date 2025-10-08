@@ -51,7 +51,7 @@ interface SizingJournalEntryCardProps {
 	onEdit: (entry: SizingJournalEntry) => void;
 	onDelete: (entry: SizingJournalEntry) => void;
 	onToggleCollection?: (entry: SizingJournalEntry) => void;
-	viewMode?: 'journal' | 'collection' | 'archive';
+	viewMode?: 'journal' | 'collection' | 'archive' | 'wishlist';
 	onIncrementWear?: (entry: SizingJournalEntry) => void;
 	onDecrementWear?: (entry: SizingJournalEntry) => void;
 	onMoveToWatchlist?: (entry: SizingJournalEntry) => void;

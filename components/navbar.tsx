@@ -16,6 +16,7 @@ export function Navbar() {
     { href: '/', label: 'Home' },
     { href: '/add-new-item', label: 'Add New Item' },
     { href: '/dashboard', label: 'Dashboard' },
+    { href: '/wishlist', label: 'Wishlist' },
     { href: '/collection', label: 'Collection' },
   ]
 
