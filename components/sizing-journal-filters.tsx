@@ -67,7 +67,7 @@ export function SizingJournalFilters({
   }
 
   return (
-    <div className="flex flex-col gap-[var(--space-lg)] mb-[var(--space-xl)]">
+    <div className="flex flex-col gap-[var(--space-lg)] mb-[var(--space-4xl)] border rounded-2xl p-3 bg-gray-100 ">
       {/* Category Filter Section */}
       <div className="bg-white border border-gray-200 rounded-lg p-[var(--space-base)] shadow-sm">
         <div className="flex items-center justify-between mb-[var(--space-sm)]">
@@ -106,7 +106,7 @@ export function SizingJournalFilters({
                   htmlFor={`category-${config.id}`}
                   className="text-sm font-normal cursor-pointer flex items-center gap-1.5"
                 >
-                  <IconComponent className="h-3.5 w-3.5" style={{ color: config.color }} />
+                  {/* <IconComponent className="h-3 w-3" style={{ color: config.color }} /> */}
                   {config.label}
                 </Label>
               </div>
@@ -118,12 +118,12 @@ export function SizingJournalFilters({
       {/* Other Filters */}
       <div className="flex flex-col md:flex-row items-center gap-[var(--space-md)]">
         <div className="relative w-full md:flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-placeholder" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-text-placeholder" />
           <Input
             placeholder="Search items..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9 h-10"
+            className="pl-9 h-5"
           />
         </div>
 
@@ -142,7 +142,7 @@ export function SizingJournalFilters({
 
         <div className="ml-0 md:ml-auto w-full md:w-auto">
           <Select value={sortBy} onValueChange={onSortChange}>
-            <SelectTrigger className="h-10 w-full md:w-[180px]">
+            <SelectTrigger className="h-5 w-full md:w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>

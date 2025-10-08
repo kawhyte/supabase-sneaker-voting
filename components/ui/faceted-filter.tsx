@@ -37,14 +37,14 @@ interface FacetedFilterProps {
 export function FacetedFilter({
   title,
   options,
-  selectedValues = new Set(), // <<<< THE FIX IS HERE
+  selectedValues = new Set(), 
   onValueChange,
 }: FacetedFilterProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-10 border-dashed">
-          <PlusCircle className="mr-2 h-4 w-4" />
+        <Button variant="outline" size="sm" className="h-5 border-dashed">
+          <PlusCircle className="mr-2 h-3 w-3" />
           {title}
           {selectedValues.size > 0 && ( // This line will no longer error out
             <>
@@ -82,16 +82,16 @@ export function FacetedFilter({
                   >
                     <div
                       className={cn(
-                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                        'mr-2 flex h-3 w-3 items-center justify-center rounded-sm border border-primary',
                         isSelected
                           ? 'bg-primary text-primary-foreground'
                           : 'opacity-50 [&_svg]:invisible'
                       )}
                     >
-                      <Check className={cn('h-4 w-4')} />
+                      <Check className={cn('h-3 w-3 text-black')} />
                     </div>
                     {option.icon && (
-                      <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <option.icon className="mr-2 h-3 w-3 text-muted-foreground" />
                     )}
                     <span>{option.label}</span>
                   </CommandItem>
