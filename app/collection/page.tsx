@@ -5,7 +5,7 @@ import { SizingJournalEntry, ArchiveReason } from '@/components/types/sizing-jou
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ArchiveReasonDialog } from '@/components/archive-reason-dialog'
-import { EditSneakerModal } from '@/components/edit-sneaker-modal'
+import { EditItemModal } from '@/components/edit-item-modal'
 import { Plus, Package, Archive } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
@@ -13,11 +13,11 @@ import { useState, useEffect } from 'react'
 
 export default function CollectionPage() {
   const supabase = createClient()
-  const [collectionSneakers, setCollectionSneakers] = useState<SizingJournalEntry[]>([])
-  const [archivedSneakers, setArchivedSneakers] = useState<SizingJournalEntry[]>([])
+  const [collectionItems, setCollectionItems] = useState<SizingJournalEntry[]>([])
+  const [archivedItems, setArchivedItems] = useState<SizingJournalEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false)
-  const [sneakerToArchive, setSneakerToArchive] = useState<SizingJournalEntry | null>(null)
+  const [itemToArchive, setItemToArchive] = useState<SizingJournalEntry | null>(null)
   const [editingEntry, setEditingEntry] = useState<SizingJournalEntry | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
@@ -39,7 +39,7 @@ export default function CollectionPage() {
     if (error) {
       console.error('Error fetching collection:', error)
     } else {
-      setCollectionSneakers(collectionData || [])
+      setCollectionItems(collectionData || [])
     }
     setLoading(false)
   }
@@ -55,7 +55,7 @@ export default function CollectionPage() {
     if (error) {
       console.error('Error fetching archived:', error)
     } else {
-      setArchivedSneakers(archivedData || [])
+      setArchivedItems(archivedData || [])
     }
   }
 
@@ -64,11 +64,11 @@ export default function CollectionPage() {
     const now = new Date().toISOString()
 
     // Optimistic update
-    setCollectionSneakers(prev =>
-      prev.map(sneaker =>
-        sneaker.id === entry.id
-          ? { ...sneaker, wears: newWearCount, last_worn_date: now }
-          : sneaker
+    setCollectionItems(prev =>
+      prev.map(item =>
+        item.id === entry.id
+          ? { ...item, wears: newWearCount, last_worn_date: now }
+          : item
       )
     )
 
@@ -93,11 +93,11 @@ export default function CollectionPage() {
     const lastWornDate = newWearCount === 0 ? null : entry.last_worn_date
 
     // Optimistic update
-    setCollectionSneakers(prev =>
-      prev.map(sneaker =>
-        sneaker.id === entry.id
-          ? { ...sneaker, wears: newWearCount, last_worn_date: lastWornDate }
-          : sneaker
+    setCollectionItems(prev =>
+      prev.map(item =>
+        item.id === entry.id
+          ? { ...item, wears: newWearCount, last_worn_date: lastWornDate }
+          : item
       )
     )
 
@@ -119,7 +119,7 @@ export default function CollectionPage() {
 
   const handleMoveToWatchlist = async (entry: SizingJournalEntry) => {
     // Optimistic update - remove from view
-    setCollectionSneakers(prev => prev.filter(sneaker => sneaker.id !== entry.id))
+    setCollectionItems(prev => prev.filter(item => item.id !== entry.id))
 
     // Update in database
     const { error } = await supabase
@@ -150,12 +150,12 @@ export default function CollectionPage() {
   }
 
   const handleDelete = async (entry: SizingJournalEntry) => {
-    if (!confirm('Are you sure you want to delete this sneaker from your collection?')) {
+    if (!confirm('Are you sure you want to delete this item from your collection?')) {
       return
     }
 
     // Optimistic update - remove from view
-    setCollectionSneakers(prev => prev.filter(sneaker => sneaker.id !== entry.id))
+    setCollectionItems(prev => prev.filter(item => item.id !== entry.id))
 
     // Delete from database
     const { error } = await supabase
@@ -164,7 +164,7 @@ export default function CollectionPage() {
       .eq('id', entry.id)
 
     if (error) {
-      console.error('Error deleting sneaker:', error)
+      console.error('Error deleting item:', error)
       // Revert on error
       fetchCollection()
     }
@@ -176,19 +176,19 @@ export default function CollectionPage() {
   }
 
   const handleArchive = (entry: SizingJournalEntry) => {
-    setSneakerToArchive(entry)
+    setItemToArchive(entry)
     setArchiveDialogOpen(true)
   }
 
   const handleArchiveConfirm = async (reason: ArchiveReason, note?: string) => {
-    if (!sneakerToArchive) return
+    if (!itemToArchive) return
 
     const now = new Date().toISOString()
 
     // Optimistic update - remove from active collection, add to archived
-    setCollectionSneakers(prev => prev.filter(sneaker => sneaker.id !== sneakerToArchive.id))
-    setArchivedSneakers(prev => [
-      { ...sneakerToArchive, is_archived: true, archive_reason: reason, archived_at: now },
+    setCollectionItems(prev => prev.filter(item => item.id !== itemToArchive.id))
+    setArchivedItems(prev => [
+      { ...itemToArchive, is_archived: true, archive_reason: reason, archived_at: now },
       ...prev
     ])
 
@@ -200,10 +200,10 @@ export default function CollectionPage() {
         archive_reason: reason,
         archived_at: now,
       })
-      .eq('id', sneakerToArchive.id)
+      .eq('id', itemToArchive.id)
 
     if (error) {
-      console.error('Error archiving sneaker:', error)
+      console.error('Error archiving item:', error)
       // Revert on error
       fetchCollection()
       fetchArchived()
@@ -212,8 +212,8 @@ export default function CollectionPage() {
 
   const handleRestore = async (entry: SizingJournalEntry) => {
     // Optimistic update - remove from archived, add to active collection
-    setArchivedSneakers(prev => prev.filter(sneaker => sneaker.id !== entry.id))
-    setCollectionSneakers(prev => [
+    setArchivedItems(prev => prev.filter(item => item.id !== entry.id))
+    setCollectionItems(prev => [
       { ...entry, is_archived: false, archive_reason: null, archived_at: null, in_collection: true },
       ...prev
     ])
@@ -230,7 +230,7 @@ export default function CollectionPage() {
       .eq('id', entry.id)
 
     if (error) {
-      console.error('Error restoring sneaker:', error)
+      console.error('Error restoring item:', error)
       // Revert on error
       fetchCollection()
       fetchArchived()
@@ -257,14 +257,14 @@ export default function CollectionPage() {
               className="mt-2 text-lg"
               style={{ color: 'var(--color-gray-500)' }}
             >
-              A visual inventory of your prized sneakers
+              A visual inventory of your prized items
             </p>
-            {collectionSneakers.length > 0 && (
+            {collectionItems.length > 0 && (
               <p
                 className="mt-1 text-sm font-medium"
                 style={{ color: 'var(--color-gray-600)' }}
               >
-                {collectionSneakers.length} {collectionSneakers.length === 1 ? 'sneaker' : 'sneakers'} in collection
+                {collectionItems.length} {collectionItems.length === 1 ? 'item' : 'items'} in collection
               </p>
             )}
           </div>
@@ -282,7 +282,7 @@ export default function CollectionPage() {
               }}
             >
               Active Collection
-              {collectionSneakers.length > 0 && (
+              {collectionItems.length > 0 && (
                 <span
                   className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold"
                   style={{
@@ -290,7 +290,7 @@ export default function CollectionPage() {
                     color: 'var(--color-black-soft)',
                   }}
                 >
-                  {collectionSneakers.length}
+                  {collectionItems.length}
                 </span>
               )}
             </TabsTrigger>
@@ -302,7 +302,7 @@ export default function CollectionPage() {
               }}
             >
               Archived
-              {archivedSneakers.length > 0 && (
+              {archivedItems.length > 0 && (
                 <span
                   className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold"
                   style={{
@@ -310,7 +310,7 @@ export default function CollectionPage() {
                     color: 'var(--color-gray-700)',
                   }}
                 >
-                  {archivedSneakers.length}
+                  {archivedItems.length}
                 </span>
               )}
             </TabsTrigger>
@@ -318,7 +318,7 @@ export default function CollectionPage() {
 
           {/* Active Collection Tab */}
           <TabsContent value="active">
-            {collectionSneakers.length === 0 ? (
+            {collectionItems.length === 0 ? (
               <div
                 className="text-center py-24 rounded-xl border-2 border-dashed"
                 style={{
@@ -348,7 +348,7 @@ export default function CollectionPage() {
                       className="text-base max-w-sm mx-auto"
                       style={{ color: 'var(--color-gray-500)' }}
                     >
-                      Start building your sneaker collection by adding your first pair
+                      Start building your item collection by adding your first pair
                     </p>
                   </div>
                   <Link href="/add-new-item" className="mt-4">
@@ -361,7 +361,7 @@ export default function CollectionPage() {
                       }}
                     >
                       <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                      Add Your First Sneaker
+                      Add Your First Item
                     </Button>
                   </Link>
                 </div>
@@ -370,12 +370,12 @@ export default function CollectionPage() {
               <div
                 className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-6"
                 role="list"
-                aria-label="Sneaker collection"
+                aria-label="Item collection"
               >
-                {collectionSneakers.map((sneaker) => (
+                {collectionItems.map((item) => (
                   <SizingJournalEntryCard
-                    key={sneaker.id}
-                    entry={sneaker}
+                    key={item.id}
+                    entry={item}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onToggleCollection={handleToggleCollection}
@@ -392,7 +392,7 @@ export default function CollectionPage() {
 
           {/* Archived Tab */}
           <TabsContent value="archived">
-            {archivedSneakers.length === 0 ? (
+            {archivedItems.length === 0 ? (
               <div
                 className="text-center py-24 rounded-xl border-2 border-dashed"
                 style={{
@@ -416,13 +416,13 @@ export default function CollectionPage() {
                       className="text-2xl font-bold"
                       style={{ color: 'var(--color-black)' }}
                     >
-                      No archived sneakers
+                      No archived items
                     </h2>
                     <p
                       className="text-base max-w-sm mx-auto"
                       style={{ color: 'var(--color-gray-500)' }}
                     >
-                      Sneakers you archive will appear here
+                      Items you archive will appear here
                     </p>
                   </div>
                 </div>
@@ -431,12 +431,12 @@ export default function CollectionPage() {
               <div
                 className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-6"
                 role="list"
-                aria-label="Archived sneakers"
+                aria-label="Archived items"
               >
-                {archivedSneakers.map((sneaker) => (
+                {archivedItems.map((item) => (
                   <SizingJournalEntryCard
-                    key={sneaker.id}
-                    entry={sneaker}
+                    key={item.id}
+                    entry={item}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onRestore={handleRestore}
@@ -449,18 +449,18 @@ export default function CollectionPage() {
         </Tabs>
 
         {/* Archive Reason Dialog */}
-        {sneakerToArchive && (
+        {itemToArchive && (
           <ArchiveReasonDialog
             open={archiveDialogOpen}
             onOpenChange={setArchiveDialogOpen}
             onConfirm={handleArchiveConfirm}
-            sneakerName={`${sneakerToArchive.brand} ${sneakerToArchive.model}`}
+            itemName={`${itemToArchive.brand} ${itemToArchive.model}`}
           />
         )}
 
         {/* Edit Modal */}
         {editingEntry && (
-          <EditSneakerModal
+          <EditItemModal
             experience={editingEntry}
             isOpen={isEditModalOpen}
             onClose={handleCloseEditModal}

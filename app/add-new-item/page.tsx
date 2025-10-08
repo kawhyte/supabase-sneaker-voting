@@ -1,12 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { RedesignedSneakerForm } from '@/components/redesigned-sneaker-form'
+import { RedesignedItemForm } from '@/components/redesigned-item-form'
 
 export default function AddNewItemPage() {
   const router = useRouter()
 
-  const handleSneakerAdded = () => {
+  const handleItemAdded = () => {
     // Auto-redirect to dashboard after successful submission
     // Short delay allows user to see success toast before transition
     setTimeout(() => {
@@ -16,7 +16,7 @@ export default function AddNewItemPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <RedesignedSneakerForm onSneakerAdded={handleSneakerAdded} />
+      <RedesignedItemForm onItemAdded={handleItemAdded} />
     </div>
   )
 }

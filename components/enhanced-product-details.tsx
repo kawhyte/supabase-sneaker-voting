@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { CheckCircle, Plus, X, Upload, Loader2, ArrowLeft } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 
-// Common sneaker sizes
+// Common item sizes
 const COMMON_SIZES = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12', '12.5', '13', '14']
 
 const sizesSchema = z.object({

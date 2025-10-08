@@ -30,7 +30,7 @@ export default async function AddProductPage() {
             Add New Product
           </h1>
           <p className="text-lg text-gray-600">
-            Manually add a sneaker to your tracking system
+            Manually add a item to your tracking system
           </p>
         </div>
 

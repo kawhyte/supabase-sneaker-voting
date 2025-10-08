@@ -16,7 +16,7 @@ interface ProductUrlInputProps {
 interface ProductData {
   brand?: string
   model?: string
-  colorway?: string
+  color?: string
   retailPrice?: number
   images?: string[]
   success: boolean
@@ -60,7 +60,7 @@ export function ProductUrlInput({ onProductDataLoaded, className = '' }: Product
         onProductDataLoaded({
           brand: data.brand || '',
           model: data.model || '',
-          colorway: data.colorway || 'Standard',
+          color: data.color || 'Standard',
           retail_price: data.retailPrice || null,
           image_url: data.images?.[0] || null,
           product_url: url.trim()
@@ -78,7 +78,7 @@ export function ProductUrlInput({ onProductDataLoaded, className = '' }: Product
     'Nike.com',
     'Adidas.com',
     'StockX.com',
-    'Other sneaker sites'
+    'Other item sites'
   ]
 
   return (
@@ -138,9 +138,9 @@ export function ProductUrlInput({ onProductDataLoaded, className = '' }: Product
                   <span className="font-medium">Model:</span> {result.model}
                 </div>
               )}
-              {result.colorway && result.colorway !== 'Standard' && (
+              {result.color && result.color !== 'Standard' && (
                 <div>
-                  <span className="font-medium">Colorway:</span> {result.colorway}
+                  <span className="font-medium">Color:</span> {result.color}
                 </div>
               )}
               {result.retailPrice && (
@@ -178,7 +178,7 @@ export function ProductUrlInput({ onProductDataLoaded, className = '' }: Product
 
       {/* Help Text */}
       <div className="text-xs text-gray-500 space-y-1">
-        <p>💡 <strong>How it works:</strong> Paste a sneaker product URL and we'll automatically extract the brand, model, colorway, and price to fill out your form.</p>
+        <p>💡 <strong>How it works:</strong> Paste a item product URL and we'll automatically extract the brand, model, color, and price to fill out your form.</p>
         <p>📝 <strong>Manual entry:</strong> You can still fill out the form manually if auto-fill doesn't work or if you prefer to enter custom information.</p>
       </div>
     </div>

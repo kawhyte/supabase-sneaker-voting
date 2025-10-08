@@ -71,7 +71,7 @@ interface PhotoItem {
 }
 
 // Enhanced form schema with SKU and sale price
-const sneakerSchema = z
+const itemSchema = z
 	.object({
 		userName: z.enum(["Kenny", "Rene"], {
 			required_error: "Please select who is tracking this item",
@@ -111,7 +111,7 @@ const sneakerSchema = z
 			.trim(),
 		model: z
 			.string()
-			.min(2, "Please enter the sneaker model (e.g., Air Jordan 1, Yeezy 350)")
+			.min(2, "Please enter the item model (e.g., Air Jordan 1, Yeezy 350)")
 			.max(100, "Model name must be less than 100 characters")
 			.trim(),
 		sku: z
@@ -123,9 +123,9 @@ const sneakerSchema = z
 			)
 			.optional()
 			.or(z.literal("")),
-		colorway: z
+		color: z
 			.string()
-			.max(100, "Colorway must be less than 100 characters")
+			.max(100, "Color must be less than 100 characters")
 			.trim()
 			.optional()
 			.or(z.literal("")),
@@ -228,7 +228,7 @@ const sneakerSchema = z
 		}
 	);
 
-type SneakerFormData = z.infer<typeof sneakerSchema>;
+type ItemFormData = z.infer<typeof itemSchema>;
 
 // Fit rating descriptions
 const FIT_RATINGS = [
@@ -244,13 +244,13 @@ const FIT_RATINGS = [
 	{ value: 5, label: "Too Big", icon: "🔴", description: "Swimming in them" },
 ];
 
-interface RedesignedSneakerFormProps {
-	onSneakerAdded?: () => void;
+interface RedesignedItemFormProps {
+	onItemAdded?: () => void;
 }
 
-export function RedesignedSneakerForm({
-	onSneakerAdded,
-}: RedesignedSneakerFormProps = {}) {
+export function RedesignedItemForm({
+	onItemAdded,
+}: RedesignedItemFormProps = {}) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [successMessage, setSuccessMessage] = useState("");
 	const [sizePreferences, setSizePreferences] = useState<
@@ -283,8 +283,8 @@ export function RedesignedSneakerForm({
 		formState: { errors, isValid, isDirty },
 		setValue,
 		watch,
-	} = useForm<SneakerFormData>({
-		resolver: zodResolver(sneakerSchema),
+	} = useForm<ItemFormData>({
+		resolver: zodResolver(itemSchema),
 		mode: "onChange",
 		defaultValues: {
 			userName: "Kenny",
@@ -361,7 +361,7 @@ export function RedesignedSneakerForm({
 				timestamp: new Date().toISOString(),
 				photoCount: photos.length,
 			};
-			localStorage.setItem("sneaker-form-draft", JSON.stringify(draft));
+			localStorage.setItem("item-form-draft", JSON.stringify(draft));
 			setLastSavedTime(new Date());
 			console.log("📝 Draft auto-saved at", new Date().toLocaleTimeString());
 		} catch (error) {
@@ -371,7 +371,7 @@ export function RedesignedSneakerForm({
 
 	const restoreDraft = () => {
 		try {
-			const savedDraft = localStorage.getItem("sneaker-form-draft");
+			const savedDraft = localStorage.getItem("item-form-draft");
 			if (!savedDraft) return;
 
 			const draft = JSON.parse(savedDraft);
@@ -380,7 +380,7 @@ export function RedesignedSneakerForm({
 
 			// Only restore drafts less than 7 days old
 			if (draftAge > maxAge) {
-				localStorage.removeItem("sneaker-form-draft");
+				localStorage.removeItem("item-form-draft");
 				return;
 			}
 
@@ -409,13 +409,13 @@ export function RedesignedSneakerForm({
 			);
 		} catch (error) {
 			console.error("Failed to restore draft:", error);
-			localStorage.removeItem("sneaker-form-draft");
+			localStorage.removeItem("item-form-draft");
 		}
 	};
 
 	const clearDraft = () => {
 		try {
-			localStorage.removeItem("sneaker-form-draft");
+			localStorage.removeItem("item-form-draft");
 			setIsDraftRestored(false);
 			setShowDraftNotification(false);
 			setLastSavedTime(null);
@@ -541,8 +541,8 @@ export function RedesignedSneakerForm({
 							.replace(/\s+/g, " ")
 							.trim()
 					: "";
-				const cleanColorway = data.colorway
-					? data.colorway
+				const cleanColor = data.color
+					? data.color
 							.replace(/[\n\t\r]/g, " ")
 							.replace(/\s+/g, " ")
 							.trim()
@@ -612,9 +612,9 @@ export function RedesignedSneakerForm({
 						});
 					}
 
-					if (cleanColorway && cleanColorway !== "Standard") {
-						console.log("✅ Setting colorway:", cleanColorway);
-						setValue("colorway", cleanColorway, {
+					if (cleanColor && cleanColor !== "Standard") {
+						console.log("✅ Setting color:", cleanColor);
+						setValue("color", cleanColor, {
 							shouldValidate: true,
 							shouldDirty: true,
 							shouldTouch: true,
@@ -824,7 +824,7 @@ export function RedesignedSneakerForm({
 	};
 
 	// Create price monitor function
-	const createPriceMonitor = async (data: SneakerFormData) => {
+	const createPriceMonitor = async (data: ItemFormData) => {
 		if (!data.productUrl || !data.userName) return;
 
 		try {
@@ -848,7 +848,7 @@ export function RedesignedSneakerForm({
 		return false;
 	};
 
-	const onSubmit = async (data: SneakerFormData) => {
+	const onSubmit = async (data: ItemFormData) => {
 		setIsLoading(true);
 		setSuccessMessage("");
 
@@ -912,7 +912,7 @@ export function RedesignedSneakerForm({
 				user_name: data.userName,
 				brand: data.brand,
 				model: data.model,
-				colorway: data.colorway || "Standard",
+				color: data.color || "Standard",
 				sku: data.sku || null,
 				category: data.category, // NEW: Item category
 				size_type: getSizeType(data.category), // NEW: Size type based on category
@@ -943,7 +943,7 @@ export function RedesignedSneakerForm({
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 			};
 
-			const { data: insertedSneaker, error } = await supabase
+			const { data: insertedItem, error } = await supabase
 				.from("items")
 				.insert(experienceData)
 				.select()
@@ -955,10 +955,10 @@ export function RedesignedSneakerForm({
 			}
 
 			// Insert all photos into item_photos table
-			if (uploadedPhotos.length > 0 && insertedSneaker) {
+			if (uploadedPhotos.length > 0 && insertedItem) {
 				console.log('📸 Saving', uploadedPhotos.length, 'photos to item_photos table...');
 				const photoRecords = uploadedPhotos.map((photo) => ({
-					item_id: insertedSneaker.id,
+					item_id: insertedItem.id,
 					image_url: photo.url,
 					cloudinary_id: photo.cloudinaryId,
 					image_order: photo.order,
@@ -983,7 +983,7 @@ export function RedesignedSneakerForm({
 					console.log('✅ Successfully saved', insertedPhotos?.length, 'photos to database');
 				}
 			} else {
-				console.log('⚠️ No photos to save. uploadedPhotos.length:', uploadedPhotos.length, 'insertedSneaker:', !!insertedSneaker);
+				console.log('⚠️ No photos to save. uploadedPhotos.length:', uploadedPhotos.length, 'insertedItem:', !!insertedItem);
 			}
 
 			// Create price monitor if URL provided
@@ -1019,7 +1019,7 @@ export function RedesignedSneakerForm({
 				setSmartImportExpanded(true); // Reset to expanded
 				clearDraft(); // Clear saved draft
 				setHasUnsavedChanges(false);
-				onSneakerAdded?.();
+				onItemAdded?.();
 			}, 800);
 		} catch (error) {
 			console.error("Error saving:", error);
@@ -1386,7 +1386,7 @@ export function RedesignedSneakerForm({
 												<Lightbulb className='h-4 w-4 hidden md:block flex-shrink-0 mt-0.5' />
 												<span>
 													Smart Import will automatically fill brand, model,
-													colorway, store, and price
+													color, store, and price
 												</span>
 											</div>
 										</div>
@@ -1419,7 +1419,7 @@ export function RedesignedSneakerForm({
 															{errors.model.message}
 														</p>
 														<p className='text-xs text-red-600 mt-0.5'>
-															Enter the sneaker model (e.g., "Air Jordan 1
+															Enter the item model (e.g., "Air Jordan 1
 															High", "990v6")
 														</p>
 													</div>
@@ -1473,14 +1473,14 @@ export function RedesignedSneakerForm({
 											/>
 										</div>
 
-										{/* Colorway */}
+										{/* Color */}
 
 										<div>
 											<Label className='text-sm text-gray-600'>
 												Color (Optional)
 											</Label>
 											<Input
-												{...register("colorway")}
+												{...register("color")}
 												placeholder='Bred, Chicago, etc.'
 												className='mt-[var(--space-md)] h-6'
 											/>
@@ -1613,7 +1613,7 @@ export function RedesignedSneakerForm({
 										placeholder={
 											watchedInteractionType === "tried"
 												? "e.g., 'Tight on pinky toe', 'Great for walking', 'Runs small compared to other Nikes'"
-												: "e.g., 'Love the colorway', 'Perfect for summer', 'Saw on Instagram'"
+												: "e.g., 'Love the color', 'Perfect for summer', 'Saw on Instagram'"
 										}
 										className='mt-[var(--space-md)] resize-none'
 										rows={3}
@@ -1750,7 +1750,7 @@ export function RedesignedSneakerForm({
 																	{errors.fitRating.message}
 																</p>
 																<p className='text-xs text-red-600 mt-0.5'>
-																	Rate how the sneaker fit - from too small to
+																	Rate how the item fit - from too small to
 																	too big
 																</p>
 															</div>

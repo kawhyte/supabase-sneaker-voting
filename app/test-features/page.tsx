@@ -208,7 +208,7 @@ export default function TestFeaturesPage() {
                     <div className="space-y-1 text-sm text-green-700">
                       <div><strong>Brand:</strong> {autoFillData.brand || 'Not detected'}</div>
                       <div><strong>Model:</strong> {autoFillData.model || 'Not detected'}</div>
-                      <div><strong>Colorway:</strong> {autoFillData.colorway || 'Standard'}</div>
+                      <div><strong>Color:</strong> {autoFillData.color || 'Standard'}</div>
                       <div><strong>Retail Price:</strong> {autoFillData.retail_price ? `$${autoFillData.retail_price}` : 'Not detected'}</div>
                       <div><strong>Image URL:</strong> {autoFillData.image_url ? '✅ Found' : 'Not detected'}</div>
                     </div>
@@ -304,7 +304,7 @@ export default function TestFeaturesPage() {
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                   <PriceMonitorManager
                     user_name="test_user"
-                    sneaker_id={undefined}
+                    item_id={undefined}
                   />
                 </div>
 

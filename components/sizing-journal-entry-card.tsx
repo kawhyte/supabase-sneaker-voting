@@ -163,7 +163,7 @@ export function SizingJournalEntryCard({
 										onClick={() => onArchive(entry)}
 										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
 										type='button'
-										aria-label='Archive sneaker'>
+										aria-label='Archive item'>
 										<Archive
 											className='h-3 w-3 transition-colors'
 											style={{ color: 'var(--color-gray-600)' }}
@@ -177,7 +177,7 @@ export function SizingJournalEntryCard({
 									</button>
 								</TooltipTrigger>
 								<TooltipContent side="bottom" className="z-[9999]">
-									<p>Archive sneaker</p>
+									<p>Archive item</p>
 								</TooltipContent>
 							</Tooltip>
 						)}
@@ -288,7 +288,7 @@ export function SizingJournalEntryCard({
 								<img
 									src={photos[0].image_url}
 									alt={`${entry.brand} ${entry.model}${
-										entry.colorway !== "Standard" ? ` in ${entry.colorway}` : ""
+										entry.color !== "Standard" ? ` in ${entry.color}` : ""
 									}`}
 									className='w-full h-full object-contain'
                   loading="lazy"
@@ -323,9 +323,9 @@ export function SizingJournalEntryCard({
 					{/* Title */}
 					<h3 className='text-base sm:text-lg font-bold leading-tight line-clamp-2'>
 						{entry.model}
-						{entry.colorway !== "Standard" && (
+						{entry.color !== "Standard" && (
 							<span className='block text-sm font-normal text-gray-600 mt-1'>
-								{entry.colorway}
+								{entry.color}
 							</span>
 						)}
 					</h3>

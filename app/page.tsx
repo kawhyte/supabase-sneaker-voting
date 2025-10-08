@@ -36,7 +36,7 @@ export default function HomePage() {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-teal-600 to-orange-500 bg-clip-text text-transparent"
           >
-            Sneaker Sizing Tracker
+            Item Sizing Tracker
           </motion.h1>
 
           <motion.p

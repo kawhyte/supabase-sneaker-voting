@@ -123,7 +123,7 @@ export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
           <Brain className="h-12 w-12 mx-auto mb-4 text-gray-400" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No Try-On Data Available</h3>
           <p className="text-gray-600 mb-4">
-            Start trying on sneakers and rating their fit to unlock powerful insights!
+            Start trying on items and rating their fit to unlock powerful insights!
           </p>
           {onGoBack && (
             <Button onClick={onGoBack} className="bg-blue-600 hover:bg-blue-700">
@@ -361,7 +361,7 @@ export function InsightsDashboard({ onGoBack }: InsightsDashboardProps) {
                       <p>👍 You have fairly consistent sizing, with some variation across brands. Our recommendations should be quite reliable.</p>
                     )}
                     {insights.consistencyScore >= 40 && insights.consistencyScore < 60 && (
-                      <p>⚠️ Your sizing varies somewhat across experiences. Try more sneakers to improve recommendation accuracy.</p>
+                      <p>⚠️ Your sizing varies somewhat across experiences. Try more items to improve recommendation accuracy.</p>
                     )}
                     {insights.consistencyScore < 40 && (
                       <p>📊 Your fit preferences vary significantly. This could indicate different preferences for different activities or styles.</p>

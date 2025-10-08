@@ -27,8 +27,8 @@ interface PhotoItem {
 }
 
 // Apple-style contextual form schema
-const sneakerSchema = z.object({
-  userName: z.enum(['Kenny', 'Rene'], { required_error: 'Select who is tracking this sneaker' }),
+const itemSchema = z.object({
+  userName: z.enum(['Kenny', 'Rene'], { required_error: 'Select who is tracking this item' }),
   interactionType: z.enum(['seen', 'tried'], { required_error: 'Select your experience' }),
   // URL import fields
   productUrl: z.string().optional(),
@@ -37,7 +37,7 @@ const sneakerSchema = z.object({
   // Product fields
   brand: z.string().min(1, 'Brand is required'),
   model: z.string().min(1, 'Model is required'),
-  colorway: z.string().optional(),
+  color: z.string().optional(),
   // Try-on specific (conditional)
   sizeTried: z.string().optional(),
   fitRating: z.coerce.number().min(1).max(5).optional(),
@@ -53,13 +53,13 @@ const sneakerSchema = z.object({
   }
   return true
 }, {
-  message: "Size and fit rating are required when you've tried the sneaker",
+  message: "Size and fit rating are required when you've tried the item",
   path: ["sizeTried"]
 })
 
-type SneakerFormData = z.infer<typeof sneakerSchema>
+type ItemFormData = z.infer<typeof itemSchema>
 
-// Common sneaker brands for quick selection
+// Common item brands for quick selection
 const COMMON_BRANDS = ['Nike', 'Jordan', 'Adidas', 'New Balance', 'Asics', 'Puma', 'Vans', 'Converse']
 
 // Common sizes with EU and Women's equivalents (US Men's 3.5 - 10.5)
@@ -90,11 +90,11 @@ const FIT_RATINGS = [
   { value: 5, label: 'Too Big', icon: '🔴', description: 'Swimming in them' }
 ]
 
-interface SmartSneakerFormProps {
-  onSneakerAdded?: () => void
+interface SmartItemFormProps {
+  onItemAdded?: () => void
 }
 
-export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {}) {
+export function SmartItemForm({ onItemAdded }: SmartItemFormProps = {}) {
   const [isLoading, setIsLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [sizePreferences, setSizePreferences] = useState<Record<string, string>>({})
@@ -118,8 +118,8 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
     formState: { errors, isValid },
     setValue,
     watch
-  } = useForm<SneakerFormData>({
-    resolver: zodResolver(sneakerSchema),
+  } = useForm<ItemFormData>({
+    resolver: zodResolver(itemSchema),
     mode: 'onChange'
   })
 
@@ -236,7 +236,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         // Clean and trim all text data
         const cleanBrand = data.brand ? data.brand.replace(/[\n\t\r]/g, ' ').replace(/\s+/g, ' ').trim() : ''
         const cleanModel = data.model ? data.model.replace(/[\n\t\r]/g, ' ').replace(/\s+/g, ' ').trim() : ''
-        const cleanColorway = data.colorway ? data.colorway.replace(/[\n\t\r]/g, ' ').replace(/\s+/g, ' ').trim() : ''
+        const cleanColor = data.color ? data.color.replace(/[\n\t\r]/g, ' ').replace(/\s+/g, ' ').trim() : ''
 
         // Extract store name from URL
         const storeName = new URL(url).hostname.replace('www.', '').split('.')[0]
@@ -263,9 +263,9 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
             setValue('model', cleanModel, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
           }
 
-          if (cleanColorway && cleanColorway !== 'Standard') {
-            console.log('✅ Setting colorway:', cleanColorway)
-            setValue('colorway', cleanColorway, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+          if (cleanColor && cleanColor !== 'Standard') {
+            console.log('✅ Setting color:', cleanColor)
+            setValue('color', cleanColor, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
           }
 
           if (capitalizedStoreName) {
@@ -300,7 +300,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
   }
 
   // Create price monitor function
-  const createPriceMonitor = async (data: SneakerFormData) => {
+  const createPriceMonitor = async (data: ItemFormData) => {
     if (!data.productUrl || !data.userName) return
 
     try {
@@ -326,7 +326,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
   }
 
 
-  const onSubmit = async (data: SneakerFormData) => {
+  const onSubmit = async (data: ItemFormData) => {
     setIsLoading(true)
     setSuccessMessage('')
 
@@ -361,7 +361,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         user_name: data.userName,
         brand: data.brand,
         model: data.model,
-        colorway: data.colorway || 'Standard',
+        color: data.color || 'Standard',
         // Only include try-on specific fields if actually tried on
         size_tried: data.interactionType === 'tried' ? data.sizeTried : null,
         fit_rating: data.interactionType === 'tried' ? data.fitRating : null,
@@ -408,8 +408,8 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         data.interactionType === 'tried'
           ? '⚡ Try-on experience saved!'
           : data.productUrl
-            ? '✨ Sneaker added with price monitoring!'
-            : '✨ Sneaker added to your list!'
+            ? '✨ Item added with price monitoring!'
+            : '✨ Item added to your list!'
       )
 
       // Auto-reset after 3 seconds for rapid entry
@@ -420,7 +420,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         setPhotos([])
         setUrlData(null)
         setShowUrlImport(false)
-        onSneakerAdded?.()
+        onItemAdded?.()
       }, 3000)
 
     } catch (error) {
@@ -445,15 +445,15 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
   }
 
   const getFormTitle = () => {
-    if (!watchedInteractionType) return '👟 Track Sneaker'
-    return watchedInteractionType === 'tried' ? '⚡ Try-On Experience' : '👀 Sneaker Spotted'
+    if (!watchedInteractionType) return '👟 Track Item'
+    return watchedInteractionType === 'tried' ? '⚡ Try-On Experience' : '👀 Item Spotted'
   }
 
   const getFormDescription = () => {
-    if (!watchedInteractionType) return 'Add a sneaker to your collection'
+    if (!watchedInteractionType) return 'Add a item to your collection'
     return watchedInteractionType === 'tried'
       ? 'Rate your try-on experience'
-      : 'Save this sneaker for later'
+      : 'Save this item for later'
   }
 
   return (
@@ -493,7 +493,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-[var(--space-lg)]">
           {/* Step 1: User Selection */}
           <div>
-            <Label className="text-sm font-medium text-gray-700">Who's tracking this sneaker?</Label>
+            <Label className="text-sm font-medium text-gray-700">Who's tracking this item?</Label>
             <div className="grid grid-cols-2 gap-[var(--space-sm)] mt-[var(--space-md)]">
               <Button
                 type="button"
@@ -520,7 +520,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
           {/* Step 2: Interaction Type */}
           {watchedUser && (
             <div>
-              <Label className="text-sm font-medium text-gray-700">What's your experience with this sneaker?</Label>
+              <Label className="text-sm font-medium text-gray-700">What's your experience with this item?</Label>
               <div className="grid grid-cols-2 gap-[var(--space-sm)] mt-[var(--space-md)]">
                 <Button
                   type="button"
@@ -684,7 +684,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
             </AnimatePresence>
           )}
 
-          {/* Step 3: Sneaker Details */}
+          {/* Step 3: Item Details */}
           {watchedInteractionType && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -862,7 +862,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                 <p className="text-xs text-gray-500 mt-[var(--space-xs)]">
                   💡 Quick thoughts: {watchedInteractionType === 'tried'
                     ? '"Tight on pinky toe", "Great for walking"'
-                    : '"Love the colorway", "Perfect for summer"'
+                    : '"Love the color", "Perfect for summer"'
                   }
                 </p>
               </div>
@@ -872,7 +872,7 @@ export function SmartSneakerForm({ onSneakerAdded }: SmartSneakerFormProps = {})
                 <div className="grid grid-cols-2 gap-[var(--space-base)]">
                   <div>
                     <Label className="text-sm text-gray-600">Color (Optional)</Label>
-                    <Input {...register('colorway')} placeholder="Bred, Chicago, etc." className="mt-[var(--space-xs)]" />
+                    <Input {...register('color')} placeholder="Bred, Chicago, etc." className="mt-[var(--space-xs)]" />
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600">Store (Optional)</Label>

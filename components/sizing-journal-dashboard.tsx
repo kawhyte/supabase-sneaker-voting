@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Search } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
-import { EditSneakerModal } from './edit-sneaker-modal'
+import { EditItemModal } from './edit-item-modal'
 import { SizingJournalFilters } from './sizing-journal-filters'
 import { SizingJournalStats } from './sizing-journal-stats'
 import { SizingJournalEntryCard } from './sizing-journal-entry-card'
@@ -112,7 +112,7 @@ export function SizingJournalDashboard({ onAddNew, status = 'wishlisted' }: Sizi
         .eq('item_id', deletingEntry.id)
 
       if (photosError) {
-        console.warn('Error fetching sneaker photos:', photosError)
+        console.warn('Error fetching item photos:', photosError)
       }
 
       if (photos && photos.length > 0) {
@@ -306,7 +306,7 @@ export function SizingJournalDashboard({ onAddNew, status = 'wishlisted' }: Sizi
       </div>
 
       {editingEntry && (
-        <EditSneakerModal
+        <EditItemModal
           experience={editingEntry}
           isOpen={isEditModalOpen}
           onClose={handleCloseEditModal}

@@ -15,7 +15,7 @@ export interface SizingJournalEntry {
   user_name: string
   brand: string
   model: string
-  colorway: string
+  color: string
   category: ItemCategory // NEW: Item category
   size_type: SizeType // NEW: Size measurement type
   interaction_type: 'seen' | 'tried'

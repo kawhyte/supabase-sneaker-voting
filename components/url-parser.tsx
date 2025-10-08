@@ -15,7 +15,7 @@ interface ParsedProduct {
   name: string
   brand: string
   model: string
-  colorway?: string
+  color?: string
   price: number
   salePrice?: number
   sku?: string
@@ -143,7 +143,7 @@ export function UrlParser({ onProductParsed }: UrlParserProps) {
             sku: parsedProduct.sku || `${parsedProduct.brand}-${Date.now()}`,
             brand: parsedProduct.brand,
             model: parsedProduct.model,
-            colorway: parsedProduct.colorway,
+            color: parsedProduct.color,
             retail_price: parsedProduct.price,
             image_url: parsedProduct.images[0] || null
           })
@@ -200,7 +200,7 @@ export function UrlParser({ onProductParsed }: UrlParserProps) {
             URL Product Parser
           </CardTitle>
           <CardDescription>
-            Parse product data from supported sneaker retailer websites
+            Parse product data from supported item retailer websites
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -292,8 +292,8 @@ export function UrlParser({ onProductParsed }: UrlParserProps) {
                 <h3 className="font-semibold text-lg">{parsedProduct.name}</h3>
                 <div className="flex gap-2 mt-1">
                   <Badge variant="outline">{parsedProduct.brand}</Badge>
-                  {parsedProduct.colorway && (
-                    <Badge variant="outline">{parsedProduct.colorway}</Badge>
+                  {parsedProduct.color && (
+                    <Badge variant="outline">{parsedProduct.color}</Badge>
                   )}
                 </div>
               </div>

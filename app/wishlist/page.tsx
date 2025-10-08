@@ -3,7 +3,7 @@
 import { SizingJournalEntryCard } from '@/components/sizing-journal-entry-card'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 import { Button } from '@/components/ui/button'
-import { EditSneakerModal } from '@/components/edit-sneaker-modal'
+import { EditItemModal } from '@/components/edit-item-modal'
 import { Plus, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
@@ -239,7 +239,7 @@ export default function WishlistPage() {
 
         {/* Edit Modal */}
         {editingEntry && (
-          <EditSneakerModal
+          <EditItemModal
             experience={editingEntry}
             isOpen={isEditModalOpen}
             onClose={handleCloseEditModal}

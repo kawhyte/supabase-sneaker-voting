@@ -9,7 +9,7 @@ export default function ProductParserPage() {
             SoleTracker Product Parser
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Easily add products to your SoleTracker database by parsing URLs from major sneaker retailers
+            Easily add products to your SoleTracker database by parsing URLs from major item retailers
             or entering product details manually.
           </p>
         </div>

@@ -113,7 +113,7 @@ export function PhotoCarousel({
           >
             <img
               src={photo.image_url}
-              alt="Sneaker photo"
+              alt="Item photo"
               className="w-full h-full object-contain rounded-lg"
               style={{ aspectRatio: autoHeight ? 'auto' : '1 / 1' }}
             />
@@ -153,7 +153,7 @@ export function PhotoCarousel({
                   >
                     <img
                       src={photo.image_url}
-                      alt={`Sneaker photo ${index + 1}`}
+                      alt={`Item photo ${index + 1}`}
                       className="w-full h-full object-contain"
                     />
 

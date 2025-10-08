@@ -10,8 +10,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
 	metadataBase: new URL(defaultUrl),
-	title: "SoleTracker - Sneaker Price Monitor",
-	description: "Track sneaker prices across multiple stores and get notified when prices drop",
+	title: "SoleTracker - Item Price Monitor",
+	description: "Track item prices across multiple stores and get notified when prices drop",
 	manifest: "/manifest.json",
 	icons: {
 		icon: "/icon-192x192.png",

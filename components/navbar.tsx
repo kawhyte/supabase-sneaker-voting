@@ -28,7 +28,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center gap-2">
             <span className="text-2xl">👟</span>
             <span className="text-xl font-bold text-gray-900">
-              Sneaker Tracker
+              Item Tracker
             </span>
           </Link>
 

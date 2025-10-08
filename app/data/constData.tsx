@@ -3,14 +3,14 @@ import { Archive, Clock, Heart, LayoutDashboard, Library } from "lucide-react";
 export const links = [
 	{
 		title: "Overview ",
-		href: "/sneakers/dashboard",
+		href: "/items/dashboard",
 		icon: LayoutDashboard,
 		variant: "default",
 		color: "green",
 	},
 	{
 		title: "Awaiting Vote ",
-		href: "/sneakers/dashboard/pending",
+		href: "/items/dashboard/pending",
 		value: "4",
 		icon: Clock,
 		variant: "default",
@@ -18,7 +18,7 @@ export const links = [
 	},
 	{
 		title: "Potential Purchases ",
-		href: "/sneakers/dashboard/voted",
+		href: "/items/dashboard/voted",
 		value: "2",
 		icon: Heart,
 		variant: "default",
@@ -26,14 +26,14 @@ export const links = [
 	},
 	{
 		title: "Archived ",
-		href: "/sneakers/dashboard/archived",
+		href: "/items/dashboard/archived",
 		icon: Archive,
 		variant: "default",
 		color: "red",
 	},
 	{
 		title: "Collection ",
-		href: "/sneakers/collection",
+		href: "/items/collection",
 		icon: Library,
 		variant: "default",
 		color: "red",

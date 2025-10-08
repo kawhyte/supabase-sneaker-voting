@@ -32,20 +32,20 @@ interface PriceMonitor {
   is_active: boolean
   notification_sent: boolean
   created_at: string
-  sneakers?: {
+  items?: {
     brand: string
     model: string
-    colorway: string | null
+    color: string | null
   }
 }
 
 interface PriceMonitorManagerProps {
-  sneaker_id?: string
+  item_id?: string
   user_name: string
   className?: string
 }
 
-export function PriceMonitorManager({ sneaker_id, user_name, className = "" }: PriceMonitorManagerProps) {
+export function PriceMonitorManager({ item_id, user_name, className = "" }: PriceMonitorManagerProps) {
   const [monitors, setMonitors] = useState<PriceMonitor[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -119,7 +119,7 @@ export function PriceMonitorManager({ sneaker_id, user_name, className = "" }: P
           store_name: newMonitor.store_name,
           user_name,
           target_price: newMonitor.target_price ? parseFloat(newMonitor.target_price) : null,
-          sneaker_id
+          item_id
         })
       })
 

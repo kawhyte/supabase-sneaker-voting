@@ -21,12 +21,12 @@ import { cn } from '@/lib/utils'
 import { CATEGORY_CONFIGS, type ItemCategory } from '@/components/types/item-category'
 
 // Schema for journal entry editing
-const sneakerSchema = z.object({
+const itemSchema = z.object({
   userName: z.enum(['Kenny', 'Rene'], {
-    required_error: 'Please select who is tracking this sneaker'
+    required_error: 'Please select who is tracking this item'
   }),
   interactionType: z.enum(['seen', 'tried'], {
-    required_error: 'Please select whether you saw or tried on this sneaker'
+    required_error: 'Please select whether you saw or tried on this item'
   }),
   category: z.enum(['shoes', 'tops', 'bottoms', 'outerwear', 'accessories', 'jewelry', 'watches'], {
     required_error: 'Please select the item category'
@@ -36,7 +36,7 @@ const sneakerSchema = z.object({
     .max(50, 'Brand name must be less than 50 characters')
     .trim(),
   model: z.string()
-    .min(2, 'Please enter the sneaker model (e.g., Air Jordan 1, Yeezy 350)')
+    .min(2, 'Please enter the item model (e.g., Air Jordan 1, Yeezy 350)')
     .max(100, 'Model name must be less than 100 characters')
     .trim(),
   sku: z.string()
@@ -44,8 +44,8 @@ const sneakerSchema = z.object({
     .regex(/^[A-Za-z0-9-]*$/, 'SKU can only contain letters, numbers, and hyphens')
     .optional()
     .or(z.literal('')),
-  colorway: z.string()
-    .max(100, 'Colorway must be less than 100 characters')
+  color: z.string()
+    .max(100, 'Color must be less than 100 characters')
     .trim()
     .optional()
     .or(z.literal('')),
@@ -130,7 +130,7 @@ const sneakerSchema = z.object({
   path: ['salePrice']
 })
 
-type SneakerFormData = z.infer<typeof sneakerSchema>
+type ItemFormData = z.infer<typeof itemSchema>
 
 interface PhotoItem {
   id: string
@@ -148,14 +148,14 @@ interface ExistingPhoto {
   is_main_image: boolean
 }
 
-interface EditSneakerModalProps {
+interface EditItemModalProps {
   experience: any
   isOpen: boolean
   onClose: () => void
   onSave: () => void
 }
 
-export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSneakerModalProps) {
+export function EditItemModal({ experience, isOpen, onClose, onSave }: EditItemModalProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [photos, setPhotos] = useState<PhotoItem[]>([])
@@ -175,8 +175,8 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
     watch,
     trigger,
     reset
-  } = useForm<SneakerFormData>({
-    resolver: zodResolver(sneakerSchema),
+  } = useForm<ItemFormData>({
+    resolver: zodResolver(itemSchema),
     mode: 'onBlur'
   })
 
@@ -236,7 +236,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         brand: experience.brand,
         model: experience.model,
         sku: experience.sku || '',
-        colorway: experience.colorway || '',
+        color: experience.color || '',
         sizeTried: experience.size_tried || '',
         comfortRating: experience.comfort_rating || undefined,
         storeName: experience.store_name || '',
@@ -265,7 +265,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
     }
   }, [isOpen, experience, reset])
 
-  const onSubmit = async (data: SneakerFormData) => {
+  const onSubmit = async (data: ItemFormData) => {
     setIsLoading(true)
     setSuccessMessage('')
 
@@ -320,7 +320,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
         user_name: data.userName,
         brand: data.brand,
         model: data.model,
-        colorway: data.colorway || 'Standard',
+        color: data.color || 'Standard',
         sku: data.sku || null,
         category: data.category,
         size_tried: data.interactionType === 'tried' ? data.sizeTried : null,
@@ -659,11 +659,11 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                     />
                   </div>
 
-                  {/* Colorway */}
+                  {/* Color */}
                   <div>
                     <Label className="text-sm text-gray-600">Color (Optional)</Label>
                     <Input
-                      {...register("colorway")}
+                      {...register("color")}
                       placeholder="Bred, Chicago, etc."
                       className="mt-[var(--space-md)] h-6"
                     />
@@ -776,7 +776,7 @@ export function EditSneakerModal({ experience, isOpen, onClose, onSave }: EditSn
                   placeholder={
                     watchedInteractionType === "tried"
                       ? "e.g., 'Tight on pinky toe', 'Great for walking', 'Runs small compared to other Nikes'"
-                      : "e.g., 'Love the colorway', 'Perfect for summer', 'Saw on Instagram'"
+                      : "e.g., 'Love the color', 'Perfect for summer', 'Saw on Instagram'"
                   }
                   className="mt-[var(--space-md)] resize-none"
                   rows={3}

@@ -20,7 +20,7 @@ interface ArchiveReasonDialogProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
 	onConfirm: (reason: ArchiveReason, note?: string) => void
-	sneakerName: string
+	itemName: string
 }
 
 const ARCHIVE_REASONS = [
@@ -54,7 +54,7 @@ export function ArchiveReasonDialog({
 	open,
 	onOpenChange,
 	onConfirm,
-	sneakerName,
+	itemName,
 }: ArchiveReasonDialogProps) {
 	const [selectedReason, setSelectedReason] = useState<ArchiveReason | null>(null)
 	const [otherNote, setOtherNote] = useState('')
@@ -92,11 +92,11 @@ export function ArchiveReasonDialog({
 							style={{ color: 'var(--color-gray-600)' }}
 						/>
 						<DialogTitle style={{ color: 'var(--color-black)' }}>
-							Archive Sneaker
+							Archive Item
 						</DialogTitle>
 					</div>
 					<DialogDescription style={{ color: 'var(--color-gray-600)' }}>
-						Why are you archiving <strong>{sneakerName}</strong>?
+						Why are you archiving <strong>{itemName}</strong>?
 					</DialogDescription>
 				</DialogHeader>
 
@@ -204,7 +204,7 @@ export function ArchiveReasonDialog({
 						}}
 					>
 						<Archive className="h-4 w-4 mr-2" />
-						Archive Sneaker
+						Archive Item
 					</Button>
 				</DialogFooter>
 			</DialogContent>

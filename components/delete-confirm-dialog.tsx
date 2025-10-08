@@ -39,8 +39,8 @@ export function DeleteConfirmDialog({
             {experience.brand} {experience.model}
           </div>
           <div className="text-sm text-gray-600">
-            {experience.colorway !== 'Standard' && experience.colorway && (
-              <span>{experience.colorway} • </span>
+            {experience.color !== 'Standard' && experience.color && (
+              <span>{experience.color} • </span>
             )}
             {experience.user_name} • {experience.interaction_type === 'tried' ? 'Tried On' : 'Spotted'}
             {experience.size_tried && ` • Size ${experience.size_tried}`}

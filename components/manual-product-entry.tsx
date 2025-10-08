@@ -62,27 +62,27 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
   const parseProductName = (productName: string) => {
     const parts = productName.trim().split(' ')
     if (parts.length < 2) {
-      return { brand: productName, model: '', colorway: '' }
+      return { brand: productName, model: '', color: '' }
     }
 
     const brand = parts[0]
     const remaining = parts.slice(1).join(' ')
 
-    // Try to detect colorway at the end (often in quotes or after keywords)
-    const colorwayIndicators = ['"', "'", 'in', 'colorway']
+    // Try to detect color at the end (often in quotes or after keywords)
+    const colorIndicators = ['"', "'", 'in', 'color']
     let model = remaining
-    let colorway = ''
+    let color = ''
 
-    for (const indicator of colorwayIndicators) {
+    for (const indicator of colorIndicators) {
       const index = remaining.toLowerCase().lastIndexOf(indicator)
       if (index > 0) {
         model = remaining.substring(0, index).trim()
-        colorway = remaining.substring(index).replace(/["']/g, '').replace(/^(in|colorway)\s*/i, '').trim()
+        color = remaining.substring(index).replace(/["']/g, '').replace(/^(in|color)\s*/i, '').trim()
         break
       }
     }
 
-    return { brand, model, colorway }
+    return { brand, model, color }
   }
 
 
@@ -92,7 +92,7 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
 
     try {
       // Parse the product name
-      const { brand, model, colorway } = parseProductName(data.productName)
+      const { brand, model, color } = parseProductName(data.productName)
 
       let mainImageUrl = null
       let mainCloudinaryId = null
@@ -129,9 +129,9 @@ export function ManualProductEntry({ onProductAdded }: ManualProductEntryProps =
         sku: data.sku,
         brand,
         model,
-        colorway: colorway || 'Standard',
+        color: color || 'Standard',
         retail_price: parseFloat(data.price),
-        category: 'sneakers',
+        category: 'items',
         image_url: mainImageUrl,
         cloudinary_id: mainCloudinaryId
       }

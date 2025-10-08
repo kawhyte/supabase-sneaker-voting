@@ -12,7 +12,7 @@ export function filterJournalEntries(
     const matchesSearch = searchTerm === '' ||
       entry.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.colorway.toLowerCase().includes(searchTerm.toLowerCase())
+      entry.color.toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesUser = selectedUsers.size === 0 || selectedUsers.has(entry.user_name)
     const matchesBrand = selectedBrands.size === 0 || selectedBrands.has(entry.brand)

@@ -3,18 +3,18 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { SmartSneakerForm } from './smart-sneaker-form'
+import { SmartItemForm } from './smart-item-form'
 import { SizingJournalDashboard } from './sizing-journal-dashboard'
 import { InsightsDashboard } from './insights-dashboard'
 import { Zap, BarChart3, Brain } from 'lucide-react'
 
 type ViewMode = 'entry' | 'dashboard' | 'insights'
 
-export function SneakerTrackerApp() {
+export function ItemTrackerApp() {
   const [currentView, setCurrentView] = useState<ViewMode>('entry')
 
-  const handleSneakerAdded = () => {
-    // Switch to dashboard after adding a sneaker
+  const handleItemAdded = () => {
+    // Switch to dashboard after adding a item
     setCurrentView('dashboard')
   }
 
@@ -42,7 +42,7 @@ export function SneakerTrackerApp() {
             whileTap={{ scale: 0.95 }}
             className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-teal-600 to-orange-500 bg-clip-text text-transparent cursor-pointer"
           >
-            👟 Sneaker Sizing Tracker44
+            👟 Item Sizing Tracker44
           </motion.h1>
 
           <motion.div
@@ -134,9 +134,9 @@ export function SneakerTrackerApp() {
               transition={{ duration: 0.3 }}
             >
               {currentView === 'entry'
-                ? 'Add sneakers you\'ve seen or tried on to your collection'
+                ? 'Add items you\'ve seen or tried on to your collection'
                 : currentView === 'dashboard'
-                  ? 'View your sneaker collection and experiences'
+                  ? 'View your item collection and experiences'
                   : 'AI-powered size recommendations and fit analysis'
               }
             </motion.span>
@@ -161,7 +161,7 @@ export function SneakerTrackerApp() {
           >
             {currentView === 'entry' ? (
               <div className="flex justify-center">
-                <SmartSneakerForm onSneakerAdded={handleSneakerAdded} />
+                <SmartItemForm onItemAdded={handleItemAdded} />
               </div>
             ) : currentView === 'dashboard' ? (
               <SizingJournalDashboard onAddNew={handleAddNew} />
