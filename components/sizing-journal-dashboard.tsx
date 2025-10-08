@@ -337,7 +337,7 @@ function DashboardHeader({ viewMode }: { viewMode: 'watchlist' | 'purchased' }) 
     // ...
     const titles = {
     watchlist: {
-      title: 'Personal Pricing Watchlist',
+      title: 'My Wishlist',
       description: 'Track items you\'re interested in and monitor price changes'
     },
     purchased: {
