@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
+import { FTUEChecklist } from '@/components/ftue-checklist'
 import { Package, Eye, Heart } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -16,6 +17,11 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
+        {/* FTUE Checklist - shown to new users */}
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FTUEChecklist />
+        </div>
+
         <Tabs defaultValue="owned" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8">
             <TabsTrigger value="owned" className="flex items-center gap-2">
