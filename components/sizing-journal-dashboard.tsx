@@ -17,13 +17,10 @@ import { type ItemCategory } from '@/components/types/item-category'
 
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
-  viewMode?: 'watchlist' | 'purchased'
-  // We no longer need to pass category state in, this component will handle it.
-  // selectedCategories?: ItemCategory[] 
-  // onCategoriesChange?: (categories: ItemCategory[]) => void
+  status?: 'owned' | 'wishlisted' | 'journaled'
 }
 
-export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: SizingJournalDashboardProps) {
+export function SizingJournalDashboard({ onAddNew, status = 'wishlisted' }: SizingJournalDashboardProps) {
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -46,44 +43,40 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: Siz
 
   useEffect(() => {
     loadJournalEntries()
-  }, [viewMode])
+  }, [status])
 
   const loadJournalEntries = async () => {
-    // ... (rest of this function is unchanged)
     try {
       setIsLoading(true)
       let query = supabase
         .from('items')
         .select(`*, item_photos (id, image_url, image_order, is_main_image)`)
         .eq('is_archived', false)
+        .eq('status', status) // PHASE 3: Filter by status field
         .order('image_order', { foreignTable: 'item_photos', ascending: true })
-      if (viewMode === 'purchased') {
-        query = query.eq('is_purchased', true).neq('category', 'shoes')
-      } else {
-        query = query.or('category.eq.shoes,is_purchased.eq.false')
-      }
+
       let { data, error } = await query.order('created_at', { ascending: false })
+
       if (error && error.message?.includes('item_photos')) {
         let basicQuery = supabase
           .from('items')
           .select('*')
           .eq('is_archived', false)
-        if (viewMode === 'purchased') {
-          basicQuery = basicQuery.eq('is_purchased', true).neq('category', 'shoes')
-        } else {
-          basicQuery = basicQuery.or('category.eq.shoes,is_purchased.eq.false')
-        }
+          .eq('status', status) // PHASE 3: Filter by status field
         const basicResult = await basicQuery.order('created_at', { ascending: false })
         data = basicResult.data
         error = basicResult.error
       }
+
       if (error) {
         console.error('Error loading journal entries:', error)
+        toast.error('Failed to load items')
         return
       }
       setJournalEntries(data || [])
     } catch (error) {
       console.error('Error:', error)
+      toast.error('An error occurred while loading items')
     } finally {
       setIsLoading(false)
     }
@@ -266,7 +259,7 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: Siz
   if (isLoading) {
     return (
       <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
-        <DashboardHeader viewMode={viewMode} />
+        <DashboardHeader status={status} />
         <LoadingSkeleton />
       </div>
     )
@@ -274,7 +267,7 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: Siz
 
   return (
     <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
-      <DashboardHeader viewMode={viewMode} />
+      <DashboardHeader status={status} />
 
       {/* SizingJournalFilters props are now fully updated */}
       <SizingJournalFilters
@@ -332,21 +325,24 @@ export function SizingJournalDashboard({ onAddNew, viewMode = 'watchlist' }: Siz
   )
 }
 
-// Sub-components (unchanged)
-function DashboardHeader({ viewMode }: { viewMode: 'watchlist' | 'purchased' }) {
-    // ...
-    const titles = {
-    watchlist: {
-      title: 'My Wishlist',
+// Sub-components
+function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journaled' }) {
+  const titles = {
+    owned: {
+      title: 'Owned Items',
+      description: 'Items you own and have purchased'
+    },
+    wishlisted: {
+      title: 'Wishlist',
       description: 'Track items you\'re interested in and monitor price changes'
     },
-    purchased: {
-      title: 'Purchased Items',
-      description: 'Items you\'ve bought and own'
+    journaled: {
+      title: 'Tried Items',
+      description: 'Items you\'ve tried on or seen in person'
     }
   }
 
-  const { title, description } = titles[viewMode]
+  const { title, description } = titles[status]
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">

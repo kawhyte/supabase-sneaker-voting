@@ -4,11 +4,10 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
-import { InsightsDashboard } from '@/components/insights-dashboard'
-import { BarChart3, Brain, ShoppingBag } from 'lucide-react'
+import { Package, Eye, Heart } from 'lucide-react'
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState('collection')
+  const [activeTab, setActiveTab] = useState('owned')
 
   return (
     <div className="w-full py-8">
@@ -17,53 +16,55 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Tabs defaultValue="collection" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs defaultValue="owned" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8">
-            <TabsTrigger value="collection" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-            Watchlist
+            <TabsTrigger value="owned" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Owned
             </TabsTrigger>
-            <TabsTrigger value="purchased" className="flex items-center gap-2">
-              <ShoppingBag className="h-4 w-4" />
-              Purchased
+            <TabsTrigger value="tried" className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Tried
             </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-2 ">
-              <Brain className="h-4 w-4" />
-              Insights
+            <TabsTrigger value="wishlist" className="flex items-center gap-2">
+              <Heart className="h-4 w-4" />
+              Wishlist
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="collection">
+          <TabsContent value="owned">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
               <SizingJournalDashboard
-                viewMode="watchlist"
+                status="owned"
               />
             </motion.div>
           </TabsContent>
 
-          <TabsContent value="purchased">
+          <TabsContent value="tried">
             <motion.div
               initial={{ opacity: 0, x: 0 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
               <SizingJournalDashboard
-                viewMode="purchased"
+                status="journaled"
               />
             </motion.div>
           </TabsContent>
 
-          <TabsContent value="insights">
+          <TabsContent value="wishlist">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <InsightsDashboard onGoBack={() => setActiveTab('collection')} />
+              <SizingJournalDashboard
+                status="wishlisted"
+              />
             </motion.div>
           </TabsContent>
         </Tabs>
