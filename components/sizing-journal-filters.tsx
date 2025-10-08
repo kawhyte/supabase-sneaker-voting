@@ -4,10 +4,9 @@
 import { useMemo } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { Search, X } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { CATEGORY_CONFIGS, type ItemCategory } from '@/components/types/item-category'
 import { FacetedFilter } from '@/components/ui/faceted-filter'
 
@@ -50,16 +49,6 @@ export function SizingJournalFilters({
   })), [availableBrands])
 
   const allCategoryIds = useMemo(() => Object.keys(CATEGORY_CONFIGS) as ItemCategory[], [])
-
-  // This line is now safe because selectedUsers and selectedBrands will always be a Set.
-  const isFiltered = searchTerm.length > 0 || selectedCategories.length < allCategoryIds.length || selectedUsers.size > 0 || selectedBrands.size > 0;
-
-  const handleReset = () => {
-    onSearchChange('');
-    onCategoriesChange(allCategoryIds);
-    onUserChange(new Set());
-    onBrandChange(new Set());
-  }
 
   const toggleCategory = (categoryId: ItemCategory) => {
     if (selectedCategories.includes(categoryId)) {
@@ -150,13 +139,6 @@ export function SizingJournalFilters({
           selectedValues={selectedBrands}
           onValueChange={onBrandChange}
         />
-
-        {isFiltered && (
-          <Button variant="ghost" onClick={handleReset} className="h-10 px-2 lg:px-3">
-            Reset
-            <X className="ml-2 h-4 w-4" />
-          </Button>
-        )}
 
         <div className="ml-0 md:ml-auto w-full md:w-auto">
           <Select value={sortBy} onValueChange={onSortChange}>
