@@ -71,7 +71,7 @@ export function SizingJournalEntryCard({
 	onArchive,
 	onRestore,
 }: SizingJournalEntryCardProps) {
-	const isTried = entry.interaction_type === "tried";
+	const isTried = entry.has_been_tried;
 	const fitInfo = getFitRatingInfo(entry.fit_rating);
 	const photos = preparePhotos(entry);
 	const categoryConfig = getCategoryConfig(entry.category);
@@ -98,15 +98,13 @@ export function SizingJournalEntryCard({
 										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
 										type='button'
 										aria-label={
-											isShoe
-												? (entry.in_collection ? 'Remove from collection' : 'Add to collection')
-												: (entry.is_purchased ? 'Unmark as purchased' : 'Mark as purchased')
+											entry.status === 'owned' ? 'Remove from collection' : 'Add to collection'
 										}>
 										{isShoe ? (
 											<Bookmark
 												className='h-3 w-3 transition-all'
 												style={{
-													color: entry.in_collection
+													color: entry.status === 'owned'
 														? 'var(--color-primary-500)'
 														: 'var(--color-gray-500)',
 												}}
@@ -115,7 +113,7 @@ export function SizingJournalEntryCard({
 											<ShoppingBag
 												className='h-3 w-3 transition-all'
 												style={{
-													color: entry.is_purchased
+													color: entry.status === 'owned'
 														? 'var(--color-green-500)'
 														: 'var(--color-gray-500)',
 												}}
@@ -125,10 +123,7 @@ export function SizingJournalEntryCard({
 								</TooltipTrigger>
 								<TooltipContent side="bottom" className="z-[9999]">
 									<p>
-										{isShoe
-											? (entry.in_collection ? 'Remove from collection' : 'Add to collection')
-											: (entry.is_purchased ? 'Unmark as purchased' : 'Mark as purchased')
-										}
+										{entry.status === 'owned' ? 'Remove from collection' : 'Add to collection'}
 									</p>
 								</TooltipContent>
 							</Tooltip>
@@ -245,8 +240,8 @@ export function SizingJournalEntryCard({
 					</div>
 				)} */}
 
-				{/* In Collection / Purchased Badge - Only show in journal view when applicable */}
-				{viewMode === 'journal' && (isShoe ? entry.in_collection : entry.is_purchased) && (
+				{/* Owned Badge - Only show in journal view when applicable */}
+				{viewMode === 'journal' && entry.status === 'owned' && (
 					<div
 						className='absolute  top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
 						style={{

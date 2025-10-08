@@ -292,7 +292,7 @@ export function AddItemForm({
 		mode: "onChange",
 		defaultValues: initialData ? {
 			userName: initialData.user_name || "Kenny",
-			interactionType: initialData.interaction_type || "seen",
+			interactionType: initialData.has_been_tried ? "tried" : "seen",
 			category: initialData.category || "shoes",
 			brand: initialData.brand || "",
 			model: initialData.model || "",
@@ -470,7 +470,7 @@ export function AddItemForm({
 				.from("items")
 				.select("user_name, brand, size_tried, comfort_rating")
 				.eq("category", "shoes") // Only load fit data for shoes
-				.eq("interaction_type", "tried")
+				.eq("has_been_tried", true)
 				.not("size_tried", "is", null)
 				.not("comfort_rating", "is", null);
 
@@ -953,8 +953,8 @@ export function AddItemForm({
 				model: data.model,
 				color: data.color || "Standard",
 				sku: data.sku || null,
-				category: data.category, // NEW: Item category
-				size_type: getSizeType(data.category), // NEW: Size type based on category
+				category: data.category,
+				size_type: getSizeType(data.category),
 				// Only include try-on specific fields if actually tried on
 				size_tried: data.interactionType === "tried" ? data.sizeTried : null,
 				comfort_rating:
@@ -969,15 +969,8 @@ export function AddItemForm({
 				// Explicitly set wears to null (only shoes can have wears tracking)
 				wears: null,
 
-				// PHASE 1: DUAL-WRITE to both old and new columns
-				// OLD COLUMNS (maintain for backward compatibility)
-				interested_in_buying: true,
-				in_collection: false,
-				interaction_type: data.interactionType,
-				would_buy_at_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
-
-				// NEW COLUMNS (future schema)
-				status: 'wishlisted' as const, // User is adding to wishlist when interested_in_buying is true
+				// Current schema fields
+				status: 'wishlisted' as const,
 				has_been_tried: data.interactionType === 'tried',
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 			};

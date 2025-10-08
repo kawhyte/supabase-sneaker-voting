@@ -16,9 +16,8 @@ export interface SizingJournalEntry {
   brand: string
   model: string
   color: string
-  category: ItemCategory // NEW: Item category
-  size_type: SizeType // NEW: Size measurement type
-  interaction_type: 'seen' | 'tried'
+  category: ItemCategory
+  size_type: SizeType
   size_tried: string | null
   fit_rating: number | null
   comfort_rating?: number
@@ -28,30 +27,19 @@ export interface SizingJournalEntry {
   retail_price?: number
   purchase_price?: number
   would_recommend: boolean | null
-  interested_in_buying: boolean
   image_url?: string
   cloudinary_id?: string
-  item_photos?: ItemPhoto[] // Photos for all item types
-  in_collection?: boolean // Only for shoes
-  is_purchased?: boolean // NEW: For non-shoe items
-  wears?: number // Only for shoes
-  last_worn_date?: string | null // Only for shoes
+  item_photos?: ItemPhoto[]
+  wears?: number
+  last_worn_date?: string | null
   is_archived?: boolean
   archive_reason?: ArchiveReason | null
   archived_at?: string | null
 
-  // NEW SCHEMA FIELDS (Phase 1: Parallel Change)
-  status?: 'owned' | 'wishlisted' | 'journaled' // Replaces: in_collection, is_purchased, interested_in_buying
-  has_been_tried?: boolean // Replaces: interaction_type === 'tried'
-  target_price?: number // Replaces: would_buy_at_price (legacy field)
-
-  // OLD SCHEMA FIELDS (To be deprecated in Phase 2)
-  // These are kept for backward compatibility during the parallel change phase
-  // interested_in_buying: boolean - already listed above
-  // in_collection: boolean - already listed above
-  // is_purchased: boolean - already listed above
-  // interaction_type: 'seen' | 'tried' - already listed above
-  would_buy_at_price?: number // Legacy field, use target_price instead
+  // Current schema fields
+  status: 'owned' | 'wishlisted' | 'journaled'
+  has_been_tried: boolean
+  target_price?: number
 }
 
 export interface FitRating {

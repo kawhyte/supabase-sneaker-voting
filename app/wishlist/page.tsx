@@ -96,15 +96,11 @@ export default function WishlistPage() {
     // Optimistic update - remove from view
     setWishlistItems(prev => prev.filter(item => item.id !== entry.id))
 
-    // Update in database - dual-write to both old and new columns
+    // Update in database
     const { error } = await supabase
       .from('items')
       .update({
-        // NEW COLUMNS
         status: 'owned',
-        // OLD COLUMNS (maintain sync)
-        in_collection: true,
-        interested_in_buying: false,
       })
       .eq('id', entry.id)
 

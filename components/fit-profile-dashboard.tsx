@@ -45,7 +45,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
         .from('items')
         .select('user_name, brand, size_tried, fit_rating')
         .eq('category', 'shoes')
-        .eq('interaction_type', 'tried')
+        .eq('has_been_tried', true)
         .not('size_tried', 'is', null)
         .not('fit_rating', 'is', null)
 

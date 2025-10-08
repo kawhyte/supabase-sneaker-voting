@@ -171,81 +171,52 @@ export function SizingJournalDashboard({ onAddNew, status = 'wishlisted' }: Sizi
   }
 
   const handleToggleCollection = async (entry: SizingJournalEntry) => {
-    if (entry.category === 'shoes') {
-      const newCollectionStatus = !entry.in_collection
-      if (newCollectionStatus && !entry.purchase_price && !entry.retail_price) {
-        toast.error('Please set a price before adding to collection', {
-          description: 'A price is required to track cost per wear',
-          action: {
-            label: 'Edit',
-            onClick: () => handleEditEntry(entry)
-          }
-        })
-        return
-      }
-      setJournalEntries(prev =>
-        prev.map(e => e.id === entry.id ? { ...e, in_collection: newCollectionStatus } : e)
-      )
-      try {
-        const { error } = await supabase
-          .from('items')
-          .update({ in_collection: newCollectionStatus })
-          .eq('id', entry.id)
-        if (error) {
-          console.error('Error toggling collection status:', error)
-          setJournalEntries(prev =>
-            prev.map(e => e.id === entry.id ? { ...e, in_collection: !newCollectionStatus } : e)
-          )
-          toast.error('Failed to update collection')
-          return
+    const newStatus = entry.status === 'owned' ? 'journaled' : 'owned'
+
+    if (newStatus === 'owned' && entry.category === 'shoes' && !entry.purchase_price && !entry.retail_price) {
+      toast.error('Please set a price before adding to collection', {
+        description: 'A price is required to track cost per wear',
+        action: {
+          label: 'Edit',
+          onClick: () => handleEditEntry(entry)
         }
-        toast.success(
-          newCollectionStatus ? 'Added to collection' : 'Removed from collection',
-          {
-            description: `${entry.brand} ${entry.model}`,
-            duration: 3000,
-          }
-        )
-      } catch (error) {
-        console.error('Error:', error)
+      })
+      return
+    }
+
+    setJournalEntries(prev =>
+      prev.map(e => e.id === entry.id ? { ...e, status: newStatus } : e)
+    )
+
+    try {
+      const { error } = await supabase
+        .from('items')
+        .update({ status: newStatus })
+        .eq('id', entry.id)
+
+      if (error) {
+        console.error('Error toggling collection status:', error)
         setJournalEntries(prev =>
-          prev.map(e => e.id === entry.id ? { ...e, in_collection: !newCollectionStatus } : e)
+          prev.map(e => e.id === entry.id ? { ...e, status: entry.status } : e)
         )
         toast.error('Failed to update collection')
+        return
       }
-    } else {
-      const newPurchasedStatus = !entry.is_purchased
-      setJournalEntries(prev =>
-        prev.map(e => e.id === entry.id ? { ...e, is_purchased: newPurchasedStatus } : e)
-      )
-      try {
-        const { error } = await supabase
-          .from('items')
-          .update({ is_purchased: newPurchasedStatus })
-          .eq('id', entry.id)
-        if (error) {
-          console.error('Error toggling purchased status:', error)
-          setJournalEntries(prev =>
-            prev.map(e => e.id === entry.id ? { ...e, is_purchased: !newPurchasedStatus } : e)
-          )
-          toast.error('Failed to update purchased status')
-          return
+
+      toast.success(
+        newStatus === 'owned' ? 'Added to collection' : 'Removed from collection',
+        {
+          description: `${entry.brand} ${entry.model}`,
+          duration: 3000,
         }
-        toast.success(
-          newPurchasedStatus ? 'Marked as purchased' : 'Unmarked as purchased',
-          {
-            description: `${entry.brand} ${entry.model}`,
-            duration: 3000,
-          }
-        )
-        loadJournalEntries()
-      } catch (error) {
-        console.error('Error:', error)
-        setJournalEntries(prev =>
-          prev.map(e => e.id === entry.id ? { ...e, is_purchased: !newPurchasedStatus } : e)
-        )
-        toast.error('Failed to update purchased status')
-      }
+      )
+      loadJournalEntries()
+    } catch (error) {
+      console.error('Error:', error)
+      setJournalEntries(prev =>
+        prev.map(e => e.id === entry.id ? { ...e, status: entry.status } : e)
+      )
+      toast.error('Failed to update collection')
     }
   }
 

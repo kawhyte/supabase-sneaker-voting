@@ -10,13 +10,13 @@ interface SizingJournalStatsProps {
 export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) {
   const totalEntries = journalEntries.length
   const perfectFits = journalEntries.filter(
-    entry => entry.fit_rating === 3 && entry.interaction_type === 'tried'
+    entry => entry.fit_rating === 3 && entry.has_been_tried
   ).length
   const recommended = journalEntries.filter(
-    entry => entry.would_recommend && entry.interaction_type === 'tried'
+    entry => entry.would_recommend && entry.has_been_tried
   ).length
   const spotted = journalEntries.filter(
-    entry => entry.interaction_type === 'seen'
+    entry => !entry.has_been_tried
   ).length
 
   const stats = [

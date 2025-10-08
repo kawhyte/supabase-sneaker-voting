@@ -32,7 +32,7 @@ export default function CollectionPage() {
       .from('items')
       .select('*')
       .eq('category', 'shoes')
-      .eq('in_collection', true)
+      .eq('status', 'owned')
       .eq('is_archived', false)
       .order('created_at', { ascending: false })
 
@@ -124,7 +124,7 @@ export default function CollectionPage() {
     // Update in database
     const { error } = await supabase
       .from('items')
-      .update({ in_collection: false })
+      .update({ status: 'wishlisted' })
       .eq('id', entry.id)
 
     if (error) {
@@ -214,7 +214,7 @@ export default function CollectionPage() {
     // Optimistic update - remove from archived, add to active collection
     setArchivedItems(prev => prev.filter(item => item.id !== entry.id))
     setCollectionItems(prev => [
-      { ...entry, is_archived: false, archive_reason: null, archived_at: null, in_collection: true },
+      { ...entry, is_archived: false, archive_reason: null, archived_at: null, status: 'owned' },
       ...prev
     ])
 
@@ -225,7 +225,7 @@ export default function CollectionPage() {
         is_archived: false,
         archive_reason: null,
         archived_at: null,
-        in_collection: true,
+        status: 'owned',
       })
       .eq('id', entry.id)
 
