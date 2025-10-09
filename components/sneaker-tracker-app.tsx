@@ -164,7 +164,7 @@ export function ItemTrackerApp() {
                 <AddItemForm onItemAdded={handleItemAdded} mode="create" />
               </div>
             ) : currentView === 'dashboard' ? (
-              <SizingJournalDashboard onAddNew={handleAddNew} />
+              <SizingJournalDashboard onAddNew={handleAddNew} status={['wishlisted']} />
             ) : (
               <FitProfileDashboard onGoBack={() => setCurrentView('dashboard')} />
             )}

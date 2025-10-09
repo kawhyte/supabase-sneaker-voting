@@ -295,12 +295,12 @@ export function AddItemForm({
 	const supabase = createClient();
 
 	// Prepare default values - either from initialData or defaults
-	const getDefaultValues = () => {
+	const getDefaultValues = (): Partial<ItemFormData> => {
 		if (mode === "edit" && initialData) {
 			return {
-				userName: initialData.user_name || "Kenny",
-				interactionType: initialData.has_been_tried ? "tried" : "seen",
-				category: initialData.category || "shoes",
+				userName: (initialData.user_name || "Kenny") as "Kenny" | "Rene",
+				interactionType: (initialData.has_been_tried ? "tried" : "seen") as "seen" | "tried",
+				category: (initialData.category || "shoes") as ItemCategory,
 				brand: initialData.brand || "",
 				model: initialData.model || "",
 				sku: initialData.sku || "",
@@ -375,10 +375,10 @@ export function AddItemForm({
 				initialData
 			);
 
-			const formData = {
-				userName: initialData.user_name || "Kenny",
-				interactionType: initialData.has_been_tried ? "tried" : "seen",
-				category: initialData.category || "shoes",
+			const formData: Partial<ItemFormData> = {
+				userName: (initialData.user_name || "Kenny") as "Kenny" | "Rene",
+				interactionType: (initialData.has_been_tried ? "tried" : "seen") as "seen" | "tried",
+				category: (initialData.category || "shoes") as ItemCategory,
 				brand: initialData.brand || "",
 				model: initialData.model || "",
 				sku: initialData.sku || "",

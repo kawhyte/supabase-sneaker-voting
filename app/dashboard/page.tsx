@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -9,7 +10,7 @@ import { FitProfileDashboard } from '@/components/fit-profile-dashboard' // Make
 import { FTUEChecklist } from '@/components/ftue-checklist'
 import { Package, Heart, Brain, Archive } from 'lucide-react'
 
-export default function DashboardPage() {
+function DashboardContent() {
   const searchParams = useSearchParams()
   // Default to 'owned' if no tab is specified in the URL
   const defaultTab = searchParams.get('tab') || 'owned'
@@ -70,5 +71,17 @@ export default function DashboardPage() {
         </div>
       </motion.div>
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="w-full py-8 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   )
 }
