@@ -27,13 +27,13 @@ export default function DashboardPage() {
         <Tabs defaultValue={defaultTab} className="w-full">
           {/* --- The New Simplified Tabs --- */}
           <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-8">
-            <TabsTrigger value="owned" className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              Owned
-            </TabsTrigger>
             <TabsTrigger value="wishlist" className="flex items-center gap-2">
               <Heart className="h-4 w-4" />
               Wishlist
+            </TabsTrigger>
+            <TabsTrigger value="owned" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Owned
             </TabsTrigger>
             <TabsTrigger value="fit-profile" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />

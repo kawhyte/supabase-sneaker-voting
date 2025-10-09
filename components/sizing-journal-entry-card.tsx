@@ -57,6 +57,7 @@ interface SizingJournalEntryCardProps {
 	onMoveToWatchlist?: (entry: SizingJournalEntry) => void;
 	onArchive?: (entry: SizingJournalEntry) => void;
 	onRestore?: (entry: SizingJournalEntry) => void;
+	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
 }
 
 export function SizingJournalEntryCard({
@@ -70,6 +71,7 @@ export function SizingJournalEntryCard({
 	onMoveToWatchlist,
 	onArchive,
 	onRestore,
+	onMarkAsPurchased,
 }: SizingJournalEntryCardProps) {
 	const isTried = entry.has_been_tried;
 	const fitInfo = getFitRatingInfo(entry.fit_rating);
@@ -209,17 +211,46 @@ export function SizingJournalEntryCard({
 							</button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align='end' className='w-48 z-50'>
+							{/* Context-aware actions based on status */}
+							{(entry.status === 'wishlisted' || entry.status === 'journaled') && onMarkAsPurchased && (
+								<DropdownMenuItem
+									onSelect={() => onMarkAsPurchased(entry)}
+									className='cursor-pointer'>
+									<ShoppingBag className='h-3 w-3 mr-2' />
+									Purchased...
+								</DropdownMenuItem>
+							)}
+
+							{entry.status === 'owned' && onMoveToWatchlist && (
+								<DropdownMenuItem
+									onSelect={() => onMoveToWatchlist(entry)}
+									className='cursor-pointer'>
+									<Bookmark className='h-3 w-3 mr-2' />
+									Move to Wishlist
+								</DropdownMenuItem>
+							)}
+
 							<DropdownMenuItem
 								onSelect={() => onEdit(entry)}
 								className='cursor-pointer'>
 								<Edit className='h-3 w-3 mr-2' />
 								Edit
 							</DropdownMenuItem>
+
+							{onArchive && (
+								<DropdownMenuItem
+									onSelect={() => onArchive(entry)}
+									className='cursor-pointer'>
+									<Archive className='h-3 w-3 mr-2' />
+									Archive...
+								</DropdownMenuItem>
+							)}
+
 							<DropdownMenuItem
 								onSelect={() => onDelete(entry)}
 								className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
 								<Trash2 className='h-3 w-3 mr-2' />
-								Delete
+								Delete...
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

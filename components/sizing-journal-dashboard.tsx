@@ -11,6 +11,8 @@ import { SizingJournalFilters } from './sizing-journal-filters'
 import { SizingJournalStats } from './sizing-journal-stats'
 import { SizingJournalEntryCard } from './sizing-journal-entry-card'
 import { DeleteConfirmDialog } from './delete-confirm-dialog'
+import { PurchasedConfirmationModal } from './purchased-confirmation-modal'
+import { ArchiveReasonDialog } from './archive-reason-dialog'
 import { SizingJournalEntry } from './types/sizing-journal-entry'
 import { filterJournalEntries, sortJournalEntries, getUniqueBrands } from '@/lib/sizing-journal-utils'
 import { type ItemCategory } from '@/components/types/item-category'
@@ -38,6 +40,9 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: Si
   const [deletingEntry, setDeletingEntry] = useState<SizingJournalEntry | null>(null)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [selectedItemForAction, setSelectedItemForAction] = useState<SizingJournalEntry | null>(null)
+  const [isPurchasedModalOpen, setIsPurchasedModalOpen] = useState(false)
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false)
 
   const supabase = createClient()
 
@@ -220,6 +225,110 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: Si
     }
   }
 
+  // New Action Handlers
+  const handleOpenPurchasedModal = (item: SizingJournalEntry) => {
+    setSelectedItemForAction(item)
+    setIsPurchasedModalOpen(true)
+  }
+
+  const handleOpenArchiveDialog = (item: SizingJournalEntry) => {
+    setSelectedItemForAction(item)
+    setIsArchiveDialogOpen(true)
+  }
+
+  // Database Functions
+  const markItemAsPurchased = async (purchasePrice: number, purchaseDate: Date) => {
+    if (!selectedItemForAction) return
+
+    try {
+      const { error } = await supabase
+        .from('items')
+        .update({
+          status: 'owned',
+          purchase_price: purchasePrice,
+          purchase_date: purchaseDate.toISOString().split('T')[0]
+        })
+        .eq('id', selectedItemForAction.id)
+
+      if (error) {
+        console.error('Error marking item as purchased:', error)
+        toast.error('Failed to mark item as purchased', {
+          description: error.message || 'Database update failed'
+        })
+        return
+      }
+
+      toast.success('Item marked as purchased!', {
+        description: `${selectedItemForAction.brand} ${selectedItemForAction.model} - $${purchasePrice}`,
+        duration: 3000,
+      })
+
+      setIsPurchasedModalOpen(false)
+      setSelectedItemForAction(null)
+      loadJournalEntries()
+    } catch (error) {
+      console.error('Error:', error)
+      toast.error('Failed to mark item as purchased')
+    }
+  }
+
+  const moveItemToWishlist = async (item: SizingJournalEntry) => {
+    try {
+      const { error } = await supabase
+        .from('items')
+        .update({ status: 'wishlisted' })
+        .eq('id', item.id)
+
+      if (error) {
+        console.error('Error moving item to wishlist:', error)
+        toast.error('Failed to move item to wishlist')
+        return
+      }
+
+      toast.success('Moved to wishlist', {
+        description: `${item.brand} ${item.model}`,
+        duration: 3000,
+      })
+      loadJournalEntries()
+    } catch (error) {
+      console.error('Error:', error)
+      toast.error('Failed to move item to wishlist')
+    }
+  }
+
+  const archiveItem = async (reason: string) => {
+    if (!selectedItemForAction) return
+
+    try {
+      const { error } = await supabase
+        .from('items')
+        .update({
+          is_archived: true,
+          archive_reason: reason,
+          archived_at: new Date().toISOString()
+        })
+        .eq('id', selectedItemForAction.id)
+
+      if (error) {
+        console.error('Error archiving item:', error)
+        toast.error('Failed to archive item')
+        return
+      }
+
+      toast.success('Item archived', {
+        description: `${selectedItemForAction.brand} ${selectedItemForAction.model}`,
+        duration: 3000,
+      })
+
+      setIsArchiveDialogOpen(false)
+      setSelectedItemForAction(null)
+      loadJournalEntries()
+    } catch (error) {
+      console.error('Error:', error)
+      toast.error('Failed to archive item')
+    }
+  }
+
   // Computed values (UPDATED)
   const filteredAndSortedEntries = sortJournalEntries(
     filterJournalEntries(journalEntries, searchTerm, selectedUsers, selectedBrands, selectedCategories),
@@ -274,6 +383,9 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: Si
               onEdit={handleEditEntry}
               onDelete={handleDeleteEntry}
               onToggleCollection={handleToggleCollection}
+              onMarkAsPurchased={handleOpenPurchasedModal}
+              onMoveToWatchlist={moveItemToWishlist}
+              onArchive={handleOpenArchiveDialog}
             />
           ))
         )}
@@ -294,6 +406,26 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: Si
         isDeleting={isDeleting}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+      />
+
+      <PurchasedConfirmationModal
+        isOpen={isPurchasedModalOpen}
+        onClose={() => {
+          setIsPurchasedModalOpen(false)
+          setSelectedItemForAction(null)
+        }}
+        onConfirm={markItemAsPurchased}
+        itemName={selectedItemForAction ? `${selectedItemForAction.brand} ${selectedItemForAction.model}` : undefined}
+      />
+
+      <ArchiveReasonDialog
+        open={isArchiveDialogOpen}
+        onOpenChange={(open) => {
+          setIsArchiveDialogOpen(open)
+          if (!open) setSelectedItemForAction(null)
+        }}
+        onConfirm={archiveItem}
+        itemName={selectedItemForAction ? `${selectedItemForAction.brand} ${selectedItemForAction.model}` : ''}
       />
     </div>
   )
