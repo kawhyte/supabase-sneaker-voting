@@ -280,6 +280,49 @@ export function AddItemForm({
 
 	const supabase = createClient();
 
+	// Prepare default values - either from initialData or defaults
+	const getDefaultValues = () => {
+		if (mode === 'edit' && initialData) {
+			return {
+				userName: initialData.user_name || "Kenny",
+				interactionType: initialData.has_been_tried ? "tried" : "seen",
+				category: initialData.category || "shoes",
+				brand: initialData.brand || "",
+				model: initialData.model || "",
+				sku: initialData.sku || "",
+				color: initialData.color || "",
+				sizeTried: initialData.size_tried || "",
+				comfortRating: initialData.comfort_rating || undefined,
+				retailPrice: initialData.retail_price?.toString() || "",
+				salePrice: initialData.sale_price?.toString() || "",
+				idealPrice: initialData.ideal_price?.toString() || "",
+				targetPrice: initialData.target_price?.toString() || "",
+				notes: initialData.notes || "",
+				productUrl: "",
+				enableNotifications: false,
+			};
+		}
+
+		return {
+			userName: "Kenny" as const,
+			interactionType: "seen" as const,
+			category: undefined,
+			brand: "",
+			model: "",
+			sku: "",
+			color: "",
+			sizeTried: "",
+			comfortRating: undefined,
+			retailPrice: "",
+			salePrice: "",
+			idealPrice: "",
+			targetPrice: "",
+			notes: "",
+			productUrl: "",
+			enableNotifications: false,
+		};
+	};
+
 	const {
 		register,
 		handleSubmit,
@@ -290,27 +333,7 @@ export function AddItemForm({
 	} = useForm<ItemFormData>({
 		resolver: zodResolver(itemSchema),
 		mode: "onChange",
-		defaultValues: initialData ? {
-			userName: initialData.user_name || "Kenny",
-			interactionType: initialData.has_been_tried ? "tried" : "seen",
-			category: initialData.category || "shoes",
-			brand: initialData.brand || "",
-			model: initialData.model || "",
-			sku: initialData.sku || "",
-			color: initialData.color || "",
-			sizeTried: initialData.size_tried || "",
-			comfortRating: initialData.comfort_rating || undefined,
-			retailPrice: initialData.retail_price?.toString() || "",
-			salePrice: initialData.sale_price?.toString() || "",
-			idealPrice: initialData.ideal_price?.toString() || "",
-			targetPrice: initialData.target_price?.toString() || "",
-			notes: initialData.notes || "",
-			productUrl: "",
-			enableNotifications: false,
-		} : {
-			userName: "Kenny",
-			interactionType: "seen",
-		},
+		defaultValues: getDefaultValues(),
 	});
 
 	const watchedUser = watch("userName");
@@ -330,7 +353,49 @@ export function AddItemForm({
 			  )
 			: 0;
 
-	// Load fit data on component mount and load existing photos in edit mode
+	// CRITICAL FIX: Reset form when initialData changes in edit mode
+	useEffect(() => {
+		if (mode === 'edit' && initialData) {
+			console.log('🔄 Edit mode detected - resetting form with initialData:', initialData);
+
+			const formData = {
+				userName: initialData.user_name || "Kenny",
+				interactionType: initialData.has_been_tried ? "tried" : "seen",
+				category: initialData.category || "shoes",
+				brand: initialData.brand || "",
+				model: initialData.model || "",
+				sku: initialData.sku || "",
+				color: initialData.color || "",
+				sizeTried: initialData.size_tried || "",
+				comfortRating: initialData.comfort_rating || undefined,
+				retailPrice: initialData.retail_price?.toString() || "",
+				salePrice: initialData.sale_price?.toString() || "",
+				idealPrice: initialData.ideal_price?.toString() || "",
+				targetPrice: initialData.target_price?.toString() || "",
+				notes: initialData.notes || "",
+				productUrl: "",
+				enableNotifications: false,
+			};
+
+			console.log('📝 Resetting form with data:', formData);
+			reset(formData);
+
+			// Load existing photos in edit mode
+			if (initialData.item_photos && initialData.item_photos.length > 0) {
+				console.log('📸 Loading existing photos:', initialData.item_photos);
+				const existingPhotoItems: PhotoItem[] = initialData.item_photos.map((photo: any, index: number) => ({
+					id: photo.id || `existing-${index}`,
+					file: new File([], ''), // Empty file object since photo is already uploaded
+					preview: photo.image_url,
+					isMain: photo.is_main_image || false,
+					order: photo.image_order || index,
+				}));
+				setPhotos(existingPhotoItems);
+			}
+		}
+	}, [mode, initialData, reset]);
+
+	// Load fit data on component mount and restore draft in create mode
 	useEffect(() => {
 		loadFitData();
 
@@ -338,37 +403,23 @@ export function AddItemForm({
 		if (mode === 'create') {
 			restoreDraft();
 		}
-
-		// Load existing photos in edit mode
-		if (mode === 'edit' && initialData?.item_photos && initialData.item_photos.length > 0) {
-			// Convert existing photos to PhotoItem format for display
-			// Note: These are already uploaded, so we just show them as previews
-			const existingPhotoItems: PhotoItem[] = initialData.item_photos.map((photo: any, index: number) => ({
-				id: photo.id || `existing-${index}`,
-				file: new File([], ''), // Empty file object since photo is already uploaded
-				preview: photo.image_url,
-				isMain: photo.is_main_image || false,
-				order: photo.image_order || index,
-			}));
-			setPhotos(existingPhotoItems);
-		}
-	}, [mode, initialData]);
+	}, [mode]);
 
 	// Track unsaved changes
 	useEffect(() => {
 		setHasUnsavedChanges(isDirty || photos.length > 0);
 	}, [isDirty, photos]);
 
-	// Auto-save draft every 30 seconds
+	// Auto-save draft every 30 seconds (only in create mode)
 	useEffect(() => {
-		if (!hasUnsavedChanges) return;
+		if (mode === 'create' && hasUnsavedChanges) {
+			const autoSaveInterval = setInterval(() => {
+				saveDraft();
+			}, 30000); // 30 seconds
 
-		const autoSaveInterval = setInterval(() => {
-			saveDraft();
-		}, 30000); // 30 seconds
-
-		return () => clearInterval(autoSaveInterval);
-	}, [hasUnsavedChanges, watch(), photos, urlData]);
+			return () => clearInterval(autoSaveInterval);
+		}
+	}, [mode, hasUnsavedChanges, watch, photos, urlData]);
 
 	// Unsaved changes warning before page unload
 	useEffect(() => {
@@ -523,6 +574,7 @@ export function AddItemForm({
 				.select("preferred_size")
 				.eq("user_name", userName)
 				.eq("brand", brand)
+				.limit(1)
 				.single();
 
 			if (data?.preferred_size) {
@@ -906,6 +958,20 @@ export function AddItemForm({
 
 				for (let i = 0; i < photos.length; i++) {
 					const photo = photos[i];
+
+					// Skip if this is an existing photo (empty file)
+					if (photo.file.size === 0 && photo.preview.startsWith('http')) {
+						console.log(`⏭️ Skipping existing photo ${i + 1} (already uploaded)`);
+						// For existing photos, just add them to uploadedPhotos
+						uploadedPhotos.push({
+							url: photo.preview,
+							cloudinaryId: photo.id.startsWith('existing-') ? null : photo.id,
+							order: photo.order,
+							isMain: photo.isMain,
+						});
+						continue;
+					}
+
 					const formData = new FormData();
 					formData.append("file", photo.file);
 
@@ -1006,10 +1072,11 @@ export function AddItemForm({
 				throw dbError;
 			}
 
-			// Insert all photos into item_photos table
-			if (uploadedPhotos.length > 0 && resultItem) {
-				console.log('📸 Saving', uploadedPhotos.length, 'photos to item_photos table...');
-				const photoRecords = uploadedPhotos.map((photo) => ({
+			// Insert all photos into item_photos table (only new photos)
+			const newPhotos = uploadedPhotos.filter(photo => photo.cloudinaryId);
+			if (newPhotos.length > 0 && resultItem) {
+				console.log('📸 Saving', newPhotos.length, 'new photos to item_photos table...');
+				const photoRecords = newPhotos.map((photo) => ({
 					item_id: resultItem.id,
 					image_url: photo.url,
 					cloudinary_id: photo.cloudinaryId,
@@ -1035,11 +1102,11 @@ export function AddItemForm({
 					console.log('✅ Successfully saved', insertedPhotos?.length, 'photos to database');
 				}
 			} else {
-				console.log('⚠️ No photos to save. uploadedPhotos.length:', uploadedPhotos.length, 'resultItem:', !!resultItem);
+				console.log('⚠️ No new photos to save. newPhotos.length:', newPhotos.length, 'resultItem:', !!resultItem);
 			}
 
-			// Create price monitor if URL provided
-			if (data.productUrl) {
+			// Create price monitor if URL provided (only in create mode)
+			if (mode === 'create' && data.productUrl) {
 				setUploadProgress("📊 Setting up price monitoring...");
 				const monitorCreated = await createPriceMonitor(data);
 				if (monitorCreated) {
@@ -1077,7 +1144,9 @@ export function AddItemForm({
 				setUrlData(null);
 				setScrapeFailed(false);
 				setSmartImportExpanded(true); // Reset to expanded
-				clearDraft(); // Clear saved draft
+				if (mode === 'create') {
+					clearDraft(); // Clear saved draft only in create mode
+				}
 				setHasUnsavedChanges(false);
 				onItemAdded?.();
 			}, 800);
@@ -1114,8 +1183,8 @@ export function AddItemForm({
 				</CardHeader>
 
 				<CardContent>
-					{/* Draft Restored Notification */}
-					{showDraftNotification && (
+					{/* Draft Restored Notification - Only show in create mode */}
+					{mode === 'create' && showDraftNotification && (
 						<Alert className='mb-6 border-blue-200 bg-blue-50'>
 							<div className='flex items-center justify-between w-full'>
 								<div className='flex items-center gap-[var(--space-md)]'>
@@ -1159,8 +1228,8 @@ export function AddItemForm({
 						</Alert>
 					)}
 
-					{/* Auto-save Indicator */}
-					{lastSavedTime && hasUnsavedChanges && (
+					{/* Auto-save Indicator - Only show in create mode */}
+					{mode === 'create' && lastSavedTime && hasUnsavedChanges && (
 						<div className='mb-4 text-xs text-gray-500 flex items-center gap-[var(--space-xs)]'>
 							<RefreshCw className='h-3 w-3' />
 							<span>Last saved: {lastSavedTime.toLocaleTimeString()}</span>
@@ -1448,8 +1517,12 @@ export function AddItemForm({
 										</div>
 									)}
 								</div>
+							</>
+						)}
 
-								{/* Two-Column Layout - Primary Fields Left, Metadata Right */}
+						{/* Product Details - Show when basic info is filled OR in edit mode */}
+						{((watchedUser && watchedInteractionType && watchedCategory) || mode === 'edit') && (
+							<>
 								<h3 className='font-semibold text-gray-700 border-b pb-[var(--space-md)] mt-6'>
 									Product Details
 								</h3>
@@ -1545,10 +1618,6 @@ export function AddItemForm({
 
 									{/* RIGHT COLUMN - Metadata */}
 									<div className='space-y-[var(--space-base)]'>
-										{/*<h3 className='font-semibold text-gray-700 border-b pb-[var(--space-md)]'>
-											Additional Info
-										</h3>*/}
-
 										{/* Pricing Section */}
 										<div className='space-y-[var(--space-sm)] '>
 											<div>
@@ -1745,82 +1814,13 @@ export function AddItemForm({
 												</div>
 											)}
 
-											{/* Fit Rating */}
-											{/*<div className="mt-8">
-													<Label className='text-sm font-medium text-gray-700'>
-														How did they fit? *
-													</Label>
-													<p className='text-xs text-gray-500 mt-[var(--space-xs)]'>
-														Select the fit that best describes your experience
-													</p>
-													<div className='grid grid-cols-5 gap-[var(--space-md)] mt-[var(--space-sm)]'>
-														{FIT_RATINGS.map((rating) => (
-															<Button
-																key={rating.value}
-																type='button'
-																variant={
-																	watchedFitRating === rating.value
-																		? "default"
-																		: "outline"
-																}
-																onClick={() =>
-																	setValue("fitRating", rating.value)
-																}
-																className={cn(
-																	"min-h-[80px] md:h-20 flex flex-col items-center justify-center p-[var(--space-md)] relative touch-manipulation",
-																	watchedFitRating === rating.value &&
-																		"ring-2 ring-blue-600 ring-offset-2",
-																	"focus:ring-4 focus:ring-blue-300"
-																)}
-																aria-label={`Fit rating ${rating.value}: ${rating.label}`}
-																aria-pressed={
-																	watchedFitRating === rating.value
-																}>
-																<span
-																	className='text-2xl mb-1'
-																	aria-hidden='true'>
-																	{rating.icon}
-																</span>
-																<span className='text-xs font-semibold text-center leading-tight'>
-																	{rating.label}
-																</span>
-															</Button>
-														))}
-													</div>
-													{watchedFitRating && (
-														<div className='mt-[var(--space-sm)] p-[var(--space-sm)] bg-blue-50 border border-blue-200 rounded-lg'>
-															<p className='text-sm text-blue-800 font-medium'>
-																{getFitRatingInfo(watchedFitRating)?.label}:{" "}
-																{
-																	getFitRatingInfo(watchedFitRating)
-																		?.description
-																}
-															</p>
-														</div>
-													)}
-													{errors.fitRating && (
-														<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]'>
-															<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
-															<div>
-																<p className='text-xs font-semibold text-red-700'>
-																	{errors.fitRating.message}
-																</p>
-																<p className='text-xs text-red-600 mt-0.5'>
-																	Rate how the item fit - from too small to
-																	too big
-																</p>
-															</div>
-														</div>
-													)}
-												</div>*/}
-
 											{/* Comfort Rating (Required for shoes only) */}
 											{isComfortRequired(watchedCategory) && (
 												<div className='mt-4 '>
-													<Label className='text-sm font-medium text-gray-700 '>
-														<span>How comfortable were they?</span>{" "}
-														<span className='text-red-500'>*</span>
-													</Label>
+												<Label className='text-sm font-medium text-gray-700 '>
+													<span>How comfortable were they?</span>{" "}
+													<span className='text-red-500'>*</span>
+												</Label>
 
 												<div className='flex items-center gap-[var(--space-xs)] '>
 													{[1, 2, 3, 4, 5].map((rating) => (
@@ -1900,24 +1900,6 @@ export function AddItemForm({
 								)}
 
 								<div className='flex items-center justify-end gap-3 mt-6'>
-									{/* Discard Button */}
-									{/*<Button
-										type='button'
-										variant='outline'
-										onClick={() => {
-											reset();
-											setPhotos([]);
-											setUrlData(null);
-											setScrapeFailed(false);
-											setSmartImportExpanded(true);
-											clearDraft();
-											setHasUnsavedChanges(false);
-										}}
-										className='h-6 px-4 text-sm hover:bg-gray-100'
-										disabled={isLoading}>
-										Discard
-									</Button>*/}
-
 									{/* Validation Summary - Show what's blocking submission */}
 									{(!isValid || photos.length === 0) && !isLoading && (
 										<Alert className="border-yellow-500 bg-yellow-50">
