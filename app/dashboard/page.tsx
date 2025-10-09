@@ -1,12 +1,13 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
 import { FitProfileDashboard } from '@/components/fit-profile-dashboard' // Make sure you have this component
 import { FTUEChecklist } from '@/components/ftue-checklist'
-import { Package, Heart, Brain } from 'lucide-react'
+import { Package, Heart, Brain, Archive } from 'lucide-react'
 
 export default function DashboardPage() {
   const searchParams = useSearchParams()
@@ -56,6 +57,17 @@ export default function DashboardPage() {
             {/* <FitProfileDashboard /> */}
           </TabsContent>
         </Tabs>
+
+        {/* Archive Link */}
+        <div className="max-w-lg mx-auto mt-6 text-center">
+          <Link
+            href="/archive"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <Archive className="h-4 w-4" />
+            View Archived Items
+          </Link>
+        </div>
       </motion.div>
     </div>
   )

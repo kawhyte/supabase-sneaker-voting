@@ -20,9 +20,10 @@ import { type ItemCategory } from '@/components/types/item-category'
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
   status: ('owned' | 'wishlisted' | 'journaled')[]
+  isArchivePage?: boolean
 }
 
-export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: SizingJournalDashboardProps) {
+export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isArchivePage = false }: SizingJournalDashboardProps) {
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -48,7 +49,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: Si
 
   useEffect(() => {
     loadJournalEntries()
-  }, [status])
+  }, [status, isArchivePage])
 
   const loadJournalEntries = async () => {
     try {
@@ -56,7 +57,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: Si
       let query = supabase
         .from('items')
         .select(`*, item_photos (id, image_url, image_order, is_main_image)`)
-        .eq('is_archived', false)
+        .eq('is_archived', isArchivePage) // Filter based on archive page
         .in('status', status) // PHASE 3: Filter by status field
         .order('image_order', { foreignTable: 'item_photos', ascending: true })
 
@@ -66,7 +67,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: Si
         let basicQuery = supabase
           .from('items')
           .select('*')
-          .eq('is_archived', false)
+          .eq('is_archived', isArchivePage) // Filter based on archive page
           .in('status', status) // PHASE 3: Filter by status field
         const basicResult = await basicQuery.order('created_at', { ascending: false })
         data = basicResult.data
@@ -329,6 +330,34 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: Si
     }
   }
 
+  const unarchiveItem = async (item: SizingJournalEntry) => {
+    try {
+      const { error } = await supabase
+        .from('items')
+        .update({
+          is_archived: false,
+          archive_reason: null,
+          archived_at: null
+        })
+        .eq('id', item.id)
+
+      if (error) {
+        console.error('Error unarchiving item:', error)
+        toast.error('Failed to unarchive item')
+        return
+      }
+
+      toast.success('Item restored', {
+        description: `${item.brand} ${item.model} has been restored`,
+        duration: 3000,
+      })
+      loadJournalEntries()
+    } catch (error) {
+      console.error('Error:', error)
+      toast.error('Failed to unarchive item')
+    }
+  }
+
   // Computed values (UPDATED)
   const filteredAndSortedEntries = sortJournalEntries(
     filterJournalEntries(journalEntries, searchTerm, selectedUsers, selectedBrands, selectedCategories),
@@ -386,6 +415,8 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: Si
               onMarkAsPurchased={handleOpenPurchasedModal}
               onMoveToWatchlist={moveItemToWishlist}
               onArchive={handleOpenArchiveDialog}
+              onUnarchive={unarchiveItem}
+              isArchivePage={isArchivePage}
             />
           ))
         )}

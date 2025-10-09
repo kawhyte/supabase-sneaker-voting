@@ -58,6 +58,8 @@ interface SizingJournalEntryCardProps {
 	onArchive?: (entry: SizingJournalEntry) => void;
 	onRestore?: (entry: SizingJournalEntry) => void;
 	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
+	onUnarchive?: (entry: SizingJournalEntry) => void;
+	isArchivePage?: boolean;
 }
 
 export function SizingJournalEntryCard({
@@ -72,6 +74,8 @@ export function SizingJournalEntryCard({
 	onArchive,
 	onRestore,
 	onMarkAsPurchased,
+	onUnarchive,
+	isArchivePage = false,
 }: SizingJournalEntryCardProps) {
 	const isTried = entry.has_been_tried;
 	const fitInfo = getFitRatingInfo(entry.fit_rating);
@@ -211,47 +215,70 @@ export function SizingJournalEntryCard({
 							</button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align='end' className='w-48 z-50'>
-							{/* Context-aware actions based on status */}
-							{(entry.status === 'wishlisted' || entry.status === 'journaled') && onMarkAsPurchased && (
-								<DropdownMenuItem
-									onSelect={() => onMarkAsPurchased(entry)}
-									className='cursor-pointer'>
-									<ShoppingBag className='h-3 w-3 mr-2' />
-									Purchased...
-								</DropdownMenuItem>
+							{isArchivePage ? (
+								// Archive page actions
+								<>
+									{onUnarchive && (
+										<DropdownMenuItem
+											onSelect={() => onUnarchive(entry)}
+											className='cursor-pointer'>
+											<ArchiveRestore className='h-3 w-3 mr-2' />
+											Unarchive
+										</DropdownMenuItem>
+									)}
+
+									<DropdownMenuItem
+										onSelect={() => onDelete(entry)}
+										className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
+										<Trash2 className='h-3 w-3 mr-2' />
+										Delete Permanently
+									</DropdownMenuItem>
+								</>
+							) : (
+								// Normal actions - context-aware based on status
+								<>
+									{(entry.status === 'wishlisted' || entry.status === 'journaled') && onMarkAsPurchased && (
+										<DropdownMenuItem
+											onSelect={() => onMarkAsPurchased(entry)}
+											className='cursor-pointer'>
+											<ShoppingBag className='h-3 w-3 mr-2' />
+											Purchased...
+										</DropdownMenuItem>
+									)}
+
+									{entry.status === 'owned' && onMoveToWatchlist && (
+										<DropdownMenuItem
+											onSelect={() => onMoveToWatchlist(entry)}
+											className='cursor-pointer'>
+											<Bookmark className='h-3 w-3 mr-2' />
+											Move to Wishlist
+										</DropdownMenuItem>
+									)}
+
+									<DropdownMenuItem
+										onSelect={() => onEdit(entry)}
+										className='cursor-pointer'>
+										<Edit className='h-3 w-3 mr-2' />
+										Edit
+									</DropdownMenuItem>
+
+									{onArchive && (
+										<DropdownMenuItem
+											onSelect={() => onArchive(entry)}
+											className='cursor-pointer'>
+											<Archive className='h-3 w-3 mr-2' />
+											Archive...
+										</DropdownMenuItem>
+									)}
+
+									<DropdownMenuItem
+										onSelect={() => onDelete(entry)}
+										className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
+										<Trash2 className='h-3 w-3 mr-2' />
+										Delete...
+									</DropdownMenuItem>
+								</>
 							)}
-
-							{entry.status === 'owned' && onMoveToWatchlist && (
-								<DropdownMenuItem
-									onSelect={() => onMoveToWatchlist(entry)}
-									className='cursor-pointer'>
-									<Bookmark className='h-3 w-3 mr-2' />
-									Move to Wishlist
-								</DropdownMenuItem>
-							)}
-
-							<DropdownMenuItem
-								onSelect={() => onEdit(entry)}
-								className='cursor-pointer'>
-								<Edit className='h-3 w-3 mr-2' />
-								Edit
-							</DropdownMenuItem>
-
-							{onArchive && (
-								<DropdownMenuItem
-									onSelect={() => onArchive(entry)}
-									className='cursor-pointer'>
-									<Archive className='h-3 w-3 mr-2' />
-									Archive...
-								</DropdownMenuItem>
-							)}
-
-							<DropdownMenuItem
-								onSelect={() => onDelete(entry)}
-								className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
-								<Trash2 className='h-3 w-3 mr-2' />
-								Delete...
-							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
@@ -345,6 +372,14 @@ export function SizingJournalEntryCard({
 					<div className='text-[10px] font-semibold uppercase tracking-widest text-gray-500'>
 						{entry.brand}
 					</div>
+
+					{/* Archive Reason - Only show on archive page */}
+					{isArchivePage && entry.archive_reason && (
+						<div className='text-xs text-gray-600 flex items-center gap-2'>
+							<Archive className='h-3 w-3' />
+							<span>Reason: {formatArchiveReason(entry.archive_reason)}</span>
+						</div>
+					)}
 
 					{/* Title */}
 					<h3 className='text-base sm:text-lg font-bold leading-tight line-clamp-2'>
