@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -255,6 +256,7 @@ export function AddItemForm({
 	initialData,
 	mode = 'create' as 'create' | 'edit',
 }: AddItemFormProps = {}) {
+	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 	const [successMessage, setSuccessMessage] = useState("");
 	const [sizePreferences, setSizePreferences] = useState<
@@ -1146,9 +1148,13 @@ export function AddItemForm({
 				setSmartImportExpanded(true); // Reset to expanded
 				if (mode === 'create') {
 					clearDraft(); // Clear saved draft only in create mode
+					// Redirect to wishlist tab on dashboard
+					router.push('/dashboard?tab=wishlist');
+				} else {
+					// In edit mode, call the callback instead
+					onItemAdded?.();
 				}
 				setHasUnsavedChanges(false);
-				onItemAdded?.();
 			}, 800);
 		} catch (error) {
 			console.error("Error saving:", error);

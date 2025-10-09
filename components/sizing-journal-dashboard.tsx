@@ -17,10 +17,10 @@ import { type ItemCategory } from '@/components/types/item-category'
 
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
-  status?: 'owned' | 'wishlisted' | 'journaled'
+  status: ('owned' | 'wishlisted' | 'journaled')[]
 }
 
-export function SizingJournalDashboard({ onAddNew, status = 'wishlisted' }: SizingJournalDashboardProps) {
+export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'] }: SizingJournalDashboardProps) {
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -52,7 +52,7 @@ export function SizingJournalDashboard({ onAddNew, status = 'wishlisted' }: Sizi
         .from('items')
         .select(`*, item_photos (id, image_url, image_order, is_main_image)`)
         .eq('is_archived', false)
-        .eq('status', status) // PHASE 3: Filter by status field
+        .in('status', status) // PHASE 3: Filter by status field
         .order('image_order', { foreignTable: 'item_photos', ascending: true })
 
       let { data, error } = await query.order('created_at', { ascending: false })
@@ -62,7 +62,7 @@ export function SizingJournalDashboard({ onAddNew, status = 'wishlisted' }: Sizi
           .from('items')
           .select('*')
           .eq('is_archived', false)
-          .eq('status', status) // PHASE 3: Filter by status field
+          .in('status', status) // PHASE 3: Filter by status field
         const basicResult = await basicQuery.order('created_at', { ascending: false })
         data = basicResult.data
         error = basicResult.error
@@ -227,10 +227,13 @@ export function SizingJournalDashboard({ onAddNew, status = 'wishlisted' }: Sizi
   )
   const availableBrands = getUniqueBrands(journalEntries)
 
+  // Important Bug Fix: Create displayStatus for DashboardHeader
+  const displayStatus = status.includes('wishlisted') ? 'wishlisted' : status[0]
+
   if (isLoading) {
     return (
       <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
-        <DashboardHeader status={status} />
+        <DashboardHeader status={displayStatus} />
         <LoadingSkeleton />
       </div>
     )
@@ -238,7 +241,7 @@ export function SizingJournalDashboard({ onAddNew, status = 'wishlisted' }: Sizi
 
   return (
     <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
-      <DashboardHeader status={status} />
+      <DashboardHeader status={displayStatus} />
 
       {/* SizingJournalFilters props are now fully updated */}
       <SizingJournalFilters

@@ -1,14 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
+import { FitProfileDashboard } from '@/components/fit-profile-dashboard' // Make sure you have this component
 import { FTUEChecklist } from '@/components/ftue-checklist'
-import { Package, Eye, Heart } from 'lucide-react'
+import { Package, Heart, Brain } from 'lucide-react'
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState('owned')
+  const searchParams = useSearchParams()
+  // Default to 'owned' if no tab is specified in the URL
+  const defaultTab = searchParams.get('tab') || 'owned'
 
   return (
     <div className="w-full py-8">
@@ -17,61 +20,40 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* FTUE Checklist - shown to new users */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <FTUEChecklist />
         </div>
 
-        <Tabs defaultValue="owned" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8">
+        <Tabs defaultValue={defaultTab} className="w-full">
+          {/* --- The New Simplified Tabs --- */}
+          <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-8">
             <TabsTrigger value="owned" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Owned
-            </TabsTrigger>
-            <TabsTrigger value="tried" className="flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              Tried
             </TabsTrigger>
             <TabsTrigger value="wishlist" className="flex items-center gap-2">
               <Heart className="h-4 w-4" />
               Wishlist
             </TabsTrigger>
+            <TabsTrigger value="fit-profile" className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              Fit Profile
+            </TabsTrigger>
           </TabsList>
 
+          {/* --- The Content for the New Tabs --- */}
           <TabsContent value="owned">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <SizingJournalDashboard
-                status="owned"
-              />
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent value="tried">
-            <motion.div
-              initial={{ opacity: 0, x: 0 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <SizingJournalDashboard
-                status="journaled"
-              />
-            </motion.div>
+            <SizingJournalDashboard status={['owned']} />
           </TabsContent>
 
           <TabsContent value="wishlist">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <SizingJournalDashboard
-                status="wishlisted"
-              />
-            </motion.div>
+            {/* This now shows both wishlisted and journaled items */}
+            <SizingJournalDashboard status={['wishlisted', 'journaled']} />
+          </TabsContent>
+
+          <TabsContent value="fit-profile">
+            {/* Assuming you have a FitProfileDashboard component */}
+            {/* <FitProfileDashboard /> */}
           </TabsContent>
         </Tabs>
       </motion.div>
