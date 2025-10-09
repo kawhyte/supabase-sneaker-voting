@@ -25,8 +25,10 @@ export interface SizingJournalEntry {
   try_on_date: string
   notes?: string
   retail_price?: number
+  sale_price?: number
   purchase_price?: number
   purchase_date?: string | null
+  target_price?: number
   would_recommend: boolean | null
   image_url?: string
   cloudinary_id?: string
@@ -40,7 +42,6 @@ export interface SizingJournalEntry {
   // Current schema fields
   status: 'owned' | 'wishlisted' | 'journaled'
   has_been_tried: boolean
-  target_price?: number
 }
 
 export interface FitRating {

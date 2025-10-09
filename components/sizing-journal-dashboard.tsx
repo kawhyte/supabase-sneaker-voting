@@ -417,6 +417,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
               onArchive={handleOpenArchiveDialog}
               onUnarchive={unarchiveItem}
               isArchivePage={isArchivePage}
+              purchaseDate={entry.purchase_date}
             />
           ))
         )}

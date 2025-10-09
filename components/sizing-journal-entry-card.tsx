@@ -60,6 +60,7 @@ interface SizingJournalEntryCardProps {
 	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
 	onUnarchive?: (entry: SizingJournalEntry) => void;
 	isArchivePage?: boolean;
+	purchaseDate?: string | null;
 }
 
 export function SizingJournalEntryCard({
@@ -76,6 +77,7 @@ export function SizingJournalEntryCard({
 	onMarkAsPurchased,
 	onUnarchive,
 	isArchivePage = false,
+	purchaseDate,
 }: SizingJournalEntryCardProps) {
 	const isTried = entry.has_been_tried;
 	const fitInfo = getFitRatingInfo(entry.fit_rating);
@@ -85,6 +87,11 @@ export function SizingJournalEntryCard({
 	const canBePurchased = canMarkAsPurchased(entry.category);
 	const canTrack = canTrackWears(entry.category);
 
+	// Context-aware display logic
+	const isOwned = entry.status === 'owned';
+	const isWishlist = entry.status === 'wishlisted' || entry.status === 'journaled';
+	const isOnSale = entry.sale_price && entry.retail_price && entry.sale_price < entry.retail_price;
+
 	return (
 		<TooltipProvider delayDuration={300}>
 			<Card
@@ -93,118 +100,8 @@ export function SizingJournalEntryCard({
 				role='article'
 				aria-label={`${entry.brand} ${entry.model}`}>
 				<div className='flex flex-col'>
-					{/* Collection/Purchase Toggle & Kebab Menu */}
+					{/* Kebab Menu - All Actions Consolidated */}
 					<div className='absolute right-2 z-50 flex items-center gap-1'>
-						{/* Collection/Purchase Toggle */}
-						{onToggleCollection && viewMode === 'journal' && (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<button
-										onClick={() => onToggleCollection(entry)}
-										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
-										type='button'
-										aria-label={
-											entry.status === 'owned' ? 'Remove from collection' : 'Add to collection'
-										}>
-										{isShoe ? (
-											<Bookmark
-												className='h-3 w-3 transition-all'
-												style={{
-													color: entry.status === 'owned'
-														? 'var(--color-primary-500)'
-														: 'var(--color-gray-500)',
-												}}
-											/>
-										) : (
-											<ShoppingBag
-												className='h-3 w-3 transition-all'
-												style={{
-													color: entry.status === 'owned'
-														? 'var(--color-green-500)'
-														: 'var(--color-gray-500)',
-												}}
-											/>
-										)}
-									</button>
-								</TooltipTrigger>
-								<TooltipContent side="bottom" className="z-[9999]">
-									<p>
-										{entry.status === 'owned' ? 'Remove from collection' : 'Add to collection'}
-									</p>
-								</TooltipContent>
-							</Tooltip>
-						)}
-
-						{/* Move to Watchlist Button - Collection Mode Only */}
-						{viewMode === 'collection' && onMoveToWatchlist && !entry.is_archived && (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<button
-										onClick={() => onMoveToWatchlist(entry)}
-										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-blue-50 active:bg-blue-100'
-										type='button'
-										aria-label='Move to watchlist'>
-										<Bookmark
-											className='h-3 w-3 transition-all'
-											style={{ color: 'var(--color-blue-500)' }}
-										/>
-									</button>
-								</TooltipTrigger>
-								<TooltipContent side="bottom" className="z-[9999]">
-									<p>Move to watchlist</p>
-								</TooltipContent>
-							</Tooltip>
-						)}
-
-						{/* Archive Button - Show in Journal/Collection, not in Archive view or if already archived */}
-						{!entry.is_archived && viewMode !== 'archive' && onArchive && (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<button
-										onClick={() => onArchive(entry)}
-										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 active:bg-gray-200'
-										type='button'
-										aria-label='Archive item'>
-										<Archive
-											className='h-3 w-3 transition-colors'
-											style={{ color: 'var(--color-gray-600)' }}
-											onMouseEnter={(e) => {
-												e.currentTarget.style.color = 'var(--color-gray-900)'
-											}}
-											onMouseLeave={(e) => {
-												e.currentTarget.style.color = 'var(--color-gray-600)'
-											}}
-										/>
-									</button>
-								</TooltipTrigger>
-								<TooltipContent side="bottom" className="z-[9999]">
-									<p>Archive item</p>
-								</TooltipContent>
-							</Tooltip>
-						)}
-
-						{/* Restore Button - Only in Archive view for archived items */}
-						{viewMode === 'archive' && entry.is_archived && onRestore && (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<button
-										onClick={() => onRestore(entry)}
-										className='h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center transition-all hover:bg-green-50 active:bg-green-100'
-										type='button'
-										aria-label='Restore to collection'>
-										<ArchiveRestore
-											className='h-3 w-3 transition-colors'
-											style={{ color: 'var(--color-green-500)' }}
-										/>
-									</button>
-								</TooltipTrigger>
-								<TooltipContent side="bottom" className="z-[9999]">
-									<p>Restore to collection</p>
-								</TooltipContent>
-							</Tooltip>
-						)}
-
-						{/* Kebab Menu */}
 						<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
 							<button
@@ -283,43 +180,6 @@ export function SizingJournalEntryCard({
 					</DropdownMenu>
 				</div>
 
-				{/* Category Badge */}
-				{/* {categoryConfig && (
-					<div
-						className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
-						style={{
-							backgroundColor: categoryConfig.bgColor,
-							borderColor: categoryConfig.borderColor,
-							color: categoryConfig.textColor,
-							border: '1px solid',
-						}}>
-						<categoryConfig.icon className='h-2 w-2' />
-						{categoryConfig.label}
-					</div>
-				)} */}
-
-				{/* Owned Badge - Only show in journal view when applicable */}
-				{viewMode === 'journal' && entry.status === 'owned' && (
-					<div
-						className='absolute  top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1'
-						style={{
-							backgroundColor: isShoe ? 'var(--color-primary-500)' : 'var(--color-green-500)',
-							color: 'var(--color-black)',
-						}}>
-						{isShoe ? (
-							<>
-								<Heart className='h-2 w-2 fill-current' />
-								In Collection
-							</>
-						) : (
-							<>
-								<ShoppingBag className='h-2 w-2' />
-								Purchased
-							</>
-						)}
-					</div>
-				)}
-
 				{/* Archived Badge - Show when archived but not in archive view */}
 				{entry.is_archived && viewMode !== 'archive' && (
 					<div
@@ -392,8 +252,72 @@ export function SizingJournalEntryCard({
 					</h3>
 
 					{/* Metadata Grid */}
-
 					<div className='flex flex-col gap-2 mt-2'>
+						{/* Context-Aware Date Display */}
+						<div className='text-xs text-gray-600 flex items-center gap-1'>
+							<Calendar className='h-3 w-3 text-gray-400' />
+							{isOwned && (entry.purchase_date || purchaseDate) ? (
+								<span>Purchased on: {formatDate(entry.purchase_date || purchaseDate || '')}</span>
+							) : (
+								<span>Tracked since: {formatDate(entry.created_at)}</span>
+							)}
+						</div>
+
+						{/* Context-Aware Price Display */}
+						<div className='flex flex-col gap-1.5'>
+							{isOwned ? (
+								// OWNED ITEMS: Show purchase price
+								entry.purchase_price && (
+									<div className='flex items-center gap-2'>
+										<DollarSign className='h-4 w-4 text-gray-400' />
+										<span className='text-sm font-semibold' style={{ color: 'var(--color-black)' }}>
+											Purchased for: ${entry.purchase_price}
+										</span>
+									</div>
+								)
+							) : (
+								// WISHLIST ITEMS: Show retail/sale price and target price
+								<>
+									{entry.retail_price && (
+										<div className='flex items-center gap-2 flex-wrap'>
+											<DollarSign className='h-4 w-4 text-gray-400' />
+											{isOnSale ? (
+												<>
+													<span className='text-sm line-through text-gray-400'>
+														${entry.retail_price}
+													</span>
+													<span className='text-sm font-bold' style={{ color: 'var(--color-green-600)' }}>
+														${entry.sale_price}
+													</span>
+													<Badge
+														variant='outline'
+														className='text-[10px] px-1.5 py-0'
+														style={{
+															backgroundColor: 'var(--color-green-50)',
+															borderColor: 'var(--color-green-500)',
+															color: 'var(--color-green-700)',
+														}}
+													>
+														On Sale!
+													</Badge>
+												</>
+											) : (
+												<span className='text-sm font-medium' style={{ color: 'var(--color-black)' }}>
+													${entry.retail_price}
+												</span>
+											)}
+										</div>
+									)}
+									{entry.target_price && (
+										<div className='flex items-center gap-2 text-xs text-gray-600'>
+											<span className='ml-5'>Your Target: ${entry.target_price}</span>
+										</div>
+									)}
+								</>
+							)}
+						</div>
+
+						{/* Size, Fit, Comfort - Show for both owned and wishlist */}
 						<div className='flex items-center gap-2 text-xs flex-wrap'>
 							{entry.size_tried && (
 								<>
@@ -508,59 +432,32 @@ export function SizingJournalEntryCard({
 							)}
 						</div>
 
-						{/* Divider line */}
-						{(entry.retail_price || entry.store_name) && (
-							<div className='metadata-divider'></div>
-						)}
+						{/* Store Name and Last Worn Date */}
+						{(entry.store_name || (viewMode === 'collection' && canTrack && entry.last_worn_date)) && (
+							<div className='flex items-center gap-2 text-xs flex-wrap text-gray-600'>
+								{entry.store_name && (
+									<>
+										<div className='flex items-center gap-1'>
+											<MapPin className='h-2.5 w-2.5 text-gray-400' />
+											<span className='truncate max-w-[160px] sm:max-w-[200px]'>
+												{entry.store_name}
+											</span>
+										</div>
+										{viewMode === 'collection' && canTrack && entry.last_worn_date && (
+											<span className='hidden sm:inline text-gray-300 mx-0.5'>|</span>
+										)}
+									</>
+								)}
 
-						{/* Row 2: Secondary metadata */}
-						<div className='flex items-center gap-2 text-xs flex-wrap text-gray-600'>
-							{entry.retail_price && (
-								<>
-									<div className='flex items-center gap-1'>
-										<DollarSign className='h-3.5 w-3.5 text-gray-400' />
-										<span className='font-medium'>${entry.retail_price}</span>
-									</div>
-									{(entry.store_name || entry.try_on_date) && (
-										<span className='hidden sm:inline text-gray-300 mx-0.5'>
-											|
-										</span>
-									)}
-								</>
-							)}
-
-							{entry.store_name && (
-								<>
-									<div className='flex items-center gap-1'>
-										<MapPin className='h-2.5 w-2.5 text-gray-400' />
-										<span className='truncate max-w-[160px] sm:max-w-[200px]'>
-											{entry.store_name}
-										</span>
-									</div>
-									<span className='hidden sm:inline text-gray-300 mx-0.5'>
-										|
-									</span>
-								</>
-							)}
-
-							<div className='flex items-center gap-1'>
-								<Calendar className='h-2.5 w-2.5 text-gray-400' />
-								<span>{formatDate(entry.try_on_date)}</span>
-							</div>
-
-							{/* Last Worn Date - Collection Mode Only (shoes only) */}
-							{viewMode === 'collection' && canTrack && entry.last_worn_date && (
-								<>
-									<span className='hidden sm:inline text-gray-300 mx-0.5'>
-										|
-									</span>
+								{/* Last Worn Date - Collection Mode Only (shoes only) */}
+								{viewMode === 'collection' && canTrack && entry.last_worn_date && (
 									<div className='flex items-center gap-1'>
 										<Calendar className='h-2.5 w-2.5 text-gray-400' />
 										<span className='text-xs'>Last worn: {formatDate(entry.last_worn_date)}</span>
 									</div>
-								</>
-							)}
-						</div>
+								)}
+							</div>
+						)}
 					</div>
 
 					{/* Notes */}
