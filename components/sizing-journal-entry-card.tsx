@@ -101,7 +101,7 @@ export function SizingJournalEntryCard({
 				aria-label={`${entry.brand} ${entry.model}`}>
 				<div className='flex flex-col'>
 					{/* Kebab Menu - All Actions Consolidated */}
-					<div className='absolute right-2 z-50 flex items-center gap-1'>
+					<div className='absolute right-3 top-3 z-40 flex items-center gap-1'>
 						<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
 							<button
@@ -255,7 +255,7 @@ export function SizingJournalEntryCard({
 					<div className='flex flex-col gap-2 mt-2'>
 						{/* Context-Aware Date Display */}
 						<div className='text-xs text-gray-600 flex items-center gap-1'>
-							<Calendar className='h-3 w-3 text-gray-400' />
+							{/* <Calendar className='h-3 w-3 text-gray-400' /> */}
 							{isOwned && (entry.purchase_date || purchaseDate) ? (
 								<span>Purchased on: {formatDate(entry.purchase_date || purchaseDate || '')}</span>
 							) : (
@@ -279,14 +279,15 @@ export function SizingJournalEntryCard({
 								// WISHLIST ITEMS: Show retail/sale price and target price
 								<>
 									{entry.retail_price && (
-										<div className='flex items-center gap-2 flex-wrap'>
-											<DollarSign className='h-4 w-4 text-gray-400' />
+										<div className='flex items-center gap- flex-wrap'>
+											{/* <DollarSign className='h-4 w-4 text-gray-400' /> */}
+											<span className=' text-xs text-gray-600 mr-1'>Retail price:</span> {entry.target_price}
 											{isOnSale ? (
 												<>
-													<span className='text-sm line-through text-gray-400'>
-														${entry.retail_price}
+													<span className='text-sm line-through text-gray-400 mr-1'>
+														 ${entry.retail_price}
 													</span>
-													<span className='text-sm font-bold' style={{ color: 'var(--color-green-600)' }}>
+													<span className='text-sm font-bold mr-1' style={{ color: 'var(--color-green-600)' }}>
 														${entry.sale_price}
 													</span>
 													<Badge
@@ -303,14 +304,15 @@ export function SizingJournalEntryCard({
 												</>
 											) : (
 												<span className='text-sm font-medium' style={{ color: 'var(--color-black)' }}>
-													${entry.retail_price}
+													${entry.retail_price} 
 												</span>
+												
 											)}
 										</div>
 									)}
-									{entry.target_price && (
-										<div className='flex items-center gap-2 text-xs text-gray-600'>
-											<span className='ml-5'>Your Target: ${entry.target_price}</span>
+									{entry.ideal_price && (
+										<div className='flex items-center  text-xs text-gray-600'>
+											<span className=''>Your Ideal Price: ${entry.ideal_price}</span>
 										</div>
 									)}
 								</>

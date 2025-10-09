@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Search } from 'lucide-react'
+import { Search, Heart, Package, Archive } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
 import { EditItemModal } from './edit-item-modal'
@@ -402,6 +402,8 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         {filteredAndSortedEntries.length === 0 ? (
           <EmptyState
             hasEntries={journalEntries.length > 0}
+            displayStatus={displayStatus}
+            isArchivePage={isArchivePage}
             onAddNew={onAddNew}
           />
         ) : (
@@ -516,12 +518,100 @@ function LoadingSkeleton() {
 
 interface EmptyStateProps {
   hasEntries: boolean
+  displayStatus: 'owned' | 'wishlisted' | 'journaled'
+  isArchivePage: boolean
   onAddNew?: () => void
 }
 
-function EmptyState({ hasEntries, onAddNew }: EmptyStateProps) {
-    // ...
-      return (
+function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: EmptyStateProps) {
+  // If there are entries but filters hide them, show search icon
+  if (hasEntries) {
+    return (
+      <div className="col-span-1 xl:col-span-2">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <div className="text-gray-400 mb-4">
+              <Search className="h-6 w-6 mx-auto mb-2" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No matching entries
+            </h3>
+            <p className="text-gray-600">
+              Try adjusting your search or filters.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Show different empty states based on the section
+  if (isArchivePage) {
+    return (
+      <div className="col-span-1 xl:col-span-2">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center p-12 text-center">
+            <Archive className="h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No Archived Items
+            </h3>
+            <p className="text-gray-600 max-w-md">
+              Items you archive will appear here. Archive items you're no longer interested in to keep your main lists organized.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (displayStatus === 'wishlisted') {
+    return (
+      <div className="col-span-1 xl:col-span-2">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center p-12 text-center">
+            <Heart className="h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Your Wishlist is Empty
+            </h3>
+            <p className="text-gray-600 mb-6 max-w-md">
+              Start tracking items you're interested in. Add products to monitor prices and keep track of items you want.
+            </p>
+            {onAddNew && (
+              <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700">
+                Add Your First Item
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (displayStatus === 'owned') {
+    return (
+      <div className="col-span-1 xl:col-span-2">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center p-12 text-center">
+            <Package className="h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Your Wardrobe is Empty
+            </h3>
+            <p className="text-gray-600 mb-6 max-w-md">
+              You haven't added any items to your collection yet. Start by adding items you own to track your wardrobe.
+            </p>
+            {onAddNew && (
+              <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700">
+                Add Your First Item
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Default fallback
+  return (
     <div className="col-span-1 xl:col-span-2">
       <Card>
         <CardContent className="p-8 text-center">
@@ -529,14 +619,12 @@ function EmptyState({ hasEntries, onAddNew }: EmptyStateProps) {
             <Search className="h-12 w-12 mx-auto mb-2" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {hasEntries ? 'No matching entries' : 'No journal entries yet'}
+            No entries yet
           </h3>
           <p className="text-gray-600 mb-4">
-            {hasEntries
-              ? 'Try adjusting your search or filters.'
-              : 'Start tracking your sizing and fit insights!'}
+            Start tracking your items!
           </p>
-          {!hasEntries && onAddNew && (
+          {onAddNew && (
             <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700">
               Add Your First Entry
             </Button>

@@ -23,7 +23,7 @@ export function EditItemModal({ experience, isOpen, onClose, onSave }: EditItemM
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Edit Item</DialogTitle>
-          <Button
+          {/* <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
@@ -31,7 +31,7 @@ export function EditItemModal({ experience, isOpen, onClose, onSave }: EditItemM
             aria-label="Close modal"
           >
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </DialogHeader>
 
         <AddItemForm

@@ -69,6 +69,7 @@ interface PhotoItem {
 	preview: string;
 	isMain: boolean;
 	order: number;
+	isExisting?: boolean;
 }
 
 // Enhanced form schema with SKU and sale price
@@ -186,7 +187,7 @@ const itemSchema = z
 			.or(z.literal("")),
 		notes: z
 			.string()
-			.max(80, "Notes must be less than 80 characters")
+			.max(120, "Notes must be less than 120 characters")
 			.trim()
 			.optional()
 			.or(z.literal("")),
@@ -406,6 +407,7 @@ export function AddItemForm({
 						preview: photo.image_url,
 						isMain: photo.is_main_image || false,
 						order: photo.image_order || index,
+						isExisting: true, // Mark as existing photo
 					})
 				);
 				setPhotos(existingPhotoItems);
@@ -972,6 +974,14 @@ export function AddItemForm({
 			let mainImageUrl = null;
 			let mainCloudinaryId = null;
 			const uploadedPhotos = [];
+			const existingPhotoIds: string[] = [];
+
+			// In edit mode, track existing photo IDs to identify deletions
+			if (mode === "edit" && initialData?.item_photos) {
+				initialData.item_photos.forEach((photo: any) => {
+					if (photo.id) existingPhotoIds.push(photo.id);
+				});
+			}
 
 			// Upload all photos to Cloudinary if provided
 			if (photos.length > 0) {
@@ -984,18 +994,12 @@ export function AddItemForm({
 				for (let i = 0; i < photos.length; i++) {
 					const photo = photos[i];
 
-					// Skip if this is an existing photo (empty file)
-					if (photo.file.size === 0 && photo.preview.startsWith("http")) {
+					// Check if this is an existing photo
+					if (photo.isExisting && photo.file.size === 0) {
 						console.log(
-							`⏭️ Skipping existing photo ${i + 1} (already uploaded)`
+							`⏭️ Keeping existing photo ${i + 1} (ID: ${photo.id})`
 						);
-						// For existing photos, just add them to uploadedPhotos
-						uploadedPhotos.push({
-							url: photo.preview,
-							cloudinaryId: photo.id.startsWith("existing-") ? null : photo.id,
-							order: photo.order,
-							isMain: photo.isMain,
-						});
+						// Don't upload, this photo already exists in the database
 						continue;
 					}
 
@@ -1098,6 +1102,38 @@ export function AddItemForm({
 			if (dbError) {
 				console.error("Database error:", dbError);
 				throw dbError;
+			}
+
+			// Handle photo deletions in edit mode
+			if (mode === "edit" && initialData?.id && existingPhotoIds.length > 0) {
+				const currentPhotoIds = photos
+					.filter((p) => p.isExisting)
+					.map((p) => p.id)
+					.filter((id) => !id.startsWith("existing-"));
+
+				const deletedPhotoIds = existingPhotoIds.filter(
+					(id) => !currentPhotoIds.includes(id)
+				);
+
+				if (deletedPhotoIds.length > 0) {
+					console.log("🗑️ Deleting", deletedPhotoIds.length, "removed photos...");
+
+					// Delete from database
+					const { error: deleteError } = await supabase
+						.from("item_photos")
+						.delete()
+						.in("id", deletedPhotoIds);
+
+					if (deleteError) {
+						console.error("❌ Failed to delete photos:", deleteError);
+						toast.error("Failed to delete some photos", {
+							description: deleteError.message,
+							duration: 5000,
+						});
+					} else {
+						console.log("✅ Successfully deleted photos from database");
+					}
+				}
 			}
 
 			// Insert all photos into item_photos table (only new photos)
@@ -1794,7 +1830,7 @@ export function AddItemForm({
 										</Label>
 										{watch("notes") && (
 											<span className='text-xs text-gray-500'>
-												{watch("notes")?.length || 0} / 80
+												{watch("notes")?.length || 0} / 120
 											</span>
 										)}
 									</div>
@@ -1807,7 +1843,7 @@ export function AddItemForm({
 										}
 										className='mt-[var(--space-md)] resize-none'
 										rows={3}
-										maxLength={80}
+										maxLength={120}
 									/>
 									<div className='mt-[var(--space-md)] text-xs text-gray-500'>
 										💡 Quick tips:{" "}

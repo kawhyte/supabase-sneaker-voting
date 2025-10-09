@@ -29,6 +29,7 @@ export interface SizingJournalEntry {
   purchase_price?: number
   purchase_date?: string | null
   target_price?: number
+  ideal_price?: number
   would_recommend: boolean | null
   image_url?: string
   cloudinary_id?: string

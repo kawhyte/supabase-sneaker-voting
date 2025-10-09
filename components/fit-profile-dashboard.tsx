@@ -119,15 +119,21 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
   if (rawData.length === 0) {
     return (
       <Card className="max-w-4xl mx-auto">
-        <CardContent className="p-8 text-center">
-          <Brain className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Try-On Data Available</h3>
-          <p className="text-gray-600 mb-4">
-            Start trying on items and rating their fit to unlock powerful insights!
+        <CardContent className="flex flex-col items-center justify-center p-12 text-center">
+          <Brain className="h-12 w-12 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Not Enough Data for Insights
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-md">
+            Start trying on items and rating their fit to unlock personalized size recommendations and insights!
           </p>
-          {onGoBack && (
+          {onGoBack ? (
             <Button onClick={onGoBack} className="bg-blue-600 hover:bg-blue-700">
               Start Tracking Experiences
+            </Button>
+          ) : (
+            <Button onClick={() => window.location.href = '/add-new-item'} className="bg-blue-600 hover:bg-blue-700">
+              Add Your First Item
             </Button>
           )}
         </CardContent>
