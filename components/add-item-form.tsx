@@ -59,7 +59,7 @@ import {
 	getCategoryConfig,
 	isSizeRequired,
 	isComfortRequired,
-	getSizeType
+	getSizeType,
 } from "@/components/types/item-category";
 import { detectCategoryFromUrl } from "@/lib/item-utils";
 
@@ -80,9 +80,20 @@ const itemSchema = z
 		interactionType: z.enum(["seen", "tried"], {
 			required_error: "Please select whether you saw or tried on this item",
 		}),
-		category: z.enum(["shoes", "tops", "bottoms", "outerwear", "accessories", "jewelry", "watches"], {
-			required_error: "Please select the item category",
-		}),
+		category: z.enum(
+			[
+				"shoes",
+				"tops",
+				"bottoms",
+				"outerwear",
+				"accessories",
+				"jewelry",
+				"watches",
+			],
+			{
+				required_error: "Please select the item category",
+			}
+		),
 		// Smart Import fields
 		productUrl: z
 			.string()
@@ -248,13 +259,13 @@ const FIT_RATINGS = [
 interface AddItemFormProps {
 	onItemAdded?: () => void;
 	initialData?: any; // The existing item data for edit mode
-	mode?: 'create' | 'edit';
+	mode?: "create" | "edit";
 }
 
 export function AddItemForm({
 	onItemAdded,
 	initialData,
-	mode = 'create' as 'create' | 'edit',
+	mode = "create" as "create" | "edit",
 }: AddItemFormProps = {}) {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
@@ -284,7 +295,7 @@ export function AddItemForm({
 
 	// Prepare default values - either from initialData or defaults
 	const getDefaultValues = () => {
-		if (mode === 'edit' && initialData) {
+		if (mode === "edit" && initialData) {
 			return {
 				userName: initialData.user_name || "Kenny",
 				interactionType: initialData.has_been_tried ? "tried" : "seen",
@@ -357,8 +368,11 @@ export function AddItemForm({
 
 	// CRITICAL FIX: Reset form when initialData changes in edit mode
 	useEffect(() => {
-		if (mode === 'edit' && initialData) {
-			console.log('🔄 Edit mode detected - resetting form with initialData:', initialData);
+		if (mode === "edit" && initialData) {
+			console.log(
+				"🔄 Edit mode detected - resetting form with initialData:",
+				initialData
+			);
 
 			const formData = {
 				userName: initialData.user_name || "Kenny",
@@ -379,19 +393,21 @@ export function AddItemForm({
 				enableNotifications: false,
 			};
 
-			console.log('📝 Resetting form with data:', formData);
+			console.log("📝 Resetting form with data:", formData);
 			reset(formData);
 
 			// Load existing photos in edit mode
 			if (initialData.item_photos && initialData.item_photos.length > 0) {
-				console.log('📸 Loading existing photos:', initialData.item_photos);
-				const existingPhotoItems: PhotoItem[] = initialData.item_photos.map((photo: any, index: number) => ({
-					id: photo.id || `existing-${index}`,
-					file: new File([], ''), // Empty file object since photo is already uploaded
-					preview: photo.image_url,
-					isMain: photo.is_main_image || false,
-					order: photo.image_order || index,
-				}));
+				console.log("📸 Loading existing photos:", initialData.item_photos);
+				const existingPhotoItems: PhotoItem[] = initialData.item_photos.map(
+					(photo: any, index: number) => ({
+						id: photo.id || `existing-${index}`,
+						file: new File([], ""), // Empty file object since photo is already uploaded
+						preview: photo.image_url,
+						isMain: photo.is_main_image || false,
+						order: photo.image_order || index,
+					})
+				);
 				setPhotos(existingPhotoItems);
 			}
 		}
@@ -402,7 +418,7 @@ export function AddItemForm({
 		loadFitData();
 
 		// Skip draft restoration in edit mode
-		if (mode === 'create') {
+		if (mode === "create") {
 			restoreDraft();
 		}
 	}, [mode]);
@@ -414,7 +430,7 @@ export function AddItemForm({
 
 	// Auto-save draft every 30 seconds (only in create mode)
 	useEffect(() => {
-		if (mode === 'create' && hasUnsavedChanges) {
+		if (mode === "create" && hasUnsavedChanges) {
 			const autoSaveInterval = setInterval(() => {
 				saveDraft();
 			}, 30000); // 30 seconds
@@ -589,7 +605,10 @@ export function AddItemForm({
 	};
 
 	// URL scraping function with retry logic
-	const handleUrlScrape = async (url: string, retryCount: number = 0): Promise<void> => {
+	const handleUrlScrape = async (
+		url: string,
+		retryCount: number = 0
+	): Promise<void> => {
 		if (!url.trim()) return;
 
 		const maxRetries = 2;
@@ -653,7 +672,11 @@ export function AddItemForm({
 						});
 					}
 				} else {
-					console.log("ℹ️ User already selected category:", watchedCategory, "- skipping auto-detection");
+					console.log(
+						"ℹ️ User already selected category:",
+						watchedCategory,
+						"- skipping auto-detection"
+					);
 				}
 
 				// Extract store name from URL
@@ -962,12 +985,14 @@ export function AddItemForm({
 					const photo = photos[i];
 
 					// Skip if this is an existing photo (empty file)
-					if (photo.file.size === 0 && photo.preview.startsWith('http')) {
-						console.log(`⏭️ Skipping existing photo ${i + 1} (already uploaded)`);
+					if (photo.file.size === 0 && photo.preview.startsWith("http")) {
+						console.log(
+							`⏭️ Skipping existing photo ${i + 1} (already uploaded)`
+						);
 						// For existing photos, just add them to uploadedPhotos
 						uploadedPhotos.push({
 							url: photo.preview,
-							cloudinaryId: photo.id.startsWith('existing-') ? null : photo.id,
+							cloudinaryId: photo.id.startsWith("existing-") ? null : photo.id,
 							order: photo.order,
 							isMain: photo.isMain,
 						});
@@ -1029,6 +1054,7 @@ export function AddItemForm({
 					data.interactionType === "tried" ? data.comfortRating || null : null,
 				// Always optional fields
 				retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
+				sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
 				ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
 				notes: data.notes || null,
 				try_on_date: new Date().toISOString().split("T")[0],
@@ -1038,20 +1064,20 @@ export function AddItemForm({
 				wears: null,
 
 				// Current schema fields
-				status: 'wishlisted' as const,
-				has_been_tried: data.interactionType === 'tried',
+				status: "wishlisted" as const,
+				has_been_tried: data.interactionType === "tried",
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 			};
 
 			let resultItem: any = null;
 			let dbError: any = null;
 
-			if (mode === 'edit' && initialData?.id) {
+			if (mode === "edit" && initialData?.id) {
 				// UPDATE existing item
 				const { data: updatedItem, error } = await supabase
 					.from("items")
 					.update(experienceData)
-					.eq('id', initialData.id)
+					.eq("id", initialData.id)
 					.select()
 					.single();
 
@@ -1075,9 +1101,13 @@ export function AddItemForm({
 			}
 
 			// Insert all photos into item_photos table (only new photos)
-			const newPhotos = uploadedPhotos.filter(photo => photo.cloudinaryId);
+			const newPhotos = uploadedPhotos.filter((photo) => photo.cloudinaryId);
 			if (newPhotos.length > 0 && resultItem) {
-				console.log('📸 Saving', newPhotos.length, 'new photos to item_photos table...');
+				console.log(
+					"📸 Saving",
+					newPhotos.length,
+					"new photos to item_photos table..."
+				);
 				const photoRecords = newPhotos.map((photo) => ({
 					item_id: resultItem.id,
 					image_url: photo.url,
@@ -1086,7 +1116,7 @@ export function AddItemForm({
 					is_main_image: photo.isMain,
 				}));
 
-				console.log('📸 Photo records to insert:', photoRecords);
+				console.log("📸 Photo records to insert:", photoRecords);
 
 				const { data: insertedPhotos, error: photosError } = await supabase
 					.from("item_photos")
@@ -1095,20 +1125,32 @@ export function AddItemForm({
 
 				if (photosError) {
 					console.error("❌ Failed to save photos:", photosError);
-					console.error("❌ Full error details:", JSON.stringify(photosError, null, 2));
-					toast.error('Photos uploaded but failed to link to item', {
-						description: photosError.message || 'Unknown error - check console',
-						duration: 5000
+					console.error(
+						"❌ Full error details:",
+						JSON.stringify(photosError, null, 2)
+					);
+					toast.error("Photos uploaded but failed to link to item", {
+						description: photosError.message || "Unknown error - check console",
+						duration: 5000,
 					});
 				} else {
-					console.log('✅ Successfully saved', insertedPhotos?.length, 'photos to database');
+					console.log(
+						"✅ Successfully saved",
+						insertedPhotos?.length,
+						"photos to database"
+					);
 				}
 			} else {
-				console.log('⚠️ No new photos to save. newPhotos.length:', newPhotos.length, 'resultItem:', !!resultItem);
+				console.log(
+					"⚠️ No new photos to save. newPhotos.length:",
+					newPhotos.length,
+					"resultItem:",
+					!!resultItem
+				);
 			}
 
 			// Create price monitor if URL provided (only in create mode)
-			if (mode === 'create' && data.productUrl) {
+			if (mode === "create" && data.productUrl) {
 				setUploadProgress("📊 Setting up price monitoring...");
 				const monitorCreated = await createPriceMonitor(data);
 				if (monitorCreated) {
@@ -1120,7 +1162,7 @@ export function AddItemForm({
 			const itemName = `${data.brand} ${data.model}`;
 			const categoryLabel = getCategoryConfig(data.category)?.label || "Item";
 
-			if (mode === 'edit') {
+			if (mode === "edit") {
 				toast.success(`${itemName} updated!`, {
 					description: "Your changes have been saved",
 					duration: 5000,
@@ -1146,10 +1188,10 @@ export function AddItemForm({
 				setUrlData(null);
 				setScrapeFailed(false);
 				setSmartImportExpanded(true); // Reset to expanded
-				if (mode === 'create') {
+				if (mode === "create") {
 					clearDraft(); // Clear saved draft only in create mode
 					// Redirect to wishlist tab on dashboard
-					router.push('/dashboard?tab=wishlist');
+					router.push("/dashboard?tab=wishlist");
 				} else {
 					// In edit mode, call the callback instead
 					onItemAdded?.();
@@ -1174,23 +1216,25 @@ export function AddItemForm({
 					background:
 						"linear-gradient(135deg, var(--color-surface-primary), var(--color-gray-50), var(--color-blue-50))",
 				}}>
-				<CardHeader className='text-left pb-6'>
-					<CardTitle
-						className='text-3xl flex flex-col justify-start'
-						style={{ color: "var(--color-black)" }}>
-						<p className='-mb-2'>{mode === 'edit' ? 'Edit Item' : 'Track Your Items'}</p>
+				{mode === "create" && (
+					<CardHeader className='text-left pb-6'>
+						<CardTitle
+							className='text-3xl flex flex-col justify-start'
+							style={{ color: "var(--color-black)" }}>
+							<p className='-mb-2'>Track Your Items</p>
 
-						<p
-							className='text-sm'
-							style={{ color: "var(--color-text-secondary)" }}>
-							{mode === 'edit' ? 'Update item details' : 'Shoes, clothing, accessories & more'}
-						</p>
-					</CardTitle>
-				</CardHeader>
+							<p
+								className='text-sm'
+								style={{ color: "var(--color-text-secondary)" }}>
+								Shoes, clothing, accessories & more
+							</p>
+						</CardTitle>
+					</CardHeader>
+				)}
 
 				<CardContent>
 					{/* Draft Restored Notification - Only show in create mode */}
-					{mode === 'create' && showDraftNotification && (
+					{mode === "create" && showDraftNotification && (
 						<Alert className='mb-6 border-blue-200 bg-blue-50'>
 							<div className='flex items-center justify-between w-full'>
 								<div className='flex items-center gap-[var(--space-md)]'>
@@ -1235,7 +1279,7 @@ export function AddItemForm({
 					)}
 
 					{/* Auto-save Indicator - Only show in create mode */}
-					{mode === 'create' && lastSavedTime && hasUnsavedChanges && (
+					{mode === "create" && lastSavedTime && hasUnsavedChanges && (
 						<div className='mb-4 text-xs text-gray-500 flex items-center gap-[var(--space-xs)]'>
 							<RefreshCw className='h-3 w-3' />
 							<span>Last saved: {lastSavedTime.toLocaleTimeString()}</span>
@@ -1260,14 +1304,18 @@ export function AddItemForm({
 									className='flex gap-4'>
 									<div className='flex items-center space-x-2'>
 										<RadioGroupItem value='Kenny' id='user-kenny' />
-										<Label htmlFor='user-kenny' className='font-normal cursor-pointer flex items-center gap-2'>
+										<Label
+											htmlFor='user-kenny'
+											className='font-normal cursor-pointer flex items-center gap-2'>
 											<UserCircle className='h-4 w-4 text-blue-600' />
 											Kenny
 										</Label>
 									</div>
 									<div className='flex items-center space-x-2'>
 										<RadioGroupItem value='Rene' id='user-rene' />
-										<Label htmlFor='user-rene' className='font-normal cursor-pointer flex items-center gap-2'>
+										<Label
+											htmlFor='user-rene'
+											className='font-normal cursor-pointer flex items-center gap-2'>
 											<UserCircle className='h-4 w-4 text-purple-600' />
 											Rene
 										</Label>
@@ -1296,14 +1344,18 @@ export function AddItemForm({
 									className='flex gap-4'>
 									<div className='flex items-center space-x-2'>
 										<RadioGroupItem value='seen' id='exp-seen' />
-										<Label htmlFor='exp-seen' className='font-normal cursor-pointer flex items-center gap-2'>
+										<Label
+											htmlFor='exp-seen'
+											className='font-normal cursor-pointer flex items-center gap-2'>
 											<Eye className='h-4 w-4 text-teal-600' />
 											Seen
 										</Label>
 									</div>
 									<div className='flex items-center space-x-2'>
 										<RadioGroupItem value='tried' id='exp-tried' />
-										<Label htmlFor='exp-tried' className='font-normal cursor-pointer flex items-center gap-2'>
+										<Label
+											htmlFor='exp-tried'
+											className='font-normal cursor-pointer flex items-center gap-2'>
 											<Footprints className='h-4 w-4 text-orange-600' />
 											Tried On
 										</Label>
@@ -1364,170 +1416,177 @@ export function AddItemForm({
 						</div>
 
 						{/* Smart Import Section - Only show in create mode */}
-						{mode === 'create' && watchedUser && watchedInteractionType && watchedCategory && (
-							<>
-								<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border-2 border-blue-200'>
-									<button
-										type='button'
-										onClick={() => setSmartImportExpanded(!smartImportExpanded)}
-										className='w-full flex items-center justify-between mb-4'>
-										<div className='flex items-center gap-3'>
-											<Rocket className='hidden  md:block h-5 w-5 text-blue-600' />
-											<span className='text-base font-semibold text-blue-800 cursor-pointer'>
-												Auto-fill from URL
-											</span>
-										</div>
-										{smartImportExpanded ? (
-											<ChevronUp className='h-3 w-3 text-blue-600' />
-										) : (
-											<ChevronDown className='h-3 w-3 text-blue-600' />
-										)}
-									</button>
-
-									{smartImportExpanded && (
-										<div className='space-y-4'>
-											{/* URL Input */}
-											<div>
-												<Label className='text-xs text-blue-700 mb-2 block'>
-													Paste product URL from Nike, Adidas, Foot Locker,
-													StockX, etc.
-												</Label>
-												<div className='flex flex-col sm:flex-row gap-2 sm:gap-3'>
-													<Input
-														{...register("productUrl")}
-														placeholder='https://www.nike.com/t/...'
-														className='flex-1 h-4'
-														disabled={isScrapingUrl}
-														aria-label='Product URL'
-														aria-describedby='url-help-text'
-													/>
-													<Button
-														type='button'
-														onClick={() =>
-															handleUrlScrape(watch("productUrl") || "")
-														}
-														disabled={isScrapingUrl || !watch("productUrl")}
-														size='sm'
-														className='btn-primary rounded-lg px-4 py-2 font-semibold cursor-pointer h-4'
-														aria-label={
-															isScrapingUrl
-																? "Scraping product data"
-																: "Scrape product URL"
-														}
-														aria-busy={isScrapingUrl}>
-														{isScrapingUrl ? (
-															<Loader2
-																className='h-3 w-3 animate-spin'
-																aria-hidden='true'
-															/>
-														) : (
-															""
-														)}
-														<span className='ml-2'>
-															{isScrapingUrl ? "Loading..." : "Import"}
-														</span>
-													</Button>
-												</div>
-												<p id='url-help-text' className='sr-only'>
-													Paste a product URL from Nike, Adidas, Foot Locker,
-													StockX, or other retailers
-												</p>
-											</div>
-
-											{/* Scraping Skeleton Loader */}
-											{isScrapingUrl && (
-												<div className='bg-white rounded-lg p-4 border-2 border-blue-300'>
-													<div className='flex items-start gap-3'>
-														<Skeleton className='w-16 h-16 rounded-lg' />
-														<div className='flex-1 space-y-2'>
-															<Skeleton className='h-4 w-3/4' />
-															<Skeleton className='h-6 w-1/2' />
-															<Skeleton className='h-3 w-1/3' />
-														</div>
-													</div>
-												</div>
-											)}
-
-											{/* URL Data Preview */}
-											{!isScrapingUrl && urlData && (
-												<div className='bg-white rounded-lg p-4 border-2 border-green-300 animate-in fade-in slide-in-from-top-4 duration-300'>
-													<div className='flex flex-col sm:flex-row sm:items-start gap-3'>
-														{urlData.image && (
-															<img
-																src={urlData.image}
-																alt='Product'
-																className='w-16 h-16 object-cover rounded-lg flex-shrink-0'
-															/>
-														)}
-														<div className='flex-1 min-w-0'>
-															<div className='flex items-center gap-2'>
-																<CheckCircle className='h-4 w-4 text-green-600 flex-shrink-0' />
-																<h4 className='font-medium text-sm text-green-800 truncate'>
-																	{urlData.title || "Product Found"}
-																</h4>
-															</div>
-															<div className='flex flex-wrap items-center gap-2 mt-1'>
-																{urlData.price && (
-																	<span className='text-lg font-bold text-green-600'>
-																		${urlData.price}
-																	</span>
-																)}
-																{urlData.storeName && (
-																	<span className='text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded'>
-																		{urlData.storeName}
-																	</span>
-																)}
-															</div>
-															{urlData.images && urlData.images.length > 1 && (
-																<div className='flex items-center gap-1 mt-1'>
-																	<Camera className='h-3 w-3 text-blue-600' />
-																	<p className='text-xs text-blue-600'>
-																		{urlData.images.length} images found
-																	</p>
-																</div>
-															)}
-														</div>
-													</div>
-												</div>
-											)}
-
-											{/* Upload Progress */}
-											{uploadProgress && (
-												<Alert
-													className={
-														scrapeFailed
-															? "border-red-200 bg-red-50"
-															: "border-blue-200 bg-blue-50"
-													}>
-													<Upload
-														className={`h-4 w-4 ${
-															scrapeFailed ? "text-red-600" : "text-blue-600"
-														}`}
-													/>
-													<AlertDescription
-														className={
-															scrapeFailed ? "text-red-800" : "text-blue-800"
-														}>
-														{uploadProgress}
-													</AlertDescription>
-												</Alert>
-											)}
-
-											<div className='text-xs text-blue-700 bg-blue-100 p-3 rounded flex items-start gap-2'>
-												<Lightbulb className='h-4 w-4 hidden md:block flex-shrink-0 mt-0.5' />
-												<span>
-													Smart Import will automatically fill brand, model,
-													color, store, and price
+						{mode === "create" &&
+							watchedUser &&
+							watchedInteractionType &&
+							watchedCategory && (
+								<>
+									<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border-2 border-blue-200'>
+										<button
+											type='button'
+											onClick={() =>
+												setSmartImportExpanded(!smartImportExpanded)
+											}
+											className='w-full flex items-center justify-between mb-4'>
+											<div className='flex items-center gap-3'>
+												<Rocket className='hidden  md:block h-5 w-5 text-blue-600' />
+												<span className='text-base font-semibold text-blue-800 cursor-pointer'>
+													Auto-fill from URL
 												</span>
 											</div>
-										</div>
-									)}
-								</div>
-							</>
-						)}
+											{smartImportExpanded ? (
+												<ChevronUp className='h-3 w-3 text-blue-600' />
+											) : (
+												<ChevronDown className='h-3 w-3 text-blue-600' />
+											)}
+										</button>
+
+										{smartImportExpanded && (
+											<div className='space-y-4'>
+												{/* URL Input */}
+												<div>
+													<Label className='text-xs text-blue-700 mb-2 block'>
+														Paste product URL from Nike, Adidas, Foot Locker,
+														StockX, etc.
+													</Label>
+													<div className='flex flex-col sm:flex-row gap-2 sm:gap-3'>
+														<Input
+															{...register("productUrl")}
+															placeholder='https://www.nike.com/t/...'
+															className='flex-1 h-4'
+															disabled={isScrapingUrl}
+															aria-label='Product URL'
+															aria-describedby='url-help-text'
+														/>
+														<Button
+															type='button'
+															onClick={() =>
+																handleUrlScrape(watch("productUrl") || "")
+															}
+															disabled={isScrapingUrl || !watch("productUrl")}
+															size='sm'
+															className='btn-primary rounded-lg px-4 py-2 font-semibold cursor-pointer h-4'
+															aria-label={
+																isScrapingUrl
+																	? "Scraping product data"
+																	: "Scrape product URL"
+															}
+															aria-busy={isScrapingUrl}>
+															{isScrapingUrl ? (
+																<Loader2
+																	className='h-3 w-3 animate-spin'
+																	aria-hidden='true'
+																/>
+															) : (
+																""
+															)}
+															<span className='ml-2'>
+																{isScrapingUrl ? "Loading..." : "Import"}
+															</span>
+														</Button>
+													</div>
+													<p id='url-help-text' className='sr-only'>
+														Paste a product URL from Nike, Adidas, Foot Locker,
+														StockX, or other retailers
+													</p>
+												</div>
+
+												{/* Scraping Skeleton Loader */}
+												{isScrapingUrl && (
+													<div className='bg-white rounded-lg p-4 border-2 border-blue-300'>
+														<div className='flex items-start gap-3'>
+															<Skeleton className='w-16 h-16 rounded-lg' />
+															<div className='flex-1 space-y-2'>
+																<Skeleton className='h-4 w-3/4' />
+																<Skeleton className='h-6 w-1/2' />
+																<Skeleton className='h-3 w-1/3' />
+															</div>
+														</div>
+													</div>
+												)}
+
+												{/* URL Data Preview */}
+												{!isScrapingUrl && urlData && (
+													<div className='bg-white rounded-lg p-4 border-2 border-green-300 animate-in fade-in slide-in-from-top-4 duration-300'>
+														<div className='flex flex-col sm:flex-row sm:items-start gap-3'>
+															{urlData.image && (
+																<img
+																	src={urlData.image}
+																	alt='Product'
+																	className='w-16 h-16 object-cover rounded-lg flex-shrink-0'
+																/>
+															)}
+															<div className='flex-1 min-w-0'>
+																<div className='flex items-center gap-2'>
+																	<CheckCircle className='h-4 w-4 text-green-600 flex-shrink-0' />
+																	<h4 className='font-medium text-sm text-green-800 truncate'>
+																		{urlData.title || "Product Found"}
+																	</h4>
+																</div>
+																<div className='flex flex-wrap items-center gap-2 mt-1'>
+																	{urlData.price && (
+																		<span className='text-lg font-bold text-green-600'>
+																			${urlData.price}
+																		</span>
+																	)}
+																	{urlData.storeName && (
+																		<span className='text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded'>
+																			{urlData.storeName}
+																		</span>
+																	)}
+																</div>
+																{urlData.images &&
+																	urlData.images.length > 1 && (
+																		<div className='flex items-center gap-1 mt-1'>
+																			<Camera className='h-3 w-3 text-blue-600' />
+																			<p className='text-xs text-blue-600'>
+																				{urlData.images.length} images found
+																			</p>
+																		</div>
+																	)}
+															</div>
+														</div>
+													</div>
+												)}
+
+												{/* Upload Progress */}
+												{uploadProgress && (
+													<Alert
+														className={
+															scrapeFailed
+																? "border-red-200 bg-red-50"
+																: "border-blue-200 bg-blue-50"
+														}>
+														<Upload
+															className={`h-4 w-4 ${
+																scrapeFailed ? "text-red-600" : "text-blue-600"
+															}`}
+														/>
+														<AlertDescription
+															className={
+																scrapeFailed ? "text-red-800" : "text-blue-800"
+															}>
+															{uploadProgress}
+														</AlertDescription>
+													</Alert>
+												)}
+
+												<div className='text-xs text-blue-700 bg-blue-100 p-3 rounded flex items-start gap-2'>
+													<Lightbulb className='h-4 w-4 hidden md:block flex-shrink-0 mt-0.5' />
+													<span>
+														Smart Import will automatically fill brand, model,
+														color, store, and price
+													</span>
+												</div>
+											</div>
+										)}
+									</div>
+								</>
+							)}
 
 						{/* Product Details - Show when basic info is filled OR in edit mode */}
-						{((watchedUser && watchedInteractionType && watchedCategory) || mode === 'edit') && (
+						{((watchedUser && watchedInteractionType && watchedCategory) ||
+							mode === "edit") && (
 							<>
 								<h3 className='font-semibold text-gray-700 border-b pb-[var(--space-md)] mt-6'>
 									Product Details
@@ -1554,8 +1613,8 @@ export function AddItemForm({
 															{errors.model.message}
 														</p>
 														<p className='text-xs text-red-600 mt-0.5'>
-															Enter the item model (e.g., "Air Jordan 1
-															High", "990v6")
+															Enter the item model (e.g., "Air Jordan 1 High",
+															"990v6")
 														</p>
 													</div>
 												</div>
@@ -1643,7 +1702,7 @@ export function AddItemForm({
 													/>
 												</div>
 
-												{/* Sale Price Alert - Only if detected from scraper */}
+												{/* Sale Price Alert */}
 												{watchedSalePrice &&
 													watchedRetailPrice &&
 													parseFloat(watchedSalePrice) <
@@ -1770,7 +1829,8 @@ export function AddItemForm({
 												<div className='mb-4 mt-4 w-full'>
 													<Label className='text-sm font-medium text-gray-700'>
 														<span>
-															{getCategoryConfig(watchedCategory)?.sizeLabel || "Size Tried"}
+															{getCategoryConfig(watchedCategory)?.sizeLabel ||
+																"Size Tried"}
 														</span>{" "}
 														<span className='text-red-500'>*</span>
 													</Label>
@@ -1823,83 +1883,85 @@ export function AddItemForm({
 											{/* Comfort Rating (Required for shoes only) */}
 											{isComfortRequired(watchedCategory) && (
 												<div className='mt-4 '>
-												<Label className='text-sm font-medium text-gray-700 '>
-													<span>How comfortable were they?</span>{" "}
-													<span className='text-red-500'>*</span>
-												</Label>
+													<Label className='text-sm font-medium text-gray-700 '>
+														<span>How comfortable were they?</span>{" "}
+														<span className='text-red-500'>*</span>
+													</Label>
 
-												<div className='flex items-center gap-[var(--space-xs)] '>
-													{[1, 2, 3, 4, 5].map((rating) => (
-														<button
-															key={rating}
-															type='button'
-															onClick={() =>
-																setValue("comfortRating", rating, {
-																	shouldValidate: true,
-																})
-															}
-															className='group p-[var(--space-sm)] md:p-[var(--space-md)] hover:scale-110 transition-transform touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 rounded'
-															style={{ boxShadow: "var(--color-focus-ring)" }}
-															title={`${rating} star${rating !== 1 ? "s" : ""}`}
-															aria-label={`${rating} star${
-																rating !== 1 ? "s" : ""
-															} comfort rating`}>
-															<Star
-																className={cn(
-																	"h-4 w-4 md:h-4 md:w-4 transition-colors",
-																	watch("comfortRating") &&
-																		watch("comfortRating")! >= rating
-																		? "fill-yellow-400 text-yellow-400"
-																		: "text-gray-300 group-hover:text-gray-400"
-																)}
-																aria-hidden='true'
-															/>
-														</button>
-													))}
-													{watch("comfortRating") && (
-														<button
-															type='button'
-															onClick={() =>
-																setValue("comfortRating", undefined)
-															}
-															className='ml-3 text-xs text-gray-500 hover:text-gray-700 underline min-h-[44px] flex items-center focus:ring-2 focus:ring-blue-300 rounded px-2'
-															aria-label='Clear comfort rating'>
-															Clear
-														</button>
-													)}
-												</div>
-												{watch("comfortRating") && (
-													<div
-														className='mt-1 p-1 rounded'
-														style={{
-															backgroundColor: "var(--color-primary-50)",
-															borderColor: "var(--color-primary-200)",
-															border: "1px solid",
-														}}>
-														<p
-															className='text-sm'
-															style={{ color: "var(--color-primary-900)" }}>
-															<span className='font-semibold'>
-																{watch("comfortRating")} / 5 stars
-															</span>{" "}
-															-{" "}
-															{watch("comfortRating") === 1
-																? "Very uncomfortable"
-																: watch("comfortRating") === 2
-																? "Uncomfortable"
-																: watch("comfortRating") === 3
-																? "Decent comfort"
-																: watch("comfortRating") === 4
-																? "Very comfortable"
-																: "Extremely comfortable"}
-														</p>
+													<div className='flex items-center gap-[var(--space-xs)] '>
+														{[1, 2, 3, 4, 5].map((rating) => (
+															<button
+																key={rating}
+																type='button'
+																onClick={() =>
+																	setValue("comfortRating", rating, {
+																		shouldValidate: true,
+																	})
+																}
+																className='group p-[var(--space-sm)] md:p-[var(--space-md)] hover:scale-110 transition-transform touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 rounded'
+																style={{ boxShadow: "var(--color-focus-ring)" }}
+																title={`${rating} star${
+																	rating !== 1 ? "s" : ""
+																}`}
+																aria-label={`${rating} star${
+																	rating !== 1 ? "s" : ""
+																} comfort rating`}>
+																<Star
+																	className={cn(
+																		"h-4 w-4 md:h-4 md:w-4 transition-colors",
+																		watch("comfortRating") &&
+																			watch("comfortRating")! >= rating
+																			? "fill-yellow-400 text-yellow-400"
+																			: "text-gray-300 group-hover:text-gray-400"
+																	)}
+																	aria-hidden='true'
+																/>
+															</button>
+														))}
+														{watch("comfortRating") && (
+															<button
+																type='button'
+																onClick={() =>
+																	setValue("comfortRating", undefined)
+																}
+																className='ml-3 text-xs text-gray-500 hover:text-gray-700 underline min-h-[44px] flex items-center focus:ring-2 focus:ring-blue-300 rounded px-2'
+																aria-label='Clear comfort rating'>
+																Clear
+															</button>
+														)}
 													</div>
-												)}
-												<p className='text-xs text-gray-500 mt-1'>
-													Rate overall comfort - cushioning, support,
-													breathability
-												</p>
-											</div>
+													{watch("comfortRating") && (
+														<div
+															className='mt-1 p-1 rounded'
+															style={{
+																backgroundColor: "var(--color-primary-50)",
+																borderColor: "var(--color-primary-200)",
+																border: "1px solid",
+															}}>
+															<p
+																className='text-sm'
+																style={{ color: "var(--color-primary-900)" }}>
+																<span className='font-semibold'>
+																	{watch("comfortRating")} / 5 stars
+																</span>{" "}
+																-{" "}
+																{watch("comfortRating") === 1
+																	? "Very uncomfortable"
+																	: watch("comfortRating") === 2
+																	? "Uncomfortable"
+																	: watch("comfortRating") === 3
+																	? "Decent comfort"
+																	: watch("comfortRating") === 4
+																	? "Very comfortable"
+																	: "Extremely comfortable"}
+															</p>
+														</div>
+													)}
+													<p className='text-xs text-gray-500 mt-1'>
+														Rate overall comfort - cushioning, support,
+														breathability
+													</p>
+												</div>
 											)}
 										</div>
 									</div>
@@ -1908,11 +1970,13 @@ export function AddItemForm({
 								<div className='flex items-center justify-end gap-3 mt-6'>
 									{/* Validation Summary - Show what's blocking submission */}
 									{(!isValid || photos.length === 0) && !isLoading && (
-										<Alert className="border-yellow-500 bg-yellow-50">
-											<AlertTriangle className="h-4 w-4 text-yellow-600" />
-											<AlertDescription className="text-yellow-800">
-												<div className="font-semibold mb-2">Please complete the following before saving:</div>
-												<ul className="list-disc list-inside space-y-1 text-sm">
+										<Alert className='border-yellow-500 bg-yellow-50'>
+											<AlertTriangle className='h-4 w-4 text-yellow-600' />
+											<AlertDescription className='text-yellow-800'>
+												<div className='font-semibold mb-2'>
+													Please complete the following before saving:
+												</div>
+												<ul className='list-disc list-inside space-y-1 text-sm'>
 													{photos.length === 0 && (
 														<li>Upload at least one product photo</li>
 													)}
@@ -1925,12 +1989,8 @@ export function AddItemForm({
 													{errors.category && (
 														<li>{errors.category.message}</li>
 													)}
-													{errors.brand && (
-														<li>{errors.brand.message}</li>
-													)}
-													{errors.model && (
-														<li>{errors.model.message}</li>
-													)}
+													{errors.brand && <li>{errors.brand.message}</li>}
+													{errors.model && <li>{errors.model.message}</li>}
 													{errors.sizeTried && (
 														<li>{errors.sizeTried.message}</li>
 													)}
@@ -1977,7 +2037,7 @@ export function AddItemForm({
 											</>
 										) : (
 											<>
-												{(mode as 'create' | 'edit') === 'edit' ? (
+												{(mode as "create" | "edit") === "edit" ? (
 													<>
 														<Zap className='h-4 w-4 mr-2' aria-hidden='true' />
 														Update Item
@@ -1988,9 +2048,7 @@ export function AddItemForm({
 														Save
 													</>
 												) : (
-													<>
-														Add to Watchlist
-													</>
+													<>Add to Watchlist</>
 												)}
 											</>
 										)}
