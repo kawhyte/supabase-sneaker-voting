@@ -27,10 +27,11 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<{ id: string; email: string } | null>(null)
 
   // State - Filters (UPDATED)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedUsers, setSelectedUsers] = useState(new Set<string>())
+  const [userFilter, setUserFilter] = useState<string>('my-items')
   const [selectedBrands, setSelectedBrands] = useState(new Set<string>())
   const [sortBy, setSortBy] = useState<string>('date-desc')
   const [selectedCategories, setSelectedCategories] = useState<ItemCategory[]>([])
@@ -47,9 +48,20 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
   const supabase = createClient()
 
+  // Fetch current user session
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUser({ id: user.id, email: user.email || '' })
+      }
+    }
+    fetchUser()
+  }, [])
+
   useEffect(() => {
     loadJournalEntries()
-  }, [status, isArchivePage])
+  }, [status, isArchivePage, userFilter])
 
   const loadJournalEntries = async () => {
     try {
@@ -60,6 +72,33 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         .eq('is_archived', isArchivePage) // Filter based on archive page
         .in('status', status) // PHASE 3: Filter by status field
         .order('image_order', { foreignTable: 'item_photos', ascending: true })
+
+      // Apply user filter based on userFilter state
+      if (userFilter === 'my-items' && user) {
+        query = query.eq('user_id', user.id)
+      } else if (userFilter === 'kenny') {
+        // Hardcoded Kenny's user ID - get from user.email containing 'kenny'
+        const { data: kennyData } = await supabase
+          .from('items')
+          .select('user_id')
+          .eq('user_name', 'Kenny')
+          .limit(1)
+          .single()
+        if (kennyData?.user_id) {
+          query = query.eq('user_id', kennyData.user_id)
+        }
+      } else if (userFilter === 'rene') {
+        // Hardcoded Rene's user ID - get from user.email containing 'rene'
+        const { data: reneData } = await supabase
+          .from('items')
+          .select('user_id')
+          .eq('user_name', 'Rene')
+          .limit(1)
+          .single()
+        if (reneData?.user_id) {
+          query = query.eq('user_id', reneData.user_id)
+        }
+      }
 
       let { data, error } = await query.order('created_at', { ascending: false })
 
@@ -360,7 +399,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
   // Computed values (UPDATED)
   const filteredAndSortedEntries = sortJournalEntries(
-    filterJournalEntries(journalEntries, searchTerm, selectedUsers, selectedBrands, selectedCategories),
+    filterJournalEntries(journalEntries, searchTerm, new Set<string>(), selectedBrands, selectedCategories),
     sortBy
   )
   const availableBrands = getUniqueBrands(journalEntries)
@@ -385,8 +424,9 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
       <SizingJournalFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        selectedUsers={selectedUsers}
-        onUserChange={setSelectedUsers}
+        currentUser={user}
+        userFilter={userFilter}
+        onUserFilterChange={setUserFilter}
         selectedBrands={selectedBrands}
         onBrandChange={setSelectedBrands}
         sortBy={sortBy}
