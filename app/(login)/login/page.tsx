@@ -1,6 +1,4 @@
-import { headers } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
+import { login } from "./actions";
 import { SubmitButton } from "./submit-button";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,47 +13,6 @@ export default async function Login({
 	searchParams: Promise<{ message: string }>;
 }) {
 	const params = await searchParams;
-	const signIn = async (formData: FormData) => {
-		"use server";
-
-		const email = formData.get("email") as string;
-		const password = formData.get("password") as string;
-		const supabase = await createClient();
-
-		const { error } = await supabase.auth.signInWithPassword({
-			email,
-			password,
-		});
-
-		if (error) {
-			return redirect("/login?message=Could not authenticate user");
-		}
-
-		return redirect("/items/dashboard");
-	};
-
-	const signUp = async (formData: FormData) => {
-		"use server";
-
-		const origin = (await headers()).get("origin");
-		const email = formData.get("email") as string;
-		const password = formData.get("password") as string;
-		const supabase = await createClient();
-
-		const { error } = await supabase.auth.signUp({
-			email,
-			password,
-			options: {
-				emailRedirectTo: `${origin}/auth/callback`,
-			},
-		});
-
-		if (error) {
-			return redirect("/login?message=Could not authenticate user");
-		}
-
-		return redirect("/login?message=Check email to continue sign in process");
-	};
 
 	return (
 		<>
@@ -68,7 +25,7 @@ export default async function Login({
 								Enter your email below to login to your account
 							</p>
 						</div>
-						<form className='animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground'>
+						<form action={login} className='animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground'>
 							<div className='grid gap-4'>
 								<div className='grid gap-2'>
 									<Label htmlFor='email'>Email</Label>
@@ -101,7 +58,6 @@ export default async function Login({
 									Login-nah
 								</Button> */}
 								<SubmitButton
-									formAction={signIn}
 									className='bg-green-500 hover:bg-green-500/90 text-black  text-sm  rounded-md px-4 py-2 w-full text-foreground mb-2'
 									pendingText='Signing In...'>
 									Login
