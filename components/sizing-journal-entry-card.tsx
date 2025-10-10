@@ -269,7 +269,7 @@ export function SizingJournalEntryCard({
 								// OWNED ITEMS: Show purchase price
 								entry.purchase_price && (
 									<div className='flex items-center gap-2'>
-										<DollarSign className='h-4 w-4 text-gray-400' />
+										{/* <DollarSign className='h-4 w-4 text-gray-400' /> */}
 										<span className='text-sm font-semibold' style={{ color: 'var(--color-black)' }}>
 											Purchased for: ${entry.purchase_price}
 										</span>
