@@ -1585,6 +1585,7 @@ export function AddItemForm({
 							)}
 
 						{((watchedInteractionType && watchedCategory) ||
+						{((watchedUser && watchedInteractionType && watchedCategory) ||
 							mode === "edit") && (
 							<>
 								<h3 className='font-semibold text-gray-700 border-b pb-[var(--space-md)] mt-6'>

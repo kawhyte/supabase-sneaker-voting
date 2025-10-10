@@ -32,6 +32,7 @@ import {
 	ChevronUp,
 	ChevronDown,
 	Zap,
+	UserCircle,
 	AlertTriangle,
 	Camera,
 	Rocket,
@@ -1329,8 +1330,47 @@ export function AddItemForm({
 					<form
 						onSubmit={handleSubmit(onSubmit)}
 						className='space-y-[var(--space-lg)]'>
-						{/* Experience, and Category - Required First */}
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-[var(--space-base)] pb-[var(--space-base)]'>
+						{/* User, Experience, and Category - Required First */}
+						<div className='grid grid-cols-1 md:grid-cols-3 gap-[var(--space-base)] pb-[var(--space-base)]'>
+							<div>
+								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)] mb-3'>
+									<span>Who's tracking?</span>
+									<span className='text-red-500 -ml-1'>*</span>
+								</Label>
+								<RadioGroup
+									value={watchedUser}
+									onValueChange={(value: "Kenny" | "Rene") =>
+										setValue("userName", value, { shouldValidate: true })
+									}
+									className='flex gap-4'>
+									<div className='flex items-center space-x-2'>
+										<RadioGroupItem value='Kenny' id='user-kenny' />
+										<Label
+											htmlFor='user-kenny'
+											className='font-normal cursor-pointer flex items-center gap-2'>
+											<UserCircle className='h-4 w-4 text-blue-600' />
+											Kenny
+										</Label>
+									</div>
+									<div className='flex items-center space-x-2'>
+										<RadioGroupItem value='Rene' id='user-rene' />
+										<Label
+											htmlFor='user-rene'
+											className='font-normal cursor-pointer flex items-center gap-2'>
+											<UserCircle className='h-4 w-4 text-purple-600' />
+											Rene
+										</Label>
+									</div>
+								</RadioGroup>
+								{errors.userName && (
+									<div className='mt-[var(--space-md)] p-[var(--space-md)] bg-red-50 border border-red-200 rounded flex items-start gap-[var(--space-md)]'>
+										<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
+										<p className='text-xs font-semibold text-red-700'>
+											{errors.userName.message}
+										</p>
+									</div>
+								)}
+							</div>
 
 							<div>
 								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)] mb-3'>
@@ -1418,6 +1458,7 @@ export function AddItemForm({
 
 						{/* Smart Import Section - Only show in create mode */}
 						{mode === "create" &&
+							watchedUser &&
 							watchedInteractionType &&
 							watchedCategory && (
 								<>
@@ -1584,7 +1625,8 @@ export function AddItemForm({
 								</>
 							)}
 
-						{((watchedInteractionType && watchedCategory) ||
+						{/* Product Details - Show when basic info is filled OR in edit mode */}
+						{((watchedUser && watchedInteractionType && watchedCategory) ||
 							mode === "edit") && (
 							<>
 								<h3 className='font-semibold text-gray-700 border-b pb-[var(--space-md)] mt-6'>
@@ -1978,6 +2020,9 @@ export function AddItemForm({
 												<ul className='list-disc list-inside space-y-1 text-sm'>
 													{photos.length === 0 && (
 														<li>Upload at least one product photo</li>
+													)}
+													{errors.userName && (
+														<li>{errors.userName.message}</li>
 													)}
 													{errors.interactionType && (
 														<li>{errors.interactionType.message}</li>

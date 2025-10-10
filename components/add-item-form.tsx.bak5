@@ -32,6 +32,7 @@ import {
 	ChevronUp,
 	ChevronDown,
 	Zap,
+	UserCircle,
 	AlertTriangle,
 	Camera,
 	Rocket,
@@ -1584,7 +1585,8 @@ export function AddItemForm({
 								</>
 							)}
 
-						{((watchedInteractionType && watchedCategory) ||
+						{/* Product Details - Show when basic info is filled OR in edit mode */}
+						{((watchedUser && watchedInteractionType && watchedCategory) ||
 							mode === "edit") && (
 							<>
 								<h3 className='font-semibold text-gray-700 border-b pb-[var(--space-md)] mt-6'>
@@ -1978,6 +1980,9 @@ export function AddItemForm({
 												<ul className='list-disc list-inside space-y-1 text-sm'>
 													{photos.length === 0 && (
 														<li>Upload at least one product photo</li>
+													)}
+													{errors.userName && (
+														<li>{errors.userName.message}</li>
 													)}
 													{errors.interactionType && (
 														<li>{errors.interactionType.message}</li>

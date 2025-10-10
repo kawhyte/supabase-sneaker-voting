@@ -32,6 +32,7 @@ import {
 	ChevronUp,
 	ChevronDown,
 	Zap,
+	UserCircle,
 	AlertTriangle,
 	Camera,
 	Rocket,
@@ -1329,8 +1330,8 @@ export function AddItemForm({
 					<form
 						onSubmit={handleSubmit(onSubmit)}
 						className='space-y-[var(--space-lg)]'>
-						{/* Experience, and Category - Required First */}
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-[var(--space-base)] pb-[var(--space-base)]'>
+						{/* User, Experience, and Category - Required First */}
+						<div className='grid grid-cols-1 md:grid-cols-3 gap-[var(--space-base)] pb-[var(--space-base)]'>
 
 							<div>
 								<Label className='text-sm font-medium text-gray-700 flex items-center gap-[var(--space-md)] mb-3'>
@@ -1418,6 +1419,7 @@ export function AddItemForm({
 
 						{/* Smart Import Section - Only show in create mode */}
 						{mode === "create" &&
+							watchedUser &&
 							watchedInteractionType &&
 							watchedCategory && (
 								<>
@@ -1584,7 +1586,8 @@ export function AddItemForm({
 								</>
 							)}
 
-						{((watchedInteractionType && watchedCategory) ||
+						{/* Product Details - Show when basic info is filled OR in edit mode */}
+						{((watchedUser && watchedInteractionType && watchedCategory) ||
 							mode === "edit") && (
 							<>
 								<h3 className='font-semibold text-gray-700 border-b pb-[var(--space-md)] mt-6'>
@@ -1978,6 +1981,9 @@ export function AddItemForm({
 												<ul className='list-disc list-inside space-y-1 text-sm'>
 													{photos.length === 0 && (
 														<li>Upload at least one product photo</li>
+													)}
+													{errors.userName && (
+														<li>{errors.userName.message}</li>
 													)}
 													{errors.interactionType && (
 														<li>{errors.interactionType.message}</li>
