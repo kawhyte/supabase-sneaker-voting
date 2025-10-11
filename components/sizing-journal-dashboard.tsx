@@ -17,6 +17,20 @@ import { SizingJournalEntry } from './types/sizing-journal-entry'
 import { filterJournalEntries, sortJournalEntries, getUniqueBrands } from '@/lib/sizing-journal-utils'
 import { type ItemCategory } from '@/components/types/item-category'
 
+// Helper functions to get hardcoded user IDs
+// TODO: Replace these with a more dynamic user lookup system
+function getKennyUserId(): string | null {
+  // Hardcoded Kenny's user ID
+  // This should be replaced with a proper user management system
+  return process.env.NEXT_PUBLIC_KENNY_USER_ID || null
+}
+
+function getReneUserId(): string | null {
+  // Hardcoded Rene's user ID
+  // This should be replaced with a proper user management system
+  return process.env.NEXT_PUBLIC_RENE_USER_ID || null
+}
+
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
   status: ('owned' | 'wishlisted' | 'journaled')[]
@@ -77,26 +91,16 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
       if (userFilter === 'my-items' && user) {
         query = query.eq('user_id', user.id)
       } else if (userFilter === 'kenny') {
-        // Hardcoded Kenny's user ID - get from user.email containing 'kenny'
-        const { data: kennyData } = await supabase
-          .from('items')
-          .select('user_id')
-          .eq('user_name', 'Kenny')
-          .limit(1)
-          .single()
-        if (kennyData?.user_id) {
-          query = query.eq('user_id', kennyData.user_id)
+        // Get Kenny's user ID from email lookup
+        const kennyUserId = getKennyUserId()
+        if (kennyUserId) {
+          query = query.eq('user_id', kennyUserId)
         }
       } else if (userFilter === 'rene') {
-        // Hardcoded Rene's user ID - get from user.email containing 'rene'
-        const { data: reneData } = await supabase
-          .from('items')
-          .select('user_id')
-          .eq('user_name', 'Rene')
-          .limit(1)
-          .single()
-        if (reneData?.user_id) {
-          query = query.eq('user_id', reneData.user_id)
+        // Get Rene's user ID from email lookup
+        const reneUserId = getReneUserId()
+        if (reneUserId) {
+          query = query.eq('user_id', reneUserId)
         }
       }
 

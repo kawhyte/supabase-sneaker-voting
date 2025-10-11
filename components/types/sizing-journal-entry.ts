@@ -12,7 +12,7 @@ export type ArchiveReason = 'sold' | 'donated' | 'worn_out' | 'other'
 export interface SizingJournalEntry {
   id: string
   created_at: string
-  user_name: string
+  user_id: string
   brand: string
   model: string
   color: string

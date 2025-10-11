@@ -43,7 +43,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
       setLoading(true)
       const { data, error } = await supabase
         .from('items')
-        .select('user_name, brand, size_tried, fit_rating')
+        .select('user_id, brand, size_tried, fit_rating')
         .eq('category', 'shoes')
         .eq('has_been_tried', true)
         .not('size_tried', 'is', null)
@@ -57,7 +57,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
       // Transform to FitData format with frequency calculation
       const transformedData: FitData[] = []
       const groupedData = data.reduce((acc, item) => {
-        const key = `${item.user_name}-${item.brand}-${item.size_tried}-${item.fit_rating}`
+        const key = `${item.user_id}-${item.brand}-${item.size_tried}-${item.fit_rating}`
         if (!acc[key]) {
           acc[key] = { ...item, frequency: 0 }
         }
@@ -67,7 +67,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
 
       Object.values(groupedData).forEach((item: any) => {
         transformedData.push({
-          user_name: item.user_name,
+          user_id: item.user_id,
           brand: item.brand,
           size_tried: item.size_tried,
           fit_rating: item.fit_rating,

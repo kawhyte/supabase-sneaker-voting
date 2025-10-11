@@ -14,12 +14,13 @@ export function filterJournalEntries(
       entry.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.color.toLowerCase().includes(searchTerm.toLowerCase())
 
-    const matchesUser = selectedUsers.size === 0 || selectedUsers.has(entry.user_name)
+    // Note: User filtering is now handled at the database level via RLS and queries
+    // The selectedUsers parameter is kept for backward compatibility but no longer used
     const matchesBrand = selectedBrands.size === 0 || selectedBrands.has(entry.brand)
     const matchesCategory = selectedCategories.length === 0 ||
       selectedCategories.includes(entry.category as ItemCategory)
 
-    return matchesSearch && matchesUser && matchesBrand && matchesCategory
+    return matchesSearch && matchesBrand && matchesCategory
   })
 }
 

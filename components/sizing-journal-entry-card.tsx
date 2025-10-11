@@ -471,9 +471,6 @@ export function SizingJournalEntryCard({
 
 					{/* Footer */}
 					<div className='flex items-center gap-2 flex-wrap mt-auto pt-3 border-t border-gray-100'>
-						<Badge variant='outline' className='text-[11px] sm:text-xs'>
-							{entry.user_name}
-						</Badge>
 
 
 				

@@ -1,7 +1,7 @@
 // Size recommendation and analytics engine
 
 export interface FitData {
-  user_name: string
+  user_id: string // Changed from user_name to user_id
   brand: string
   size_tried: string
   fit_rating: number
@@ -38,10 +38,10 @@ export interface FitInsights {
 export function calculateSizeRecommendations(
   userData: FitData[],
   targetBrand: string,
-  userName: string
+  userId: string // Changed from userName to userId
 ): SizeRecommendation | null {
   // Filter data for this user
-  const userExperiences = userData.filter(d => d.user_name === userName)
+  const userExperiences = userData.filter(d => d.user_id === userId)
 
   // Get user's perfect fits (rating 3) across all brands
   const perfectFits = userExperiences.filter(d => d.fit_rating === 3)
@@ -107,8 +107,8 @@ export function calculateSizeRecommendations(
 /**
  * Analyzes brand-specific sizing patterns
  */
-export function analyzeBrandComparisons(userData: FitData[], userName: string): BrandComparison[] {
-  const userExperiences = userData.filter(d => d.user_name === userName)
+export function analyzeBrandComparisons(userData: FitData[], userId: string): BrandComparison[] {
+  const userExperiences = userData.filter(d => d.user_id === userId)
   const brandGroups = groupBy(userExperiences, 'brand')
 
   return Object.entries(brandGroups).map(([brand, experiences]) => {
@@ -117,7 +117,7 @@ export function analyzeBrandComparisons(userData: FitData[], userName: string): 
     const averageFitRating = experiences.reduce((sum, e) => sum + e.fit_rating, 0) / experiences.length
 
     // Determine if brand runs true to size
-    const userOverallAvgSize = calculateUserAverageSize(userData, userName)
+    const userOverallAvgSize = calculateUserAverageSize(userData, userId)
     const brandAvgSize = averageSize
     const sizeDifference = brandAvgSize - userOverallAvgSize
 
@@ -148,8 +148,8 @@ export function analyzeBrandComparisons(userData: FitData[], userName: string): 
 /**
  * Generates comprehensive fit insights for a user
  */
-export function generateFitInsights(userData: FitData[], userName: string): FitInsights {
-  const userExperiences = userData.filter(d => d.user_name === userName)
+export function generateFitInsights(userData: FitData[], userId: string): FitInsights {
+  const userExperiences = userData.filter(d => d.user_id === userId)
   const perfectFits = userExperiences.filter(d => d.fit_rating === 3)
 
   // Calculate preferred size (most common perfect fit)
@@ -159,14 +159,14 @@ export function generateFitInsights(userData: FitData[], userName: string): FitI
   const consistencyScore = calculateConsistencyScore(userExperiences)
 
   // Generate brand comparisons
-  const brandComparisons = analyzeBrandComparisons(userData, userName)
+  const brandComparisons = analyzeBrandComparisons(userData, userId)
 
   // Generate size recommendations for each brand
   const brands = Array.from(new Set(userData.map(d => d.brand)))
   const sizeRecommendations: Record<string, SizeRecommendation> = {}
 
   brands.forEach(brand => {
-    const recommendation = calculateSizeRecommendations(userData, brand, userName)
+    const recommendation = calculateSizeRecommendations(userData, brand, userId)
     if (recommendation) {
       sizeRecommendations[brand] = recommendation
     }
@@ -254,8 +254,8 @@ function calculateAverageSize(sizes: string[]): number {
   return numericSizes.reduce((sum, size) => sum + size, 0) / numericSizes.length
 }
 
-function calculateUserAverageSize(userData: FitData[], userName: string): number {
-  const userPerfectFits = userData.filter(d => d.user_name === userName && d.fit_rating === 3)
+function calculateUserAverageSize(userData: FitData[], userId: string): number {
+  const userPerfectFits = userData.filter(d => d.user_id === userId && d.fit_rating === 3)
   if (userPerfectFits.length === 0) return 0
 
   return calculateAverageSize(userPerfectFits.map(f => f.size_tried))

@@ -531,7 +531,7 @@ export function AddItemForm({
 		try {
 			const { data, error } = await supabase
 				.from("items")
-				.select("user_name, brand, size_tried, comfort_rating")
+				.select("user_id, brand, size_tried, comfort_rating")
 				.eq("category", "shoes") // Only load fit data for shoes
 				.eq("has_been_tried", true)
 				.not("size_tried", "is", null)
@@ -554,7 +554,7 @@ export function AddItemForm({
 			// Transform to FitData format with frequency calculation
 			const transformedData: FitData[] = [];
 			const groupedData = data.reduce((acc, item) => {
-				const key = `${item.user_name}-${item.brand}-${item.size_tried}-${item.comfort_rating}`;
+				const key = `${item.user_id}-${item.brand}-${item.size_tried}-${item.comfort_rating}`;
 				if (!acc[key]) {
 					acc[key] = { ...item, frequency: 0 };
 				}
@@ -564,7 +564,7 @@ export function AddItemForm({
 
 			Object.values(groupedData).forEach((item: any) => {
 				transformedData.push({
-					user_name: item.user_name,
+					user_id: item.user_id,
 					brand: item.brand,
 					size_tried: item.size_tried,
 					fit_rating: item.comfort_rating, // Map comfort_rating to fit_rating for compatibility
@@ -933,30 +933,8 @@ export function AddItemForm({
 		}
 	};
 
-	// Create price monitor function
-	const createPriceMonitor = async (data: ItemFormData, userName: string) => {
-		if (!data.productUrl) return;
-
-		try {
-			const response = await fetch("/api/create-monitor", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					url: data.productUrl,
-					userName: userName,
-					targetPrice: data.targetPrice ? parseFloat(data.targetPrice) : null,
-					enableNotifications: data.enableNotifications || false,
-				}),
-			});
-
-			if (response.ok) {
-				return true;
-			}
-		} catch (error) {
-			console.error("Failed to create price monitor:", error);
-		}
-		return false;
-	};
+	// NOTE: Price monitor function removed during user_name to user_id migration
+	// TODO: Re-implement price monitoring using user_id instead of userName
 
 	const onSubmit = async (data: ItemFormData) => {
 		setIsLoading(true);
@@ -1044,12 +1022,8 @@ export function AddItemForm({
 				);
 			}
 
-			// Map user email to user_name (for backward compatibility)
-			const userName = user.email?.includes("kenny") ? "Kenny" : "Rene";
-
 			const experienceData = {
 				user_id: user.id,
-				user_name: userName,
 				brand: data.brand,
 				model: data.model,
 				color: data.color || "Standard",
@@ -1190,13 +1164,14 @@ export function AddItemForm({
 			}
 
 			// Create price monitor if URL provided (only in create mode)
-			if (mode === "create" && data.productUrl) {
-				setUploadProgress("📊 Setting up price monitoring...");
-				const monitorCreated = await createPriceMonitor(data, userName);
-				if (monitorCreated) {
-					setUploadProgress("🎯 Price monitoring enabled!");
-				}
-			}
+			// TODO: Re-enable price monitoring after updating price monitor API to use user_id
+			// if (mode === "create" && data.productUrl) {
+			// 	setUploadProgress("📊 Setting up price monitoring...");
+			// 	const monitorCreated = await createPriceMonitor(data, userName);
+			// 	if (monitorCreated) {
+			// 		setUploadProgress("🎯 Price monitoring enabled!");
+			// 	}
+			// }
 
 			// Show success toast with item context
 			const itemName = `${data.brand} ${data.model}`;
