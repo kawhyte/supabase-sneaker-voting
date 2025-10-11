@@ -21,6 +21,12 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
 	CheckCircle,
 	Loader2,
 	Upload,
@@ -273,6 +279,9 @@ export function AddItemForm({
 	const [photos, setPhotos] = useState<PhotoItem[]>([]);
 	const [uploadProgress, setUploadProgress] = useState("");
 	const [fitData, setFitData] = useState<FitData[]>([]);
+
+	// Progressive Disclosure state
+	const [isFormVisible, setIsFormVisible] = useState(mode === "edit");
 
 	// Smart Import states
 	const [isScrapingUrl, setIsScrapingUrl] = useState(false);
@@ -749,6 +758,9 @@ export function AddItemForm({
 						});
 					}
 				}, 100);
+
+				// Show the main form after successful scrape
+				setIsFormVisible(true);
 
 				// Show image confirmation modal if images were found
 				if (data.images && data.images.length > 0) {
