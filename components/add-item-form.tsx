@@ -97,16 +97,16 @@ const itemSchema = z
             .max(500)
             .optional()
             .or(z.literal("")),
-        targetPrice: z
-            .string()
-            .regex(/^\d+(\.\d{1,2})?$/)
-            .refine((val) => {
-                if (val === "") return true;
-                const price = parseFloat(val);
-                return price >= 0 && price <= 10000;
-            })
-            .optional()
-            .or(z.literal("")),
+        // targetPrice: z
+        //     .string()
+        //     .regex(/^\d+(\.\d{1,2})?$/)
+        //     .refine((val) => {
+        //         if (val === "") return true;
+        //         const price = parseFloat(val);
+        //         return price >= 0 && price <= 10000;
+        //     })
+        //     .optional()
+        //     .or(z.literal("")),
         enableNotifications: z.boolean().default(false),
         brand: z.string().min(1, "Brand is required").max(50).trim(),
         model: z.string().min(2, "Item name is required").max(100).trim(),
@@ -134,7 +134,7 @@ const itemSchema = z
             })
             .optional()
             .or(z.literal("")),
-        idealPrice: z
+        targetPrice: z
             .string()
             .regex(/^\d+(\.\d{1,2})?$/)
             .refine((val) => {
@@ -221,8 +221,8 @@ export function AddItemForm({
             comfortRating: initialData.comfort_rating || undefined,
             retailPrice: initialData.retail_price?.toString() || "",
             salePrice: initialData.sale_price?.toString() || "",
-            idealPrice: initialData.ideal_price?.toString() || "",
-            targetPrice: initialData.target_price?.toString() || "",
+            targetPrice: initialData.ideal_price?.toString() || "",
+            // targetPrice: initialData.target_price?.toString() || "",
             notes: initialData.notes || "",
         } : {
             interactionType: "seen",
@@ -248,8 +248,8 @@ export function AddItemForm({
                 comfortRating: initialData.comfort_rating || undefined,
                 retailPrice: initialData.retail_price?.toString() || "",
                 salePrice: initialData.sale_price?.toString() || "",
-                idealPrice: initialData.ideal_price?.toString() || "",
-                targetPrice: initialData.target_price?.toString() || "",
+                targetPrice: initialData.ideal_price?.toString() || "",
+                // targetPrice: initialData.target_price?.toString() || "",
                 notes: initialData.notes || "",
             });
 
@@ -368,11 +368,11 @@ export function AddItemForm({
                 comfort_rating: data.interactionType === "tried" ? data.comfortRating : null,
                 retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
                 sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
-                ideal_price: data.idealPrice ? parseFloat(data.idealPrice) : null,
+                target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
                 notes: data.notes || null,
                 status: (mode === 'create' ? 'wishlisted' : initialData?.status) as 'wishlisted' | 'owned' | 'journaled',
                 has_been_tried: data.interactionType === "tried",
-                target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
+                // target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
             };
 
             let resultItem;
@@ -523,8 +523,8 @@ export function AddItemForm({
                                             <div><Label>Sale Price</Label><Input {...register("salePrice")} type="number" step="0.01" /></div>
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div><Label>Ideal Price</Label><Input {...register("idealPrice")} type="number" step="0.01" /></div>
-                                            <div><Label>Target Price</Label><Input {...register("targetPrice")} type="number" step="0.01" /></div>
+                                            <div><Label>Ideal Price</Label><Input {...register("targetPrice")} type="number" step="0.01" /></div>
+                                            {/* <div><Label>Target Price</Label><Input {...register("targetPrice")} type="number" step="0.01" /></div> */}
                                         </div>
                                         <div>
                                             <Label>Notes ({watch("notes")?.length || 0} / 120)</Label>
