@@ -405,7 +405,7 @@ export function AddItemForm({
 					(photo: any, index: number) => ({
 						id: photo.id || `existing-${index}`,
 						file: new File([], ""), // Empty file object since photo is already uploaded
-						preview: photo.image_url,
+						preview: photo.image_url, // Use image_url directly, no createObjectURL
 						isMain: photo.is_main_image || false,
 						order: photo.image_order || index,
 						isExisting: true, // Mark as existing photo
