@@ -376,7 +376,13 @@ export function AddItemForm({
 			const {
 				data: { user },
 			} = await supabase.auth.getUser();
-			if (!user) throw new Error("User not authenticated.");
+			if (!user) {
+				toast.error("Authentication Error", {
+					description: "You must be logged in to add or edit an item.",
+				});
+				setIsLoading(false);
+				return;
+			}
 
 			const newPhotos = photos.filter((p) => !p.isExisting);
 			const uploadedPhotoData: {
@@ -424,11 +430,11 @@ export function AddItemForm({
 					| "owned"
 					| "journaled",
 				has_been_tried: data.interactionType === "tried",
-				
+
 				// target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 			};
 
-			let resultItem;
+			let resultItem: any;
 			if (mode === "edit" && initialData?.id) {
 				const { data: updatedItem, error } = await supabase
 					.from("items")
