@@ -281,7 +281,7 @@ export function SizingJournalEntryCard({
 									{entry.retail_price && (
 										<div className='flex items-center gap- flex-wrap'>
 											{/* <DollarSign className='h-4 w-4 text-gray-400' /> */}
-											<span className=' text-xs text-gray-600 mr-1'>Retail price:</span> {entry.target_price}
+											<span className=' text-xs text-gray-600 mr-1'>Retail price:</span> 
 											{isOnSale ? (
 												<>
 													<span className='text-sm line-through text-gray-400 mr-1'>
@@ -310,9 +310,9 @@ export function SizingJournalEntryCard({
 											)}
 										</div>
 									)}
-									{entry.ideal_price && (
+									{entry.target_price && (
 										<div className='flex items-center  text-xs text-gray-600'>
-											<span className=''>Your Ideal Price: ${entry.ideal_price}</span>
+											<span className=''>My Target Price: ${entry.target_price}</span>
 										</div>
 									)}
 								</>
