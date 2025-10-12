@@ -260,7 +260,8 @@ export function AddItemForm({
 				comfortRating: initialData.comfort_rating || undefined,
 				retailPrice: initialData.retail_price?.toString() || "",
 				salePrice: initialData.sale_price?.toString() || "",
-				targetPrice: initialData.ideal_price?.toString() || "",
+				targetPrice: initialData.target_price?.toString() || "",
+				
 				// targetPrice: initialData.target_price?.toString() || "",
 				notes: initialData.notes || "",
 			});
@@ -417,11 +418,13 @@ export function AddItemForm({
 				sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 				notes: data.notes || null,
+				wears:0,
 				status: (mode === "create" ? "wishlisted" : initialData?.status) as
 					| "wishlisted"
 					| "owned"
 					| "journaled",
 				has_been_tried: data.interactionType === "tried",
+				
 				// target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 			};
 
@@ -569,7 +572,7 @@ export function AddItemForm({
 						<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
 							<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 								<div>
-									<Label>Experience *</Label>
+									<Label>Experience <span className='text-red-500'>*</span></Label>
 									<RadioGroup
 										value={watchedInteractionType}
 										onValueChange={(v) =>
@@ -589,7 +592,7 @@ export function AddItemForm({
 									</RadioGroup>
 								</div>
 								<div>
-									<Label>Item Category *</Label>
+									<Label>Item Category <span className='text-red-500'>*</span></Label>
 									<Select
 										onValueChange={(v) =>
 											setValue("category", v as ItemCategory, {
@@ -615,7 +618,7 @@ export function AddItemForm({
 
 							<div className='space-y-6'>
 								<div>
-									<Label>Item Name *</Label>
+									<Label>Item Name <span className='text-red-500'>*</span></Label>
 									<Input {...register("model")} />
 									{errors.model && (
 										<p className='text-sm text-red-600 mt-1'>
@@ -624,7 +627,7 @@ export function AddItemForm({
 									)}
 								</div>
 								<div>
-									<Label>Brand *</Label>
+									<Label>Brand <span className='text-red-500'>*</span></Label>
 									<BrandCombobox
 										value={watchedBrand}
 										onChange={(v) =>
@@ -637,6 +640,156 @@ export function AddItemForm({
 										</p>
 									)}
 								</div>
+
+								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+									<div className="">
+										<Label className='text-sm font-medium text-gray-700'>
+											Retail Price <span className='text-red-500'>*</span>
+										</Label>
+
+										<div className='relative mt-[var(--space-md)]'>
+											<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'>
+												$
+											</span>
+											<Input
+												{...register("retailPrice")}
+												placeholder='170.00'
+												type='number'
+												step='0.01'
+												className='pl-8 h-10'
+											/>
+										</div>
+
+										<>
+
+{watchedSalePrice &&
+        watchedRetailPrice &&
+        parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
+            <div
+                className='mt-2 p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300'
+                style={{
+                    backgroundColor: "var(--color-green-50)",
+                    borderColor: "var(--color-green-200)",
+                }}
+                role='status'
+                aria-live='polite'>
+                <Sparkles
+                    className='h-4 w-4 flex-shrink-0'
+                    style={{ color: "var(--color-green-600)" }}
+                    aria-hidden='true'
+                />
+                <div className='flex-1 min-w-0'>
+                    <p
+                        className='text-sm font-semibold'
+                        style={{ color: "var(--color-green-800)" }}>
+                        Active sale detected: ${watchedSalePrice}
+                    </p>
+                    <p
+                        className='text-xs'
+                        style={{ color: "var(--color-green-700)" }}>
+                        You save ${
+                            (parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)).toFixed(2)
+                        } ({
+                            // Calculate discount percentage
+                            Math.round(
+                                ((parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)) /
+                                    parseFloat(watchedRetailPrice)) *
+                                    100
+                            )
+                        }%)
+                    </p>
+                </div>
+            </div>
+    )}
+
+</>
+
+
+									</div>
+								
+								</div>
+								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+									<div>
+										<Label className='text-sm font-medium text-gray-700'>
+											Target Price <span className='text-red-500'>*</span>
+										</Label>
+										<Input
+											{...register("targetPrice")}
+											type='number'
+											step='0.01'
+										/>
+									</div>
+									{/* <div><Label>Target Price</Label><Input {...register("targetPrice")} type="number" step="0.01" /></div> */}
+								</div>
+
+{watchedInteractionType === "tried" && (
+											<div className='border-t pt-6 space-y-6'>
+												<h4 className='font-semibold'>Try-On Details</h4>
+												{isSizeRequired(watchedCategory) && (
+													<div>
+														<Label>Size Tried <span className='text-red-500'>*</span></Label>
+														{watchedCategory === "shoes" ? (
+															<SizeCombobox
+																value={watch("sizeTried")}
+																onChange={(v) =>
+																	setValue("sizeTried", v, {
+																		shouldValidate: true,
+																	})
+																}
+															/>
+														) : (
+															<ClothingSizeCombobox
+																value={watch("sizeTried")}
+																onChange={(v) =>
+																	setValue("sizeTried", v, {
+																		shouldValidate: true,
+																	})
+																}
+															/>
+														)}
+														{errors.sizeTried && (
+															<p className='text-sm text-red-600 mt-1'>
+																{errors.sizeTried.message}
+															</p>
+														)}
+													</div>
+												)}
+												{isComfortRequired(watchedCategory) && (
+													<div>
+														<Label>Comfort Rating *</Label>
+														<RadioGroup
+															value={watch("comfortRating")?.toString()}
+															onValueChange={(v) =>
+																setValue("comfortRating", parseInt(v), {
+																	shouldValidate: true,
+																})
+															}
+															className='flex gap-2 mt-2'>
+															{[1, 2, 3, 4, 5].map((r) => (
+																<div
+																	key={r}
+																	className='flex items-center space-x-2'>
+																	<RadioGroupItem
+																		value={r.toString()}
+																		id={`r${r}`}
+																	/>
+																	<Label htmlFor={`r${r}`}>{r}</Label>
+																</div>
+															))}
+														</RadioGroup>
+														{errors.comfortRating && (
+															<p className='text-sm text-red-600 mt-1'>
+																{errors.comfortRating.message}
+															</p>
+														)}
+													</div>
+												)}
+											</div>
+										)}
+
+
+
+
 								<div>
 									<Label>
 										Photos *{" "}
@@ -675,32 +828,7 @@ export function AddItemForm({
 												<Input {...register("color")} />
 											</div>
 										</div>
-										<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-											<Label className='text-sm font-medium text-gray-700'>
-												Retail Price <span className='text-red-500'>*</span>
-											</Label>
-											<div>
-												<Label>Sale Price</Label>
-												<Input
-													{...register("salePrice")}
-													type='number'
-													step='0.01'
-												/>
-											</div>
-										</div>
-										<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-											<div>
-												<Label className='text-sm font-medium text-gray-700'>
-													Target Price <span className='text-red-500'>*</span>
-												</Label>
-												<Input
-													{...register("targetPrice")}
-													type='number'
-													step='0.01'
-												/>
-											</div>
-											{/* <div><Label>Target Price</Label><Input {...register("targetPrice")} type="number" step="0.01" /></div> */}
-										</div>
+
 										<div>
 											<Label>Notes ({watch("notes")?.length || 0} / 120)</Label>
 											<Textarea {...register("notes")} maxLength={120} />
