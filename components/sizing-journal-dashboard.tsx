@@ -45,7 +45,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
   // State - Filters (UPDATED)
   const [searchTerm, setSearchTerm] = useState('')
-  const [userFilter, setUserFilter] = useState<string>('my-items')
+  // const [userFilter, setUserFilter] = useState<string>('my-items')
   const [selectedBrands, setSelectedBrands] = useState(new Set<string>())
   const [sortBy, setSortBy] = useState<string>('date-desc')
   const [selectedCategories, setSelectedCategories] = useState<ItemCategory[]>([])
@@ -75,7 +75,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
   useEffect(() => {
     loadJournalEntries()
-  }, [status, isArchivePage, userFilter])
+  }, [status, isArchivePage])
 
   const loadJournalEntries = async () => {
     try {
@@ -88,21 +88,21 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         .order('image_order', { foreignTable: 'item_photos', ascending: true })
 
       // Apply user filter based on userFilter state
-      if (userFilter === 'my-items' && user) {
-        query = query.eq('user_id', user.id)
-      } else if (userFilter === 'kenny') {
-        // Get Kenny's user ID from email lookup
-        const kennyUserId = getKennyUserId()
-        if (kennyUserId) {
-          query = query.eq('user_id', kennyUserId)
-        }
-      } else if (userFilter === 'rene') {
-        // Get Rene's user ID from email lookup
-        const reneUserId = getReneUserId()
-        if (reneUserId) {
-          query = query.eq('user_id', reneUserId)
-        }
-      }
+      // if (userFilter === 'my-items' && user) {
+      //   query = query.eq('user_id', user.id)
+      // } else if (userFilter === 'kenny') {
+       
+      //   const kennyUserId = getKennyUserId()
+      //   if (kennyUserId) {
+      //     query = query.eq('user_id', kennyUserId)
+      //   }
+      // } else if (userFilter === 'rene') {
+    
+      //   const reneUserId = getReneUserId()
+      //   if (reneUserId) {
+      //     query = query.eq('user_id', reneUserId)
+      //   }
+      // }
 
       let { data, error } = await query.order('created_at', { ascending: false })
 
@@ -428,9 +428,9 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
       <SizingJournalFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        currentUser={user}
-        userFilter={userFilter}
-        onUserFilterChange={setUserFilter}
+        // currentUser={user}
+        // userFilter={userFilter}
+        // onUserFilterChange={setUserFilter}
         selectedBrands={selectedBrands}
         onBrandChange={setSelectedBrands}
         sortBy={sortBy}
