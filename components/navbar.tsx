@@ -1,6 +1,10 @@
 import AuthButton from "@/components/AuthButton";
 import { NavbarClient } from "@/components/navbar-client";
+import { createClient } from "@/utils/supabase/server";
 
 export async function Navbar() {
-	return <NavbarClient authButton={<AuthButton />} />;
+	const supabase = await createClient();
+	const { data: { user } } = await supabase.auth.getUser();
+
+	return <NavbarClient authButton={<AuthButton />} isAuthenticated={!!user} />;
 }

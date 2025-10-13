@@ -8,19 +8,27 @@ import { Menu, X } from "lucide-react";
 
 interface NavbarClientProps {
 	authButton: ReactNode;
+	isAuthenticated: boolean;
 }
 
-export function NavbarClient({ authButton }: NavbarClientProps) {
+export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps) {
 	const pathname = usePathname();
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
 	const isActive = (path: string) => pathname === path;
 
-	const navLinks = [
+	const publicNavLinks = [
 		{ href: '/', label: 'Home' },
+	];
+
+	const authenticatedNavLinks = [
 		{ href: '/add-new-item', label: 'Add New Item' },
 		{ href: '/dashboard', label: 'My Wardrobe' },
 	];
+
+	const navLinks = isAuthenticated
+		? [...publicNavLinks, ...authenticatedNavLinks]
+		: publicNavLinks;
 
 	return (
 		<nav className='sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80'>

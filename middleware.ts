@@ -1,4 +1,4 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
@@ -8,14 +8,16 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // If user is not logged in and not on the login page, redirect to login
-  if (!user && pathname !== '/login') {
-    return Response.redirect(new URL('/login', request.url))
+  const publicPaths = ['/', '/login'] // Define public paths
+
+  // If user is not logged in and the path is not public, redirect to login
+  if (!user && !publicPaths.includes(pathname)) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // If user IS logged in and tries to access login page, redirect to dashboard
+  // If user is logged in and tries to access login page, redirect to dashboard
   if (user && pathname === '/login') {
-    return Response.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return response
