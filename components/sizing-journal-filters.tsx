@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-// import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Search } from 'lucide-react'
 import { CATEGORY_CONFIGS, type ItemCategory } from '@/components/types/item-category'
 import { FacetedFilter } from '@/components/ui/faceted-filter'
@@ -14,10 +13,7 @@ import { FacetedFilter } from '@/components/ui/faceted-filter'
 interface SizingJournalFiltersProps {
   searchTerm: string
   onSearchChange: (value: string) => void
-  // currentUser?: { id: string; email: string } | null
-  // userFilter: string
-  // onUserFilterChange: (value: string) => void
-  selectedBrands?: Set<string> // Optional
+  selectedBrands?: Set<string>
   onBrandChange: (brands: Set<string>) => void
   sortBy: string
   onSortChange: (value: string) => void
@@ -29,9 +25,6 @@ interface SizingJournalFiltersProps {
 export function SizingJournalFilters({
   searchTerm,
   onSearchChange,
-  // currentUser,
-  // userFilter,
-  // onUserFilterChange,
   selectedBrands = new Set(),
   onBrandChange,
   sortBy,
@@ -124,30 +117,6 @@ export function SizingJournalFilters({
             className="pl-9 h-5"
           />
         </div>
-
-        {/* <div className="flex flex-col gap-2 min-w-[200px]">
-          <Label className="text-sm font-medium">Show Items For</Label>
-          <RadioGroup value={userFilter} onValueChange={onUserFilterChange}>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="my-items" id="my-items" />
-              <Label htmlFor="my-items" className="font-normal cursor-pointer">
-                My Items
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="kenny" id="kenny" />
-              <Label htmlFor="kenny" className="font-normal cursor-pointer">
-                {currentUser?.email?.includes('kenny') ? "Rene's Items" : "Kenny's Items"}
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="rene" id="rene" />
-              <Label htmlFor="rene" className="font-normal cursor-pointer">
-                {currentUser?.email?.includes('rene') ? "Kenny's Items" : "Rene's Items"}
-              </Label>
-            </div>
-          </RadioGroup>
-        </div> */}
 
         <FacetedFilter
           title="Brand"

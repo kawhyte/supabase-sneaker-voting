@@ -17,20 +17,6 @@ import { SizingJournalEntry } from './types/sizing-journal-entry'
 import { filterJournalEntries, sortJournalEntries, getUniqueBrands } from '@/lib/sizing-journal-utils'
 import { type ItemCategory } from '@/components/types/item-category'
 
-// Helper functions to get hardcoded user IDs
-// TODO: Replace these with a more dynamic user lookup system
-function getKennyUserId(): string | null {
-  // Hardcoded Kenny's user ID
-  // This should be replaced with a proper user management system
-  return process.env.NEXT_PUBLIC_KENNY_USER_ID || null
-}
-
-function getReneUserId(): string | null {
-  // Hardcoded Rene's user ID
-  // This should be replaced with a proper user management system
-  return process.env.NEXT_PUBLIC_RENE_USER_ID || null
-}
-
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
   status: ('owned' | 'wishlisted' | 'journaled')[]
@@ -41,11 +27,9 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [user, setUser] = useState<{ id: string; email: string } | null>(null)
 
-  // State - Filters (UPDATED)
+  // State - Filters
   const [searchTerm, setSearchTerm] = useState('')
-  // const [userFilter, setUserFilter] = useState<string>('my-items')
   const [selectedBrands, setSelectedBrands] = useState(new Set<string>())
   const [sortBy, setSortBy] = useState<string>('date-desc')
   const [selectedCategories, setSelectedCategories] = useState<ItemCategory[]>([])
@@ -62,17 +46,6 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
   const supabase = createClient()
 
-  // Fetch current user session
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUser({ id: user.id, email: user.email || '' })
-      }
-    }
-    fetchUser()
-  }, [])
-
   useEffect(() => {
     loadJournalEntries()
   }, [status, isArchivePage])
@@ -83,26 +56,9 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
       let query = supabase
         .from('items')
         .select(`*, item_photos (id, image_url, image_order, is_main_image)`)
-        .eq('is_archived', isArchivePage) // Filter based on archive page
-        .in('status', status) // PHASE 3: Filter by status field
+        .eq('is_archived', isArchivePage)
+        .in('status', status)
         .order('image_order', { foreignTable: 'item_photos', ascending: true })
-
-      // Apply user filter based on userFilter state
-      // if (userFilter === 'my-items' && user) {
-      //   query = query.eq('user_id', user.id)
-      // } else if (userFilter === 'kenny') {
-       
-      //   const kennyUserId = getKennyUserId()
-      //   if (kennyUserId) {
-      //     query = query.eq('user_id', kennyUserId)
-      //   }
-      // } else if (userFilter === 'rene') {
-    
-      //   const reneUserId = getReneUserId()
-      //   if (reneUserId) {
-      //     query = query.eq('user_id', reneUserId)
-      //   }
-      // }
 
       let { data, error } = await query.order('created_at', { ascending: false })
 
@@ -110,8 +66,8 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         let basicQuery = supabase
           .from('items')
           .select('*')
-          .eq('is_archived', isArchivePage) // Filter based on archive page
-          .in('status', status) // PHASE 3: Filter by status field
+          .eq('is_archived', isArchivePage)
+          .in('status', status)
         const basicResult = await basicQuery.order('created_at', { ascending: false })
         data = basicResult.data
         error = basicResult.error
@@ -401,14 +357,13 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     }
   }
 
-  // Computed values (UPDATED)
+  // Computed values
   const filteredAndSortedEntries = sortJournalEntries(
     filterJournalEntries(journalEntries, searchTerm, new Set<string>(), selectedBrands, selectedCategories),
     sortBy
   )
   const availableBrands = getUniqueBrands(journalEntries)
 
-  // Important Bug Fix: Create displayStatus for DashboardHeader
   const displayStatus = status.includes('wishlisted') ? 'wishlisted' : status[0]
 
   if (isLoading) {
@@ -424,13 +379,9 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
       <DashboardHeader status={displayStatus} />
 
-      {/* SizingJournalFilters props are now fully updated */}
       <SizingJournalFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        // currentUser={user}
-        // userFilter={userFilter}
-        // onUserFilterChange={setUserFilter}
         selectedBrands={selectedBrands}
         onBrandChange={setSelectedBrands}
         sortBy={sortBy}
