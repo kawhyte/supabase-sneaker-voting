@@ -63,7 +63,7 @@ export default function RootLayout({
             )}
             suppressHydrationWarning
         >
-            <body className="min-h-screen text-primary bg-primary">
+            <body className="min-h-screen text-primary bg-primary border-t-4 border-primary">
                 <div>
                     <Navbar />
                     <main className="py-8 sm:py-12 lg:py-16 lg:px-8">

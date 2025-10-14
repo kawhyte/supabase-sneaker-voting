@@ -16,7 +16,7 @@ function DashboardContent() {
   const defaultTab = searchParams.get('tab') || 'owned'
 
   return (
-    <div className="w-full py-8">
+    <div className="w-full py-xl">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -33,11 +33,11 @@ function DashboardContent() {
               <Heart className="h-4 w-4" />
               Wishlist
             </TabsTrigger>
-            <TabsTrigger value="owned" className="flex items-center gap-2">
+            <TabsTrigger value="owned" className="flex items-center gap-xs">
               <Package className="h-4 w-4" />
               Owned
             </TabsTrigger>
-            <TabsTrigger value="fit-profile" className="flex items-center gap-2">
+            <TabsTrigger value="fit-profile" className="flex items-center gap-xs">
               <Brain className="h-4 w-4" />
               Fit Profile
             </TabsTrigger>
@@ -60,10 +60,10 @@ function DashboardContent() {
         </Tabs>
 
         {/* Archive Link */}
-        <div className="max-w-lg mx-auto mt-6 text-center">
+        <div className="max-w-lg mx-auto mt-lg text-center">
           <Link
             href="/archive"
-            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="inline-flex items-center gap-xs text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
             <Archive className="h-4 w-4" />
             View Archived Items
@@ -77,7 +77,7 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div className="w-full py-8 flex items-center justify-center">
+      <div className="w-full py-xl flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     }>

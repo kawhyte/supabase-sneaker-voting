@@ -368,7 +368,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
   if (isLoading) {
     return (
-      <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
+      <div className="max-w-[1920px] mx-auto px-xl py-xl">
         <DashboardHeader status={displayStatus} />
         <LoadingSkeleton />
       </div>
@@ -376,7 +376,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
   }
 
   return (
-    <div className="max-w-[1920px] mx-auto px-[var(--space-xl)] py-[var(--space-xl)]">
+    <div className="max-w-[1920px] mx-auto px-xl py-xl">
       <DashboardHeader status={displayStatus} />
 
       <SizingJournalFilters
@@ -480,7 +480,7 @@ function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journal
   const { title, description } = titles[status]
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-base mb-xl">
       <div>
         <h1 className="text-3xl font-bold font-heading">{title}</h1>
         <p className="text-gray-600">{description}</p>
@@ -492,15 +492,15 @@ function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journal
 function LoadingSkeleton() {
     // ...
       return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-[var(--space-xl)]">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-xl">
       {[...Array(6)].map((_, i) => (
         <Card key={i} className="overflow-hidden flex flex-col md:flex-row animate-pulse">
           <div className="relative w-full h-[360px] md:h-[280px] md:w-[280px] bg-gray-200 flex-shrink-0" />
-          <CardContent className="flex-1 p-[var(--space-lg)] flex flex-col gap-[var(--space-sm)] md:border-l md:border-gray-200">
+          <CardContent className="flex-1 p-lg flex flex-col gap-sm md:border-l md:border-gray-200">
             <div className="h-3 bg-gray-200 rounded w-1/4"></div>
             <div className="h-5 bg-gray-200 rounded w-3/4"></div>
             <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="grid grid-cols-2 gap-[var(--space-xs)] mt-[var(--space-xs)]">
+            <div className="grid grid-cols-2 gap-xs mt-xs">
               <div className="h-3 bg-gray-200 rounded"></div>
               <div className="h-3 bg-gray-200 rounded"></div>
             </div>

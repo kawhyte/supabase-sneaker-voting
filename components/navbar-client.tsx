@@ -31,31 +31,31 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 		: publicNavLinks;
 
 	return (
-		<nav className='sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80'>
-			<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
+		<nav className='sticky top-0 z-50 w-full border-b border-[var(--color-border-primary)] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80'>
+			<div className='container mx-auto px-md sm:px-lg lg:px-xl'>
 				<div className='flex h-16 items-center justify-between'>
 					{/* Logo/Brand */}
-					<Link href='/' className='flex items-center gap-2'>
+					<Link href='/' className='flex items-center gap-xs'>
 						<span className='text-2xl'>👟</span>
-						<span className='text-xl font-bold text-gray-900'>
+						<span className='text-xl font-bold text-[var(--color-text-primary)]'>
 							Item Tracker
 						</span>
 					</Link>
 
 					{/* Desktop Navigation Links */}
-					<div className='hidden md:flex items-center space-x-8'>
+					<div className='hidden md:flex items-center gap-5'>
 						{navLinks.map((link) => (
 							<Link key={link.href} href={link.href} className='relative'>
 								<span
 									className={`text-sm font-medium transition-colors ${
 										isActive(link.href)
-											? "text-gray-900"
-											: "text-gray-600 hover:text-gray-900"
+											? "text-[var(--color-text-primary)]"
+											: "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
 									}`}>
 									{link.label}
 								</span>
 								{isActive(link.href) && (
-									<span className='absolute bottom-[-4px] left-0 right-0 h-0.5 bg-yellow-400'></span>
+									<span className='absolute bottom-[-4px] left-0 right-0 h-0.5 bg-[var(--color-primary-500)]'></span>
 								)}
 							</Link>
 						))}
@@ -83,21 +83,21 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 				{/* Mobile Menu */}
 				{isMobileMenuOpen && (
-					<div className='md:hidden py-4 border-t border-gray-200'>
-						<div className='flex flex-col space-y-4'>
+					<div className='md:hidden py-md border-t border-[var(--color-border-primary)]'>
+						<div className='flex flex-col gap-md'>
 							{navLinks.map((link) => (
 								<Link key={link.href} href={link.href} className='relative'>
 									<span
 										className={`text-sm font-medium transition-colors ${
 											isActive(link.href)
-												? "text-gray-900"
-												: "text-gray-600 hover:text-gray-900"
+												? "text-[var(--color-text-primary)]"
+												: "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
 										}`}
 										onClick={() => setIsMobileMenuOpen(false)}>
 										{link.label}
 									</span>
 									{isActive(link.href) && (
-										<span className='absolute bottom-[-4px] w-10 left-0 right-0 h-0.5 bg-yellow-400'></span>
+										<span className='absolute bottom-[-4px] w-10 left-0 right-0 h-0.5 bg-[var(--color-primary-500)]'></span>
 									)}
 								</Link>
 							))}
