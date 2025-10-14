@@ -29,7 +29,7 @@ export function DeleteConfirmDialog({
             <Trash2 className="h-5 w-5 text-red-600" />
           </div>
           <div>
-            <h3 className="text-lg font-medium text-gray-900">Delete Journal Entry</h3>
+            <h3 className="text-lg font-medium text-gray-900 font-heading">Delete Journal Entry</h3>
             <p className="text-sm text-gray-500">This action cannot be undone.</p>
           </div>
         </div>

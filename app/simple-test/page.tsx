@@ -12,7 +12,7 @@ export default function SimpleTestPage() {
   return (
     <div className="container mx-auto p-6 space-y-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Simple Test Page</h1>
+        <h1 className="text-4xl font-bold mb-4 font-heading">Simple Test Page</h1>
         <p className="text-gray-600 mb-6">Testing basic functionality</p>
       </div>
 

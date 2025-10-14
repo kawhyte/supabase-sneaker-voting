@@ -482,7 +482,7 @@ function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journal
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--space-base)] mb-[var(--space-xl)]">
       <div>
-        <h1 className="text-3xl font-bold">{title}</h1>
+        <h1 className="text-3xl font-bold font-heading">{title}</h1>
         <p className="text-gray-600">{description}</p>
       </div>
     </div>
@@ -528,7 +528,7 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
             <div className="text-gray-400 mb-4">
               <Search className="h-6 w-6 mx-auto mb-2" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
               No matching entries
             </h3>
             <p className="text-gray-600">
@@ -547,7 +547,7 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
         <Card>
           <CardContent className="flex flex-col items-center justify-center p-12 text-center">
             <Archive className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
               No Archived Items
             </h3>
             <p className="text-gray-600 max-w-md">
@@ -565,7 +565,7 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
         <Card>
           <CardContent className="flex flex-col items-center justify-center p-12 text-center">
             <Heart className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
               Your Wishlist is Empty
             </h3>
             <p className="text-gray-600 mb-6 max-w-md">
@@ -588,7 +588,7 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
         <Card>
           <CardContent className="flex flex-col items-center justify-center p-12 text-center">
             <Package className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
               Your Wardrobe is Empty
             </h3>
             <p className="text-gray-600 mb-6 max-w-md">
@@ -613,7 +613,7 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
           <div className="text-gray-400 mb-4">
             <Search className="h-12 w-12 mx-auto mb-2" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
             No entries yet
           </h3>
           <p className="text-gray-600 mb-4">

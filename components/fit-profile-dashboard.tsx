@@ -121,7 +121,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
       <Card className="max-w-4xl mx-auto">
         <CardContent className="flex flex-col items-center justify-center p-12 text-center">
           <Brain className="h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
             Not Enough Data for Insights
           </h3>
           <p className="text-gray-600 mb-6 max-w-md">
@@ -146,7 +146,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="text-3xl font-bold flex items-center gap-2 font-heading">
             <Brain className="h-8 w-8 text-teal-600" />
             My Fit Profile
           </h1>

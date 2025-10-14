@@ -63,7 +63,7 @@ export function SizingJournalFilters({
       <div className="bg-white border border-gray-200 rounded-lg p-[var(--space-base)] shadow-sm">
         <div className="flex items-center justify-between mb-[var(--space-sm)]">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-gray-700">Filter by Category</h3>
+            <h3 className="text-sm font-semibold text-gray-700 font-heading">Filter by Category</h3>
             <span className="text-xs text-gray-500">
               ({selectedCategories.length} of {allCategoryIds.length} selected)
             </span>

@@ -512,7 +512,7 @@ export function AddItemForm({
 			<Card className='card-interactive shadow-lg'>
 				{!isFormVisible && mode === "create" && (
 					<CardHeader className='text-left pb-6'>
-						<CardTitle className='text-3xl flex flex-col justify-start'>
+						<CardTitle className='text-3xl flex flex-col justify-start font-heading'>
 							<p className='-mb-2'>Add a New Item</p>
 							<p className='text-sm text-muted-foreground'>
 								Start by entering a URL or adding details manually.
@@ -525,7 +525,7 @@ export function AddItemForm({
 					{!isFormVisible && mode === "create" ? (
 						<div className='space-y-6'>
 							<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border-2 border-blue-200'>
-								<h3 className='text-base font-semibold text-blue-800 mb-4'>
+								<h3 className='text-base font-semibold text-blue-800 mb-4 font-heading'>
 									Auto-fill from URL
 								</h3>
 								<div className='space-y-2'>
@@ -620,7 +620,7 @@ export function AddItemForm({
 								</div>
 							</div>
 
-							<h3 className='font-semibold border-b pb-2'>Product Details</h3>
+							<h3 className='font-semibold border-b pb-2 font-heading'>Product Details</h3>
 
 							<div className='space-y-6'>
 								<div>
@@ -819,7 +819,7 @@ export function AddItemForm({
 							<Accordion type='single' collapsible className='w-full'>
 								<AccordionItem value='item-1'>
 									<AccordionTrigger>
-										<h3 className='font-semibold'>
+										<h3 className='font-semibold font-heading'>
 											Add More Details (Optional)
 										</h3>
 									</AccordionTrigger>

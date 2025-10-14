@@ -5,7 +5,7 @@ export default function ProductParserPage() {
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
+          <h1 className="text-4xl font-bold tracking-tight mb-4 font-heading">
             SoleTracker Product Parser
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -18,7 +18,7 @@ export default function ProductParserPage() {
 
         {/* Sample URLs for Testing */}
         <div className="mt-12 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-semibold mb-4">Sample URLs for Testing</h2>
+          <h2 className="text-2xl font-semibold mb-4 font-heading">Sample URLs for Testing</h2>
           <p className="text-muted-foreground mb-4">
             Try these sample product URLs to test the parsing functionality:
           </p>

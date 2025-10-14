@@ -242,7 +242,7 @@ export function SizingJournalEntryCard({
 					)}
 
 					{/* Title */}
-					<h3 className='text-base sm:text-lg font-bold leading-tight line-clamp-2'>
+					<h3 className='text-base sm:text-lg font-bold leading-tight line-clamp-2 font-heading'>
 						{entry.model}
 						{entry.color !== "Standard" && (
 							<span className='block text-sm font-normal text-gray-600 mt-1'>
