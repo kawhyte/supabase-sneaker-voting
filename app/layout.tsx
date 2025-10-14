@@ -1,4 +1,4 @@
-import { GeistSans } from "geist/font/sans";
+import { Inter } from 'next/font/google';;
 import "./globals.css";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -29,10 +29,17 @@ export const metadata = {
 };
 
 export const viewport = {
-	themeColor: "#2563eb",
+	themeColor: "#D4A373",
 	width: "device-width",
 	initialScale: 1,
 };
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans', 
+});
+
+
 
 export default function RootLayout({
 	children,
@@ -40,21 +47,24 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html
-		lang="en"
-			className={cn(
-				"light text-foreground",
-				GeistSans.className
-			)}>
-			<body className="min-h-screen text-primary" suppressHydrationWarning>
-				<div className="min-h-screen bg-primary">
-					<Navbar />
-					<main className=" lg:px-8">
-						{children}
-					</main>
-					<Toaster />
-				</div>
-			</body>
-		</html>
-	);
+        <html lang="en" suppressHydrationWarning>
+            {/*
+              The font variable is applied here.
+              We also set the base background and text colors for the whole app.
+            */}
+            <body
+                className={cn(
+                    "min-h-screen bg-background font-sans antialiased",
+                    inter.variable
+                )}
+            >
+                <Navbar />
+                {/* This main tag adds the generous vertical spacing */}
+                <main className="py-8 sm:py-12 lg:py-16">
+                    {children}
+                </main>
+                <Toaster />
+            </body>
+        </html>
+    );
 }
