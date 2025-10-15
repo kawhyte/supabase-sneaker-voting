@@ -43,12 +43,12 @@ export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) 
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-[var(--space-xl)] mb-[var(--space-xl)]">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-xl mb-xl">
       {stats.map((stat, index) => (
         <Card key={index} className="hover-lift">
-          <CardContent className="p-[var(--space-base)] text-center">
+          <CardContent className="p-md text-center">
             <div
-              className="text-3xl font-bold mb-[var(--space-2xs)]"
+              className="text-3xl font-bold mb-xxs"
               style={{ color: stat.color }}
             >
               {stat.value}

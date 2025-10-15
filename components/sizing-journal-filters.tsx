@@ -58,10 +58,10 @@ export function SizingJournalFilters({
   }
 
   return (
-    <div className="flex flex-col gap-[var(--space-lg)] mb-[var(--space-4xl)] border rounded-2xl p-3 bg-gray-100 ">
+    <div className="flex flex-col gap-lg mb-4xl border rounded-2xl p-3 bg-gray-100 ">
       {/* Category Filter Section */}
-      <div className="bg-white border border-gray-200 rounded-lg p-[var(--space-base)] shadow-sm">
-        <div className="flex items-center justify-between mb-[var(--space-sm)]">
+      <div className="bg-white border border-gray-200 rounded-lg p-md shadow-sm">
+        <div className="flex items-center justify-between mb-md">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold text-gray-700 font-heading">Filter by Category</h3>
             <span className="text-xs text-gray-500">
@@ -107,7 +107,7 @@ export function SizingJournalFilters({
       </div>
 
       {/* Other Filters */}
-      <div className="flex flex-col md:flex-row items-center gap-[var(--space-md)]">
+      <div className="flex flex-col md:flex-row items-center gap-md">
         <div className="relative w-full md:flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-text-placeholder" />
           <Input

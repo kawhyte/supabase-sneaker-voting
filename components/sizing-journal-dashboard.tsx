@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Search, Heart, Package, Archive } from 'lucide-react'
@@ -10,12 +11,14 @@ import { EditItemModal } from './edit-item-modal'
 import { SizingJournalFilters } from './sizing-journal-filters'
 import { SizingJournalStats } from './sizing-journal-stats'
 import { SizingJournalEntryCard } from './sizing-journal-entry-card'
+import { SizingJournalSkeleton } from './sizing-journal-skeleton'
 import { DeleteConfirmDialog } from './delete-confirm-dialog'
 import { PurchasedConfirmationModal } from './purchased-confirmation-modal'
 import { ArchiveReasonDialog } from './archive-reason-dialog'
 import { SizingJournalEntry } from './types/sizing-journal-entry'
 import { filterJournalEntries, sortJournalEntries, getUniqueBrands } from '@/lib/sizing-journal-utils'
 import { type ItemCategory } from '@/components/types/item-category'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
 
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
@@ -368,9 +371,14 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
   if (isLoading) {
     return (
-      <div className="max-w-[1920px] mx-auto px-xl py-xl">
+      <div
+        className="max-w-[1920px] mx-auto px-xl py-xl"
+        role="status"
+        aria-busy="true"
+        aria-label="Loading items"
+      >
         <DashboardHeader status={displayStatus} />
-        <LoadingSkeleton />
+        <SizingJournalSkeleton />
       </div>
     )
   }
@@ -393,7 +401,12 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
       <SizingJournalStats journalEntries={journalEntries} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-6">
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         {filteredAndSortedEntries.length === 0 ? (
           <EmptyState
             hasEntries={journalEntries.length > 0}
@@ -418,7 +431,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
             />
           ))
         )}
-      </div>
+      </motion.div>
 
       {editingEntry && (
         <EditItemModal
@@ -484,33 +497,11 @@ function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journal
   const { title, description } = titles[status]
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-base mb-xl">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-xl">
       <div>
         <h1 className="text-3xl font-bold font-heading">{title}</h1>
         <p className="text-gray-600">{description}</p>
       </div>
-    </div>
-  )
-}
-
-function LoadingSkeleton() {
-    // ...
-      return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-xl">
-      {[...Array(6)].map((_, i) => (
-        <Card key={i} className="overflow-hidden flex flex-col md:flex-row animate-pulse">
-          <div className="relative w-full h-[360px] md:h-[280px] md:w-[280px] bg-gray-200 flex-shrink-0" />
-          <CardContent className="flex-1 p-lg flex flex-col gap-sm md:border-l md:border-gray-200">
-            <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-5 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="grid grid-cols-2 gap-xs mt-xs">
-              <div className="h-3 bg-gray-200 rounded"></div>
-              <div className="h-3 bg-gray-200 rounded"></div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
     </div>
   )
 }
@@ -526,20 +517,18 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
   // If there are entries but filters hide them, show search icon
   if (hasEntries) {
     return (
-      <div className="col-span-1 xl:col-span-2">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <div className="text-gray-400 mb-4">
-              <Search className="h-6 w-6 mx-auto mb-2" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
-              No matching entries
-            </h3>
-            <p className="text-gray-600">
+      <div className="col-span-full flex justify-center">
+        <Empty className="max-w-md border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Search />
+            </EmptyMedia>
+            <EmptyTitle>No matching entries</EmptyTitle>
+            <EmptyDescription>
               Try adjusting your search or filters.
-            </p>
-          </CardContent>
-        </Card>
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       </div>
     )
   }
@@ -547,89 +536,93 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
   // Show different empty states based on the section
   if (isArchivePage) {
     return (
-      <div className="col-span-1 xl:col-span-2">
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center p-12 text-center">
-            <Archive className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
-              No Archived Items
-            </h3>
-            <p className="text-gray-600 max-w-md">
+      <div className="col-span-full flex justify-center">
+        <Empty className="max-w-md border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Archive />
+            </EmptyMedia>
+            <EmptyTitle>No Archived Items</EmptyTitle>
+            <EmptyDescription>
               Items you archive will appear here. Archive items you're no longer interested in to keep your main lists organized.
-            </p>
-          </CardContent>
-        </Card>
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       </div>
     )
   }
 
   if (displayStatus === 'wishlisted') {
     return (
-      <div className="col-span-1 xl:col-span-2">
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center p-12 text-center">
-            <Heart className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
-              Your Wishlist is Empty
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-md">
+      <div className="col-span-full flex justify-center">
+        <Empty className="max-w-md border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Heart />
+            </EmptyMedia>
+            <EmptyTitle>Your Wishlist is Empty</EmptyTitle>
+            <EmptyDescription>
               Start tracking items you're interested in. Add products to monitor prices and keep track of items you want.
-            </p>
-            {onAddNew && (
+            </EmptyDescription>
+          </EmptyHeader>
+          {onAddNew && (
+            <EmptyContent>
               <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700">
                 Add Your First Item
               </Button>
-            )}
-          </CardContent>
-        </Card>
+            </EmptyContent>
+          )}
+        </Empty>
       </div>
     )
   }
 
   if (displayStatus === 'owned') {
     return (
-      <div className="col-span-1 xl:col-span-2">
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center p-12 text-center">
-            <Package className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
-              Your Wardrobe is Empty
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-md">
+      <div className="col-span-full flex justify-center">
+        <Empty className="max-w-md border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Package />
+            </EmptyMedia>
+            <EmptyTitle>Your Wardrobe is Empty</EmptyTitle>
+            <EmptyDescription>
               You haven't added any items to your collection yet. Start by adding items you own to track your wardrobe.
-            </p>
-            {onAddNew && (
+            </EmptyDescription>
+          </EmptyHeader>
+          {onAddNew && (
+            <EmptyContent>
               <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700">
                 Add Your First Item
               </Button>
-            )}
-          </CardContent>
-        </Card>
+            </EmptyContent>
+          )}
+        </Empty>
       </div>
     )
   }
 
   // Default fallback
   return (
-    <div className="col-span-1 xl:col-span-2">
-      <Card>
-        <CardContent className="p-8 text-center">
-          <div className="text-gray-400 mb-4">
-            <Search className="h-12 w-12 mx-auto mb-2" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
-            No entries yet
-          </h3>
-          <p className="text-gray-600 mb-4">
+    <div className="col-span-full flex justify-center">
+      <Empty className="max-w-md border">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <Search />
+          </EmptyMedia>
+          <EmptyTitle>No entries yet</EmptyTitle>
+          <EmptyDescription>
             Start tracking your items!
-          </p>
-          {onAddNew && (
+          </EmptyDescription>
+        </EmptyHeader>
+        {onAddNew && (
+          <EmptyContent>
             <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700">
               Add Your First Entry
             </Button>
-          )}
-        </CardContent>
-      </Card>
+          </EmptyContent>
+        )}
+      </Empty>
     </div>
   )
 }
