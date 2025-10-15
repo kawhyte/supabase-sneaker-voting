@@ -19,7 +19,7 @@ import { type ItemCategory } from '@/components/types/item-category'
 
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
-  status: ('owned' | 'wishlisted' | 'journaled')[]
+  status: ('owned' | 'wishlisted' | 'journaled'| 'archive')[]
   isArchivePage?: boolean
 }
 
@@ -474,6 +474,10 @@ function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journal
     journaled: {
       title: 'Tried Items',
       description: 'Items you\'ve tried on or seen in person'
+    },
+    archive: {
+      title: 'archive Items',
+      description: 'Archive Items'
     }
   }
 
@@ -513,7 +517,7 @@ function LoadingSkeleton() {
 
 interface EmptyStateProps {
   hasEntries: boolean
-  displayStatus: 'owned' | 'wishlisted' | 'journaled'
+  displayStatus: 'owned' | 'wishlisted' | 'journaled' | 'archive'
   isArchivePage: boolean
   onAddNew?: () => void
 }

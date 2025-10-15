@@ -71,7 +71,6 @@ export default function SimpleTestPage() {
               <h3 className="text-lg font-semibold mb-md">Spacing Utilities</h3>
               <div className="flex flex-wrap gap-xs items-center">
                 <div className="px-xxs py-xxs bg-blue-100 text-xs">px-xxs py-xxs (4px)</div>
-                <div className="px-2xs py-2xs bg-green-100 text-xs">px-2xs py-2xs (6px)</div>
                 <div className="px-xs py-xs bg-yellow-100 text-xs">px-xs py-xs (8px)</div>
                 <div className="px-sm py-sm bg-purple-100 text-xs">px-sm py-sm (12px)</div>
                 <div className="px-md py-md bg-pink-100 text-xs">px-md py-md (16px)</div>
@@ -81,7 +80,7 @@ export default function SimpleTestPage() {
             {/* Gap Test */}
             <div>
               <h3 className="text-lg font-semibold mb-md">Gap Utilities</h3>
-              <div className="flex flex-col gap-2xs">
+              <div className="flex flex-col gap-xs">
                 <div className="flex gap-xxs">
                   <div className="w-8 h-8 bg-blue-500"></div>
                   <div className="w-8 h-8 bg-blue-500"></div>
@@ -108,7 +107,7 @@ export default function SimpleTestPage() {
             {/* Typography Test */}
             <div>
               <h3 className="text-lg font-semibold mb-md">Typography Scale</h3>
-              <div className="space-y-2xs">
+              <div className="space-y-xs">
                 <p className="text-xs">text-xs (12px) - Fine print</p>
                 <p className="text-sm">text-sm (14px) - Small text</p>
                 <p className="text-base">text-base (16px) - Body text</p>

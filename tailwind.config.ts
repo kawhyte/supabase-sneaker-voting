@@ -1,3 +1,18 @@
+/* ============================================
+   🎨 TAILWIND CSS V4 CONFIGURATION
+
+   IMPORTANT: In Tailwind v4, design tokens (colors, spacing,
+   typography) are defined in globals.css using @theme.
+
+   This file is minimal and only contains:
+   - Content paths for file scanning
+   - Dark mode configuration
+   - Plugin registrations
+
+   DO NOT add colors, spacing, or typography here!
+   All design system tokens live in app/globals.css
+   ============================================ */
+
 const config = {
 	darkMode: ["class"],
 	content: [
@@ -7,75 +22,10 @@ const config = {
 		"./src/**/*.{ts,tsx}",
 	],
 	prefix: "",
-	theme: {
-		container: {
-			center: true,
-			padding: "2rem",
-			screens: {
-				"2xl": "1400px",
-			},
-		},
-		extend: {
-			colors: {
-				border: "hsl(var(--border))",
-				input: "hsl(var(--input))",
-				ring: "hsl(var(--ring))",
-				background: "hsl(var(--background))",
-				foreground: "hsl(var(--foreground))",
-				primary: {
-					DEFAULT: "hsl(var(--primary))",
-					foreground: "hsl(var(--primary-foreground))",
-				},
-				secondary: {
-					DEFAULT: "hsl(var(--secondary))",
-					foreground: "hsl(var(--secondary-foreground))",
-				},
-				destructive: {
-					DEFAULT: "hsl(var(--destructive))",
-					foreground: "hsl(var(--destructive-foreground))",
-				},
-				muted: {
-					DEFAULT: "hsl(var(--muted))",
-					foreground: "hsl(var(--muted-foreground))",
-				},
-				accent: {
-					DEFAULT: "hsl(var(--accent))",
-					foreground: "hsl(var(--accent-foreground))",
-				},
-				popover: {
-					DEFAULT: "hsl(var(--popover))",
-					foreground: "hsl(var(--popover-foreground))",
-				},
-				card: {
-					DEFAULT: "hsl(var(--card))",
-					foreground: "hsl(var(--card-foreground))",
-				},
-			},
-			borderRadius: {
-				lg: "var(--radius)",
-				md: "calc(var(--radius) - 2px)",
-				sm: "calc(var(--radius) - 4px)",
-			},
-			keyframes: {
-				"accordion-down": {
-					from: { height: "0" },
-					to: { height: "var(--radix-accordion-content-height)" },
-				},
-				"accordion-up": {
-					from: { height: "var(--radix-accordion-content-height)" },
-					to: { height: "0" },
-				},
-			},
-			animation: {
-				"accordion-down": "accordion-down 0.2s ease-out",
-				"accordion-up": "accordion-up 0.2s ease-out",
-			},
-		},
-	},
 	plugins: [
+		// Line clamp plugin for multi-line text truncation
 		require("@tailwindcss/line-clamp"),
-		
 	],
-} 
+}
 
 export default config;

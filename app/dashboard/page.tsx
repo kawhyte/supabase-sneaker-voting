@@ -2,11 +2,10 @@
 
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
-import { FitProfileDashboard } from '@/components/fit-profile-dashboard' // Make sure you have this component
+import { FitProfileDashboard } from '@/components/fit-profile-dashboard'
 import { FTUEChecklist } from '@/components/ftue-checklist'
 import { Package, Heart, Brain, Archive } from 'lucide-react'
 
@@ -16,7 +15,7 @@ function DashboardContent() {
   const defaultTab = searchParams.get('tab') || 'owned'
 
   return (
-    <div className="w-full py-xl">
+    <div className="w-full min-h-screen">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -26,10 +25,12 @@ function DashboardContent() {
           <FTUEChecklist />
         </div>
 
+
+
         <Tabs defaultValue={defaultTab} className="w-full">
           {/* --- The New Simplified Tabs --- */}
-          <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-8">
-            <TabsTrigger value="wishlist" className="flex items-center gap-2">
+          <TabsList className="grid w-full max-w-7xl mx-auto grid-cols-4 mb-lg">
+            <TabsTrigger value="wishlist" className="flex items-center gap-xs">
               <Heart className="h-4 w-4" />
               Wishlist
             </TabsTrigger>
@@ -41,34 +42,34 @@ function DashboardContent() {
               <Brain className="h-4 w-4" />
               Fit Profile
             </TabsTrigger>
+            <TabsTrigger value="archive" className="flex items-center gap-xs">
+               <Archive className="h-4 w-4" />
+              Archived Items
+            </TabsTrigger>
           </TabsList>
 
           {/* --- The Content for the New Tabs --- */}
-          <TabsContent value="owned">
-            <SizingJournalDashboard status={['owned']} />
-          </TabsContent>
+          <div className="w-full max-w-[1920px] mx-auto min-h-[600px]">
+            <TabsContent value="owned" className="min-h-[600px]">
+              <SizingJournalDashboard status={['owned']} />
+            </TabsContent>
 
-          <TabsContent value="wishlist">
-            {/* This now shows both wishlisted and journaled items */}
-            <SizingJournalDashboard status={['wishlisted', 'journaled']} />
-          </TabsContent>
+            <TabsContent value="wishlist" className="min-h-[600px]">
+              <SizingJournalDashboard status={['wishlisted', 'journaled']} />
+            </TabsContent>
 
-          <TabsContent value="fit-profile">
-            {/* Assuming you have a FitProfileDashboard component */}
-            {/* <FitProfileDashboard /> */}
-          </TabsContent>
+            <TabsContent value="archive" className="min-h-[600px]">
+              <SizingJournalDashboard
+                status={['owned', 'wishlisted', 'journaled']}
+                isArchivePage={true}
+              />
+            </TabsContent>
+
+            <TabsContent value="fit-profile" className="min-h-[600px]">
+              <FitProfileDashboard />
+            </TabsContent>
+          </div>
         </Tabs>
-
-        {/* Archive Link */}
-        <div className="max-w-lg mx-auto mt-lg text-center">
-          <Link
-            href="/archive"
-            className="inline-flex items-center gap-xs text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <Archive className="h-4 w-4" />
-            View Archived Items
-          </Link>
-        </div>
       </motion.div>
     </div>
   )
