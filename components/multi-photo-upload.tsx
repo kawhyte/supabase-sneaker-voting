@@ -76,29 +76,29 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
         <div
           {...attributes}
           {...listeners}
-          className="absolute top-2 left-2 z-10 p-1 bg-black/50 rounded cursor-grab active:cursor-grabbing hover:bg-black/70 transition-colors"
+          className="absolute top-2 left-2 z-10 p-1 bg-slate-900/60 rounded cursor-grab active:cursor-grabbing hover:bg-slate-900/80 transition-colors"
         >
           <GripVertical className="h-2 w-2 text-white" />
         </div>
 
         {/* Main Photo Badge */}
         {photo.isMain && (
-          <Badge
-            className="absolute top-2 right-8 z-10 bg-blue-600 text-xs"
-            variant="default"
-          >
-            Main
-          </Badge>
+          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/40 to-black/0 z-10 flex items-center justify-center pt-3">
+            <Badge className="bg-sun-400 text-slate-900 px-3 py-2 font-semibold shadow-md">
+              Main
+            </Badge>
+          </div>
         )}
 
         {/* Remove Button */}
         <Button
           variant="destructive"
           size="sm"
-          className="absolute top-2 right-2 z-10 h-3 w-3 p-0"
+          className="absolute top-2 right-2 z-10 h-6 w-6 p-0 rounded-full hover:scale-110 transition-transform"
+          title="Remove photo"
           onClick={() => onRemove(photo.id)}
         >
-          <X className="h-2 w-2" />
+          <X className="h-5 w-5" />
         </Button>
 
         {/* Photo */}
@@ -112,11 +112,11 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
           {/* Set Main Photo Overlay */}
           {!photo.isMain && (
             <div
-              className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors cursor-pointer flex items-center justify-center group"
+              className="absolute inset-0 bg-slate-900/0 hover:bg-slate-900/20 transition-colors cursor-pointer flex items-center justify-center group"
               onClick={() => onSetMain(photo.id)}
             >
               <Button
-                variant="secondary"
+                variant="default"
                 size="sm"
                 className="opacity-0 group-hover:opacity-100 transition-opacity text-xs"
               >
@@ -127,7 +127,7 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
         </div>
 
         {/* Photo Info */}
-        <div className="p-2 bg-gray-50 text-xs text-gray-600">
+        <div className="p-2 bg-stone-50 text-xs text-slate-600">
           <div className="flex items-center justify-between">
             <span className="truncate">{photo.file?.name || 'Existing photo'}</span>
             <span>#{photo.order}</span>
@@ -262,8 +262,8 @@ export function MultiPhotoUpload({
           className={`
             relative border-2 border-dashed rounded-lg p-6 text-center transition-colors
             ${draggedOver
-              ? 'border-blue-400 bg-blue-50'
-              : 'border-gray-300 hover:border-gray-400'
+              ? 'border-sun-400 bg-sun-50'
+              : 'border-stone-300 hover:border-stone-400'
             }
           `}
         >
@@ -275,11 +275,11 @@ export function MultiPhotoUpload({
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
           <div className="space-y-2">
-            <Upload className="mx-auto h-8 w-8 text-gray-400" />
-            <div className="text-sm text-gray-600">
+            <Upload className="mx-auto h-8 w-8 text-slate-400" />
+            <div className="text-sm text-slate-600">
               <span className="font-medium">Click to upload</span> or drag and drop
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-slate-500">
               PNG, JPG, GIF up to 10MB each ({remainingSlots} of {maxPhotos} slots remaining)
             </div>
           </div>
@@ -301,7 +301,7 @@ export function MultiPhotoUpload({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium">Photos ({photos.length}/{maxPhotos})</h4>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-slate-500">
               <GripVertical className="inline h-3 w-3 mr-1" />
               Drag handle to reorder
             </div>
@@ -332,18 +332,18 @@ export function MultiPhotoUpload({
       {/* Empty State */}
       {photos.length === 0 && remainingSlots === maxPhotos && (
         <div className="text-center py-8">
-          <ImageIcon className="mx-auto h-12 w-12 text-gray-300" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No photos yet</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <ImageIcon className="mx-auto h-12 w-12 text-slate-300" />
+          <h3 className="mt-2 text-sm font-medium text-slate-900">No photos yet</h3>
+          <p className="mt-1 text-sm text-slate-500">
             Upload up to {maxPhotos} photos of your item
           </p>
         </div>
       )}
 
       {/* Instructions */}
-      <div className="text-xs text-gray-500 p-3 bg-gray-50 rounded-lg">
+      <div className="text-xs text-slate-500 p-3 bg-stone-50 rounded-lg">
         <div className="flex items-start gap-2">
-          <GripVertical className="h-3 w-3 mt-0.5 text-gray-400" />
+          <GripVertical className="h-3 w-3 mt-0.5 text-slate-400" />
           <div>
             <strong>How to reorder:</strong> Click and hold the grip handle (⋮⋮) in the top-left corner of any photo, then drag to reorder.
           </div>
