@@ -474,7 +474,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 }
 
 // Sub-components
-function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journaled' }) {
+function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journaled' | 'archive' }) {
   const titles = {
     owned: {
       title: 'Owned Items',
@@ -489,12 +489,12 @@ function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journal
       description: 'Items you\'ve tried on or seen in person'
     },
     archive: {
-      title: 'archive Items',
-      description: 'Archive Items'
+      title: 'Archived Items',
+      description: 'Items you\'ve archived and no longer need to track'
     }
   }
 
-  const { title, description } = titles[status]
+  const { title, description } = titles[status as keyof typeof titles]
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-xl">

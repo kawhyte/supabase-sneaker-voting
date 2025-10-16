@@ -135,6 +135,7 @@ import {
 	Zap,
 	AlertTriangle,
 	Camera,
+	Package,
 	Rocket,
 	Lightbulb,
 	Star,
@@ -613,8 +614,8 @@ export function AddItemForm({
 	// --- END ---
 
 	return (
-		<div className='max-w-7xl mx-auto w-full'>
-			<Card className='bg-card '>
+		<div className='max-w-7xl mx-auto w-full p-4 md:p-6 lg:p-8'>
+			<Card className='bg-card shadow-md'>
 				{!isFormVisible && mode === "create" && (
 					<CardHeader className='text-left pb-6'>
 						<CardTitle className='text-3xl flex flex-col justify-start font-heading'>
@@ -683,8 +684,11 @@ export function AddItemForm({
 						<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
 							{/* Experience Section */}
 							<div className='flex items-center gap-3 p-4 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors'>
-								<div>
-									<Label className='block mb-2 text-sm'>Experience <span className='text-red-500'>*</span></Label>
+								<div className='w-full'>
+									<div className='flex items-center gap-2 mb-2'>
+										<Eye className='h-4 w-4 text-slate-600' />
+										<Label className='block text-sm font-semibold text-slate-900'>Experience <span className='text-red-500'>*</span></Label>
+									</div>
 									<div className='flex items-center gap-3'>
 										<Switch
 											checked={watchedTriedOn}
@@ -697,7 +701,7 @@ export function AddItemForm({
 										/>
 										<Label
 											htmlFor='triedOn'
-											className='cursor-pointer text-sm font-medium text-foreground'
+											className='cursor-pointer text-sm font-medium text-slate-900'
 										>
 											{watchedTriedOn ? "Tried On ✓" : "Just Browsing"}
 										</Label>
@@ -711,13 +715,16 @@ export function AddItemForm({
 							</div>
 
 							{/* Product Details Section */}
-							<div className='space-y-4'>
-								<h3 className='font-semibold border-b pb-2 font-heading text-base'>📦 Product Details</h3>
+							<div className='space-y-6'>
+								<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
+									<Package className='h-5 w-5 text-slate-600 flex-shrink-0' />
+									<h3 className='font-semibold font-heading text-base text-slate-900 leading-5'>Product Details</h3>
+								</div>
 
 								{/* Row 1: Brand & Item Name */}
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 									<div>
-										<Label>Brand <span className='text-red-500'>*</span></Label>
+										<Label className='text-sm font-medium text-slate-900'>Brand <span className='text-red-500'>*</span></Label>
 										<BrandCombobox
 											value={watchedBrand}
 											onChange={(v) =>
@@ -731,8 +738,8 @@ export function AddItemForm({
 										)}
 									</div>
 									<div>
-										<Label>Item Name <span className='text-red-500'>*</span></Label>
-										<Input {...register("model")} />
+										<Label className='text-sm font-medium text-slate-900'>Item Name <span className='text-red-500'>*</span></Label>
+										<Input {...register("model")} className='mt-2' />
 										{errors.model && (
 											<p className='text-sm text-red-600 mt-1'>
 												{errors.model.message}
@@ -818,7 +825,7 @@ export function AddItemForm({
 								{/* Row 3: Item Category */}
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 									<div>
-										<Label>
+										<Label className='text-sm font-medium text-slate-900'>
 											Item Category <span className='text-red-500'>*</span>
 										</Label>
 										<Select
@@ -849,12 +856,15 @@ export function AddItemForm({
 							</div>
 
 							{/* Photos Section */}
-							<div className='space-y-4'>
-								<h3 className='font-semibold border-b pb-2 font-heading text-base'>📸 Photos</h3>
+							<div className='space-y-6'>
+								<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
+									<Camera className='h-5 w-5 text-slate-600 flex-shrink-0' />
+									<h3 className='font-semibold font-heading text-base text-slate-900 leading-5'>Photos</h3>
+								</div>
 								<div>
-									<Label>
+									<Label className='text-sm font-medium text-slate-900'>
 										Photos <span className='text-red-500'>*</span>{" "}
-										<span className='text-xs text-muted-foreground'>
+										<span className='text-xs text-muted-foreground font-normal'>
 											(Min 1, Max 5)
 										</span>
 									</Label>
@@ -888,26 +898,26 @@ export function AddItemForm({
 									<AccordionContent className='space-y-6 pt-6'>
 										<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 											<div>
-												<Label>SKU / Style Code</Label>
-												<Input {...register("sku")} />
+												<Label className='text-sm font-medium text-slate-900'>SKU / Style Code</Label>
+												<Input {...register("sku")} className='mt-2' />
 											</div>
 											<div>
-												<Label>Color</Label>
-												<Input {...register("color")} />
+												<Label className='text-sm font-medium text-slate-900'>Color</Label>
+												<Input {...register("color")} className='mt-2' />
 											</div>
 										</div>
 
 										<div>
-											<Label>Notes ({watch("notes")?.length || 0} / 120)</Label>
-											<Textarea {...register("notes")} maxLength={120} />
+											<Label className='text-sm font-medium text-slate-900'>Notes ({watch("notes")?.length || 0} / 120)</Label>
+											<Textarea {...register("notes")} maxLength={120} className='mt-2' />
 										</div>
 
 										{watchedTriedOn && (
 											<div className='border-t pt-6 space-y-6'>
-												<h4 className='font-semibold'>Try-On Details</h4>
+												<h4 className='font-semibold text-slate-900'>Try-On Details</h4>
 												{isSizeRequired(watchedCategory) && (
 													<div>
-														<Label>Size Tried *</Label>
+														<Label className='text-sm font-medium text-slate-900'>Size Tried *</Label>
 														{watchedCategory === "shoes" ? (
 															<SizeCombobox
 																value={watch("sizeTried")}
@@ -936,7 +946,7 @@ export function AddItemForm({
 												)}
 												{isComfortRequired(watchedCategory) && (
 													<div>
-														<Label>Comfort Rating *</Label>
+														<Label className='text-sm font-medium text-slate-900'>Comfort Rating *</Label>
 														<RadioGroup
 															value={watch("comfortRating")?.toString()}
 															onValueChange={(v) =>
