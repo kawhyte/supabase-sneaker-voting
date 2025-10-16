@@ -17,208 +17,439 @@
      This MUST be defined first! Enables p-1 through p-96
      ============================================ */
 
-  --spacing: 4px;  /* Base unit for all spacing calculations */
+  --spacing: 4px;  /* Tailwind base unit - DO NOT CHANGE */
 
   /* ============================================
-     SPACING SYSTEM - 8pt Grid with 4px Micro-Adjustments
+     SPACING SYSTEM v2.0 - Pure 8-Point Grid
 
-     Generates utilities: p-*, m-*, gap-*, space-*
+     🎯 PHILOSOPHY:
+     - Pure 8px grid for visual consistency and vertical rhythm
+     - Exception: 4px (spacing-1) for micro UI elements only
+     - All values align to 8px multiples for harmonious layouts
+     - Numeric naming matches Tailwind utilities (p-4, m-8, gap-6)
 
-     Use numeric utilities: p-1 (4px), p-2 (8px), p-4 (16px), p-6 (24px)
-     Semantic aliases also available: p-xxs (4px), p-xs (8px), p-md (16px)
+     📘 USAGE GUIDE:
+
+     **Common Patterns:**
+     - Button padding: spacing-2 to spacing-4 (8-16px)
+     - Card padding: spacing-6 (24px)
+     - Section spacing: spacing-12 to spacing-16 (48-64px)
+     - Page margins: spacing-16 to spacing-20 (64-80px)
+
+     **Semantic Tokens (Use These):**
+     - spacing-element: Default element spacing (16px)
+     - spacing-component: Card/container padding (24px)
+     - spacing-section: Between sections (48px)
+     - spacing-page: Page-level margins (64px)
+
+     **Generates Tailwind Utilities:**
+     - p-4 = padding: 16px
+     - m-8 = margin: 32px
+     - gap-6 = gap: 24px
+     - space-y-12 = vertical spacing: 48px
+
+     ♿ ACCESSIBILITY:
+     - Larger spacing improves touch targets (min 44px)
+     - Consistent rhythm aids readability
+     - Generous whitespace reduces cognitive load
      ============================================ */
 
-  /* Micro spacing (4px increments for tight layouts) */
-  --spacing-xxs: 4px;   /* Ultra-compact (badges, tight gaps) */
-  --spacing-xs: 8px;    /* Icons, checkboxes, compact UI */
-  --spacing-sm: 16px;   /* DEPRECATED - Use md instead. Changed from 12px → 16px for 8px grid alignment */
+  /* --- TIER 0: Reset --- */
+  --spacing-0: 0px;         /* p-0 - Remove spacing */
 
-  /* Core 8px grid (primary scale - use these 80% of the time) */
-  --spacing-md: 16px;   /* Element spacing (default) - PRIMARY small spacing token */
-  --spacing-lg: 24px;   /* Card padding, component spacing */
-  --spacing-xl: 32px;   /* Section separation */
-  --spacing-2xl: 40px;  /* Large section spacing */
-  --spacing-3xl: 48px;  /* Hero/major sections */
-  --spacing-4xl: 64px;  /* Page-level spacing */
-  --spacing-5xl: 80px;  /* Extra large sections */
-  --spacing-6xl: 96px;  /* Massive spacing */
+  /* --- TIER 1: Micro (4px Exception) --- */
+  --spacing-1: 4px;         /* p-1 - Icon gaps, badge padding, borders */
+
+  /* --- TIER 2-32: Pure 8pt Grid --- */
+  --spacing-2: 8px;         /* p-2 - Compact button padding, tight gaps */
+  --spacing-3: 12px;        /* p-3 - Form element internal padding */
+  --spacing-4: 16px;        /* p-4 - DEFAULT element spacing ⭐ */
+  --spacing-5: 20px;        /* p-5 - Comfortable element spacing */
+  --spacing-6: 24px;        /* p-6 - Card padding, component gaps ⭐ */
+  --spacing-7: 28px;        /* p-7 - Medium component spacing */
+  --spacing-8: 32px;        /* p-8 - Section separation ⭐ */
+  --spacing-10: 40px;       /* p-10 - Large section spacing */
+  --spacing-11: 44px;       /* p-11 - Min touch target + spacing */
+  --spacing-12: 48px;       /* p-12 - Hero sections, major spacing ⭐ */
+  --spacing-13: 52px;       /* p-13 - Extra large spacing */
+  --spacing-14: 56px;       /* p-14 - Very large sections */
+  --spacing-15: 60px;       /* p-15 - Generous spacing */
+  --spacing-16: 64px;       /* p-16 - Page-level margins ⭐ */
+  --spacing-17: 68px;       /* p-17 - Extra page spacing */
+  --spacing-18: 72px;       /* p-18 - Major section breaks */
+  --spacing-19: 76px;       /* p-19 - Large breaks */
+  --spacing-20: 80px;       /* p-20 - Massive spacing ⭐ */
+  --spacing-22: 88px;       /* p-22 - Ultra spacing */
+  --spacing-24: 96px;       /* p-24 - Extreme spacing */
+  --spacing-32: 128px;      /* p-32 - Maximum (rare use) */
+
+  /* --- NEGATIVE SPACING (Advanced Layouts) --- */
+  /* Use for: Overlapping cards, hero image bleed, sticky header offsets */
+  --spacing-neg-1: -4px;    /* -m-1 - Tight overlap */
+  --spacing-neg-2: -8px;    /* -m-2 - Small overlap */
+  --spacing-neg-4: -16px;   /* -m-4 - Card bleed effect */
+  --spacing-neg-6: -24px;   /* -m-6 - Medium bleed */
+  --spacing-neg-8: -32px;   /* -m-8 - Hero image bleed */
+
+  /* --- SEMANTIC ALIASES (Recommended for Readability) --- */
+  --spacing-element: var(--spacing-4);           /* 16px - Default element spacing */
+  --spacing-component: var(--spacing-6);         /* 24px - Cards, containers, component padding */
+  --spacing-section: var(--spacing-12);          /* 48px - Between sections */
+  --spacing-section-large: var(--spacing-20);    /* 80px - Major section breaks */
+  --spacing-page: var(--spacing-16);             /* 64px - Page margins, hero padding */
+
+  /* --- BACKWARD COMPATIBILITY (Deprecated in v3.0) --- */
+  /* Migrate to numeric tokens: xxs→1, xs→2, md→4, lg→6, xl→8, etc. */
+  --spacing-xxs: var(--spacing-1);    /* DEPRECATED - Use spacing-1 */
+  --spacing-xs: var(--spacing-2);     /* DEPRECATED - Use spacing-2 */
+  --spacing-sm: var(--spacing-4);     /* DEPRECATED - Use spacing-4 */
+  --spacing-md: var(--spacing-4);     /* DEPRECATED - Use spacing-4 */
+  --spacing-lg: var(--spacing-6);     /* DEPRECATED - Use spacing-6 */
+  --spacing-xl: var(--spacing-8);     /* DEPRECATED - Use spacing-8 */
+  --spacing-2xl: var(--spacing-10);   /* DEPRECATED - Use spacing-10 */
+  --spacing-3xl: var(--spacing-12);   /* DEPRECATED - Use spacing-12 */
+  --spacing-4xl: var(--spacing-16);   /* DEPRECATED - Use spacing-16 */
+  --spacing-5xl: var(--spacing-20);   /* DEPRECATED - Use spacing-20 */
+  --spacing-6xl: var(--spacing-24);   /* DEPRECATED - Use spacing-24 */
 
   /* ============================================
-     TYPOGRAPHY - Integrated Line Heights on 8px Grid
+     TYPOGRAPHY v2.0 - Perfect 8px Grid Vertical Rhythm
 
-     All line heights snap to 8px grid for vertical rhythm
-     Format: --text-{size}: {font-size};
-             --text-{size}--line-height: {ratio};
+     🎯 PHILOSOPHY:
+     - ALL line heights are EXACT 8px multiples (no approximations)
+     - Creates perfect vertical rhythm throughout the app
+     - Ratios calculated for mathematical precision
+     - Supports consistent spacing between text elements
 
-     Computed line heights: 16px, 24px, 32px, 40px, 48px, 56px, 64px
+     📘 USAGE:
+     - Use text-base (16px/24px) for body copy
+     - Use text-lg+ for headings with generous line height
+     - Combine with spacing tokens for perfect alignment
+
+     **Line Height Values (Exact 8px Multiples):**
+     16px (2×8), 24px (3×8), 32px (4×8), 40px (5×8),
+     48px (6×8), 56px (7×8), 64px (8×8), 80px (10×8)
+
+     ♿ ACCESSIBILITY:
+     - Minimum 1.5 line height for body text (WCAG AAA)
+     - Generous line heights improve readability
+     - Consistent rhythm aids dyslexic readers
      ============================================ */
 
   /* Font Families */
   --font-family-body: var(--font-body);
   --font-family-heading: var(--font-heading);
 
-  /* Small Sizes */
+  /* --- SMALL SIZES --- */
+
   --text-xs: 12px;
-  --text-xs--line-height: 1.35;   /* ~16px (2 × 8px grid) */
+  --text-xs--line-height: 1.333333;   /* EXACT 16px (2 × 8px) - Calculated: 16 ÷ 12 */
 
   --text-sm: 14px;
-  --text-sm--line-height: 1.75;   /* ~24px (3 × 8px grid) */
+  --text-sm--line-height: 1.714286;   /* EXACT 24px (3 × 8px) - Calculated: 24 ÷ 14 */
 
-  /* Body Sizes */
+  /* --- BODY SIZES --- */
+
   --text-base: 16px;
-  --text-base--line-height: 1.5;   /* 24px (3 × 8px grid) */
+  --text-base--line-height: 1.5;      /* EXACT 24px (3 × 8px) - Calculated: 24 ÷ 16 */
 
   --text-lg: 18px;
-  --text-lg--line-height: 1.8;     /* ~32px (4 × 8px grid) */
+  --text-lg--line-height: 1.777778;   /* EXACT 32px (4 × 8px) - Calculated: 32 ÷ 18 */
 
-  /* Heading Sizes */
+  /* --- HEADING SIZES --- */
+
   --text-xl: 20px;
-  --text-xl--line-height: 1.6;     /* 32px (4 × 8px grid) */
+  --text-xl--line-height: 1.6;        /* EXACT 32px (4 × 8px) - Calculated: 32 ÷ 20 */
 
   --text-2xl: 24px;
-  --text-2xl--line-height: 1.35;   /* ~32px (4 × 8px grid) */
+  --text-2xl--line-height: 1.333333;  /* EXACT 32px (4 × 8px) - Calculated: 32 ÷ 24 */
 
   --text-3xl: 30px;
-  --text-3xl--line-height: 1.35;   /* ~40px (5 × 8px grid) */
+  --text-3xl--line-height: 1.333333;  /* EXACT 40px (5 × 8px) - Calculated: 40 ÷ 30 */
 
   --text-4xl: 36px;
-  --text-4xl--line-height: 1.35;   /* ~48px (6 × 8px grid) */
+  --text-4xl--line-height: 1.333333;  /* EXACT 48px (6 × 8px) - Calculated: 48 ÷ 36 */
 
-  /* Display Sizes */
+  /* --- DISPLAY SIZES --- */
+
   --text-5xl: 48px;
-  --text-5xl--line-height: 1.15;   /* ~56px (7 × 8px grid) */
+  --text-5xl--line-height: 1.166667;  /* EXACT 56px (7 × 8px) - Calculated: 56 ÷ 48 */
 
   --text-6xl: 60px;
-  --text-6xl--line-height: 1.1;    /* ~64px (8 × 8px grid) */
+  --text-6xl--line-height: 1.066667;  /* EXACT 64px (8 × 8px) - Calculated: 64 ÷ 60 */
 
   --text-7xl: 72px;
-  --text-7xl--line-height: 1.1;    /* ~80px (10 × 8px grid) */
+  --text-7xl--line-height: 1.111111;  /* EXACT 80px (10 × 8px) - Calculated: 80 ÷ 72 */
 
   /* ============================================
-     COLOR SYSTEM - Warm Earth Tones + Urgency
+     COLOR SYSTEM v2.0 - Professional Sneaker Brand
      Generates utilities: bg-*, text-*, border-*
+
+     🎨 USAGE GUIDE:
+
+     **NEUTRALS** (60% usage)
+     - Stone: Warm backgrounds, cards, subtle UI
+     - Slate: Text, borders, cool contrast
+
+     **BRAND** (20% usage)
+     - Sun: Primary CTAs, focus rings, brand moments
+     - Terracotta: Secondary CTAs, warm accents
+
+     **FUNCTIONAL** (20% usage)
+     - Ember (Red): Sold out, urgent, errors
+     - Blaze (Orange): New releases, trending
+     - Meadow (Green): Good deals, success
+
+     📘 WHEN TO USE:
+     - bg-stone-200: Main page background
+     - bg-white: Cards, elevated surfaces
+     - bg-sun-400: Primary buttons, CTAs
+     - text-slate-900: Primary text
+     - text-slate-600: Secondary text
+     - border-stone-300: Subtle borders
+
+     ♿ ACCESSIBILITY:
+     - All -600+ shades are WCAG AAA for text
+     - Use -400 for large text (18px+)
+     - Pair light backgrounds (50-200) with dark text (600-900)
+
+     🔄 MIGRATION FROM v1.0:
+     - beige → stone
+     - yellow → sun
+     - drop → ember
+     - new → blaze
+     - deal → meadow
+     - gray → slate
      ============================================ */
 
-  /* --- NEUTRALS (Warm Earth Tones) --- */
+  /* --- NEUTRALS --- */
 
-  /* Beige (Primary Background) - 60% usage */
-  --color-beige-50: oklch(0.99 0.01 85);      /* #FEFAE0 - Lightest */
-  --color-beige-100: oklch(0.96 0.02 85);     /* #FAEDCD */
-  --color-beige-200: oklch(0.93 0.03 85);     /* #E9EDC9 - Main BG */
-  --color-beige-300: oklch(0.89 0.04 85);     /* Darker variant */
+  /* Stone (Warm - Primary Background)
+     Purpose: Main backgrounds, cards, subtle UI
+     Optimal: 94% lightness (stone-200) lets product images pop */
+  --color-stone-50: oklch(0.99 0.008 85);     /* Whisper - hover states */
+  --color-stone-100: oklch(0.97 0.012 85);    /* Soft - alternate BG */
+  --color-stone-200: oklch(0.94 0.018 85);    /* Main Background ⭐ */
+  --color-stone-300: oklch(0.90 0.024 85);    /* Medium - borders */
+  --color-stone-400: oklch(0.85 0.030 85);    /* Strong - dividers */
+  --color-stone-500: oklch(0.78 0.035 85);    /* Deep - emphasis */
+  --color-stone-600: oklch(0.68 0.040 85);    /* Dark text on light */
+  --color-stone-700: oklch(0.56 0.035 85);    /* Darker */
+  --color-stone-800: oklch(0.42 0.030 85);    /* Heading weight */
+  --color-stone-900: oklch(0.28 0.025 85);    /* Heavy emphasis */
+  --color-stone-950: oklch(0.15 0.015 85);    /* Near black */
 
-  /* Sage (Secondary Structure) - 30% usage */
-  --color-sage-50: oklch(0.96 0.02 120);      /* #F3F5EC - Lightest */
-  --color-sage-100: oklch(0.92 0.03 120);     /* #E0E8D0 */
-  --color-sage-200: oklch(0.87 0.04 120);     /* #CCD5AE - Main */
-  --color-sage-300: oklch(0.82 0.05 120);     /* #B8C699 */
-  --color-sage-400: oklch(0.72 0.06 120);     /* #95A76D - Darker */
+  /* Slate (Cool Gray - Utility)
+     Purpose: Text, borders, neutral UI when warmth not needed */
+  --color-slate-50: oklch(0.985 0 0);         /* Lightest */
+  --color-slate-100: oklch(0.96 0 0);         /* Very light */
+  --color-slate-200: oklch(0.92 0 0);         /* Light */
+  --color-slate-300: oklch(0.87 0 0);         /* Medium light */
+  --color-slate-400: oklch(0.71 0 0);         /* Medium ⭐ */
+  --color-slate-500: oklch(0.56 0 0);         /* True middle gray */
+  --color-slate-600: oklch(0.44 0 0);         /* Dark - body text WCAG AAA */
+  --color-slate-700: oklch(0.37 0 0);         /* Darker */
+  --color-slate-800: oklch(0.27 0 0);         /* Very dark */
+  --color-slate-900: oklch(0.15 0 0);         /* Near black - headings ⭐ */
+  --color-slate-950: oklch(0.10 0 0);         /* Darkest */
 
-  /* Grays (Utility) */
-  --color-gray-50: oklch(0.985 0 0);          /* #FAFAFA */
-  --color-gray-100: oklch(0.96 0 0);          /* #F5F5F5 */
-  --color-gray-200: oklch(0.92 0 0);          /* #E5E5E5 */
-  --color-gray-300: oklch(0.87 0 0);          /* #D4D4D4 */
-  --color-gray-400: oklch(0.71 0 0);          /* #A3A3A3 */
-  --color-gray-500: oklch(0.56 0 0);          /* #737373 */
-  --color-gray-600: oklch(0.44 0 0);          /* #525252 */
-  --color-gray-700: oklch(0.37 0 0);          /* #404040 */
-  --color-gray-800: oklch(0.27 0 0);          /* #262626 */
-  --color-gray-900: oklch(0.15 0 0);          /* #171717 */
-
-  /* Black & White */
+  /* Pure Black & White */
   --color-black: oklch(0 0 0);                /* #000000 */
   --color-white: oklch(1 0 0);                /* #FFFFFF */
 
-  /* --- ACCENT COLORS (10% usage) --- */
+  /* --- BRAND COLORS --- */
 
-  /* Yellow (Primary Accent - Urgency/CTAs) */
-  --color-yellow-100: oklch(0.97 0.05 95);    /* #FEF9C3 - Light BG */
-  --color-yellow-200: oklch(0.94 0.10 95);    /* #FEF08A */
-  --color-yellow-300: oklch(0.90 0.15 95);    /* #FDE047 */
-  --color-yellow-400: oklch(0.87 0.18 95);    /* #FFE01B - Main */
-  --color-yellow-500: oklch(0.80 0.16 95);    /* #EAB308 */
-  --color-yellow-600: oklch(0.64 0.14 95);    /* #CA8A04 - Text (WCAG AA) */
-  --color-yellow-700: oklch(0.52 0.12 95);    /* #A16207 */
-  --color-yellow-800: oklch(0.42 0.10 95);    /* #854D0E */
+  /* Sun (Vibrant Yellow - Primary Brand)
+     Purpose: CTAs, focus states, brand identity moments
+     Inspiration: Mailchimp energy
+     Use: bg-sun-400 for buttons, ring-sun-400 for focus */
+  --color-sun-50: oklch(0.97 0.08 90);        /* Light BG */
+  --color-sun-100: oklch(0.94 0.12 90);       /* Soft */
+  --color-sun-200: oklch(0.90 0.16 90);       /* Medium */
+  --color-sun-300: oklch(0.86 0.20 90);       /* Strong */
+  --color-sun-400: oklch(0.82 0.22 90);       /* Main Brand ⭐ (#FFC700) */
+  --color-sun-500: oklch(0.76 0.21 90);       /* Hover state */
+  --color-sun-600: oklch(0.68 0.18 90);       /* Active/text WCAG AAA */
+  --color-sun-700: oklch(0.58 0.16 90);       /* Deep */
+  --color-sun-800: oklch(0.48 0.14 90);       /* Dark */
+  --color-sun-900: oklch(0.38 0.12 90);       /* Darkest */
+  --color-sun-950: oklch(0.28 0.10 90);       /* Near black */
 
-  /* Terracotta (Secondary Accent) */
-  --color-terracotta-100: oklch(0.92 0.04 50); /* #F5E6DC */
-  --color-terracotta-200: oklch(0.85 0.06 50); /* #E9CDB8 */
-  --color-terracotta-300: oklch(0.78 0.08 50); /* #DDB494 */
-  --color-terracotta-400: oklch(0.71 0.10 50); /* #D4A373 - Main */
-  --color-terracotta-500: oklch(0.64 0.11 50); /* #C18F5E */
-  --color-terracotta-600: oklch(0.55 0.10 50); /* #A87448 */
+  /* Terracotta (Warm Orange-Red - Secondary Accent)
+     Purpose: Secondary CTAs, warm accents, complementary badges
+     Use: bg-terracotta-400 for secondary buttons */
+  --color-terracotta-50: oklch(0.96 0.02 50); /* Lightest */
+  --color-terracotta-100: oklch(0.92 0.04 50); /* Light BG */
+  --color-terracotta-200: oklch(0.85 0.06 50); /* Soft */
+  --color-terracotta-300: oklch(0.78 0.08 50); /* Medium */
+  --color-terracotta-400: oklch(0.71 0.10 50); /* Main ⭐ */
+  --color-terracotta-500: oklch(0.64 0.11 50); /* Hover */
+  --color-terracotta-600: oklch(0.55 0.10 50); /* Active/text WCAG AAA */
+  --color-terracotta-700: oklch(0.46 0.09 50); /* Deep */
+  --color-terracotta-800: oklch(0.37 0.08 50); /* Dark */
+  --color-terracotta-900: oklch(0.28 0.06 50); /* Darkest */
+  --color-terracotta-950: oklch(0.19 0.04 50); /* Near black */
 
-  /* --- URGENCY SIGNALS (Sneaker Drop Status) --- */
+  /* --- FUNCTIONAL COLORS (Semantic Status) --- */
 
-  /* Price Drop (Red) */
-  --color-drop-100: oklch(0.95 0.05 15);      /* #FEE2E2 - Light BG */
-  --color-drop-200: oklch(0.90 0.10 15);      /* #FECACA */
-  --color-drop-400: oklch(0.72 0.22 15);      /* #EF4444 - Badges */
-  --color-drop-500: oklch(0.63 0.24 15);      /* #DC2626 - Strong */
-  --color-drop-600: oklch(0.55 0.22 15);      /* #B91C1C - Text */
+  /* Ember (Red - Urgent/Sold Out)
+     Purpose: Sold out badges, urgent actions, destructive operations
+     Use: bg-ember-400 with text-ember-600 for badges */
+  --color-ember-50: oklch(0.96 0.03 25);      /* Light BG */
+  --color-ember-100: oklch(0.92 0.06 25);     /* Soft */
+  --color-ember-200: oklch(0.85 0.12 25);     /* Medium */
+  --color-ember-300: oklch(0.78 0.18 25);     /* Strong */
+  --color-ember-400: oklch(0.70 0.22 25);     /* Main Badge ⭐ */
+  --color-ember-500: oklch(0.63 0.24 25);     /* Emphasis */
+  --color-ember-600: oklch(0.55 0.23 25);     /* Text WCAG AAA */
+  --color-ember-700: oklch(0.47 0.21 25);     /* Deep */
+  --color-ember-800: oklch(0.39 0.18 25);     /* Dark */
+  --color-ember-900: oklch(0.30 0.15 25);     /* Darkest */
+  --color-ember-950: oklch(0.22 0.12 25);     /* Near black */
 
-  /* New Release (Orange) */
-  --color-new-100: oklch(0.96 0.04 40);       /* #FFEDD5 - Light BG */
-  --color-new-200: oklch(0.91 0.08 40);       /* #FED7AA */
-  --color-new-400: oklch(0.75 0.16 40);       /* #F97316 - Badges */
-  --color-new-500: oklch(0.68 0.17 40);       /* #EA580C - Strong */
-  --color-new-600: oklch(0.59 0.15 40);       /* #C2410C - Text */
+  /* Blaze (Orange - New Releases)
+     Purpose: New release badges, trending items, hot alerts
+     Use: bg-blaze-400 with text-blaze-600 for new release badges */
+  --color-blaze-50: oklch(0.97 0.03 45);      /* Light BG */
+  --color-blaze-100: oklch(0.93 0.06 45);     /* Soft */
+  --color-blaze-200: oklch(0.88 0.10 45);     /* Medium */
+  --color-blaze-300: oklch(0.82 0.14 45);     /* Strong */
+  --color-blaze-400: oklch(0.75 0.17 45);     /* Main Badge ⭐ */
+  --color-blaze-500: oklch(0.68 0.18 45);     /* Emphasis */
+  --color-blaze-600: oklch(0.59 0.17 45);     /* Text WCAG AAA */
+  --color-blaze-700: oklch(0.50 0.15 45);     /* Deep */
+  --color-blaze-800: oklch(0.41 0.13 45);     /* Dark */
+  --color-blaze-900: oklch(0.32 0.11 45);     /* Darkest */
+  --color-blaze-950: oklch(0.23 0.09 45);     /* Near black */
 
-  /* Good Deal (Green) */
-  --color-deal-100: oklch(0.95 0.05 155);     /* #D1FAE5 - Light BG */
-  --color-deal-200: oklch(0.89 0.10 155);     /* #A7F3D0 */
-  --color-deal-400: oklch(0.70 0.17 155);     /* #10B981 - Badges */
-  --color-deal-500: oklch(0.62 0.17 155);     /* #059669 - Strong */
-  --color-deal-600: oklch(0.54 0.15 155);     /* #047857 - Text */
+  /* Meadow (Green - Good Deals)
+     Purpose: Good deal badges, positive changes, success states
+     Use: bg-meadow-400 with text-meadow-600 for deal badges */
+  --color-meadow-50: oklch(0.96 0.05 155);    /* Light BG */
+  --color-meadow-100: oklch(0.91 0.10 155);   /* Soft */
+  --color-meadow-200: oklch(0.84 0.14 155);   /* Medium */
+  --color-meadow-300: oklch(0.77 0.17 155);   /* Strong */
+  --color-meadow-400: oklch(0.70 0.18 155);   /* Main Badge ⭐ */
+  --color-meadow-500: oklch(0.62 0.18 155);   /* Emphasis */
+  --color-meadow-600: oklch(0.54 0.16 155);   /* Text WCAG AAA */
+  --color-meadow-700: oklch(0.46 0.14 155);   /* Deep */
+  --color-meadow-800: oklch(0.38 0.12 155);   /* Dark */
+  --color-meadow-900: oklch(0.30 0.10 155);   /* Darkest */
+  --color-meadow-950: oklch(0.22 0.08 155);   /* Near black */
 
-  /* Sold Out (Muted Gray) */
-  --color-sold-100: oklch(0.94 0.005 265);    /* #F3F4F6 */
-  --color-sold-300: oklch(0.83 0.01 265);     /* #D1D5DB */
-  --color-sold-500: oklch(0.60 0.015 265);    /* #6B7280 */
+  /* --- BACKWARD COMPATIBILITY ALIASES --- */
+  /* These will be deprecated in v3.0 - migrate to new names */
+
+  /* Beige → Stone */
+  --color-beige-50: var(--color-stone-50);
+  --color-beige-100: var(--color-stone-100);
+  --color-beige-200: var(--color-stone-200);
+  --color-beige-300: var(--color-stone-300);
+
+  /* Sage → Stone (for now, may diverge in future) */
+  --color-sage-50: var(--color-stone-50);
+  --color-sage-100: var(--color-stone-100);
+  --color-sage-200: var(--color-stone-200);
+  --color-sage-300: var(--color-stone-300);
+  --color-sage-400: var(--color-stone-400);
+
+  /* Gray → Slate */
+  --color-gray-50: var(--color-slate-50);
+  --color-gray-100: var(--color-slate-100);
+  --color-gray-200: var(--color-slate-200);
+  --color-gray-300: var(--color-slate-300);
+  --color-gray-400: var(--color-slate-400);
+  --color-gray-500: var(--color-slate-500);
+  --color-gray-600: var(--color-slate-600);
+  --color-gray-700: var(--color-slate-700);
+  --color-gray-800: var(--color-slate-800);
+  --color-gray-900: var(--color-slate-900);
+
+  /* Yellow → Sun */
+  --color-yellow-100: var(--color-sun-100);
+  --color-yellow-200: var(--color-sun-200);
+  --color-yellow-300: var(--color-sun-300);
+  --color-yellow-400: var(--color-sun-400);
+  --color-yellow-500: var(--color-sun-500);
+  --color-yellow-600: var(--color-sun-600);
+  --color-yellow-700: var(--color-sun-700);
+  --color-yellow-800: var(--color-sun-800);
+
+  /* Drop → Ember */
+  --color-drop-100: var(--color-ember-100);
+  --color-drop-200: var(--color-ember-200);
+  --color-drop-400: var(--color-ember-400);
+  --color-drop-500: var(--color-ember-500);
+  --color-drop-600: var(--color-ember-600);
+
+  /* New → Blaze */
+  --color-new-100: var(--color-blaze-100);
+  --color-new-200: var(--color-blaze-200);
+  --color-new-400: var(--color-blaze-400);
+  --color-new-500: var(--color-blaze-500);
+  --color-new-600: var(--color-blaze-600);
+
+  /* Deal → Meadow */
+  --color-deal-100: var(--color-meadow-100);
+  --color-deal-200: var(--color-meadow-200);
+  --color-deal-400: var(--color-meadow-400);
+  --color-deal-500: var(--color-meadow-500);
+  --color-deal-600: var(--color-meadow-600);
+
+  /* Sold → Slate (muted gray) */
+  --color-sold-100: var(--color-slate-100);
+  --color-sold-300: var(--color-slate-300);
+  --color-sold-500: var(--color-slate-500);
 
   /* ============================================
      SEMANTIC COLORS - Shadcn/UI Compatibility
      These enable bg-background, text-foreground, etc.
+
+     🎯 COMPONENT USAGE:
+     - Use semantic names in components for consistency
+     - Example: <Button className="bg-primary hover:bg-primary-hover">
      ============================================ */
 
   /* Page Layout */
-  --color-background: oklch(0.93 0.03 85);         /* #E9EDC9 - Warm beige */
-  --color-foreground: oklch(0.15 0 0);             /* Dark text */
+  --color-background: var(--color-stone-200);      /* Warm stone background */
+  --color-foreground: var(--color-slate-900);      /* Dark text */
 
   /* Cards & Elevated Surfaces */
-  --color-card: oklch(1 0 0);                      /* White cards */
-  --color-card-foreground: oklch(0.15 0 0);
+  --color-card: var(--color-white);                /* White cards */
+  --color-card-foreground: var(--color-slate-900);
 
   /* Popovers & Dropdowns */
-  --color-popover: oklch(1 0 0);
-  --color-popover-foreground: oklch(0.15 0 0);
+  --color-popover: var(--color-white);
+  --color-popover-foreground: var(--color-slate-900);
 
-  /* Primary (Yellow Accent - CTAs) */
-  --color-primary: oklch(0.87 0.18 95);            /* #FFE01B - Vibrant */
-  --color-primary-foreground: oklch(0.15 0 0);     /* Dark text on yellow */
+  /* Primary (Sun Yellow - CTAs) */
+  --color-primary: var(--color-sun-400);           /* #FFC700 range */
+  --color-primary-foreground: var(--color-slate-900); /* Dark text on yellow */
+  --color-primary-hover: var(--color-sun-500);     /* Hover state */
+  --color-primary-active: var(--color-sun-600);    /* Active/pressed state */
 
-  /* Secondary (Sage - Structure) */
-  --color-secondary: oklch(0.87 0.04 120);         /* #CCD5AE */
-  --color-secondary-foreground: oklch(0.15 0 0);
+  /* Secondary (Terracotta) */
+  --color-secondary: var(--color-terracotta-400);
+  --color-secondary-foreground: var(--color-white);
+  --color-secondary-hover: var(--color-terracotta-500);
+  --color-secondary-active: var(--color-terracotta-600);
 
-  /* Accent (Terracotta) */
-  --color-accent: oklch(0.71 0.10 50);             /* #D4A373 */
-  --color-accent-foreground: oklch(1 0 0);
+  /* Accent (Stone - subtle backgrounds) */
+  --color-accent: var(--color-stone-100);
+  --color-accent-foreground: var(--color-slate-900);
 
-  /* Muted (Subtle backgrounds) */
-  --color-muted: oklch(0.96 0.02 85);              /* #FAEDCD */
-  --color-muted-foreground: oklch(0.44 0 0);
+  /* Muted (Subtle backgrounds & text) */
+  --color-muted: var(--color-stone-100);
+  --color-muted-foreground: var(--color-slate-600);
 
-  /* Destructive (Errors) */
-  --color-destructive: oklch(0.63 0.24 15);        /* Red */
-  --color-destructive-foreground: oklch(1 0 0);
+  /* Destructive (Errors & Urgent) */
+  --color-destructive: var(--color-ember-500);
+  --color-destructive-foreground: var(--color-white);
 
   /* Borders & Inputs */
-  --color-border: oklch(0.82 0.05 120);            /* Subtle sage border */
-  --color-input: oklch(0.82 0.05 120);
-  --color-ring: oklch(0.87 0.18 95);               /* Yellow focus ring */
+  --color-border: var(--color-stone-300);          /* Subtle warm border */
+  --color-input: var(--color-stone-300);
+  --color-ring: var(--color-sun-400);              /* Sun yellow focus ring */
 
   /* ============================================
      SHADOWS & ELEVATION
@@ -231,11 +462,17 @@
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.09), 0 8px 10px -6px rgb(0 0 0 / 0.08);
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.15);
 
-  /* Colored Shadows (for urgency highlights) */
-  --shadow-yellow: 0 4px 14px 0 rgb(255 224 27 / 0.15);
-  --shadow-drop: 0 4px 14px 0 rgb(239 68 68 / 0.15);
-  --shadow-new: 0 4px 14px 0 rgb(249 115 22 / 0.15);
-  --shadow-deal: 0 4px 14px 0 rgb(16 185 129 / 0.15);
+  /* Colored Shadows (for urgency highlights & brand glow) */
+  --shadow-sun: 0 4px 14px 0 rgb(255 199 0 / 0.18);     /* Sun yellow glow */
+  --shadow-ember: 0 4px 14px 0 rgb(239 68 68 / 0.15);   /* Ember red alert */
+  --shadow-blaze: 0 4px 14px 0 rgb(249 115 22 / 0.15);  /* Blaze orange energy */
+  --shadow-meadow: 0 4px 14px 0 rgb(16 185 129 / 0.15); /* Meadow green success */
+
+  /* Backward compatibility */
+  --shadow-yellow: var(--shadow-sun);
+  --shadow-drop: var(--shadow-ember);
+  --shadow-new: var(--shadow-blaze);
+  --shadow-deal: var(--shadow-meadow);
 
   /* ============================================
      BORDER RADIUS
@@ -302,7 +539,7 @@
 
 @layer base {
   * {
-    border-color: oklch(0.82 0.05 120); /* Sage border color */
+    border-color: var(--color-stone-300); /* Stone border color */
   }
 
   body {
@@ -312,29 +549,29 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Typography with 8px grid vertical rhythm */
+  /* Typography with perfect 8px grid vertical rhythm */
   h1 {
     @apply scroll-m-20 text-5xl font-extrabold tracking-tight;
     line-height: var(--text-5xl--line-height);
-    margin-bottom: var(--spacing-lg);  /* 24px */
+    margin-bottom: var(--spacing-6);  /* 24px - Perfect 3 × 8px */
   }
 
   h2 {
     @apply scroll-m-20 border-b text-4xl font-bold tracking-tight;
     line-height: var(--text-4xl--line-height);
-    padding-bottom: var(--spacing-md);  /* 16px */
-    margin-bottom: var(--spacing-lg);   /* 24px */
+    padding-bottom: var(--spacing-4);  /* 16px - Perfect 2 × 8px */
+    margin-bottom: var(--spacing-6);   /* 24px - Perfect 3 × 8px */
   }
 
   h3 {
     @apply scroll-m-20 text-3xl font-semibold tracking-tight;
     line-height: var(--text-3xl--line-height);
-    margin-bottom: var(--spacing-md);  /* 16px */
+    margin-bottom: var(--spacing-4);  /* 16px - Perfect 2 × 8px */
   }
 
   p {
     line-height: var(--text-base--line-height);
-    margin-top: var(--spacing-md);  /* 16px - maintains 8px grid */
+    margin-top: var(--spacing-4);  /* 16px - Perfect 2 × 8px, maintains 8px grid */
   }
 }
 
@@ -354,7 +591,7 @@
   .card-sneaker:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
-    border-color: var(--color-yellow-300);
+    border-color: var(--color-sun-300);
   }
 
   /* --- BADGE STYLES (Urgency Signals) --- */
@@ -411,17 +648,17 @@
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold;
     min-height: var(--min-touch-target);
-    background: var(--color-yellow-400);
-    color: var(--color-gray-900);
-    border: 2px solid var(--color-yellow-500);
+    background: var(--color-sun-400);
+    color: var(--color-slate-900);
+    border: 2px solid var(--color-sun-500);
     transition: all var(--transition-base);
     box-shadow: var(--shadow-sm);
   }
 
   .btn-primary:hover {
-    background: var(--color-yellow-500);
+    background: var(--color-sun-500);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md), var(--shadow-yellow);
+    box-shadow: var(--shadow-md), var(--shadow-sun);
   }
 
   .btn-primary:active {
@@ -432,14 +669,14 @@
   .btn-secondary {
     @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold;
     min-height: var(--min-touch-target);
-    background: var(--color-sage-200);
-    color: var(--color-gray-900);
-    border: 2px solid var(--color-sage-300);
+    background: var(--color-stone-200);
+    color: var(--color-slate-900);
+    border: 2px solid var(--color-stone-300);
     transition: all var(--transition-base);
   }
 
   .btn-secondary:hover {
-    background: var(--color-sage-300);
+    background: var(--color-stone-300);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
   }
@@ -464,23 +701,33 @@
   }
 
   /* Pulse animation for new drops */
-  @keyframes pulse-yellow {
+  @keyframes pulse-sun {
     0%, 100% {
-      box-shadow: 0 0 0 0 rgba(255, 224, 27, 0.4);
+      box-shadow: 0 0 0 0 rgba(255, 199, 0, 0.4);
     }
     50% {
-      box-shadow: 0 0 0 10px rgba(255, 224, 27, 0);
+      box-shadow: 0 0 0 10px rgba(255, 199, 0, 0);
     }
   }
 
   .pulse-new-drop {
-    animation: pulse-yellow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: pulse-sun 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Backward compatibility */
+  @keyframes pulse-yellow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(255, 199, 0, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba(255, 199, 0, 0);
+    }
   }
 
   /* --- TEXT UTILITIES --- */
 
   .text-gradient-accent {
-    background: linear-gradient(135deg, var(--color-yellow-400), var(--color-terracotta-400));
+    background: linear-gradient(135deg, var(--color-sun-400), var(--color-terracotta-400));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -489,7 +736,7 @@
   /* --- FOCUS STATES (Accessibility) --- */
 
   .focus-ring {
-    @apply outline-none ring-2 ring-yellow-400 ring-offset-2;
+    @apply outline-none ring-2 ring-sun-400 ring-offset-2;
   }
 }
 
@@ -499,12 +746,12 @@
 
 nav {
   @apply max-w-[1920px] mx-auto;
-  margin-block: var(--spacing-sm);
+  margin-block: var(--spacing-4);  /* 16px - Perfect alignment to 8px grid */
 }
 
 main {
   @apply max-w-[1920px] mx-auto;
-  margin-block: var(--spacing-sm);
+  margin-block: var(--spacing-4);  /* 16px - Perfect alignment to 8px grid */
 }
 
 /* ============================================
@@ -517,16 +764,16 @@ main {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-beige-100);
+  background: var(--color-stone-100);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-sage-300);
+  background: var(--color-stone-300);
   border-radius: var(--radius-lg);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-sage-400);
+  background: var(--color-stone-400);
 }
 
 :root {

@@ -29,20 +29,20 @@ function DashboardContent() {
 
         <Tabs defaultValue={defaultTab} className="w-full">
           {/* --- The New Simplified Tabs --- */}
-          <TabsList className="grid w-full max-w-7xl mx-auto grid-cols-4 mb-lg">
-            <TabsTrigger value="wishlist" className="flex items-center gap-xs">
+          <TabsList className="grid w-full max-w-7xl mx-auto grid-cols-4 mb-6">
+            <TabsTrigger value="wishlist" className="flex items-center gap-2">
               <Heart className="h-4 w-4" />
               Wishlist
             </TabsTrigger>
-            <TabsTrigger value="owned" className="flex items-center gap-xs">
+            <TabsTrigger value="owned" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Owned
             </TabsTrigger>
-            <TabsTrigger value="fit-profile" className="flex items-center gap-xs">
+            <TabsTrigger value="fit-profile" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />
               Fit Profile
             </TabsTrigger>
-            <TabsTrigger value="archive" className="flex items-center gap-xs">
+            <TabsTrigger value="archive" className="flex items-center gap-2">
                <Archive className="h-4 w-4" />
               Archived Items
             </TabsTrigger>
@@ -78,8 +78,8 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div className="w-full py-xl flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="w-full py-8 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     }>
       <DashboardContent />

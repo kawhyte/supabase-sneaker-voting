@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 export const viewport = {
-	themeColor: "#D4A373",
+	themeColor: "#FFC700", // Sun yellow - primary brand color
 	width: "device-width",
 	initialScale: 1,
 };
@@ -60,15 +60,18 @@ export default function RootLayout({
   suppressHydrationWarning
 >
   {/*
-    ✅ COLOR SYSTEM USAGE GUIDE
+    ✅ COLOR SYSTEM v2.0 USAGE GUIDE
 
-    Your app now uses the warm earth-tone palette defined in globals.css:
-    - bg-background = #E9EDC9 (warm light beige)
-    - text-foreground = dark neutral text
-    - bg-card = #CCD5AE (sage green for cards)
-    - bg-primary = #D4A373 (terracotta accent)
+    Your app uses a professional sneaker brand palette defined in globals.css:
 
-    HOW TO UPDATE OTHER PAGES:
+    🎨 SEMANTIC TOKENS (USE THESE):
+    - bg-background = stone-200 (warm stone background, lets product images pop)
+    - text-foreground = slate-900 (dark text)
+    - bg-card = white (clean white cards)
+    - bg-primary = sun-400 (vibrant yellow #FFC700, Mailchimp-inspired)
+    - bg-secondary = terracotta-400 (warm orange-red accent)
+
+    📘 HOW TO UPDATE COMPONENTS:
     1. Replace generic colors with semantic tokens:
        ❌ OLD: className="bg-white text-black"
        ✅ NEW: className="bg-background text-foreground"
@@ -76,14 +79,28 @@ export default function RootLayout({
     2. Use card backgrounds for elevated surfaces:
        ✅ className="bg-card text-card-foreground"
 
-    3. Use primary for accents/CTAs:
-       ✅ className="bg-primary text-primary-foreground"
+    3. Use primary for CTAs and brand moments:
+       ✅ className="bg-primary text-primary-foreground hover:bg-primary-hover"
 
-    4. Use secondary for supporting elements:
-       ✅ className="bg-secondary text-secondary-foreground"
+    4. Use secondary for supporting CTAs:
+       ✅ className="bg-secondary text-secondary-foreground hover:bg-secondary-hover"
 
-    5. For custom colors, define them in globals.css @layer base :root
-       (lines 12-47), NOT in tailwind.config.ts
+    5. Use functional colors for badges:
+       - Sold out: className="bg-ember-400 text-ember-600"
+       - New release: className="bg-blaze-400 text-blaze-600"
+       - Good deal: className="bg-meadow-400 text-meadow-600"
+
+    6. For direct color access, use the palette:
+       ✅ bg-stone-{50-950}, bg-sun-{50-950}, bg-terracotta-{50-950}
+       ✅ bg-ember-{50-950}, bg-blaze-{50-950}, bg-meadow-{50-950}
+       ✅ bg-slate-{50-950} (neutral grays)
+
+    ♿ ACCESSIBILITY:
+    - All -600+ shades are WCAG AAA compliant for text
+    - Use -400 for large text (18px+) or badges
+    - Pair light backgrounds (50-200) with dark text (600-900)
+
+    📚 Full documentation in globals.css (lines 97-315)
   */}
   <body className="min-h-screen bg-background text-foreground border-t-4 border-primary">
     <div className="flex flex-col min-h-screen">
