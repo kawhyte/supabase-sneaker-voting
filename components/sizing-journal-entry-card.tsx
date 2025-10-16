@@ -249,7 +249,7 @@ export function SizingJournalEntryCard({
 	return (
 		<TooltipProvider delayDuration={300}>
 			<Card
-				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full'
+				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full border border-stone-200 shadow-sm hover:shadow-md hover:border-stone-300 will-change-transform'
 				tabIndex={0}
 				role='article'
 				aria-label={`${entry.brand} ${entry.model}`}>
@@ -345,18 +345,18 @@ export function SizingJournalEntryCard({
 				{/* Image Section */}
 				{photos.length > 0 ? (
 					<div className='relative w-full overflow-hidden'>
-						<div className='relative w-full aspect-[4/3] flex items-center justify-center p-2 sm:p-4 lg:p-5 transition-all duration-200 card-image-container'>
+						<div className='relative w-full aspect-[4/3] bg-stone-100 flex items-center justify-center p-2 sm:p-4 lg:p-5 transition-all duration-200 card-image-container'>
 							{photos.length === 1 ? (
 								<img
 									src={photos[0].image_url}
 									alt={`${entry.brand} ${entry.model}${
 										entry.color !== "Standard" ? ` in ${entry.color}` : ""
 									}`}
-									className='w-full h-full object-contain'
+									className='w-full h-full object-contain transition-transform duration-300 group-hover:scale-105'
                   loading="lazy"
 								/>
 							) : (
-								<div className='w-full h-full'>
+								<div className='w-full h-full transition-transform duration-300 group-hover:scale-105'>
 									<PhotoCarousel
 										photos={photos}
 										showControls={true}
@@ -369,7 +369,7 @@ export function SizingJournalEntryCard({
 					</div>
 				) : (
 					<div className='relative w-full overflow-hidden'>
-						<div className='w-full aspect-[4/3] flex items-center justify-center transition-all duration-200 card-image-container'>
+						<div className='w-full aspect-[4/3] bg-stone-100 flex items-center justify-center transition-all duration-200 card-image-container'>
 							<ImageIcon className='h-12 w-12 text-muted-foreground' />
 						</div>
 					</div>
