@@ -681,10 +681,11 @@ export function AddItemForm({
 						</div>
 					) : (
 						<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-							<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+							{/* Experience Section */}
+							<div className='flex items-center gap-3 p-4 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors'>
 								<div>
-									<Label className='block mb-3'>Experience <span className='text-red-500'>*</span></Label>
-									<div className='flex items-center gap-3 p-3 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors'>
+									<Label className='block mb-2 text-sm'>Experience <span className='text-red-500'>*</span></Label>
+									<div className='flex items-center gap-3'>
 										<Switch
 											checked={watchedTriedOn}
 											onCheckedChange={(checked) =>
@@ -696,77 +697,57 @@ export function AddItemForm({
 										/>
 										<Label
 											htmlFor='triedOn'
-											className='flex-1 cursor-pointer text-sm font-medium text-foreground'
+											className='cursor-pointer text-sm font-medium text-foreground'
 										>
 											{watchedTriedOn ? "Tried On ✓" : "Just Browsing"}
 										</Label>
 									</div>
 									{watchedTriedOn && (
 										<p className='text-xs text-meadow-600 mt-2'>
-											👕 Details above will open when you're ready to add them
+											👕 Details will open when you're ready to add them
 										</p>
 									)}
-								</div>
-								<div>
-									<Label>Item Category <span className='text-red-500'>*</span></Label>
-									<Select
-										onValueChange={(v) =>
-											setValue("category", v as ItemCategory, {
-												shouldValidate: true,
-											})
-										}
-										value={watchedCategory}>
-										<SelectTrigger>
-											<SelectValue placeholder='Select a category' />
-										</SelectTrigger>
-										<SelectContent>
-											{Object.values(CATEGORY_CONFIGS).map((c) => (
-												<SelectItem key={c.id} value={c.id}>
-													{c.label}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
 								</div>
 							</div>
 
-							<h3 className='font-semibold border-b pb-2 font-heading'>Product Details</h3>
+							{/* Product Details Section */}
+							<div className='space-y-4'>
+								<h3 className='font-semibold border-b pb-2 font-heading text-base'>📦 Product Details</h3>
 
-							<div className='space-y-6'>
-
-								<div className="grid grid-cols-2 gap-16"> 
-								<div>
-									<Label>Item Name <span className='text-red-500'>*</span></Label>
-									<Input {...register("model")} />
-									{errors.model && (
-										<p className='text-sm text-red-600 mt-1'>
-											{errors.model.message}
-										</p>
-									)}
-								</div>
-								<div>
-									<Label>Brand <span className='text-red-500'>*</span></Label>
-									<BrandCombobox
-										value={watchedBrand}
-										onChange={(v) =>
-											setValue("brand", v, { shouldValidate: true })
-										}
-									/>
-									{errors.brand && (
-										<p className='text-sm text-red-600 mt-1'>
-											{errors.brand.message}
-										</p>
-									)}
-								</div>
-								</div>
-
+								{/* Row 1: Brand & Item Name */}
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-									<div className="">
-										<Label className='text-sm font-medium text-muted-foreground'>
+									<div>
+										<Label>Brand <span className='text-red-500'>*</span></Label>
+										<BrandCombobox
+											value={watchedBrand}
+											onChange={(v) =>
+												setValue("brand", v, { shouldValidate: true })
+											}
+										/>
+										{errors.brand && (
+											<p className='text-sm text-red-600 mt-1'>
+												{errors.brand.message}
+											</p>
+										)}
+									</div>
+									<div>
+										<Label>Item Name <span className='text-red-500'>*</span></Label>
+										<Input {...register("model")} />
+										{errors.model && (
+											<p className='text-sm text-red-600 mt-1'>
+												{errors.model.message}
+											</p>
+										)}
+									</div>
+								</div>
+
+								{/* Row 2: Retail Price & Target Price */}
+								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+									<div>
+										<Label className='text-sm font-medium'>
 											Retail Price <span className='text-red-500'>*</span>
 										</Label>
-
-										<div className='relative mt-[var(--space-md)]'>
+										<div className='relative mt-2'>
 											<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground'>
 												$
 											</span>
@@ -775,138 +756,106 @@ export function AddItemForm({
 												placeholder='170.00'
 												type='number'
 												step='0.01'
-												className='pl-8 h-10'
+												className='pl-8'
 											/>
 										</div>
+										{errors.retailPrice && (
+											<p className='text-sm text-red-600 mt-1'>
+												{errors.retailPrice.message}
+											</p>
+										)}
 
-										<>
-
-{watchedSalePrice &&
-        watchedRetailPrice &&
-        parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
-            <div
-                className='mt-2 p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300 bg-meadow-50 border-meadow-300'
-                role='status'
-                aria-live='polite'>
-                <Sparkles
-                    className='h-4 w-4 flex-shrink-0 text-meadow-600'
-                    aria-hidden='true'
-                />
-                <div className='flex-1 min-w-0'>
-                    <p
-                        className='text-sm font-semibold text-meadow-700'>
-                        Active sale detected: ${watchedSalePrice}
-                    </p>
-                    <p
-                        className='text-xs text-meadow-600'>
-                        You save ${
-                            (parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)).toFixed(2)
-                        } ({
-                            // Calculate discount percentage
-                            Math.round(
-                                ((parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)) /
-                                    parseFloat(watchedRetailPrice)) *
-                                    100
-                            )
-                        }%)
-                    </p>
-                </div>
-            </div>
-    )}
-
-</>
-
-
+										{/* Sale Alert - Inline after Retail Price */}
+										{watchedSalePrice &&
+											watchedRetailPrice &&
+											parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
+												<div
+													className='mt-3 p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300 bg-meadow-50 border-meadow-300'
+													role='status'
+													aria-live='polite'>
+													<Sparkles
+														className='h-4 w-4 flex-shrink-0 text-meadow-600 mt-0.5'
+														aria-hidden='true'
+													/>
+													<div className='flex-1 min-w-0'>
+														<p className='text-sm font-semibold text-meadow-700'>
+															Active sale: ${watchedSalePrice}
+														</p>
+														<p className='text-xs text-meadow-600'>
+															Save ${
+																(parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)).toFixed(2)
+															} ({
+																Math.round(
+																	((parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)) /
+																		parseFloat(watchedRetailPrice)) *
+																		100
+																)
+															}%)
+														</p>
+													</div>
+												</div>
+											)}
 									</div>
-								
-								</div>
-								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 									<div>
-										<Label className='text-sm font-medium text-muted-foreground'>
+										<Label className='text-sm font-medium'>
 											Target Price <span className='text-red-500'>*</span>
 										</Label>
 										<Input
 											{...register("targetPrice")}
 											type='number'
 											step='0.01'
+											placeholder='0.00'
+											className='mt-2'
 										/>
+										{errors.targetPrice && (
+											<p className='text-sm text-red-600 mt-1'>
+												{errors.targetPrice.message}
+											</p>
+										)}
 									</div>
-									{/* <div><Label>Target Price</Label><Input {...register("targetPrice")} type="number" step="0.01" /></div> */}
 								</div>
 
-{watchedTriedOn && (
-											<div className='border-t pt-6 space-y-6'>
-												<h4 className='font-semibold'>Try-On Details</h4>
-												{isSizeRequired(watchedCategory) && (
-													<div>
-														<Label>Size Tried <span className='text-red-500'>*</span></Label>
-														{watchedCategory === "shoes" ? (
-															<SizeCombobox
-																value={watch("sizeTried")}
-																onChange={(v) =>
-																	setValue("sizeTried", v, {
-																		shouldValidate: true,
-																	})
-																}
-															/>
-														) : (
-															<ClothingSizeCombobox
-																value={watch("sizeTried")}
-																onChange={(v) =>
-																	setValue("sizeTried", v, {
-																		shouldValidate: true,
-																	})
-																}
-															/>
-														)}
-														{errors.sizeTried && (
-															<p className='text-sm text-red-600 mt-1'>
-																{errors.sizeTried.message}
-															</p>
-														)}
-													</div>
-												)}
-												{isComfortRequired(watchedCategory) && (
-													<div>
-														<Label>Comfort Rating *</Label>
-														<RadioGroup
-															value={watch("comfortRating")?.toString()}
-															onValueChange={(v) =>
-																setValue("comfortRating", parseInt(v), {
-																	shouldValidate: true,
-																})
-															}
-															className='flex gap-2 mt-2'>
-															{[1, 2, 3, 4, 5].map((r) => (
-																<div
-																	key={r}
-																	className='flex items-center space-x-2'>
-																	<RadioGroupItem
-																		value={r.toString()}
-																		id={`r${r}`}
-																	/>
-																	<Label htmlFor={`r${r}`}>{r}</Label>
-																</div>
-															))}
-														</RadioGroup>
-														{errors.comfortRating && (
-															<p className='text-sm text-red-600 mt-1'>
-																{errors.comfortRating.message}
-															</p>
-														)}
-													</div>
-												)}
-											</div>
+								{/* Row 3: Item Category */}
+								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+									<div>
+										<Label>
+											Item Category <span className='text-red-500'>*</span>
+										</Label>
+										<Select
+											onValueChange={(v) =>
+												setValue("category", v as ItemCategory, {
+													shouldValidate: true,
+												})
+											}
+											value={watchedCategory}>
+											<SelectTrigger className='mt-2'>
+												<SelectValue placeholder='Select a category' />
+											</SelectTrigger>
+											<SelectContent>
+												{Object.values(CATEGORY_CONFIGS).map((c) => (
+													<SelectItem key={c.id} value={c.id}>
+														{c.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										{errors.category && (
+											<p className='text-sm text-red-600 mt-1'>
+												{errors.category.message}
+											</p>
 										)}
+									</div>
+								</div>
+							</div>
 
-
-
-
+							{/* Photos Section */}
+							<div className='space-y-4'>
+								<h3 className='font-semibold border-b pb-2 font-heading text-base'>📸 Photos</h3>
 								<div>
 									<Label>
-										Photos *{" "}
+										Photos <span className='text-red-500'>*</span>{" "}
 										<span className='text-xs text-muted-foreground'>
-											(Min 1)
+											(Min 1, Max 5)
 										</span>
 									</Label>
 									<MultiPhotoUpload
@@ -922,6 +871,7 @@ export function AddItemForm({
 								</div>
 							</div>
 
+							{/* Additional Details & Try-On Details Accordion */}
 							<Accordion
 								type='single'
 								collapsible
