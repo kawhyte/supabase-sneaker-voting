@@ -689,44 +689,6 @@ export function AddItemForm({
 						</div>
 					) : (
 						<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-							{/* Experience Section */}
-							<div className='flex items-center gap-3 p-4 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors'>
-								<div className='w-full'>
-									<div className='flex items-center gap-2 mb-2'>
-										<Eye className='h-4 w-4 text-slate-600' />
-										<Label className='block text-sm font-semibold text-slate-900'>Experience <span className='text-red-500'>*</span></Label>
-									</div>
-									<div className='flex items-center gap-3'>
-										<Switch
-											checked={watchedTriedOn}
-											onCheckedChange={(checked) =>
-												setValue("triedOn", checked, {
-													shouldValidate: true,
-												})
-											}
-											id='triedOn'
-										/>
-										<Label
-											htmlFor='triedOn'
-											className='cursor-pointer text-sm font-medium text-slate-900'
-										>
-											{watchedTriedOn ? (
-												<>
-													Tried On <CheckCircle className='inline h-4 w-4 text-meadow-600 ml-1' />
-												</>
-											) : (
-												"Just Browsing"
-											)}
-										</Label>
-									</div>
-									{watchedTriedOn && (
-										<p className='text-xs text-meadow-600 mt-2'>
-											<span className='sr-only'>Shirt emoji:</span> Details will open when you're ready to add them
-										</p>
-									)}
-								</div>
-							</div>
-
 							{/* Product Details Section */}
 							<div className='space-y-6'>
 								<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
@@ -734,7 +696,75 @@ export function AddItemForm({
 									<h3 className='font-semibold font-heading text-base text-slate-900 leading-5'>Product Details</h3>
 								</div>
 
-								{/* Row 1: Brand & Item Name */}
+								{/* Row 1: Experience & Item Category */}
+								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+									<div className='flex items-center gap-3 p-4 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors h-fit'>
+										<div className='w-full'>
+											<div className='flex items-center gap-2 mb-2'>
+												<Eye className='h-4 w-4 text-slate-600 flex-shrink-0' />
+												<Label className='block text-sm font-semibold text-slate-900'>Experience <span className='text-red-500'>*</span></Label>
+											</div>
+											<div className='flex items-center gap-3'>
+												<Switch
+													checked={watchedTriedOn}
+													onCheckedChange={(checked) =>
+														setValue("triedOn", checked, {
+															shouldValidate: true,
+														})
+													}
+													id='triedOn'
+												/>
+												<Label
+													htmlFor='triedOn'
+													className='cursor-pointer text-sm font-medium text-slate-900'
+												>
+													{watchedTriedOn ? (
+														<>
+															Tried On <CheckCircle className='inline h-4 w-4 text-meadow-600 ml-1' />
+														</>
+													) : (
+														"Just Browsing"
+													)}
+												</Label>
+											</div>
+											{watchedTriedOn && (
+												<p className='text-xs text-meadow-600 mt-2'>
+													<span className='sr-only'>Shirt emoji:</span> Details will open when you're ready to add them
+												</p>
+											)}
+										</div>
+									</div>
+									<div>
+										<Label className='text-sm font-medium text-slate-900'>
+											Item Category <span className='text-red-500'>*</span>
+										</Label>
+										<Select
+											onValueChange={(v) =>
+												setValue("category", v as ItemCategory, {
+													shouldValidate: true,
+												})
+											}
+											value={watchedCategory} >
+											<SelectTrigger className='mt-2'>
+												<SelectValue  placeholder='Select a category' />
+											</SelectTrigger>
+											<SelectContent>
+												{Object.values(CATEGORY_CONFIGS).map((c) => (
+													<SelectItem key={c.id} value={c.id}>
+														{c.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										{errors.category && (
+											<p className='text-sm text-red-600 mt-1'>
+												{errors.category.message}
+											</p>
+										)}
+									</div>
+								</div>
+
+								{/* Row 2: Brand & Item Name */}
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 									<div>
 										<Label className='text-sm font-medium text-slate-900'>Brand <span className='text-red-500'>*</span></Label>
@@ -832,38 +862,6 @@ export function AddItemForm({
 										{errors.targetPrice && (
 											<p className='text-sm text-red-600 mt-1'>
 												{errors.targetPrice.message}
-											</p>
-										)}
-									</div>
-								</div>
-
-								{/* Row 3: Item Category */}
-								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-									<div>
-										<Label className='text-sm font-medium text-slate-900'>
-											Item Category <span className='text-red-500'>*</span>
-										</Label>
-										<Select
-											onValueChange={(v) =>
-												setValue("category", v as ItemCategory, {
-													shouldValidate: true,
-												})
-											}
-											value={watchedCategory} >
-											<SelectTrigger className='mt-2'>
-												<SelectValue  placeholder='Select a category' />
-											</SelectTrigger>
-											<SelectContent>
-												{Object.values(CATEGORY_CONFIGS).map((c) => (
-													<SelectItem key={c.id} value={c.id}>
-														{c.label}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-										{errors.category && (
-											<p className='text-sm text-red-600 mt-1'>
-												{errors.category.message}
 											</p>
 										)}
 									</div>
