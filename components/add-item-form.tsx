@@ -671,11 +671,11 @@ export function AddItemForm({
 								</div>
 							</div>
 							<div className='relative'>
-								<div className='absolute inset-0 flex items-center'>
+								{/* <div className='absolute inset-0 flex items-center'>
 									<span className='w-full border-t' />
-								</div>
+								</div> */}
 								<div className='relative flex justify-center text-xs uppercase'>
-									<span className='bg-background px-2 text-muted-foreground'>
+									<span className='bg-background px-2 text-muted-foreground font-bold'>
 										Or
 									</span>
 								</div>
@@ -702,7 +702,7 @@ export function AddItemForm({
 										<div className='w-full'>
 											<div className='flex items-center gap-2 mb-2'>
 												<Eye className='h-4 w-4 text-slate-600 flex-shrink-0' />
-												<Label className='block text-sm font-semibold text-slate-900'>Experience <span className='text-red-500'>*</span></Label>
+												<Label className='block text-sm font-semibold text-slate-900'> Did you try this item before ? </Label>
 											</div>
 											<div className='flex items-center gap-3'>
 												<Switch
@@ -720,10 +720,10 @@ export function AddItemForm({
 												>
 													{watchedTriedOn ? (
 														<>
-															Tried On <CheckCircle className='inline h-4 w-4 text-meadow-600 ml-1' />
+															Yes <CheckCircle className='inline h-4 w-4 text-meadow-600 ml-1' />
 														</>
 													) : (
-														"Just Browsing"
+														"No"
 													)}
 												</Label>
 											</div>
