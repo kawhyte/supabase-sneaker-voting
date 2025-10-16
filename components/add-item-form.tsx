@@ -115,6 +115,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	Accordion,
@@ -301,6 +302,7 @@ export function AddItemForm({
 	const [showImageModal, setShowImageModal] = useState(false);
 	const [scrapedImages, setScrapedImages] = useState<string[]>([]);
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [openAccordionItem, setOpenAccordionItem] = useState<string>("");
 	const supabase = createClient();
 
 	const {
@@ -375,6 +377,15 @@ export function AddItemForm({
 			}
 		}
 	}, [mode, initialData, reset]);
+
+	// Auto-open/close accordion when switch toggles
+	useEffect(() => {
+		if (watchedTriedOn) {
+			setOpenAccordionItem("item-1");
+		} else {
+			setOpenAccordionItem("");
+		}
+	}, [watchedTriedOn]);
 
 	const handleUrlScrape = async (url: string) => {
 		if (!url.trim()) return;
@@ -672,24 +683,29 @@ export function AddItemForm({
 						<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
 							<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 								<div>
-									<Label>Experience <span className='text-red-500'>*</span></Label>
-									<RadioGroup
-										value={watchedTriedOn ? "tried" : "seen"}
-										onValueChange={(v) =>
-											setValue("triedOn", v === "tried", {
-												shouldValidate: true,
-											})
-										}
-										className='flex gap-4 mt-2'>
-										<div className='flex items-center space-x-2'>
-											<RadioGroupItem value='seen' id='seen' />
-											<Label htmlFor='seen'>Seen</Label>
-										</div>
-										<div className='flex items-center space-x-2'>
-											<RadioGroupItem value='tried' id='tried' />
-											<Label htmlFor='tried'>Tried On</Label>
-										</div>
-									</RadioGroup>
+									<Label className='block mb-3'>Experience <span className='text-red-500'>*</span></Label>
+									<div className='flex items-center gap-3 p-3 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors'>
+										<Switch
+											checked={watchedTriedOn}
+											onCheckedChange={(checked) =>
+												setValue("triedOn", checked, {
+													shouldValidate: true,
+												})
+											}
+											id='triedOn'
+										/>
+										<Label
+											htmlFor='triedOn'
+											className='flex-1 cursor-pointer text-sm font-medium text-foreground'
+										>
+											{watchedTriedOn ? "Tried On ✓" : "Just Browsing"}
+										</Label>
+									</div>
+									{watchedTriedOn && (
+										<p className='text-xs text-meadow-600 mt-2'>
+											👕 Details above will open when you're ready to add them
+										</p>
+									)}
 								</div>
 								<div>
 									<Label>Item Category <span className='text-red-500'>*</span></Label>
@@ -906,11 +922,17 @@ export function AddItemForm({
 								</div>
 							</div>
 
-							<Accordion type='single' collapsible className='w-full'>
+							<Accordion
+								type='single'
+								collapsible
+								className='w-full'
+								value={openAccordionItem}
+								onValueChange={setOpenAccordionItem}
+							>
 								<AccordionItem value='item-1'>
 									<AccordionTrigger>
 										<h3 className='font-semibold font-heading'>
-											Add More Details (Optional)
+											{watchedTriedOn ? "📋 Try-On Details" : "Add More Details (Optional)"}
 										</h3>
 									</AccordionTrigger>
 									<AccordionContent className='space-y-6 pt-6'>
