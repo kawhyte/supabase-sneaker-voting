@@ -170,9 +170,7 @@ interface PhotoItem {
 
 const itemSchema = z
 	.object({
-		interactionType: z.enum(["seen", "tried"], {
-			required_error: "Please select whether you saw or tried on this item",
-		}),
+		triedOn: z.boolean().default(false),
 		category: z.enum(
 			[
 				"shoes",
@@ -247,7 +245,7 @@ const itemSchema = z
 	})
 	.refine(
 		(data) => {
-			if (isSizeRequired(data.category) && data.interactionType === "tried") {
+			if (isSizeRequired(data.category) && data.triedOn) {
 				return data.sizeTried && data.sizeTried.length > 0;
 			}
 			return true;
@@ -258,7 +256,7 @@ const itemSchema = z
 		(data) => {
 			if (
 				isComfortRequired(data.category) &&
-				data.interactionType === "tried"
+				data.triedOn
 			) {
 				return data.comfortRating !== undefined;
 			}
@@ -318,7 +316,7 @@ export function AddItemForm({
 		defaultValues:
 			mode === "edit" && initialData
 				? {
-						interactionType: initialData.has_been_tried ? "tried" : "seen",
+						triedOn: initialData.has_been_tried || false,
 						category: initialData.category || undefined,
 						brand: initialData.brand || "",
 						model: initialData.model || "",
@@ -333,11 +331,11 @@ export function AddItemForm({
 						notes: initialData.notes || "",
 				  }
 				: {
-						interactionType: "seen",
+						triedOn: false,
 				  },
 	});
 
-	const watchedInteractionType = watch("interactionType");
+	const watchedTriedOn = watch("triedOn");
 	const watchedCategory = watch("category");
 	const watchedRetailPrice = watch("retailPrice");
 	const watchedSalePrice = watch("salePrice");
@@ -346,7 +344,7 @@ export function AddItemForm({
 	useEffect(() => {
 		if (mode === "edit" && initialData) {
 			reset({
-				interactionType: initialData.has_been_tried ? "tried" : "seen",
+				triedOn: initialData.has_been_tried || false,
 				category: initialData.category || undefined,
 				brand: initialData.brand || "",
 				model: initialData.model || "",
@@ -357,7 +355,7 @@ export function AddItemForm({
 				retailPrice: initialData.retail_price?.toString() || "",
 				salePrice: initialData.sale_price?.toString() || "",
 				targetPrice: initialData.target_price?.toString() || "",
-				
+
 				// targetPrice: initialData.target_price?.toString() || "",
 				notes: initialData.notes || "",
 			});
@@ -513,9 +511,9 @@ export function AddItemForm({
 				sku: data.sku || null,
 				category: data.category,
 				size_type: getSizeType(data.category),
-				size_tried: data.interactionType === "tried" ? data.sizeTried : null,
+				size_tried: data.triedOn ? data.sizeTried : null,
 				comfort_rating:
-					data.interactionType === "tried" ? data.comfortRating : null,
+					data.triedOn ? data.comfortRating : null,
 				retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
 				sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
@@ -525,7 +523,7 @@ export function AddItemForm({
 					| "wishlisted"
 					| "owned"
 					| "journaled",
-				has_been_tried: data.interactionType === "tried",
+				has_been_tried: data.triedOn,
 
 				// target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 			};
@@ -676,9 +674,9 @@ export function AddItemForm({
 								<div>
 									<Label>Experience <span className='text-red-500'>*</span></Label>
 									<RadioGroup
-										value={watchedInteractionType}
+										value={watchedTriedOn ? "tried" : "seen"}
 										onValueChange={(v) =>
-											setValue("interactionType", v as "seen" | "tried", {
+											setValue("triedOn", v === "tried", {
 												shouldValidate: true,
 											})
 										}
@@ -719,6 +717,8 @@ export function AddItemForm({
 							<h3 className='font-semibold border-b pb-2 font-heading'>Product Details</h3>
 
 							<div className='space-y-6'>
+
+								<div className="grid grid-cols-2 gap-16"> 
 								<div>
 									<Label>Item Name <span className='text-red-500'>*</span></Label>
 									<Input {...register("model")} />
@@ -741,6 +741,7 @@ export function AddItemForm({
 											{errors.brand.message}
 										</p>
 									)}
+								</div>
 								</div>
 
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -817,7 +818,7 @@ export function AddItemForm({
 									{/* <div><Label>Target Price</Label><Input {...register("targetPrice")} type="number" step="0.01" /></div> */}
 								</div>
 
-{watchedInteractionType === "tried" && (
+{watchedTriedOn && (
 											<div className='border-t pt-6 space-y-6'>
 												<h4 className='font-semibold'>Try-On Details</h4>
 												{isSizeRequired(watchedCategory) && (
@@ -929,7 +930,7 @@ export function AddItemForm({
 											<Textarea {...register("notes")} maxLength={120} />
 										</div>
 
-										{watchedInteractionType === "tried" && (
+										{watchedTriedOn && (
 											<div className='border-t pt-6 space-y-6'>
 												<h4 className='font-semibold'>Try-On Details</h4>
 												{isSizeRequired(watchedCategory) && (
