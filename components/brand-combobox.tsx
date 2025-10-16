@@ -78,7 +78,7 @@ export function BrandCombobox({ value, onChange, disabled }: BrandComboboxProps)
           size='sm'
           aria-expanded={open}
           disabled={disabled}
-          className="w-full justify-between h-10" 
+          className="w-full justify-between h-10 mt-2" 
         >
           {displayValue}
           <ChevronsUpDown className="ml-[var(--space-xs)] h-2 w-2 shrink-0 opacity-50" />

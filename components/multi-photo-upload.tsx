@@ -288,8 +288,8 @@ export function MultiPhotoUpload({
 
       {/* Max Photos Warning */}
       {photos.length >= maxPhotos && (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
+        <Alert className=''>
+          <AlertCircle className="h-4 w-4 " />
           <AlertDescription>
             Maximum of {maxPhotos} photos reached. Remove a photo to add more.
           </AlertDescription>

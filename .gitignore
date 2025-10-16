@@ -41,3 +41,7 @@ next-env.d.ts
 # Build permissions fix
 .next-backup/
 fix-permissions.sh
+
+# MD files
+
+*.md

@@ -622,7 +622,7 @@ export function AddItemForm({
 
 	return (
 		<div className='max-w-7xl mx-auto w-full p-4 md:p-6 lg:p-8'>
-			<Card className='bg-card shadow-md'>
+			<Card className='bg-card'>
 				{!isFormVisible && mode === "create" && (
 					<CardHeader className='text-left pb-6'>
 						<CardTitle className='text-3xl flex flex-col justify-start font-heading'>
@@ -739,10 +739,12 @@ export function AddItemForm({
 									<div>
 										<Label className='text-sm font-medium text-slate-900'>Brand <span className='text-red-500'>*</span></Label>
 										<BrandCombobox
+										
 											value={watchedBrand}
 											onChange={(v) =>
 												setValue("brand", v, { shouldValidate: true })
 											}
+										 
 										/>
 										{errors.brand && (
 											<p className='text-sm text-red-600 mt-1'>
@@ -847,9 +849,9 @@ export function AddItemForm({
 													shouldValidate: true,
 												})
 											}
-											value={watchedCategory}>
+											value={watchedCategory} >
 											<SelectTrigger className='mt-2'>
-												<SelectValue placeholder='Select a category' />
+												<SelectValue  placeholder='Select a category' />
 											</SelectTrigger>
 											<SelectContent>
 												{Object.values(CATEGORY_CONFIGS).map((c) => (
