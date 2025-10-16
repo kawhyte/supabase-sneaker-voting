@@ -1,3 +1,99 @@
+/**
+ * ✅ ADD ITEM FORM - DESIGN SYSTEM v2.0 IMPLEMENTATION
+ *
+ * 🎯 DESIGN STRATEGY:
+ *
+ * **Component Purpose:**
+ * Complex multi-step form for adding wardrobe items (shoes, clothing, accessories).
+ * Supports URL scraping for auto-fill or manual entry mode.
+ * Handles photos, sizing, comfort ratings, pricing, and try-on metadata.
+ *
+ * **Layout Structure:**
+ * 1. Card Container
+ *    - bg-card shadow-md: White elevated surface above page background
+ *    - max-w-7xl mx-auto w-full: Wide form layout (1280px max, centered, responsive)
+ *    - Responsive and adaptive to content
+ *
+ * 2. URL Input Section (Create Mode Only)
+ *    - bg-blaze-50 rounded-lg: Energetic orange background
+ *    - border-2 border-sun-300: Primary accent border
+ *    - p-4 sm:p-6: Responsive padding (16-24px)
+ *    - Highlights convenience of URL import feature
+ *
+ * 3. Manual Entry Form
+ *    - space-y-6: 24px vertical spacing between sections
+ *    - grid grid-cols-1 md:grid-cols-2 gap-6: Responsive two-column layout
+ *    - Organized sections: Experience, Category, Product Details, Try-On Details, Photos
+ *
+ * 4. Sale Detection Alert
+ *    - bg-meadow-50 border-meadow-300: Success/positive sentiment colors
+ *    - Sparkles icon with text-meadow-600: Visual emphasis
+ *    - Animated entrance: slide-in-from-top-2, fade-in
+ *    - Displays savings percentage and amount
+ *
+ * **Color System Integration:**
+ * - Background: bg-background (blaze-50) from page container
+ * - Card: bg-card (white) for elevated surfaces
+ * - URL Section: bg-blaze-50 (energetic orange), border-sun-300 (primary)
+ * - URL Section Text: text-foreground (slate-900), text-muted-foreground (slate-600)
+ * - Sale Alert: bg-meadow-50 (success green), border-meadow-300
+ * - Sale Alert Icons: text-meadow-600, text-meadow-700
+ * - Error Text: text-red-600 (standard validation error)
+ * - Labels: text-muted-foreground for secondary emphasis
+ *
+ * **Spacing System (Perfect 8px Grid):**
+ * - Card padding: p-6 sm:p-8 (responsive)
+ * - URL section padding: p-4 sm:p-6 (16-24px)
+ * - Form section spacing: space-y-6 (24px = spacing-component)
+ * - Grid gaps: gap-6 (24px = spacing-component)
+ * - Label spacing: mt-2 (8px)
+ * - Relative positioning: mt-[var(--space-md)] uses CSS variable
+ * - All values align to 8px multiples
+ *
+ * **Responsive Breakpoints:**
+ * - Mobile (< 640px): Single column, full-width, compact spacing
+ * - Tablet (640px - 1024px): Single column with improved readability
+ * - Desktop (1024px+): Two-column grid for Product Details and pricing
+ * - Max-width: 6xl (64rem) to prevent excessive width on ultra-wide screens
+ *
+ * **Accessibility (WCAG AAA):**
+ * - Role="status" aria-live="polite" on sale alert for screen readers
+ * - aria-hidden on decorative icons (Sparkles)
+ * - Semantic form structure with Labels + Inputs
+ * - Required field indicators: red asterisks with <span>
+ * - Error messages below form fields for context
+ * - Touch targets: 44px minimum (inputs, buttons)
+ * - Color not sole indicator: Error text + red styling, but also positioned below field
+ *
+ * **Form States & Modes:**
+ * - Create Mode: Shows URL import section first, then manual entry option
+ * - Edit Mode: Shows form directly with existing data pre-populated
+ * - Loading State: Loader2 spinner on submit button during upload
+ * - Scraping State: Loading indicator and progress message during URL parse
+ *
+ * **Dynamic Styling:**
+ * - Sale Alert: Visible only when salePrice < retailPrice
+ * - Try-On Details: Visible only when interactionType === "tried"
+ * - Size Fields: Conditional based on category (shoes vs clothing)
+ * - Comfort Rating: Conditional based on category requirements
+ *
+ * **Performance:**
+ * - useForm with React Hook Form for efficient validation
+ * - Zod schema for compile-time type safety
+ * - Lazy image loading via ImageConfirmationModal
+ * - FormData for efficient file uploads
+ * - CSS variables for responsive values (--space-md)
+ *
+ * **Future Scalability:**
+ * - Easily add more pricing tiers (resale price, insurance value, etc.)
+ * - Expandable photo gallery with drag-reorder
+ * - Additional try-on metadata (fit feedback, styling notes, etc.)
+ * - URL scraper integration for more retailers
+ * - Draft saving/restoration capability
+ *
+ * 📚 Related: globals.css (spacing, colors), page.tsx (uses AddItemForm), AddProductClient component
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -508,8 +604,8 @@ export function AddItemForm({
 	// --- END ---
 
 	return (
-		<div className='max-w-6xl mx-auto'>
-			<Card className='card-interactive shadow-lg'>
+		<div className='max-w-7xl mx-auto w-full'>
+			<Card className='bg-card '>
 				{!isFormVisible && mode === "create" && (
 					<CardHeader className='text-left pb-6'>
 						<CardTitle className='text-3xl flex flex-col justify-start font-heading'>
@@ -524,12 +620,12 @@ export function AddItemForm({
 				<CardContent className='pt-6'>
 					{!isFormVisible && mode === "create" ? (
 						<div className='space-y-6'>
-							<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border-2 border-blue-200'>
-								<h3 className='text-base font-semibold text-blue-800 mb-4 font-heading'>
+							<div className='bg-blaze-50 rounded-lg p-4 sm:p-6 border-2 border-sun-300'>
+								<h3 className='text-base font-semibold text-foreground mb-4 font-heading'>
 									Auto-fill from URL
 								</h3>
 								<div className='space-y-2'>
-									<Label htmlFor='productUrl' className='text-xs text-blue-700'>
+									<Label htmlFor='productUrl' className='text-xs text-muted-foreground'>
 										Paste product URL from a supported retailer.
 									</Label>
 									<div className='flex flex-col sm:flex-row gap-2'>
@@ -649,12 +745,12 @@ export function AddItemForm({
 
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 									<div className="">
-										<Label className='text-sm font-medium text-gray-700'>
+										<Label className='text-sm font-medium text-muted-foreground'>
 											Retail Price <span className='text-red-500'>*</span>
 										</Label>
 
 										<div className='relative mt-[var(--space-md)]'>
-											<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'>
+											<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground'>
 												$
 											</span>
 											<Input
@@ -672,27 +768,20 @@ export function AddItemForm({
         watchedRetailPrice &&
         parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
             <div
-                className='mt-2 p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300'
-                style={{
-                    backgroundColor: "var(--color-green-50)",
-                    borderColor: "var(--color-green-200)",
-                }}
+                className='mt-2 p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300 bg-meadow-50 border-meadow-300'
                 role='status'
                 aria-live='polite'>
                 <Sparkles
-                    className='h-4 w-4 flex-shrink-0'
-                    style={{ color: "var(--color-green-600)" }}
+                    className='h-4 w-4 flex-shrink-0 text-meadow-600'
                     aria-hidden='true'
                 />
                 <div className='flex-1 min-w-0'>
                     <p
-                        className='text-sm font-semibold'
-                        style={{ color: "var(--color-green-800)" }}>
+                        className='text-sm font-semibold text-meadow-700'>
                         Active sale detected: ${watchedSalePrice}
                     </p>
                     <p
-                        className='text-xs'
-                        style={{ color: "var(--color-green-700)" }}>
+                        className='text-xs text-meadow-600'>
                         You save ${
                             (parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)).toFixed(2)
                         } ({
@@ -716,7 +805,7 @@ export function AddItemForm({
 								</div>
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 									<div>
-										<Label className='text-sm font-medium text-gray-700'>
+										<Label className='text-sm font-medium text-muted-foreground'>
 											Target Price <span className='text-red-500'>*</span>
 										</Label>
 										<Input

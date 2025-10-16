@@ -756,10 +756,12 @@ nav {
   margin-block: var(--spacing-6);  /* 24px - Component-level spacing for major structural element */
 }
 
-main {
+/* main {
   @apply max-w-[1920px] mx-auto;
-  margin-block: var(--spacing-4);  /* 16px - Perfect alignment to 8px grid */
-}
+  margin-block: var(--spacing-6); 
+ }  */
+  /* 16px - Perfect alignment to 8px grid */
+
 
 /* ============================================
    SCROLLBAR STYLING (Optional Enhancement)
