@@ -204,7 +204,7 @@ function ArchiveMetadataBadge({
 		<>
 			<Badge
 				variant='outline'
-				className={`text-[11px] sm:text-xs ${getArchiveReasonColor(archiveReason)}`}
+				className={`text-xs rounded-md ${getArchiveReasonColor(archiveReason)}`}
 			>
 				{formatArchiveReason(archiveReason)}
 			</Badge>
@@ -249,7 +249,7 @@ export function SizingJournalEntryCard({
 	return (
 		<TooltipProvider delayDuration={300}>
 			<Card
-				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full border border-stone-200 shadow-sm hover:shadow-md hover:border-stone-300 will-change-transform'
+				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full border border-stone-200 shadow-sm hover:shadow-md hover:border-stone-300 will-change-transform focus-visible:ring-2 focus-visible:ring-sun-400 focus-visible:ring-offset-2'
 				tabIndex={0}
 				role='article'
 				aria-label={`${entry.brand} ${entry.model}`}>
@@ -259,7 +259,7 @@ export function SizingJournalEntryCard({
 						<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
 							<button
-								className='h-5 w-5 rounded-full flex items-center justify-center transition-colors hover:bg-stone-100 active:bg-stone-200 text-foreground hover:text-primary'
+								className='h-5 w-5 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:bg-stone-100 active:bg-stone-200 text-foreground hover:text-primary will-change-transform'
 								type='button'
 								aria-label='Card actions'>
 								<MoreVertical className='h-5 w-5' />
@@ -417,10 +417,12 @@ export function SizingJournalEntryCard({
 							{isOwned ? (
 								// OWNED ITEMS: Show purchase price
 								entry.purchase_price && (
-									<div className='flex items-center gap-2'>
-										{/* <DollarSign className='h-4 w-4 text-muted-foreground' /> */}
+									<div className='flex items-center gap-1'>
+										<span className='text-xs text-muted-foreground'>
+											Purchased for:
+										</span>
 										<span className='text-sm font-semibold text-foreground'>
-											Purchased for: ${entry.purchase_price}
+											${entry.purchase_price}
 										</span>
 									</div>
 								)
@@ -429,19 +431,18 @@ export function SizingJournalEntryCard({
 								<>
 									{entry.retail_price && (
 										<div className='flex items-center gap-1 flex-wrap'>
-											{/* <DollarSign className='h-4 w-4 text-muted-foreground' /> */}
-											<span className=' text-xs text-muted-foreground mr-1'>Retail price:</span>
+											<span className='text-xs text-muted-foreground'>Retail price:</span>
 											{isOnSale ? (
 												<>
-													<span className='text-sm line-through text-muted-foreground mr-1'>
-														 ${entry.retail_price}
+													<span className='text-sm line-through text-muted-foreground'>
+														${entry.retail_price}
 													</span>
-													<span className='text-sm font-bold mr-1 text-meadow-600'>
+													<span className='text-sm font-bold text-meadow-600'>
 														${entry.sale_price}
 													</span>
 													<Badge
 														variant='outline'
-														className='text-[10px] px-1.5 py-0 border-meadow-400 bg-meadow-50 text-meadow-600'
+														className='text-xs px-1.5 py-0 rounded-md border-meadow-400 bg-meadow-50 text-meadow-600'
 													>
 														On Sale!
 													</Badge>
@@ -450,13 +451,13 @@ export function SizingJournalEntryCard({
 												<span className='text-sm font-medium text-foreground'>
 													${entry.retail_price}
 												</span>
-
 											)}
 										</div>
 									)}
 									{entry.target_price && (
-										<div className='flex items-center  text-xs text-muted-foreground'>
-											<span className=''>My Target Price: ${entry.target_price}</span>
+										<div className='flex items-center gap-1'>
+											<span className='text-xs text-muted-foreground'>My Target Price:</span>
+											<span className='text-sm font-medium text-foreground'>${entry.target_price}</span>
 										</div>
 									)}
 								</>
@@ -617,10 +618,8 @@ export function SizingJournalEntryCard({
 						{/* Tried On/Not Tried Badge - Only show in journal view */}
 						{viewMode === 'journal' && (
 							<Badge
-							
 								variant='outline'
-									
-							className={isTried ? "badge-tried" : "badge-not-tried"}>
+								className={`text-xs rounded-md ${isTried ? "badge-tried" : "badge-not-tried"}`}>
 								{isTried ? "Tried On" : "Didnt Try"}
 							</Badge>
 						)}
@@ -629,7 +628,7 @@ export function SizingJournalEntryCard({
 					<Badge
 					
 						variant='outline'
-									className='text-[11px] sm:text-xs'
+									className='text-xs rounded-md'
 						
 						style={{
 							backgroundColor: categoryConfig.bgColor,

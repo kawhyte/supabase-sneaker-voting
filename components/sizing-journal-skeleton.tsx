@@ -7,9 +7,9 @@ export function SizingJournalSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-md sm:gap-lg lg:gap-lg">
       {[...Array(6)].map((_, i) => (
-        <Card key={i} className="overflow-hidden flex flex-col rounded-xl w-full">
+        <Card key={i} className="overflow-hidden flex flex-col rounded-xl w-full border border-stone-200 shadow-sm">
           {/* Image Skeleton - aspect-[4/3] to match actual cards */}
-          <div className="relative w-full aspect-[4/3] bg-gray-200 animate-pulse" />
+          <div className="relative w-full aspect-[4/3] bg-stone-100 animate-pulse" />
 
           {/* Content Section - matches actual card padding and structure */}
           <CardContent className="flex-1 p-md flex flex-col gap-xs">
@@ -43,8 +43,8 @@ export function SizingJournalSkeleton() {
 
             {/* Footer Badges */}
             <div className="flex gap-xs mt-auto pt-md border-t border-gray-100">
-              <Skeleton className="h-6 w-20 rounded-full" />
-              <Skeleton className="h-6 w-24 rounded-full" />
+              <Skeleton className="h-6 w-20 rounded-md" />
+              <Skeleton className="h-6 w-24 rounded-md" />
             </div>
           </CardContent>
         </Card>
