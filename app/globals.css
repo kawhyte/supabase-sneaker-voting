@@ -310,7 +310,7 @@
   /* Blaze (Orange - New Releases)
      Purpose: New release badges, trending items, hot alerts
      Use: bg-blaze-400 with text-blaze-600 for new release badges */
-  --color-blaze-50: oklch(0.97 0.03 45);      /* Light BG */
+  --color-blaze-50: oklch(0.97 0.03 45 / 10%);      /* Light BG */
   --color-blaze-100: oklch(0.93 0.06 45);     /* Soft */
   --color-blaze-200: oklch(0.88 0.10 45);     /* Medium */
   --color-blaze-300: oklch(0.82 0.14 45);     /* Strong */
@@ -411,7 +411,7 @@
      ============================================ */
 
   /* Page Layout */
-  --color-background: var(--color-stone-200);      /* Warm stone background */
+  --color-background: var(--color-blaze-50);       /* Light orange background */
   --color-foreground: var(--color-slate-900);      /* Dark text */
 
   /* Cards & Elevated Surfaces */
@@ -488,6 +488,12 @@
 
   /* Default Radius (for components) */
   --radius: 0.5rem;
+
+  /* ============================================
+     CONTAINER & LAYOUT
+     ============================================ */
+
+  --max-width-container: 1920px;  /* Maximum page container width */
 
   /* ============================================
      TRANSITIONS & ANIMATIONS
@@ -746,7 +752,8 @@
 
 nav {
   @apply max-w-[1920px] mx-auto;
-  margin-block: var(--spacing-4);  /* 16px - Perfect alignment to 8px grid */
+  background-color: var(--color-card);  /* White background for clean separation from blaze-50 background */
+  margin-block: var(--spacing-6);  /* 24px - Component-level spacing for major structural element */
 }
 
 main {
