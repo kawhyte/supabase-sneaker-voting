@@ -692,9 +692,10 @@ export function AddItemForm({
 							{/* Product Details Section */}
 							<div className='space-y-6'>
 								<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
-									<Package className='h-5 w-5 text-slate-600 flex-shrink-0' />
-									<h3 className='font-semibold font-heading text-base text-slate-900 leading-5'>Product Details</h3>
-								</div>
+    {/* Add relative and top-[1px] to nudge the icon down */}
+    <Package className='relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0' />
+    <h3 className='font-semibold font-heading text-base text-slate-900 leading-5'>Product Details</h3>
+</div>
 
 								{/* Row 1: Experience & Item Category */}
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -869,9 +870,9 @@ export function AddItemForm({
 							</div>
 
 							{/* Photos Section */}
-							<div className='space-y-6'>
+							<div className='space-y-6 mt-16'>
 								<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
-									<Camera className='h-5 w-5 text-slate-600 flex-shrink-0' />
+									<Camera className='relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0' />
 									<h3 className='font-semibold font-heading text-base text-slate-900 leading-5'>Photos</h3>
 								</div>
 								<div>
@@ -904,7 +905,7 @@ export function AddItemForm({
 							>
 								<AccordionItem value='item-1'>
 									<AccordionTrigger>
-										<h3 className='font-semibold font-heading'>
+										<h3 className='font-semibold font-heading text-base text-slate-900 leading-5 mt-8'>
 											{watchedTriedOn ? (
 												<>
 													<CheckCircle className='inline h-4 w-4 text-meadow-600 mr-2' />
