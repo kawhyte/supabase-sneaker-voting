@@ -388,6 +388,17 @@ export function AddItemForm({
 		}
 	}, [watchedTriedOn]);
 
+	// Cleanup object URLs on unmount to prevent memory leaks
+	useEffect(() => {
+		return () => {
+			photos.forEach((photo) => {
+				if (photo.preview) {
+					URL.revokeObjectURL(photo.preview);
+				}
+			});
+		};
+	}, []);
+
 	const handleUrlScrape = async (url: string) => {
 		if (!url.trim()) return;
 		setIsScrapingUrl(true);
@@ -607,10 +618,6 @@ export function AddItemForm({
 		setHasUnsavedChanges(isDirty || photos.some((p) => p.file.size > 0));
 	}, [isDirty, photos]);
 
-	const loadFitData = async () => {}; // Dummy function, as original was removed
-	const restoreDraft = () => {}; // Dummy function
-	const saveDraft = () => {}; // Dummy function
-
 	// --- END ---
 
 	return (
@@ -703,12 +710,18 @@ export function AddItemForm({
 											htmlFor='triedOn'
 											className='cursor-pointer text-sm font-medium text-slate-900'
 										>
-											{watchedTriedOn ? "Tried On ✓" : "Just Browsing"}
+											{watchedTriedOn ? (
+												<>
+													Tried On <CheckCircle className='inline h-4 w-4 text-meadow-600 ml-1' />
+												</>
+											) : (
+												"Just Browsing"
+											)}
 										</Label>
 									</div>
 									{watchedTriedOn && (
 										<p className='text-xs text-meadow-600 mt-2'>
-											👕 Details will open when you're ready to add them
+											<span className='sr-only'>Shirt emoji:</span> Details will open when you're ready to add them
 										</p>
 									)}
 								</div>
@@ -751,7 +764,7 @@ export function AddItemForm({
 								{/* Row 2: Retail Price & Target Price */}
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 									<div>
-										<Label className='text-sm font-medium'>
+										<Label className='text-sm font-medium text-slate-900'>
 											Retail Price <span className='text-red-500'>*</span>
 										</Label>
 										<div className='relative mt-2'>
@@ -804,7 +817,7 @@ export function AddItemForm({
 											)}
 									</div>
 									<div>
-										<Label className='text-sm font-medium'>
+										<Label className='text-sm font-medium text-slate-900'>
 											Target Price <span className='text-red-500'>*</span>
 										</Label>
 										<Input
@@ -892,7 +905,14 @@ export function AddItemForm({
 								<AccordionItem value='item-1'>
 									<AccordionTrigger>
 										<h3 className='font-semibold font-heading'>
-											{watchedTriedOn ? "📋 Try-On Details" : "Add More Details (Optional)"}
+											{watchedTriedOn ? (
+												<>
+													<CheckCircle className='inline h-4 w-4 text-meadow-600 mr-2' />
+													Try-On Details
+												</>
+											) : (
+												"Add More Details (Optional)"
+											)}
 										</h3>
 									</AccordionTrigger>
 									<AccordionContent className='space-y-6 pt-6'>
