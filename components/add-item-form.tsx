@@ -703,7 +703,7 @@ export function AddItemForm({
 										<div className='w-full'>
 											<div className='flex items-center gap-2 mb-2'>
 												<Eye className='h-4 w-4 text-slate-600 flex-shrink-0' />
-												<Label className='block text-sm font-semibold text-slate-900'> Did you try this item before ? </Label>
+												<Label className='block text-sm font-semibold text-slate-900'> Did you try on this item ? </Label>
 											</div>
 											<div className='flex items-center gap-3'>
 												<Switch
@@ -730,7 +730,7 @@ export function AddItemForm({
 											</div>
 											{watchedTriedOn && (
 												<p className='text-xs text-meadow-600 mt-2'>
-													<span className='sr-only'>Shirt emoji:</span> Details will open when you're ready to add them
+													<span className='sr-only'>Shirt emoji:</span> Great!
 												</p>
 											)}
 										</div>
@@ -853,13 +853,18 @@ export function AddItemForm({
 										<Label className='text-sm font-medium text-slate-900'>
 											Target Price <span className='text-red-500'>*</span>
 										</Label>
+<div className='relative mt-2'>
+										<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground'>
+												$
+											</span>
 										<Input
 											{...register("targetPrice")}
 											type='number'
 											step='0.01'
 											placeholder='0.00'
-											className='mt-2'
+											className='mt-2 pl-8'
 										/>
+										</div>
 										{errors.targetPrice && (
 											<p className='text-sm text-red-600 mt-1'>
 												{errors.targetPrice.message}
@@ -934,8 +939,8 @@ export function AddItemForm({
 										</div>
 
 										{watchedTriedOn && (
-											<div className='border-t pt-6 space-y-6'>
-												<h4 className='font-semibold text-slate-900'>Try-On Details</h4>
+											<div className=' pt-4 space-y-6'>
+												{/* <h4 className='font-semibold text-slate-900'>Try-On Details</h4> */}
 												{isSizeRequired(watchedCategory) && (
 													<div>
 														<Label className='text-sm font-medium text-slate-900'>Size Tried *</Label>
