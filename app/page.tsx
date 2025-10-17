@@ -9,7 +9,7 @@ import { Plus, BarChart3, Zap, TrendingUp, Target, Brain } from 'lucide-react'
 export default function HomePage() {
   return (
     <div className="container mx-auto px-4 py-12 md:py-20">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
     
           <motion.div
@@ -43,7 +43,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.6 }}
-            className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto"
+            className="text-xl md:text-2xl text-gray-600 mb-8 max-w-7xl mx-auto"
           >
             Track your try-on experiences, discover perfect fits, and never buy the wrong size again.
           </motion.p>
