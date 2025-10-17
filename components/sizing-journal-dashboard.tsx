@@ -8,7 +8,7 @@ import { Search, Heart, Package, Archive } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
 import { EditItemModal } from './edit-item-modal'
-import { SizingJournalFilters } from './sizing-journal-filters'
+import { SizingJournalFiltersV2 } from './sizing-journal-filters-v2'
 import { SizingJournalStats } from './sizing-journal-stats'
 import { SizingJournalEntryCard } from './sizing-journal-entry-card'
 import { SizingJournalSkeleton } from './sizing-journal-skeleton'
@@ -387,7 +387,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     <div className="max-w-[1920px] mx-auto px-xl py-xl">
       <DashboardHeader status={displayStatus} />
 
-      <SizingJournalFilters
+      <SizingJournalFiltersV2
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         selectedBrands={selectedBrands}
