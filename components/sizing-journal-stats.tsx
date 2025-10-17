@@ -43,7 +43,7 @@ export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) 
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-xl mb-xl">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-xl mb-xl mt-12">
       {stats.map((stat, index) => (
         <Card key={index} className="hover-lift">
           <CardContent className="p-md text-center">

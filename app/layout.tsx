@@ -10,7 +10,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
 	metadataBase: new URL(defaultUrl),
-	title: "Wardrobe Journal",
+	title: "PurrView: Wardrobe Watchlist",
 	description: "Track your wardrobe items and add items to a watchlist and get notified when prices drop",
 	manifest: "/manifest.json",
 	icons: {

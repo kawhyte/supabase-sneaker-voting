@@ -85,7 +85,7 @@ import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-
+import { PawPrint } from 'lucide-react';
 interface NavbarClientProps {
 	authButton: ReactNode;
 	isAuthenticated: boolean;
@@ -116,9 +116,14 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 				<div className='flex h-16 items-center justify-between'>
 					{/* Logo/Brand - gap-2 = 8px (spacing-2) */}
 					<Link href='/' className='flex items-center gap-2'>
-						<span className='text-2xl'>👟</span>
-						<span className='text-xl font-bold text-foreground'>
-							Item Tracker
+
+					<div className=" bg-black rounded-xl p-1 mr-1">
+
+
+						 <PawPrint className=" text-primary    h-8 w-8" />
+					</div>
+						<span className='text-xl font-bold text-foreground '>
+						PurrView
 						</span>
 					</Link>
 
