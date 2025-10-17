@@ -18,11 +18,11 @@
 
   3. Navigation Pill (CENTER - Desktop Only)
      - rounded-3xl: Moderately rounded corners (24px) like Phantom.com
-     - px-6 py-3: Internal padding (24px x 12px)
+     - px-10 py-4: Internal padding (40px x 16px) - spacious feel
      - bg-white/80 border border-border/30: Subtle glass effect
      - shadow-lg: Elevation depth
      - Contains: Discover, Home, Watchlist (auth), My Wardrobe (auth)
-     - gap-6: Link spacing (24px = spacing-component)
+     - gap-8: Link spacing (32px = spacing-element + spacing-component)
      - Active link indicator: bottom-0 h-0.5 with sun-400 underline
      - Smooth transitions on hover with scale-105
 
@@ -58,10 +58,10 @@
   - No motion-reduce: animations are optional, not essential
 
   **Spacing System (Perfect 8px Grid):**
-  - Navbar outer padding: px-4 responsive (side margins)
-  - Navbar horizontal padding: px-6 = 24px (spacing-component)
+  - Navbar outer padding: px-6 = 24px (spacing-component)
   - Logo gap: gap-2 = 8px (spacing-2)
-  - Nav link spacing: gap-6 = 24px (spacing-component)
+  - Pill internal padding: px-10 = 40px (wider feel), py-4 = 16px (generous vertical)
+  - Nav link spacing (inside pill): gap-8 = 32px (spacious separation)
   - Mobile menu padding: py-6 = 24px (spacing-component)
   - Navbar height: h-16 = 64px (spacing-16)
 
@@ -127,7 +127,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 		: publicNavLinks;
 
 	return (
-		<nav className='sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/80 border-b border-border/40'>
+		<nav className='sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/80'>
 			<div className='container mx-auto px-6'>
 				<div className='flex h-16 items-center justify-between gap-6'>
 					{/* Logo/Brand - Minimalist Design with Poppins SemiBold (Outside Pill) */}
@@ -139,7 +139,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					</Link>
 
 					{/* Desktop Navigation Links - INSIDE PILL */}
-					<div className='hidden md:flex items-center gap-6 px-6 py-3 rounded-3xl bg-white/80 border border-border/30 shadow-lg backdrop-blur-sm motion-safe:transition-all motion-safe:duration-150'>
+					<div className='hidden lg:flex md:justify-evenly items-center gap-16 px-16 py-4 rounded-4xl bg-white/80 border border-border/30 shadow-lg backdrop-blur-sm motion-safe:transition-all motion-safe:duration-150'>
 						{navLinks.map((link) => (
 							<Link key={link.href} href={link.href} className='relative'>
 								<span
@@ -158,21 +158,21 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					</div>
 
 					{/* Desktop Auth Button - Outside Pill */}
-					<div className='hidden md:block motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:-translate-y-0.5 flex-shrink-0'>
+					<div className='hidden lg:block motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:-translate-y-0.5 flex-shrink-0'>
 						{authButton}
 					</div>
 
 					{/* Mobile Menu Button - h-5 w-5 = 20px (accessible touch target) */}
-					<div className='md:hidden'>
+					<div className='lg:hidden rounded-full bg-muted p-4'>
 						<Button
 							variant='ghost'
 							className='text-foreground hover:text-primary h-5 w-5 p-0 motion-safe:transition-all motion-safe:duration-150'
 							aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
 							onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
 							{isMobileMenuOpen ? (
-								<X className='h-5 w-5' />
+								<X className='h-8 w-8' />
 							) : (
-								<Menu className='h-5 w-5' />
+								<Menu className='h-8 w-8' />
 							)}
 						</Button>
 					</div>
