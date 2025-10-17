@@ -113,13 +113,13 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 	const isActive = (path: string) => pathname === path;
 
 	const publicNavLinks = [
-		{ href: '/discover', label: 'Discover' },
 		{ href: '/', label: 'Home' },
+		{ href: '/discover', label: 'Discover' },
 	];
 
 	const authenticatedNavLinks = [
-		{ href: '/watchlist', label: 'Watchlist' },
 		{ href: '/dashboard', label: 'My Wardrobe' },
+		{ href: '/watchlist', label: 'Watchlist' },
 	];
 
 	const navLinks = isAuthenticated
