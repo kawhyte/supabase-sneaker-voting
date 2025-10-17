@@ -110,7 +110,7 @@ function DashboardContent() {
         {/* Section spacing between dashboard sections (48px) - Optimized for all screen sizes */}
         <div className="mt-12 mb-6">
           {/* Tabs Container with ultra-wide optimization */}
-          <Tabs defaultValue={defaultTab} className="w-full max-w-[1920px] mx-auto bg-card rounded-lg p-6 shadow-md">
+          <Tabs defaultValue={defaultTab} className="w-full max-w-[1920px] mx-auto rounded-lg p-6 ">
           {/* --- The New Simplified Tabs --- */}
           <TabsList className="grid w-full grid-cols-4 mb-6 justify-center">
             <TabsTrigger value="wishlist" className="flex items-center gap-2">

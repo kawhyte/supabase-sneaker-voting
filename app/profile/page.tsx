@@ -27,17 +27,6 @@ export default async function ProfilePage() {
 
   // If profile doesn't exist, create a default one
   if (profileError || !profile) {
-    const { data: newProfile } = await supabase
-      .from('profiles')
-      .insert({
-        id: user.id,
-        display_name: user.email?.split('@')[0] || 'User',
-        avatar_url: null,
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single()
-
     // Fetch again after creating
     const { data: createdProfile } = await supabase
       .from('profiles')
@@ -46,18 +35,30 @@ export default async function ProfilePage() {
       .single()
 
     return (
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <ProfileForm
-          profile={createdProfile || { id: user.id, display_name: user.email?.split('@')[0] || 'User', avatar_url: null }}
-          user={user}
-        />
+      <div className="max-w-[820px] mx-auto">
+        <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 mb-8">
+          <h1 className="text-4xl font-bold text-foreground mb-2">Profile Settings</h1>
+          <p className="text-base text-muted-foreground">Manage your profile information and preferences</p>
+        </div>
+        <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
+          <ProfileForm
+            profile={createdProfile || { id: user.id, display_name: user.email?.split('@')[0] || 'User', avatar_url: null }}
+            user={user}
+          />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <ProfileForm profile={profile} user={user} />
+    <div className="max-w-[820px] mx-auto">
+      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 mb-8">
+        <h1 className="text-4xl font-bold text-foreground mb-2">Profile Settings</h1>
+        <p className="text-base text-muted-foreground">Manage your profile information and preferences</p>
+      </div>
+      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
+        <ProfileForm profile={profile} user={user} />
+      </div>
     </div>
   )
 }

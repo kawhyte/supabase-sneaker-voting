@@ -204,7 +204,7 @@ function ArchiveMetadataBadge({
 		<>
 			<Badge
 				variant='outline'
-				className={`text-xs rounded-md ${getArchiveReasonColor(archiveReason)}`}
+				className='text-sm rounded-lg px-3 py-2 border border-slate-200 bg-slate-50 text-slate-700'
 			>
 				{formatArchiveReason(archiveReason)}
 			</Badge>
@@ -378,7 +378,7 @@ export function SizingJournalEntryCard({
 				{/* Content Section */}
 				<CardContent className='flex-1 p-4 sm:p-3 flex flex-col gap-2 sm:gap-3 md:border-l md:border-stone-200'>
 					{/* Brand */}
-					<div className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+					<div className='text-[12px] font-semibold uppercase tracking-widest text-muted-foreground'>
 						{entry.brand}
 					</div>
 
@@ -391,7 +391,7 @@ export function SizingJournalEntryCard({
 					)}
 
 					{/* Title */}
-					<h3 className='text-base sm:text-lg font-bold leading-tight line-clamp-2 font-heading'>
+					<h3 className='text-base sm:text-lg  font-medium leading-tight line-clamp-2 font-heading '>
 						{entry.model}
 						{entry.color !== "Standard" && (
 							<span className='block text-sm font-normal text-muted-foreground mt-1'>
@@ -403,7 +403,7 @@ export function SizingJournalEntryCard({
 					{/* Metadata Grid */}
 					<div className='flex flex-col gap-2 mt-2'>
 						{/* Context-Aware Date Display */}
-						<div className='text-xs text-muted-foreground flex items-center gap-1'>
+						<div className='text-sm text-muted-foreground flex items-center gap-1'>
 							{/* <Calendar className='h-3 w-3 text-muted-foreground' /> */}
 							{isOwned && (entry.purchase_date || purchaseDate) ? (
 								<span>Purchased on: {formatDate(entry.purchase_date || purchaseDate || '')}</span>
@@ -418,7 +418,7 @@ export function SizingJournalEntryCard({
 								// OWNED ITEMS: Show purchase price
 								entry.purchase_price && (
 									<div className='flex items-center gap-1'>
-										<span className='text-xs text-muted-foreground'>
+										<span className='text-sm text-muted-foreground'>
 											Purchased for:
 										</span>
 										<span className='text-sm font-semibold text-foreground'>
@@ -465,7 +465,7 @@ export function SizingJournalEntryCard({
 						</div>
 
 						{/* Size, Fit, Comfort - Show for both owned and wishlist */}
-						<div className='flex items-center gap-2 text-xs flex-wrap'>
+						<div className='flex items-center gap-2 text-sm flex-wrap'>
 							{entry.size_tried && (
 								<>
 									<span className='badge-size-highlight'>
@@ -580,8 +580,8 @@ export function SizingJournalEntryCard({
 								{entry.store_name && (
 									<>
 										<div className='flex items-center gap-1'>
-											<MapPin className='h-2.5 w-2.5 text-muted-foreground' />
-											<span className='truncate max-w-[160px] sm:max-w-[200px]'>
+											<MapPin className='h-4 w-4 text-muted-foreground' />
+											<span className='truncate text-sm max-w-[160px] sm:max-w-[200px]'>
 												{entry.store_name}
 											</span>
 										</div>
@@ -604,10 +604,10 @@ export function SizingJournalEntryCard({
 
 					{/* Notes */}
 					{entry.notes ? (
-						<div className='mt-2 sm:mt-3 p-2.5 sm:p-2 bg-stone-50 rounded-lg text-xs text-muted-foreground line-clamp-3 leading-relaxed'>
+						<div className='mt-2 sm:mt-3 p-2.5 sm:p-2 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed'>
 							{entry.notes}
 						</div>
-					):<div className="mt-2 sm:mt-3 p-2.5 sm:p-2 bg-stone-50 rounded-lg text-xs text-muted-foreground line-clamp-3 leading-relaxed italic"> No notes added.</div>}
+					):<div className="mt-2 sm:mt-3 p-2.5 sm:p-2 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed italic"> No notes added.</div>}
 
 					{/* Footer */}
 					<div className='flex items-center gap-2 flex-wrap mt-auto pt-3 border-t border-stone-200'>
@@ -619,8 +619,8 @@ export function SizingJournalEntryCard({
 						{viewMode === 'journal' && (
 							<Badge
 								variant='outline'
-								className={`text-xs rounded-md ${isTried ? "badge-tried" : "badge-not-tried"}`}>
-								{isTried ? "Tried On" : "Didnt Try"}
+								className='text-sm rounded-2xl px-6 py-4 border border-slate-200 bg-slate-50 text-slate-700'>
+								<span className="mx-4">{isTried ? "Tried On" : "Didn't Try"}</span>
 							</Badge>
 						)}
 
@@ -628,16 +628,9 @@ export function SizingJournalEntryCard({
 					<Badge
 					
 						variant='outline'
-									className='text-xs rounded-md'
-						
-						style={{
-							backgroundColor: categoryConfig.bgColor,
-							borderColor: categoryConfig.borderColor,
-							color: categoryConfig.textColor,
-							border: '1px solid',
-						}}>
-						<categoryConfig.icon className='h-2 w-2 mr-1' />
-						{categoryConfig.label}
+									className='text-sm rounded-2xl px-6 py-4 border border-slate-200 bg-slate-50 text-slate-700'>
+						<categoryConfig.icon className='h-5 w-5 mx-2 ' />
+						<span className="mr-4">{categoryConfig.label}</span> 
 					</Badge>
 				)}
 

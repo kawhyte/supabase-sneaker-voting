@@ -146,21 +146,22 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profile Settings</CardTitle>
-        <CardDescription>
-          Manage your profile information and preferences
-        </CardDescription>
+    <Card className="bg-card  border-stone-200  hover:shadow-md motion-safe:transition-shadow motion-safe:duration-300">
+      <CardHeader className="pb-6 border-b border-stone-200/50">
+        <CardTitle className="text-2xl font-bold text-foreground">Profile Information</CardTitle>
+        <CardDescription className="text-base text-muted-foreground">Update your personal details and profile picture</CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <CardContent className="pt-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Avatar Section */}
-          <div className="flex flex-col items-center gap-4 pb-6 border-b">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={avatarUrl || undefined} alt={displayName || 'User avatar'} />
-              <AvatarFallback className="text-2xl">{getInitials()}</AvatarFallback>
-            </Avatar>
+          <div className="flex flex-col items-center gap-6 pb-8 border-b border-stone-200/50">
+            <div className="group relative motion-safe:transition-all motion-safe:duration-300">
+              <Avatar className="h-32 w-32 ring-2 ring-stone-300/40 motion-safe:transition-all motion-safe:duration-300">
+                <AvatarImage src={avatarUrl || undefined} alt={displayName || 'User avatar'} />
+                <AvatarFallback className="text-4xl font-semibold text-foreground">{getInitials()}</AvatarFallback>
+              </Avatar>
+              <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/10 motion-safe:transition-colors motion-safe:duration-300"></div>
+            </div>
 
             <input
               ref={fileInputRef}
@@ -170,73 +171,90 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
               className="hidden"
             />
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-            >
-              {isUploading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload New Avatar
-                </>
-              )}
-            </Button>
+            <div className="flex flex-col items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="motion-safe:transition-all motion-safe:duration-200 motion-safe:hover:scale-105"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Avatar
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                JPG, PNG or GIF (Max 5MB)
+              </p>
+            </div>
           </div>
 
-          {/* Display Name */}
-          <div className="space-y-2">
-            <Label htmlFor="displayName">Display Name</Label>
-            <Input
-              id="displayName"
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Enter your display name"
-              required
-            />
-          </div>
+          {/* Form Fields Section */}
+          <div className="space-y-6">
+            {/* Display Name */}
+            <div className="space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500">
+              <div>
+                <Label htmlFor="displayName" className="text-base font-semibold text-foreground">Display Name</Label>
+                <p className="text-xs text-muted-foreground mt-1">This is how others will see you</p>
+              </div>
+              <Input
+                id="displayName"
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Enter your display name"
+                required
+                className="motion-safe:transition-all motion-safe:duration-200 border-stone-200 focus:ring-2 focus:ring-stone-400/40"
+              />
+            </div>
 
-          {/* Email (Read-only) */}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={user.email || ''}
-              disabled
-              className="bg-muted"
-            />
-            <p className="text-xs text-muted-foreground">
-              Email cannot be changed
-            </p>
-          </div>
+            {/* Email (Read-only) */}
+            <div className="space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700">
+              <div>
+                <Label htmlFor="email" className="text-base font-semibold text-foreground">Email Address</Label>
+                <p className="text-xs text-muted-foreground mt-1">Your account email cannot be changed</p>
+              </div>
+              <Input
+                id="email"
+                type="email"
+                value={user.email || ''}
+                disabled
+                className="bg-muted/50 text-muted-foreground cursor-not-allowed border-stone-200/50"
+              />
+            </div>
 
-          {/* Last Sign In */}
-          <div className="space-y-2">
-            <Label>Last Signed In</Label>
-            <div className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md">
-              {formatLastSignIn(user.last_sign_in_at)}
+            {/* Last Sign In */}
+            <div className="space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-900">
+              <Label className="text-base font-semibold text-foreground">Last Signed In</Label>
+              <div className="text-sm text-foreground bg-stone-50/50 border border-stone-200/50 px-4 py-3 rounded-lg">
+                {formatLastSignIn(user.last_sign_in_at)}
+              </div>
             </div>
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-4">
-            <Button type="submit" disabled={isLoading}>
+          <div className="flex justify-end pt-6 border-t border-stone-200/50">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              size="lg"
+              className="motion-safe:transition-all motion-safe:duration-200 motion-safe:hover:shadow-lg motion-safe:hover:-translate-y-0.5"
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Updating...
+                  Saving...
                 </>
               ) : (
-                'Update Profile'
+                'Save Changes'
               )}
             </Button>
           </div>
