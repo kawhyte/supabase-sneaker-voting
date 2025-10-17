@@ -1,4 +1,4 @@
-import { Lora, Lato } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import "./globals.css";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -34,15 +34,15 @@ export const viewport = {
 	initialScale: 1,
 };
 
-const fontBody = Lato({
+const fontBody = Poppins({
   subsets: ['latin'],
-  weight: ['400', '700'], // Load regular and bold weights
+  weight: ['400', '600'], // Regular and SemiBold for modern fintech aesthetic
   variable: '--font-body',
 });
 
-const fontHeading = Lora({
+const fontHeading = Poppins({
   subsets: ['latin'],
-  style: ['normal', 'italic'],
+  weight: ['600', '700'], // SemiBold and Bold for headings
   variable: '--font-heading',
 });
 
