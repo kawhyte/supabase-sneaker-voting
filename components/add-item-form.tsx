@@ -114,7 +114,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -150,6 +149,7 @@ import { ImageConfirmationModal } from "@/components/image-confirmation-modal";
 import { BrandCombobox } from "@/components/brand-combobox";
 import { SizeCombobox } from "@/components/size-combobox";
 import { ClothingSizeCombobox } from "@/components/clothing-size-combobox";
+import { ComfortRating } from "@/components/comfort-rating";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	CATEGORY_CONFIGS,
@@ -922,7 +922,7 @@ export function AddItemForm({
 										</h3>
 									</AccordionTrigger>
 									<AccordionContent className='space-y-6 pt-6'>
-										<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+										<div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
 											<div>
 												<Label className='text-sm font-medium text-slate-900'>SKU / Style Code</Label>
 												<Input {...register("sku")} className='mt-2' />
@@ -931,6 +931,41 @@ export function AddItemForm({
 												<Label className='text-sm font-medium text-slate-900'>Color</Label>
 												<Input {...register("color")} className='mt-2' />
 											</div>
+
+											{isSizeRequired(watchedCategory) && (
+													<div>
+														<Label className='text-sm font-medium text-slate-900 '>Size Tried</Label>
+														{watchedCategory === "shoes" ? (
+															<SizeCombobox
+															
+																value={watch("sizeTried")}
+																onChange={(v) =>
+																	setValue("sizeTried", v, {
+																		shouldValidate: true,
+																	})
+																}
+															/>
+														) : (
+															<ClothingSizeCombobox
+																value={watch("sizeTried")}
+																onChange={(v) =>
+																	setValue("sizeTried", v, {
+																		shouldValidate: true,
+																	})
+																}
+															/>
+														)}
+														{errors.sizeTried && (
+															<p className='text-sm text-red-600 mt-1'>
+																{errors.sizeTried.message}
+															</p>
+														)}
+													</div>
+												)}
+
+
+
+											
 										</div>
 
 										<div>
@@ -939,11 +974,11 @@ export function AddItemForm({
 										</div>
 
 										{watchedTriedOn && (
-											<div className=' pt-4 space-y-6'>
+											<div className='space-y-6 grid grid-cols-1 '>
 												{/* <h4 className='font-semibold text-slate-900'>Try-On Details</h4> */}
-												{isSizeRequired(watchedCategory) && (
+												{/* {isSizeRequired(watchedCategory) && (
 													<div>
-														<Label className='text-sm font-medium text-slate-900'>Size Tried *</Label>
+														<Label className='text-sm font-medium text-slate-900'>Size Tried</Label>
 														{watchedCategory === "shoes" ? (
 															<SizeCombobox
 																value={watch("sizeTried")}
@@ -969,36 +1004,18 @@ export function AddItemForm({
 															</p>
 														)}
 													</div>
-												)}
+												)} */}
 												{isComfortRequired(watchedCategory) && (
-													<div>
-														<Label className='text-sm font-medium text-slate-900'>Comfort Rating *</Label>
-														<RadioGroup
-															value={watch("comfortRating")?.toString()}
-															onValueChange={(v) =>
-																setValue("comfortRating", parseInt(v), {
-																	shouldValidate: true,
-																})
-															}
-															className='flex gap-2 mt-2'>
-															{[1, 2, 3, 4, 5].map((r) => (
-																<div
-																	key={r}
-																	className='flex items-center space-x-2'>
-																	<RadioGroupItem
-																		value={r.toString()}
-																		id={`r${r}`}
-																	/>
-																	<Label htmlFor={`r${r}`}>{r}</Label>
-																</div>
-															))}
-														</RadioGroup>
-														{errors.comfortRating && (
-															<p className='text-sm text-red-600 mt-1'>
-																{errors.comfortRating.message}
-															</p>
-														)}
-													</div>
+													<ComfortRating
+														value={watch("comfortRating")}
+														onChange={(value) =>
+															setValue("comfortRating", value, {
+																shouldValidate: false,
+																shouldDirty: true,
+															})
+														}
+														error={errors.comfortRating?.message}
+													/>
 												)}
 											</div>
 										)}

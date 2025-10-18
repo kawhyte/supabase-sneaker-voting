@@ -99,8 +99,8 @@ export function EditItemModal({ experience, isOpen, onClose, onSave }: EditItemM
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-7xl px-4 sm:px-6 lg:px-8 max-h-[85vh] md:max-h-[90vh] overflow-y-auto bg-card border border-stone-300">
-        <DialogHeader className="sticky top-0 bg-card z-10 pb-[var(--spacing-6)] border-b border-stone-300 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
-          <DialogTitle className="text-xl md:text-2xl">Edit Item</DialogTitle>
+        <DialogHeader className="sticky top-0 bg-card z-10 pb-[var(--spacing-6)]  border-stone-300 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+          <DialogTitle className="text-xl md:text-2xl p-8">Edit Item</DialogTitle>
         </DialogHeader>
 
         <div className="pt-[var(--spacing-6)]">

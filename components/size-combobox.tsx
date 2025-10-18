@@ -69,7 +69,7 @@ export function SizeCombobox({ value, onChange, disabled, preferredSize }: SizeC
           role="combobox"
           aria-expanded={open}
           disabled={disabled}
-          className="w-full justify-between h-5"
+          className="w-full justify-between h-10 mt-2"
         >
           <span className="truncate">{displayValue}</span>
           <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
