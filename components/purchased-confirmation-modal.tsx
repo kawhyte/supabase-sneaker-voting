@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { CalendarIcon, DollarSign } from 'lucide-react'
+import { CalendarIcon, DollarSign, AlertCircle } from 'lucide-react'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 
@@ -27,23 +27,32 @@ export function PurchasedConfirmationModal({
   const [purchasePrice, setPurchasePrice] = useState('')
   const [purchaseDate, setPurchaseDate] = useState<Date>(new Date())
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [priceError, setPriceError] = useState<string>('')
+
+  // Validation
+  const price = parseFloat(purchasePrice)
+  const isPriceValid = !isNaN(price) && price > 0
+  const hasError = purchasePrice && !isPriceValid
 
   const handleConfirm = async () => {
-    const price = parseFloat(purchasePrice)
-
-    if (isNaN(price) || price <= 0) {
+    if (!isPriceValid) {
+      setPriceError('Please enter a valid purchase price')
       return
     }
 
     setIsSubmitting(true)
+    setPriceError('')
+
     try {
       await onConfirm(price, purchaseDate)
       // Reset form
       setPurchasePrice('')
       setPurchaseDate(new Date())
+      setPriceError('')
       onClose()
     } catch (error) {
       console.error('Error confirming purchase:', error)
+      setPriceError('Failed to save purchase. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -52,27 +61,33 @@ export function PurchasedConfirmationModal({
   const handleCancel = () => {
     setPurchasePrice('')
     setPurchaseDate(new Date())
+    setPriceError('')
     onClose()
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Mark as Purchased</DialogTitle>
-          <p className="text-sm text-gray-600 mt-2">
-            Add purchase details for <span className="font-semibold">{itemName}</span>
-          </p>
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md md:max-w-lg">
+        <DialogHeader className="space-y-3">
+          <DialogTitle className="text-lg sm:text-xl font-semibold">Mark as Purchased</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Add purchase details for <span className="font-medium text-foreground">{itemName}</span>
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* Purchase Price */}
-          <div className="space-y-2">
-            <Label htmlFor="purchase-price" className="text-sm font-medium">
-              Purchase Price <span className="text-red-500">*</span>
+        <div className="space-y-6 py-6">
+          {/* Purchase Price Field */}
+          <div className="space-y-3">
+            <Label htmlFor="purchase-price" className="text-sm font-semibold text-foreground">
+              Purchase Price
+              <span className="text-destructive ml-1" aria-label="required">*</span>
             </Label>
+
             <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <DollarSign
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none"
+                aria-hidden="true"
+              />
               <Input
                 id="purchase-price"
                 type="number"
@@ -80,33 +95,64 @@ export function PurchasedConfirmationModal({
                 min="0"
                 placeholder="120.00"
                 value={purchasePrice}
-                onChange={(e) => setPurchasePrice(e.target.value)}
-                className="pl-10"
+                onChange={(e) => {
+                  setPurchasePrice(e.target.value)
+                  if (priceError) setPriceError('')
+                }}
+                onBlur={() => {
+                  if (purchasePrice && !isPriceValid) {
+                    setPriceError('Please enter a valid price')
+                  }
+                }}
+                className={cn(
+                  "pl-10 pr-3 py-2",
+                  hasError && "border-destructive focus-visible:ring-destructive"
+                )}
                 disabled={isSubmitting}
+                aria-invalid={hasError ? 'true' : 'false'}
+                aria-describedby={hasError ? "price-error" : "price-description"}
+                inputMode="decimal"
               />
             </div>
-            <p className="text-xs text-gray-500">
-              Enter the amount you paid for this item
-            </p>
+
+            {hasError && (
+              <div
+                id="price-error"
+                className="flex items-center gap-2 text-sm text-destructive"
+              >
+                <AlertCircle className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                <span>{priceError || 'Please enter a valid purchase price'}</span>
+              </div>
+            )}
+
+            {!hasError && (
+              <p id="price-description" className="text-xs text-muted-foreground">
+                Enter the amount you paid for this item
+              </p>
+            )}
           </div>
 
-          {/* Purchase Date */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">
-              Purchase Date <span className="text-red-500">*</span>
+          {/* Purchase Date Field */}
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold text-foreground">
+              Purchase Date
+              <span className="text-destructive ml-1" aria-label="required">*</span>
             </Label>
+
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !purchaseDate && "text-muted-foreground"
+                    "w-full justify-start text-left font-normal min-h-10 px-3 py-2",
+                    !purchaseDate && "text-muted-foreground",
+                    "focus-ring"
                   )}
                   disabled={isSubmitting}
+                  aria-label={`Purchase date: ${purchaseDate ? format(purchaseDate, 'PPPP') : 'Pick a date'}`}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {purchaseDate ? format(purchaseDate, 'PPP') : <span>Pick a date</span>}
+                  <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                  {purchaseDate ? format(purchaseDate, 'PPP') : 'Pick a date'}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -119,26 +165,38 @@ export function PurchasedConfirmationModal({
                 />
               </PopoverContent>
             </Popover>
-            <p className="text-xs text-gray-500">
+
+            <p id="date-description" className="text-xs text-muted-foreground">
               When did you purchase this item?
             </p>
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-3 sm:gap-2 pt-4 border-t border-stone-200">
           <Button
+            type="button"
             variant="outline"
             onClick={handleCancel}
             disabled={isSubmitting}
+            className="min-h-11"
           >
             Cancel
           </Button>
           <Button
+            type="button"
             onClick={handleConfirm}
-            disabled={!purchasePrice || parseFloat(purchasePrice) <= 0 || isSubmitting}
-            className="bg-green-600 hover:bg-green-700"
+            disabled={!purchasePrice || !isPriceValid || isSubmitting}
+            className="min-h-11 bg-meadow-600 hover:bg-meadow-700 text-white focus-ring"
+            aria-busy={isSubmitting}
           >
-            {isSubmitting ? 'Saving...' : 'Mark as Purchased'}
+            {isSubmitting ? (
+              <>
+                <span className="inline-block animate-spin mr-2">⏳</span>
+                Saving...
+              </>
+            ) : (
+              'Mark as Purchased'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -130,7 +130,6 @@ import {
 	Trash2,
 	Image as ImageIcon,
 	MoreVertical,
-	Star,
 	SquareCheckBig,
 	Heart,
 	Bookmark,
@@ -140,9 +139,6 @@ import {
 	ArchiveRestore,
 	ShoppingBag,
 	BadgeCentIcon,
-	AlertTriangle,
-	AlertCircle,
-	Check,
 } from "lucide-react";
 import { PhotoCarousel } from "./photo-carousel";
 import {
@@ -484,21 +480,11 @@ export function SizingJournalEntryCard({
 								const comfortInfo = getComfortLabel(entry.comfort_rating);
 								if (!comfortInfo) return null;
 
-								const IconMap: Record<string, typeof Star> = {
-									AlertTriangle,
-									AlertCircle,
-									Minus,
-									Check,
-									Star,
-								};
-								const IconComponent = IconMap[comfortInfo.icon];
-
 								return (
 									<div className='flex items-center gap-1.5'>
 										<span className='text-muted-foreground'>Comfort:</span>
-										<span className={`inline-flex items-center gap-1 ${comfortInfo.color} font-medium`}>
-											<IconComponent className='h-4 w-4' />
-											<span className='text-sm'>{comfortInfo.label}</span>
+										<span className={`${comfortInfo.color} font-medium text-sm`}>
+											{comfortInfo.label}
 										</span>
 									</div>
 								);
@@ -659,30 +645,25 @@ export function SizingJournalEntryCard({
 function getComfortLabel(rating: number | undefined) {
 	if (!rating) return null;
 
-	const comfortMap: Record<number, { label: string; icon: string; color: string }> = {
+	const comfortMap: Record<number, { label: string; color: string }> = {
 		1: {
 			label: 'Unwearable',
-			icon: 'AlertTriangle',
 			color: 'text-destructive',
 		},
 		2: {
 			label: 'Uncomfortable',
-			icon: 'AlertCircle',
 			color: 'text-sun-600',
 		},
 		3: {
 			label: 'Neutral',
-			icon: 'Minus',
 			color: 'text-slate-500',
 		},
 		4: {
 			label: 'Comfortable',
-			icon: 'Check',
 			color: 'text-meadow-600',
 		},
 		5: {
 			label: 'Perfect',
-			icon: 'Star',
 			color: 'text-sun-400',
 		},
 	};
