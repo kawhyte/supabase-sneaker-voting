@@ -342,7 +342,7 @@ export function SizingJournalEntryCard({
 				{/* Image Section */}
 				{photos.length > 0 ? (
 					<div className='relative w-full overflow-hidden'>
-						<div className='relative w-full aspect-[4/3] bg-stone-100 flex items-center justify-center p-2 sm:p-4 lg:p-5 transition-all duration-200 card-image-container'>
+						<div className='relative w-full aspect-[4/3] bg-gradient-to-b from-white via-white to-stone-50/30 flex items-center justify-center p-2 sm:p-4 lg:p-5 transition-all duration-200 card-image-container'>
 							{photos.length === 1 ? (
 								<img
 									src={photos[0].image_url}
@@ -366,16 +366,16 @@ export function SizingJournalEntryCard({
 					</div>
 				) : (
 					<div className='relative w-full overflow-hidden'>
-						<div className='w-full aspect-[4/3] bg-stone-100 flex items-center justify-center transition-all duration-200 card-image-container'>
+						<div className='w-full aspect-[4/3] bg-gradient-to-b from-white via-white to-stone-50/30 flex items-center justify-center transition-all duration-200 card-image-container'>
 							<ImageIcon className='h-12 w-12 text-muted-foreground' />
 						</div>
 					</div>
 				)}
 
 				{/* Content Section */}
-				<CardContent className='flex-1 p-4 sm:p-3 flex flex-col gap-2 sm:gap-3 md:border-l md:border-stone-200'>
+				<CardContent className='flex-1 p-4 flex flex-col gap-3 md:border-l md:border-stone-200'>
 					{/* Brand */}
-					<div className='text-[12px] font-semibold uppercase tracking-widest text-muted-foreground'>
+					<div className='text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
 						{entry.brand}
 					</div>
 
@@ -388,7 +388,7 @@ export function SizingJournalEntryCard({
 					)}
 
 					{/* Title */}
-					<h3 className='text-base sm:text-lg  font-medium leading-tight line-clamp-2 font-heading '>
+					<h3 className='text-base sm:text-lg font-semibold leading-tight line-clamp-2 font-heading'>
 						{entry.model}
 						{entry.color !== "Standard" && (
 							<span className='block text-sm font-normal text-muted-foreground mt-1'>
@@ -428,7 +428,7 @@ export function SizingJournalEntryCard({
 								<>
 									{entry.retail_price && (
 										<div className='flex items-center gap-1 flex-wrap'>
-											<span className='text-xs text-muted-foreground'>Retail price:</span>
+											<span className='text-sm text-muted-foreground'>Retail price:</span>
 											{isOnSale ? (
 												<>
 													<span className='text-sm line-through text-muted-foreground'>
@@ -445,7 +445,7 @@ export function SizingJournalEntryCard({
 													</Badge>
 												</>
 											) : (
-												<span className='text-sm font-medium text-foreground'>
+												<span className='text-sm font-semibold text-foreground'>
 													${entry.retail_price}
 												</span>
 											)}
@@ -453,8 +453,8 @@ export function SizingJournalEntryCard({
 									)}
 									{entry.target_price && (
 										<div className='flex items-center gap-1'>
-											<span className='text-xs text-muted-foreground'>My Target Price:</span>
-											<span className='text-sm font-medium text-foreground'>${entry.target_price}</span>
+											<span className='text-sm text-muted-foreground'>My Target Price:</span>
+											<span className='text-sm font-semibold text-foreground'>${entry.target_price}</span>
 										</div>
 									)}
 								</>
@@ -465,7 +465,7 @@ export function SizingJournalEntryCard({
 						<div className='flex items-center gap-2 text-sm flex-wrap'>
 							{entry.size_tried && (
 								<>
-									<span className='badge-size-highlight'>
+									<span className='badge-size-highlight text-muted-foreground'>
 										{viewMode === 'collection' ? 'Size' : 'Ideal Size'}: {entry.size_tried}
 									</span>
 									{entry.comfort_rating && (
@@ -582,7 +582,7 @@ export function SizingJournalEntryCard({
 								{/* Last Worn Date - Collection Mode Only (shoes only) */}
 								{viewMode === 'collection' && canTrack && entry.last_worn_date && (
 									<div className='flex items-center gap-1'>
-										<Calendar className='h-2.5 w-2.5 text-muted-foreground' />
+										<Calendar className='h-3.5 w-3.5 text-muted-foreground' />
 										<span className='text-xs'>Last worn: {formatDate(entry.last_worn_date)}</span>
 									</div>
 								)}
@@ -591,14 +591,14 @@ export function SizingJournalEntryCard({
 					</div>
 
 					{/* Notes */}
-					{entry.notes ? (
-						<div className='mt-2 sm:mt-3 p-2.5 sm:p-2 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed'>
+					{entry.notes && (
+						<div className='mt-3 p-2.5 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed'>
 							{entry.notes}
 						</div>
-					):<div className="mt-2 sm:mt-3 p-2.5 sm:p-2 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed italic"> No notes added.</div>}
+					)}
 
 					{/* Footer */}
-					<div className='flex items-center gap-2 flex-wrap mt-auto pt-3 border-t border-stone-200'>
+					<div className='flex items-center gap-2 flex-wrap mt-auto pt-4 border-t border-stone-200'>
 
 
 				
@@ -607,20 +607,19 @@ export function SizingJournalEntryCard({
 						{viewMode === 'journal' && (
 							<Badge
 								variant='outline'
-								className='text-sm rounded-2xl px-6 py-4 border border-slate-200 bg-slate-50 text-slate-700'>
-								<span className="mx-4">{isTried ? "Tried On" : "Didn't Try"}</span>
+								className='text-sm rounded-2xl px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-700'>
+								{isTried ? "Tried On" : "Didn't Try"}
 							</Badge>
 						)}
 
 						{categoryConfig && (
-					<Badge
-					
-						variant='outline'
-									className='text-sm rounded-2xl px-6 py-4 border border-slate-200 bg-slate-50 text-slate-700'>
-						<categoryConfig.icon className='h-5 w-5 mx-2 ' />
-						<span className="mr-4">{categoryConfig.label}</span> 
-					</Badge>
-				)}
+							<Badge
+								variant='outline'
+								className='text-sm rounded-2xl px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-700'>
+								<categoryConfig.icon className='h-4 w-4 mr-1' />
+								<span>{categoryConfig.label}</span>
+							</Badge>
+						)}
 
 						{/* Archive Metadata - Only show in archive view */}
 						{viewMode === 'archive' && entry.archive_reason && (

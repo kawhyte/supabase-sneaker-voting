@@ -87,17 +87,6 @@
   --spacing-section-large: var(--spacing-20);    /* 80px - Use: my-20 for major section breaks */
   --spacing-page: var(--spacing-16);             /* 64px - Use: px-16 py-16 for page margins */
 
-  /* ============================================
-     RESPONSIVE SPACING - Mobile First Design
-     Tighter spacing on smaller screens
-     ============================================ */
-
-  @media (max-width: 640px) {
-    --spacing-component: var(--spacing-4);   /* 24px → 16px on mobile */
-    --spacing-section: var(--spacing-8);     /* 48px → 32px on mobile */
-    --spacing-page: var(--spacing-12);       /* 64px → 48px on mobile */
-  }
-
 
   /* ============================================
      TYPOGRAPHY v2.0 - Perfect 8px Grid Vertical Rhythm
@@ -459,6 +448,19 @@
 }
 
 /* ============================================
+   RESPONSIVE SPACING - Mobile First Design
+   Tighter spacing on smaller screens
+   ============================================ */
+
+@media (max-width: 640px) {
+  :root {
+    --spacing-component: var(--spacing-4);   /* 24px → 16px on mobile */
+    --spacing-section: var(--spacing-8);     /* 48px → 32px on mobile */
+    --spacing-page: var(--spacing-12);       /* 64px → 48px on mobile */
+  }
+}
+
+/* ============================================
    BASE STYLES
    ============================================ */
 
@@ -515,7 +517,9 @@
   }
 
   .card-hover {
-    @apply card;
+    @apply bg-card rounded-lg border border-border;
+    padding: var(--spacing-component);
+    transition: all var(--transition-base);
   }
 
   .card-hover:hover {
@@ -526,10 +530,14 @@
 
   /* Sneaker-specific card with brand accent */
   .card-sneaker {
-    @apply card-hover;
+    @apply bg-card rounded-lg border border-border;
+    padding: var(--spacing-component);
+    transition: all var(--transition-base);
   }
 
   .card-sneaker:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
     border-color: var(--color-sun-300);
   }
 
@@ -541,7 +549,8 @@
   }
 
   .badge-urgent {
-    @apply badge bg-ember-100 text-ember-600 border border-ember-400;
+    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold bg-ember-100 text-ember-600 border border-ember-400;
+    transition: all var(--transition-fast);
   }
 
   .badge-urgent:hover {
@@ -550,7 +559,8 @@
   }
 
   .badge-new {
-    @apply badge bg-blaze-100 text-blaze-600 border border-blaze-400;
+    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold bg-blaze-100 text-blaze-600 border border-blaze-400;
+    transition: all var(--transition-fast);
   }
 
   .badge-new:hover {
@@ -559,7 +569,8 @@
   }
 
   .badge-success {
-    @apply badge bg-meadow-100 text-meadow-600 border border-meadow-400;
+    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold bg-meadow-100 text-meadow-600 border border-meadow-400;
+    transition: all var(--transition-fast);
   }
 
   .badge-success:hover {
@@ -568,15 +579,44 @@
   }
 
   .badge-neutral {
-    @apply badge bg-slate-100 text-slate-600 border border-slate-300;
+    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-300;
     opacity: 0.85;
+    transition: all var(--transition-fast);
   }
 
   /* Backward compatibility aliases for migration */
-  .badge-price-drop { @apply badge-urgent; }
-  .badge-new-release { @apply badge-new; }
-  .badge-good-deal { @apply badge-success; }
-  .badge-sold-out { @apply badge-neutral; }
+  .badge-price-drop {
+    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold bg-ember-100 text-ember-600 border border-ember-400;
+    transition: all var(--transition-fast);
+  }
+  .badge-price-drop:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-ember);
+  }
+
+  .badge-new-release {
+    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold bg-blaze-100 text-blaze-600 border border-blaze-400;
+    transition: all var(--transition-fast);
+  }
+  .badge-new-release:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-blaze);
+  }
+
+  .badge-good-deal {
+    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold bg-meadow-100 text-meadow-600 border border-meadow-400;
+    transition: all var(--transition-fast);
+  }
+  .badge-good-deal:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-meadow);
+  }
+
+  .badge-sold-out {
+    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-300;
+    opacity: 0.85;
+    transition: all var(--transition-fast);
+  }
 
   /* --- BUTTON STYLES --- */
 

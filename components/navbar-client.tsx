@@ -99,8 +99,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Plus } from "lucide-react";
 import { PawPrint } from 'lucide-react';
+interface NavLink {
+	href: string;
+	label: string;
+	isAction?: boolean;
+}
+
 interface NavbarClientProps {
 	authButton: ReactNode;
 	isAuthenticated: boolean;
@@ -112,14 +118,15 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 	const isActive = (path: string) => pathname === path;
 
-	const publicNavLinks = [
+	const publicNavLinks: NavLink[] = [
 		{ href: '/', label: 'Home' },
-		{ href: '/discover', label: 'Discover' },
+		// { href: '/discover', label: 'Discover' },
 	];
 
-	const authenticatedNavLinks = [
+	const authenticatedNavLinks: NavLink[] = [
 		{ href: '/dashboard', label: 'My Wardrobe' },
-		{ href: '/watchlist', label: 'Watchlist' },
+		// { href: '/collection', label: 'Collection' },
+		{ href: '/add-new-item', label: 'Add Item', isAction: true },
 	];
 
 	const navLinks = isAuthenticated
@@ -139,21 +146,30 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					</Link>
 
 					{/* Desktop Navigation Links - INSIDE PILL */}
-					<div className='hidden lg:flex md:justify-evenly items-center gap-16 px-16 py-4 rounded-4xl bg-white/80 border border-border/30 shadow-lg backdrop-blur-sm motion-safe:transition-all motion-safe:duration-150'>
+					<div className='hidden lg:flex md:justify-evenly items-center gap-6 px-16 py-4 rounded-4xl bg-white/80 border border-border/30 shadow-lg backdrop-blur-sm motion-safe:transition-all motion-safe:duration-150'>
 						{navLinks.map((link) => (
-							<Link key={link.href} href={link.href} className='relative'>
-								<span
-									className={`text-sm font-medium motion-safe:transition-all motion-safe:duration-150 motion-safe:hover:scale-105 will-change-transform ${
-										isActive(link.href)
-											? "text-foreground"
-											: "text-muted-foreground hover:text-foreground"
-									}`}>
-									{link.label}
-								</span>
-								{isActive(link.href) && (
-									<span className='absolute bottom-0 left-0 right-0 h-0.5 bg-primary transition-all duration-200'></span>
-								)}
-							</Link>
+							link.isAction ? (
+								<Link key={link.href} href={link.href}>
+									<Button className='flex items-center gap-2 bg-sun-400 hover:bg-sun-500 text-slate-900 font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
+										<Plus className='h-4 w-4' />
+										{link.label}
+									</Button>
+								</Link>
+							) : (
+								<Link key={link.href} href={link.href} className='relative'>
+									<span
+										className={`text-sm font-medium motion-safe:transition-all motion-safe:duration-150 motion-safe:hover:scale-105 will-change-transform ${
+											isActive(link.href)
+												? "text-foreground"
+												: "text-muted-foreground hover:text-foreground"
+										}`}>
+										{link.label}
+									</span>
+									{isActive(link.href) && (
+										<span className='absolute bottom-0 left-0 right-0 h-0.5 bg-primary transition-all duration-200'></span>
+									)}
+								</Link>
+							)
 						))}
 					</div>
 
@@ -183,20 +199,29 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					<div className='md:hidden py-6 border-t border-border/40 motion-safe:animate-in motion-safe:duration-200'>
 						<div className='flex flex-col gap-6'>
 							{navLinks.map((link) => (
-								<Link key={link.href} href={link.href} className='relative'>
-									<span
-										className={`text-sm font-medium motion-safe:transition-all motion-safe:duration-150 block ${
-											isActive(link.href)
-												? "text-foreground"
-												: "text-muted-foreground hover:text-foreground"
-										}`}
-										onClick={() => setIsMobileMenuOpen(false)}>
-										{link.label}
-									</span>
-									{isActive(link.href) && (
-										<span className='absolute bottom-0 left-0 w-10 h-0.5 bg-primary transition-all duration-200'></span>
-									)}
-								</Link>
+								link.isAction ? (
+									<Link key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
+										<Button className='flex items-center gap-2 bg-sun-400 hover:bg-sun-500 text-slate-900 font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md w-full justify-center'>
+											<Plus className='h-4 w-4' />
+											{link.label}
+										</Button>
+									</Link>
+								) : (
+									<Link key={link.href} href={link.href} className='relative'>
+										<span
+											className={`text-sm font-medium motion-safe:transition-all motion-safe:duration-150 block ${
+												isActive(link.href)
+													? "text-foreground"
+													: "text-muted-foreground hover:text-foreground"
+											}`}
+											onClick={() => setIsMobileMenuOpen(false)}>
+											{link.label}
+										</span>
+										{isActive(link.href) && (
+											<span className='absolute bottom-0 left-0 w-10 h-0.5 bg-primary transition-all duration-200'></span>
+										)}
+									</Link>
+								)
 							))}
 							<div onClick={() => setIsMobileMenuOpen(false)} className='motion-safe:transition-transform motion-safe:duration-150'>
 								{authButton}
