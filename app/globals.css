@@ -411,7 +411,7 @@
      ============================================ */
 
   /* Page Layout */
-  --color-background: var(--color-blaze-50);       /* Light orange background */
+  --color-background: var(--color-stone-50);       /* Neutral warm background - sneakers pop */
   --color-foreground: var(--color-slate-900);      /* Dark text */
 
   /* Cards & Elevated Surfaces */
@@ -842,11 +842,3 @@ nav {
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
