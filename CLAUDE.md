@@ -61,6 +61,41 @@ This is a Next.js 14+ application using the App Router with Supabase for backend
 - Requires Supabase project URL and anon key in `.env.local`
 - Project configured for Supabase integration
 
+## Database Migrations
+
+### Fit Rating Removal (Migration 007)
+The `fit_rating` feature has been deprecated from the application. All UI components, type definitions, and analytics have been updated to use `comfort_rating` instead.
+
+**Status**: Code refactoring complete and tested ✅
+
+**Ready to apply**: Migration `007_drop_fit_rating_column.sql` will drop the `fit_rating` column from the sneakers table.
+
+**Migration Command** (when ready to apply):
+```sql
+ALTER TABLE sneakers DROP COLUMN IF EXISTS fit_rating;
+COMMENT ON TABLE sneakers IS 'Sneaker tracking table - fit_rating column removed on [date]';
+```
+
+**Changes made**:
+- Removed `fit_rating` from `SizingJournalEntry` type definition
+- Removed `FIT_RATINGS` array and `FitRating` interface
+- Removed fit display from `sizing-journal-entry-card.tsx`
+- Removed `FitProfileDashboard` component from dashboard and tracker app
+- Updated `sizing-journal-stats.tsx` to remove "Perfect Fits" metric
+- Updated sort utility to use `comfort-rating` instead of `fit-rating`
+- Removed unused `FitData` import from `add-item-form.tsx`
+
+**Files affected**:
+- components/sizing-journal-entry-card.tsx
+- components/sizing-journal-stats.tsx
+- components/types/sizing-journal-entry.ts
+- components/add-item-form.tsx
+- components/sneaker-tracker-app.tsx
+- app/dashboard/page.tsx
+- lib/sizing-journal-utils.ts
+
+**Bundle improvements**: Dashboard component reduced from 9.84 kB to 4.96 kB (49% reduction)
+
 ## Data Models
 
 ### Sneaker Type

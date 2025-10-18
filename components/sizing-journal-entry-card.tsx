@@ -148,7 +148,6 @@ import { PhotoCarousel } from "./photo-carousel";
 import {
 	SizingJournalEntry,
 	ItemPhoto,
-	FIT_RATINGS,
 } from "./types/sizing-journal-entry";
 import {
 	getCategoryConfig,
@@ -237,7 +236,6 @@ export function SizingJournalEntryCard({
 	purchaseDate,
 }: SizingJournalEntryCardProps) {
 	const isTried = entry.has_been_tried;
-	const fitInfo = getFitRatingInfo(entry.fit_rating);
 	const photos = preparePhotos(entry);
 	const categoryConfig = getCategoryConfig(entry.category);
 	const isShoe = canAddToCollection(entry.category);
@@ -474,22 +472,6 @@ export function SizingJournalEntryCard({
 									<span className='badge-size-highlight'>
 										{viewMode === 'collection' ? 'Size' : 'Ideal Size'}: {entry.size_tried}
 									</span>
-									{(fitInfo || entry.comfort_rating) && (
-										<span className='hidden sm:inline text-muted-foreground mx-0.5'>
-											|
-										</span>
-									)}
-								</>
-							)}
-
-							{fitInfo && (
-								<>
-									<div className='flex items-center gap-1'>
-										<span className='text-muted-foreground'>Fit:</span>
-										<span className='font-medium'>
-											{fitInfo.icon} {fitInfo.label}
-										</span>
-									</div>
 									{entry.comfort_rating && (
 										<span className='hidden sm:inline text-muted-foreground mx-0.5'>
 											|
@@ -525,7 +507,7 @@ export function SizingJournalEntryCard({
 							{/* Wear Counter - Collection Mode Only (shoes only) */}
 							{viewMode === 'collection' && canTrack && onIncrementWear && onDecrementWear && (
 								<>
-									{(fitInfo || entry.comfort_rating) && (
+									{entry.comfort_rating && (
 										<span className='hidden sm:inline text-muted-foreground mx-0.5'>
 											|
 										</span>
@@ -674,11 +656,6 @@ export function SizingJournalEntryCard({
 }
 
 // Helper functions
-function getFitRatingInfo(rating: number | null) {
-	if (!rating) return null;
-	return FIT_RATINGS.find((r) => r.value === rating) || FIT_RATINGS[2];
-}
-
 function getComfortLabel(rating: number | undefined) {
 	if (!rating) return null;
 

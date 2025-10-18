@@ -19,7 +19,6 @@ export interface SizingJournalEntry {
   category: ItemCategory
   size_type: SizeType
   size_tried: string | null
-  fit_rating: number | null
   comfort_rating?: number
   store_name?: string
   try_on_date: string
@@ -44,18 +43,3 @@ export interface SizingJournalEntry {
   status: 'owned' | 'wishlisted' | 'journaled'
   has_been_tried: boolean
 }
-
-export interface FitRating {
-  value: number
-  label: string
-  icon: string
-  color: string
-}
-
-export const FIT_RATINGS: FitRating[] = [
-  { value: 1, label: 'Too Small', icon: '🔴', color: 'bg-red-100 text-red-800' },
-  { value: 2, label: 'Snug', icon: '🟠', color: 'bg-orange-100 text-orange-800' },
-  { value: 3, label: 'Perfect', icon: '🟢', color: 'bg-green-100 text-green-800' },
-  { value: 4, label: 'Loose', icon: '🟡', color: 'bg-yellow-100 text-yellow-800' },
-  { value: 5, label: 'Too Big', icon: '🔴', color: 'bg-red-100 text-red-800' }
-]

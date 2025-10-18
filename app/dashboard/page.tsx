@@ -5,9 +5,8 @@ import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
-import { FitProfileDashboard } from '@/components/fit-profile-dashboard'
 import { FTUEChecklist } from '@/components/ftue-checklist'
-import { Package, Heart, Brain, Archive } from 'lucide-react'
+import { Package, Heart, Archive } from 'lucide-react'
 
 /*
   ✅ DASHBOARD DESIGN SYSTEM v2.0 IMPLEMENTATION
@@ -112,7 +111,7 @@ function DashboardContent() {
           {/* Tabs Container with ultra-wide optimization */}
           <Tabs defaultValue={defaultTab} className="w-full max-w-[1920px] mx-auto rounded-lg p-6 ">
           {/* --- The New Simplified Tabs --- */}
-          <TabsList className="grid w-full grid-cols-4 mb-6 justify-center">
+          <TabsList className="grid w-full grid-cols-3 mb-6 justify-center">
             <TabsTrigger value="wishlist" className="flex items-center gap-2">
               <Heart className="h-4 w-4" />
               Wishlist
@@ -120,10 +119,6 @@ function DashboardContent() {
             <TabsTrigger value="owned" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Owned
-            </TabsTrigger>
-            <TabsTrigger value="fit-profile" className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              Fit Profile
             </TabsTrigger>
             <TabsTrigger value="archive" className="flex items-center gap-2">
                <Archive className="h-4 w-4" />
@@ -145,10 +140,6 @@ function DashboardContent() {
                 status={['owned', 'wishlisted', 'journaled']}
                 isArchivePage={true}
               />
-            </TabsContent>
-
-            <TabsContent value="fit-profile">
-              <FitProfileDashboard />
             </TabsContent>
           </Tabs>
         </div>

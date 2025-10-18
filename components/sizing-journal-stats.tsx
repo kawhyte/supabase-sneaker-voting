@@ -9,9 +9,6 @@ interface SizingJournalStatsProps {
 
 export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) {
   const totalEntries = journalEntries.length
-  const perfectFits = journalEntries.filter(
-    entry => entry.fit_rating === 3 && entry.has_been_tried
-  ).length
   const recommended = journalEntries.filter(
     entry => entry.would_recommend && entry.has_been_tried
   ).length
@@ -26,11 +23,6 @@ export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) 
       color: 'var(--color-primary-500)'
     },
     {
-      value: perfectFits,
-      label: 'Perfect Fits',
-      color: 'var(--color-accent-green-500)'
-    },
-    {
       value: recommended,
       label: 'Recommended',
       color: 'var(--color-accent-blue-500)'
@@ -43,7 +35,7 @@ export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) 
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-xl mb-xl mt-12">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-xl mb-xl mt-12">
       {stats.map((stat, index) => (
         <Card key={index} className="hover-lift">
           <CardContent className="p-md text-center">

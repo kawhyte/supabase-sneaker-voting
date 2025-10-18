@@ -34,8 +34,8 @@ export function sortJournalEntries(
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       case 'date-asc':
         return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-      case 'fit-rating':
-        return (a.fit_rating || 0) - (b.fit_rating || 0)
+      case 'comfort-rating':
+        return (a.comfort_rating || 0) - (b.comfort_rating || 0)
       case 'brand':
         return a.brand.localeCompare(b.brand)
       default:

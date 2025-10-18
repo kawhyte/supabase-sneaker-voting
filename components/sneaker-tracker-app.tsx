@@ -5,10 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { AddItemForm } from './add-item-form'
 import { SizingJournalDashboard } from './sizing-journal-dashboard'
-import { FitProfileDashboard } from './fit-profile-dashboard'
-import { Zap, BarChart3, Brain } from 'lucide-react'
+import { Zap, BarChart3 } from 'lucide-react'
 
-type ViewMode = 'entry' | 'dashboard' | 'insights'
+type ViewMode = 'entry' | 'dashboard'
 
 export function ItemTrackerApp() {
   const [currentView, setCurrentView] = useState<ViewMode>('entry')
@@ -94,28 +93,6 @@ export function ItemTrackerApp() {
                 />
               </Button>
             </motion.div>
-
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant={currentView === 'insights' ? 'default' : 'outline'}
-                onClick={() => setCurrentView('insights')}
-                className="flex items-center gap-2 relative overflow-hidden group"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.2 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Brain className="h-4 w-4" />
-                </motion.div>
-                Insights
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-teal-400/20 to-orange-400/20 opacity-0 group-hover:opacity-100"
-                  initial={{ x: -100 }}
-                  whileHover={{ x: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </Button>
-            </motion.div>
           </motion.div>
         </motion.div>
 
@@ -163,10 +140,8 @@ export function ItemTrackerApp() {
               <div className="flex justify-center">
                 <AddItemForm onItemAdded={handleItemAdded} mode="create" />
               </div>
-            ) : currentView === 'dashboard' ? (
-              <SizingJournalDashboard onAddNew={handleAddNew} status={['wishlisted']} />
             ) : (
-              <FitProfileDashboard onGoBack={() => setCurrentView('dashboard')} />
+              <SizingJournalDashboard onAddNew={handleAddNew} status={['wishlisted']} />
             )}
           </motion.div>
         </AnimatePresence>

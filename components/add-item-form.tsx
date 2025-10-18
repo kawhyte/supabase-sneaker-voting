@@ -143,7 +143,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
-import { type FitData } from "@/lib/size-analytics";
 import { MultiPhotoUpload } from "@/components/multi-photo-upload";
 import { ImageConfirmationModal } from "@/components/image-confirmation-modal";
 import { BrandCombobox } from "@/components/brand-combobox";
