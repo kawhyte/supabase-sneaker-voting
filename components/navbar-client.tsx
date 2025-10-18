@@ -179,7 +179,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					</div>
 
 					{/* Mobile Menu Button - h-5 w-5 = 20px (accessible touch target) */}
-					<div className='lg:hidden rounded-full bg-muted p-4'>
+					<div className='lg:hidden rounded-full bg-muted p-2'>
 						<Button
 							variant='ghost'
 							className='text-foreground hover:text-primary h-5 w-5 p-0 motion-safe:transition-all motion-safe:duration-150'
