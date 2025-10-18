@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, PawPrint } from 'lucide-react'
 
 // Dynamically import Lottie component for code splitting
 const Lottie = dynamic(() => import('react-lottie-player'), {
@@ -114,16 +114,17 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl  font-semibold tracking-tight text-slate-600 leading-tight"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-slate-900 leading-tight"
           >
-            Your{' '}
-            <span className="text-forground">
-              trusted
-            </span>
-            <br />
-            <span className="">
+            <div className="flex flex-row items-center justify-center gap-2 sm:gap-3">
+              <span>Your</span>
+              <PawPrint className="text-primary h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14" />
+              <span>trusted</span>
+            </div>
+
+            <div className="mt-2">
               PurrView Wardrobe
-            </span>
+            </div>
           </motion.h1>
 
           {/* Description */}
@@ -137,7 +138,7 @@ export default function HomePage() {
           </motion.p>
 
           {/* Lottie Animation */}
-          <div className="mt-8 md:mt-8">
+          <div className="mt-2 md:mt-4">
             <LottieAnimationWrapper />
           </div>
 
@@ -156,7 +157,7 @@ export default function HomePage() {
                     '0 20px 25px -5px rgba(255, 199, 0, 0.2), 0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                 }}
                 whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-4 md:py-5 text-base md:text-lg font-semibold rounded-full bg-sun-400 text-slate-900 hover:bg-sun-500 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-sun-300 focus:ring-offset-2 min-h-[44px]"
+                className="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-4 md:py-5 text-base md:text-lg font-semibold rounded-full bg-primary text-slate-900 hover:bg-sun-400 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-sun-300 focus:ring-offset-2 min-h-[44px]"
                 aria-label="Start tracking your wardrobe"
               >
                 Start Tracking

@@ -132,8 +132,8 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 				<div className='flex h-16 items-center justify-between gap-6'>
 					{/* Logo/Brand - Minimalist Design with Poppins SemiBold (Outside Pill) */}
 					<Link href='/' className='flex items-center gap-2 motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:scale-105 flex-shrink-0'>
-						<PawPrint className='text-primary h-8 w-8' />
-						<span className='text-xl font-semibold text-foreground'>
+						<PawPrint className='text-slate-600 h-8 w-8' />
+						<span className='text-xl font-semibold text-slate-600'>
 							PurrView
 						</span>
 					</Link>
