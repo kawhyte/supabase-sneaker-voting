@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'tailwindcss/container-queries';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -62,16 +61,16 @@
   --spacing-1: 4px;         /* p-1 - Icon gaps, badge padding, borders */
 
   /* --- TIER 2-32: Pure 8pt Grid --- */
-  --spacing-2: 8px;         /* p-2 - Compact button padding, tight gaps */
-  --spacing-3: 12px;        /* p-3 - Form element internal padding */
-  --spacing-4: 16px;        /* p-4 - DEFAULT element spacing ⭐ */
-  --spacing-6: 24px;        /* p-6 - Card padding, component gaps ⭐ */
-  --spacing-8: 32px;        /* p-8 - Section separation ⭐ */
-  --spacing-12: 48px;       /* p-12 - Hero sections, major spacing ⭐ */
-  --spacing-16: 64px;       /* p-16 - Page-level margins ⭐ */
-  --spacing-20: 80px;       /* p-20 - Massive spacing ⭐ */
-  --spacing-24: 96px;       /* p-24 - Extreme spacing */
-  --spacing-32: 128px;      /* p-32 - Maximum (rare use) */
+  --spacing-2: 8px;         /* p-2: gap-2, gap-x-2, gap-y-2 → Compact button padding, tight gaps */
+  --spacing-3: 12px;        /* p-3: gap-3 → Form element internal padding */
+  --spacing-4: 16px;        /* p-4: m-4, p-4, gap-4, space-y-4 → DEFAULT element spacing ⭐ */
+  --spacing-6: 24px;        /* p-6: m-6, p-6, gap-6 → Card padding, component gaps ⭐ */
+  --spacing-8: 32px;        /* p-8: m-8, p-8, gap-8 → Section separation ⭐ */
+  --spacing-12: 48px;       /* p-12: m-12, p-12, gap-12 → Hero sections, major spacing ⭐ */
+  --spacing-16: 64px;       /* p-16: m-16, p-16 → Page-level margins ⭐ */
+  --spacing-20: 80px;       /* p-20: m-20, p-20 → Massive spacing ⭐ */
+  --spacing-24: 96px;       /* p-24: m-24, p-24 → Extreme spacing */
+  --spacing-32: 128px;      /* p-32: m-32, p-32 → Maximum (rare use) */
 
   /* --- NEGATIVE SPACING (Advanced Layouts) --- */
   /* Use for: Overlapping cards, hero image bleed, sticky header offsets */
@@ -82,11 +81,11 @@
   --spacing-neg-8: -32px;   /* -m-8 - Hero image bleed */
 
   /* --- SEMANTIC ALIASES (Recommended for Readability) --- */
-  --spacing-element: var(--spacing-4);           /* 16px - Default element spacing */
-  --spacing-component: var(--spacing-6);         /* 24px - Cards, containers, component padding */
-  --spacing-section: var(--spacing-12);          /* 48px - Between sections */
-  --spacing-section-large: var(--spacing-20);    /* 80px - Major section breaks */
-  --spacing-page: var(--spacing-16);             /* 64px - Page margins, hero padding */
+  --spacing-element: var(--spacing-4);           /* 16px - Use: p-4 for default element spacing */
+  --spacing-component: var(--spacing-6);         /* 24px - Use: p-6 for card padding, modal padding */
+  --spacing-section: var(--spacing-12);          /* 48px - Use: my-12 or space-y-12 for section gaps */
+  --spacing-section-large: var(--spacing-20);    /* 80px - Use: my-20 for major section breaks */
+  --spacing-page: var(--spacing-16);             /* 64px - Use: px-16 py-16 for page margins */
 
   /* ============================================
      RESPONSIVE SPACING - Mobile First Design
@@ -214,7 +213,8 @@
 
   /* Stone (Warm - Primary Background)
      Purpose: Main backgrounds, cards, subtle UI
-     Optimal: 94% lightness (stone-200) lets product images pop */
+     Optimal: 94% lightness (stone-200) lets product images pop
+     Usage: bg-stone-50 (page), bg-stone-100 (alternate), bg-stone-200 (main) */
   --color-stone-50: oklch(0.99 0.008 85);     /* Whisper - hover states */
   --color-stone-100: oklch(0.97 0.012 85);    /* Soft - alternate BG */
   --color-stone-200: oklch(0.94 0.018 85);    /* Main Background ⭐ */
