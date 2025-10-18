@@ -504,67 +504,77 @@
 
 @layer utilities {
 
-  /* --- CARD INTERACTIONS --- */
+  /* --- CARD INTERACTIONS (Phantom Aesthetic) --- */
 
-  .card-sneaker {
+  .card {
     @apply bg-card rounded-lg border border-border;
+    padding: var(--spacing-component);
     transition: all var(--transition-base);
   }
 
-  .card-sneaker:hover {
-    transform: translateY(-4px);
+  .card-hover {
+    @apply card;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
+    border-color: var(--color-slate-300);
+  }
+
+  /* Sneaker-specific card with brand accent */
+  .card-sneaker {
+    @apply card-hover;
+  }
+
+  .card-sneaker:hover {
     border-color: var(--color-sun-300);
   }
 
-  /* --- BADGE STYLES (Urgency Signals) --- */
+  /* --- BADGE STYLES (Shadcn Pattern - Status Variants) --- */
 
-  .badge-price-drop {
+  .badge {
     @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold;
-    background: var(--color-drop-100);
-    color: var(--color-drop-600);
-    border: 1.5px solid var(--color-drop-400);
-    transition: transform var(--transition-fast);
+    transition: all var(--transition-fast);
   }
 
-  .badge-price-drop:hover {
+  .badge-urgent {
+    @apply badge bg-ember-100 text-ember-600 border border-ember-400;
+  }
+
+  .badge-urgent:hover {
     transform: scale(1.05);
-    box-shadow: var(--shadow-drop);
+    box-shadow: var(--shadow-ember);
   }
 
-  .badge-new-release {
-    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold;
-    background: var(--color-new-100);
-    color: var(--color-new-600);
-    border: 1.5px solid var(--color-new-400);
-    transition: transform var(--transition-fast);
+  .badge-new {
+    @apply badge bg-blaze-100 text-blaze-600 border border-blaze-400;
   }
 
-  .badge-new-release:hover {
+  .badge-new:hover {
     transform: scale(1.05);
-    box-shadow: var(--shadow-new);
+    box-shadow: var(--shadow-blaze);
   }
 
-  .badge-good-deal {
-    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold;
-    background: var(--color-deal-100);
-    color: var(--color-deal-600);
-    border: 1.5px solid var(--color-deal-400);
-    transition: transform var(--transition-fast);
+  .badge-success {
+    @apply badge bg-meadow-100 text-meadow-600 border border-meadow-400;
   }
 
-  .badge-good-deal:hover {
+  .badge-success:hover {
     transform: scale(1.05);
-    box-shadow: var(--shadow-deal);
+    box-shadow: var(--shadow-meadow);
   }
 
-  .badge-sold-out {
-    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-medium;
-    background: var(--color-sold-100);
-    color: var(--color-sold-500);
-    border: 1.5px solid var(--color-sold-300);
-    opacity: 0.8;
+  .badge-neutral {
+    @apply badge bg-slate-100 text-slate-600 border border-slate-300;
+    opacity: 0.85;
   }
+
+  /* Backward compatibility aliases for migration */
+  .badge-price-drop { @apply badge-urgent; }
+  .badge-new-release { @apply badge-new; }
+  .badge-good-deal { @apply badge-success; }
+  .badge-sold-out { @apply badge-neutral; }
 
   /* --- BUTTON STYLES --- */
 
@@ -623,38 +633,6 @@
     box-shadow: var(--shadow-md);
   }
 
-  /* Pulse animation for new drops */
-  @keyframes pulse-sun {
-    0%, 100% {
-      box-shadow: 0 0 0 0 rgba(255, 199, 0, 0.4);
-    }
-    50% {
-      box-shadow: 0 0 0 10px rgba(255, 199, 0, 0);
-    }
-  }
-
-  .pulse-new-drop {
-    animation: pulse-sun 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  /* Backward compatibility */
-  @keyframes pulse-yellow {
-    0%, 100% {
-      box-shadow: 0 0 0 0 rgba(255, 199, 0, 0.4);
-    }
-    50% {
-      box-shadow: 0 0 0 10px rgba(255, 199, 0, 0);
-    }
-  }
-
-  /* --- TEXT UTILITIES --- */
-
-  .text-gradient-accent {
-    background: linear-gradient(135deg, var(--color-sun-400), var(--color-terracotta-400));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
 
   /* --- FOCUS STATES (Accessibility) --- */
 
