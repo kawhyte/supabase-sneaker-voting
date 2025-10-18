@@ -139,7 +139,10 @@ import {
 	Archive,
 	ArchiveRestore,
 	ShoppingBag,
-	BadgeCentIcon
+	BadgeCentIcon,
+	AlertTriangle,
+	AlertCircle,
+	Check,
 } from "lucide-react";
 import { PhotoCarousel } from "./photo-carousel";
 import {
@@ -495,12 +498,29 @@ export function SizingJournalEntryCard({
 								</>
 							)}
 
-							{entry.comfort_rating && (
-								<div className='flex items-center gap-1'>
-									<span className='text-muted-foreground'>Comfort:</span>
-									<span>{getComfortStars(entry.comfort_rating)}</span>
-								</div>
-							)}
+							{entry.comfort_rating && (() => {
+								const comfortInfo = getComfortLabel(entry.comfort_rating);
+								if (!comfortInfo) return null;
+
+								const IconMap: Record<string, typeof Star> = {
+									AlertTriangle,
+									AlertCircle,
+									Minus,
+									Check,
+									Star,
+								};
+								const IconComponent = IconMap[comfortInfo.icon];
+
+								return (
+									<div className='flex items-center gap-1.5'>
+										<span className='text-muted-foreground'>Comfort:</span>
+										<span className={`inline-flex items-center gap-1 ${comfortInfo.color} font-medium`}>
+											<IconComponent className='h-4 w-4' />
+											<span className='text-sm'>{comfortInfo.label}</span>
+										</span>
+									</div>
+								);
+							})()}
 
 							{/* Wear Counter - Collection Mode Only (shoes only) */}
 							{viewMode === 'collection' && canTrack && onIncrementWear && onDecrementWear && (
@@ -659,18 +679,38 @@ function getFitRatingInfo(rating: number | null) {
 	return FIT_RATINGS.find((r) => r.value === rating) || FIT_RATINGS[2];
 }
 
-function getComfortStars(rating: number) {
-	return (
-		<div className="flex items-center gap-0.5">
-			{Array.from({ length: rating }, (_, i) => (
-				<Star
-					key={i}
-					className="h-2 w-2 text-primary"
-					fill="currentColor"
-				/>
-			))}
-		</div>
-	);
+function getComfortLabel(rating: number | undefined) {
+	if (!rating) return null;
+
+	const comfortMap: Record<number, { label: string; icon: string; color: string }> = {
+		1: {
+			label: 'Unwearable',
+			icon: 'AlertTriangle',
+			color: 'text-destructive',
+		},
+		2: {
+			label: 'Uncomfortable',
+			icon: 'AlertCircle',
+			color: 'text-sun-600',
+		},
+		3: {
+			label: 'Neutral',
+			icon: 'Minus',
+			color: 'text-slate-500',
+		},
+		4: {
+			label: 'Comfortable',
+			icon: 'Check',
+			color: 'text-meadow-600',
+		},
+		5: {
+			label: 'Perfect',
+			icon: 'Star',
+			color: 'text-sun-400',
+		},
+	};
+
+	return comfortMap[rating] || null;
 }
 
 function formatDate(dateString: string) {
