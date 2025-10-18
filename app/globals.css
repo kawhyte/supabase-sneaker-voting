@@ -393,12 +393,6 @@
   --shadow-blaze: 0 4px 14px 0 rgb(249 115 22 / 0.15);  /* Blaze orange energy */
   --shadow-meadow: 0 4px 14px 0 rgb(16 185 129 / 0.15); /* Meadow green success */
 
-  /* Backward compatibility */
-  --shadow-yellow: var(--shadow-sun);
-  --shadow-drop: var(--shadow-ember);
-  --shadow-new: var(--shadow-blaze);
-  --shadow-deal: var(--shadow-meadow);
-
   /* ============================================
      BORDER RADIUS
      ============================================ */
