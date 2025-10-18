@@ -93,7 +93,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
   const getConsistencyBadge = (score: number) => {
     if (score >= 80) return { label: 'Very Consistent', color: 'bg-green-100 text-green-800' }
     if (score >= 60) return { label: 'Mostly Consistent', color: 'bg-blue-100 text-blue-800' }
-    if (score >= 40) return { label: 'Somewhat Consistent', color: 'bg-yellow-100 text-yellow-800' }
+    if (score >= 40) return { label: 'Somewhat Consistent', color: 'bg-sun-100 text-sun-800' }
     return { label: 'Inconsistent', color: 'bg-red-100 text-red-800' }
   }
 
@@ -120,11 +120,11 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
     return (
       <Card className="max-w-4xl mx-auto">
         <CardContent className="flex flex-col items-center justify-center p-12 text-center">
-          <Brain className="h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2 font-heading">
+          <Brain className="h-12 w-12 text-slate-400 mb-4" />
+          <h3 className="text-lg font-medium text-slate-900 mb-2 font-heading">
             Not Enough Data for Insights
           </h3>
-          <p className="text-gray-600 mb-6 max-w-md">
+          <p className="text-slate-600 mb-6 max-w-md">
             Start trying on items and rating their fit to unlock personalized size recommendations and insights!
           </p>
           {onGoBack ? (
@@ -150,7 +150,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
             <Brain className="h-8 w-8 text-teal-600" />
             My Fit Profile
           </h1>
-          <p className="text-gray-600">Your personalized size recommendations and fit insights</p>
+          <p className="text-slate-600">Your personalized size recommendations and fit insights</p>
         </div>
         <div className="flex gap-2">
           <Select value={selectedUser} onValueChange={(value: any) => setSelectedUser(value)}>
@@ -176,7 +176,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
         <Card>
           <CardContent className="p-6 text-center">
             <BarChart3 className="h-12 w-12 mx-auto mb-4 text-blue-500" />
-            <p className="text-gray-600">Comparison view coming soon...</p>
+            <p className="text-slate-600">Comparison view coming soon...</p>
           </CardContent>
         </Card>
       ) : (
@@ -189,7 +189,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
                   <div className="text-2xl font-bold text-blue-600 mb-1">
                     {insights.preferredSize}
                   </div>
-                  <div className="text-sm text-gray-600 flex items-center justify-center gap-1">
+                  <div className="text-sm text-slate-600 flex items-center justify-center gap-1">
                     <Target className="h-3 w-3" />
                     Preferred Size
                   </div>
@@ -201,7 +201,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
                   <div className="text-2xl font-bold text-green-600 mb-1">
                     {insights.brandComparisons.filter(b => b.perfectFitSize).length}
                   </div>
-                  <div className="text-sm text-gray-600 flex items-center justify-center gap-1">
+                  <div className="text-sm text-slate-600 flex items-center justify-center gap-1">
                     <Award className="h-3 w-3" />
                     Perfect Fit Brands
                   </div>
@@ -213,7 +213,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
                   <div className="text-2xl font-bold text-teal-600 mb-1">
                     {insights.brandComparisons.length}
                   </div>
-                  <div className="text-sm text-gray-600 flex items-center justify-center gap-1">
+                  <div className="text-sm text-slate-600 flex items-center justify-center gap-1">
                     <BarChart3 className="h-3 w-3" />
                     Brands Analyzed
                   </div>
@@ -225,7 +225,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
                   <div className="text-2xl font-bold text-orange-600 mb-1">
                     {insights.consistencyScore}%
                   </div>
-                  <div className="text-sm text-gray-600 flex items-center justify-center gap-1">
+                  <div className="text-sm text-slate-600 flex items-center justify-center gap-1">
                     <TrendingUp className="h-3 w-3" />
                     Consistency
                   </div>
@@ -252,14 +252,14 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
                   {insights.brandComparisons.map((brand) => (
                     <div
                       key={brand.brand}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                      className="flex items-center justify-between p-4 bg-slate-50 rounded-lg"
                     >
                       <div className="flex items-center gap-4">
                         <div className="font-medium text-lg">{brand.brand}</div>
                         <div className="text-2xl">
                           {getSizeAdjustmentIcon(brand.sizeAdjustment)}
                         </div>
-                        <div className="text-sm text-gray-600 capitalize">
+                        <div className="text-sm text-slate-600 capitalize">
                           {brand.sizeAdjustment}
                         </div>
                       </div>
@@ -269,28 +269,28 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
                           <div className="font-medium text-green-600">
                             {brand.perfectFitSize || 'N/A'}
                           </div>
-                          <div className="text-gray-500">Perfect Fit</div>
+                          <div className="text-slate-500">Perfect Fit</div>
                         </div>
 
                         <div className="text-center">
                           <div className="font-medium">
                             {brand.averageSize.toFixed(1)}
                           </div>
-                          <div className="text-gray-500">Avg Size</div>
+                          <div className="text-slate-500">Avg Size</div>
                         </div>
 
                         <div className="text-center">
                           <div className="font-medium">
                             {brand.averageFitRating}/5
                           </div>
-                          <div className="text-gray-500">Avg Fit</div>
+                          <div className="text-slate-500">Avg Fit</div>
                         </div>
 
                         <div className="text-center">
                           <div className="font-medium text-blue-600">
                             {brand.totalTryOns}
                           </div>
-                          <div className="text-gray-500">Try-ons</div>
+                          <div className="text-slate-500">Try-ons</div>
                         </div>
                       </div>
                     </div>
@@ -317,7 +317,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
                           <Badge variant="outline" className="text-lg font-bold">
                             {rec.recommendedSize}
                           </Badge>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-slate-500">
                             {rec.confidence}% confidence
                           </div>
                         </div>
@@ -325,11 +325,11 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
 
                       <Progress value={rec.confidence} className="h-2 mb-2" />
 
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-slate-600">
                         {rec.reasoning}
                       </div>
 
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-slate-500 mt-1">
                         Based on {rec.basedOnData.length} data point{rec.basedOnData.length !== 1 ? 's' : ''}
                       </div>
                     </div>
@@ -356,7 +356,7 @@ export function FitProfileDashboard({ onGoBack }: FitProfileDashboardProps) {
                     <Progress value={insights.consistencyScore} className="h-3" />
                   </div>
 
-                  <div className="text-sm text-gray-600 space-y-2">
+                  <div className="text-sm text-slate-600 space-y-2">
                     <p>
                       <strong>What this means:</strong>
                     </p>

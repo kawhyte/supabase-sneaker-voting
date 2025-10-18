@@ -87,7 +87,7 @@ export function ProductUrlInput({ onProductDataLoaded, className = '' }: Product
         <Label htmlFor="product-url" className="text-sm font-medium flex items-center gap-2">
           <Link2 className="h-4 w-4" />
           Product URL
-          <span className="text-xs text-gray-500 font-normal">(Optional - Auto-fill form)</span>
+          <span className="text-xs text-slate-500 font-normal">(Optional - Auto-fill form)</span>
         </Label>
         <div className="flex gap-2">
           <Input
@@ -113,7 +113,7 @@ export function ProductUrlInput({ onProductDataLoaded, className = '' }: Product
           </Button>
         </div>
 
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-slate-500">
           Supported: {getSupportedSites().join(', ')}
         </div>
       </div>
@@ -177,7 +177,7 @@ export function ProductUrlInput({ onProductDataLoaded, className = '' }: Product
       )}
 
       {/* Help Text */}
-      <div className="text-xs text-gray-500 space-y-1">
+      <div className="text-xs text-slate-500 space-y-1">
         <p>💡 <strong>How it works:</strong> Paste a item product URL and we'll automatically extract the brand, model, color, and price to fill out your form.</p>
         <p>📝 <strong>Manual entry:</strong> You can still fill out the form manually if auto-fill doesn't work or if you prefer to enter custom information.</p>
       </div>

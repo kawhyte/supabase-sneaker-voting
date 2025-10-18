@@ -29,16 +29,16 @@ export function DeleteConfirmDialog({
             <Trash2 className="h-5 w-5 text-red-600" />
           </div>
           <div>
-            <h3 className="text-lg font-medium text-gray-900 font-heading">Delete Journal Entry</h3>
-            <p className="text-sm text-gray-500">This action cannot be undone.</p>
+            <h3 className="text-lg font-medium text-slate-900 font-heading">Delete Journal Entry</h3>
+            <p className="text-sm text-slate-500">This action cannot be undone.</p>
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-3 mb-6">
-          <div className="font-medium text-gray-900">
+        <div className="bg-slate-50 rounded-lg p-3 mb-6">
+          <div className="font-medium text-slate-900">
             {experience.brand} {experience.model}
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-slate-600">
             {experience.color !== 'Standard' && experience.color && (
               <span>{experience.color} • </span>
             )}
@@ -47,7 +47,7 @@ export function DeleteConfirmDialog({
           </div>
         </div>
 
-        <p className="text-sm text-gray-600 mb-6">
+        <p className="text-sm text-slate-600 mb-6">
           Are you sure you want to delete this journal entry? This will permanently remove it from your sizing journal and analytics.
         </p>
 

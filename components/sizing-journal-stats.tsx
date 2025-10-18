@@ -45,7 +45,7 @@ export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) 
             >
               {stat.value}
             </div>
-            <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+            <div className="text-xs font-medium text-slate-600 uppercase tracking-wide">
               {stat.label}
             </div>
           </CardContent>

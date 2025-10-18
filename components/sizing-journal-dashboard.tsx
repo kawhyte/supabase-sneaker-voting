@@ -500,7 +500,7 @@ function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journal
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-xl">
       <div>
         <h1 className="text-3xl font-bold font-heading">{title}</h1>
-        <p className="text-gray-600">{description}</p>
+        <p className="text-slate-600">{description}</p>
       </div>
     </div>
   )

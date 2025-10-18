@@ -88,7 +88,7 @@ export default function LoginForm() {
 
 						<SubmitButton
 							formAction={signUp}
-							className='bg-gray-200 hover:bg-gray-200/90 text-black  text-sm  rounded-md px-4 py-2 w-full text-foreground mb-2'
+							className='bg-slate-200 hover:bg-slate-200/90 text-black  text-sm  rounded-md px-4 py-2 w-full text-foreground mb-2'
 							pendingText='Signing Up...'>
 							Create an account
 						</SubmitButton>

@@ -376,8 +376,8 @@ export function PriceMonitorManager({ item_id, user_name, className = "" }: Pric
               {/* Existing Monitors */}
               <div className="space-y-3">
                 {monitors.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <DollarSign className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <div className="text-center py-8 text-slate-500">
+                    <DollarSign className="w-12 h-12 mx-auto mb-4 text-slate-300" />
                     <p>No price monitors set up yet.</p>
                     <p className="text-sm">Add a product URL above to start tracking prices.</p>
                   </div>
@@ -410,7 +410,7 @@ export function PriceMonitorManager({ item_id, user_name, className = "" }: Pric
 
                             <div className="space-y-1 text-sm">
                               <div className="flex items-center gap-2">
-                                <Link2 className="w-4 h-4 text-gray-400" />
+                                <Link2 className="w-4 h-4 text-slate-400" />
                                 <a
                                   href={monitor.product_url}
                                   target="_blank"
@@ -423,19 +423,19 @@ export function PriceMonitorManager({ item_id, user_name, className = "" }: Pric
 
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
                                 <div>
-                                  <span className="text-gray-500">Current Price:</span>
+                                  <span className="text-slate-500">Current Price:</span>
                                   <div className="font-medium">
                                     {monitor.last_price ? `$${monitor.last_price.toFixed(2)}` : 'Unknown'}
                                   </div>
                                 </div>
                                 <div>
-                                  <span className="text-gray-500">Target Price:</span>
+                                  <span className="text-slate-500">Target Price:</span>
                                   <div className="font-medium">
                                     {monitor.target_price ? `$${monitor.target_price.toFixed(2)}` : 'No target'}
                                   </div>
                                 </div>
                                 <div>
-                                  <span className="text-gray-500">Last Checked:</span>
+                                  <span className="text-slate-500">Last Checked:</span>
                                   <div className="font-medium text-xs">
                                     {monitor.last_checked_at
                                       ? new Date(monitor.last_checked_at).toLocaleString()
@@ -444,12 +444,12 @@ export function PriceMonitorManager({ item_id, user_name, className = "" }: Pric
                                   </div>
                                 </div>
                                 <div>
-                                  <span className="text-gray-500">Status:</span>
+                                  <span className="text-slate-500">Status:</span>
                                   <div className="flex items-center gap-1">
                                     {monitor.last_price ? (
                                       <CheckCircle className="w-3 h-3 text-green-600" />
                                     ) : (
-                                      <Clock className="w-3 h-3 text-yellow-600" />
+                                      <Clock className="w-3 h-3 text-sun-600" />
                                     )}
                                     <span className="text-xs">
                                       {monitor.last_price ? 'Working' : 'Pending'}
@@ -509,10 +509,10 @@ export function PriceMonitorManager({ item_id, user_name, className = "" }: Pric
                   <CardTitle className="text-sm">Monitoring System Controls</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                     <div>
                       <h4 className="font-medium">Automatic Monitoring</h4>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-600">
                         {monitoringStatus?.isActive
                           ? 'System is checking prices every hour and generating daily summaries'
                           : 'Automatic price checking is currently disabled'
@@ -532,10 +532,10 @@ export function PriceMonitorManager({ item_id, user_name, className = "" }: Pric
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                     <div>
                       <h4 className="font-medium">Manual Price Check</h4>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-600">
                         Check all active monitors right now
                       </p>
                     </div>

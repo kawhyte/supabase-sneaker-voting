@@ -73,12 +73,12 @@ export default async function Login({
 								</Link>
 								{/* <SubmitButton
 									formAction={signUp}
-									className=' rounded-md px-4 py-2 text-foreground mb-2 text-xs text-gray-500 uppercase'
+									className=' rounded-md px-4 py-2 text-foreground mb-2 text-xs text-slate-500 uppercase'
 									pendingText='Signing Up...'>
 									or Sign Up
 								</SubmitButton> */}
 								{params?.message && (
-									<p className='mt-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-md text-center'>
+									<p className='mt-4 p-4 bg-sun-100 border border-sun-400 text-sun-800 rounded-md text-center'>
 										{params.message}
 									</p>
 								)}

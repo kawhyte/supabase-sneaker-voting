@@ -255,14 +255,14 @@ export default function CollectionPage() {
             </h1>
             <p
               className="mt-2 text-lg"
-              style={{ color: 'var(--color-gray-500)' }}
+              style={{ color: 'var(--color-slate-500)' }}
             >
               A visual inventory of your prized items
             </p>
             {collectionItems.length > 0 && (
               <p
                 className="mt-1 text-sm font-medium"
-                style={{ color: 'var(--color-gray-600)' }}
+                style={{ color: 'var(--color-slate-600)' }}
               >
                 {collectionItems.length} {collectionItems.length === 1 ? 'item' : 'items'} in collection
               </p>
@@ -273,7 +273,7 @@ export default function CollectionPage() {
 
         {/* Tabs for Active/Archived */}
         <Tabs defaultValue="active" className="w-full">
-          <TabsList className="mb-6" style={{ backgroundColor: 'var(--color-gray-100)' }}>
+          <TabsList className="mb-6" style={{ backgroundColor: 'var(--color-slate-100)' }}>
             <TabsTrigger
               value="active"
               className="data-[state=active]:border-b-2"
@@ -298,7 +298,7 @@ export default function CollectionPage() {
               value="archived"
               className="data-[state=active]:border-b-2"
               style={{
-                borderColor: 'var(--color-gray-500)',
+                borderColor: 'var(--color-slate-500)',
               }}
             >
               Archived
@@ -306,8 +306,8 @@ export default function CollectionPage() {
                 <span
                   className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold"
                   style={{
-                    backgroundColor: 'var(--color-gray-200)',
-                    color: 'var(--color-gray-700)',
+                    backgroundColor: 'var(--color-slate-200)',
+                    color: 'var(--color-slate-700)',
                   }}
                 >
                   {archivedItems.length}
@@ -322,18 +322,18 @@ export default function CollectionPage() {
               <div
                 className="text-center py-24 rounded-xl border-2 border-dashed"
                 style={{
-                  borderColor: 'var(--color-gray-300)',
+                  borderColor: 'var(--color-slate-300)',
                   backgroundColor: 'var(--color-white)',
                 }}
               >
                 <div className="flex flex-col items-center gap-4">
                   <div
                     className="w-16 h-16 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: 'var(--color-gray-100)' }}
+                    style={{ backgroundColor: 'var(--color-slate-100)' }}
                   >
                     <Package
                       className="w-8 h-8"
-                      style={{ color: 'var(--color-gray-400)' }}
+                      style={{ color: 'var(--color-slate-400)' }}
                       aria-hidden="true"
                     />
                   </div>
@@ -346,7 +346,7 @@ export default function CollectionPage() {
                     </h2>
                     <p
                       className="text-base max-w-sm mx-auto"
-                      style={{ color: 'var(--color-gray-500)' }}
+                      style={{ color: 'var(--color-slate-500)' }}
                     >
                       Start building your item collection by adding your first pair
                     </p>
@@ -396,18 +396,18 @@ export default function CollectionPage() {
               <div
                 className="text-center py-24 rounded-xl border-2 border-dashed"
                 style={{
-                  borderColor: 'var(--color-gray-300)',
+                  borderColor: 'var(--color-slate-300)',
                   backgroundColor: 'var(--color-white)',
                 }}
               >
                 <div className="flex flex-col items-center gap-4">
                   <div
                     className="w-16 h-16 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: 'var(--color-gray-100)' }}
+                    style={{ backgroundColor: 'var(--color-slate-100)' }}
                   >
                     <Archive
                       className="w-8 h-8"
-                      style={{ color: 'var(--color-gray-400)' }}
+                      style={{ color: 'var(--color-slate-400)' }}
                       aria-hidden="true"
                     />
                   </div>
@@ -420,7 +420,7 @@ export default function CollectionPage() {
                     </h2>
                     <p
                       className="text-base max-w-sm mx-auto"
-                      style={{ color: 'var(--color-gray-500)' }}
+                      style={{ color: 'var(--color-slate-500)' }}
                     >
                       Items you archive will appear here
                     </p>

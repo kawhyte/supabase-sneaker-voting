@@ -85,9 +85,9 @@ export function PhotoCarousel({
 
   if (sortedPhotos.length === 0) {
     return (
-      <Card className={`bg-gray-50 ${className}`}>
+      <Card className={`bg-slate-50 ${className}`}>
         <CardContent className="flex items-center justify-center py-12">
-          <div className="text-center text-gray-500">
+          <div className="text-center text-slate-500">
             <div className="text-4xl mb-2">📸</div>
             <p>No photos available</p>
           </div>
@@ -179,7 +179,7 @@ export function PhotoCarousel({
           {showControls && sortedPhotos.length > 1 && (
             <>
               {/* Photo Counter Badge */}
-              <Badge className="absolute top-3/5 left-1/2 -translate-x-1/2 z-10 bg-white/95 text-gray-900 border-0 shadow-md">
+              <Badge className="absolute top-3/5 left-1/2 -translate-x-1/2 z-10 bg-white/95 text-slate-900 border-0 shadow-md">
                 {selectedIndex + 1}/{sortedPhotos.length}
               </Badge>
 

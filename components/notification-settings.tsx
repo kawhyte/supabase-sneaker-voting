@@ -114,7 +114,7 @@ export function NotificationSettings() {
       case 'denied':
         return <Badge className="bg-red-100 text-red-700 border-red-200"><X className="w-3 h-3 mr-1" />Denied</Badge>;
       case 'default':
-        return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200"><AlertCircle className="w-3 h-3 mr-1" />Not Set</Badge>;
+        return <Badge className="bg-sun-100 text-sun-700 border-sun-200"><AlertCircle className="w-3 h-3 mr-1" />Not Set</Badge>;
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
@@ -209,10 +209,10 @@ export function NotificationSettings() {
         </div>
 
         {permission === 'denied' && (
-          <div className="rounded-md bg-yellow-50 border border-yellow-200 p-4">
+          <div className="rounded-md bg-sun-50 border border-sun-200 p-4">
             <div className="text-sm">
-              <strong className="text-yellow-800">Permission Denied</strong>
-              <p className="text-yellow-700 mt-1">
+              <strong className="text-sun-800">Permission Denied</strong>
+              <p className="text-sun-700 mt-1">
                 Notifications are blocked. To enable them, click the lock or notification icon in your browser's address bar and allow notifications for this site.
               </p>
             </div>

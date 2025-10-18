@@ -100,7 +100,7 @@ export function ItemTrackerApp() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-gray-600 dark:text-gray-300 text-center text-lg"
+          className="text-slate-600 dark:text-slate-300 text-center text-lg"
         >
           <AnimatePresence mode="wait">
             <motion.span

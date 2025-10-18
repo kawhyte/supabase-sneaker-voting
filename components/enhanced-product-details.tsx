@@ -166,7 +166,7 @@ export function EnhancedProductDetails({ productId, onBack, onComplete }: Enhanc
 
             {/* Common Sizes */}
             <div>
-              <p className="text-sm text-gray-600 mb-3">Click sizes to add them:</p>
+              <p className="text-sm text-slate-600 mb-3">Click sizes to add them:</p>
               <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                 {COMMON_SIZES.map((size) => (
                   <Button
@@ -218,7 +218,7 @@ export function EnhancedProductDetails({ productId, onBack, onComplete }: Enhanc
               <Label className="text-lg font-semibold">Size Details</Label>
               <div className="grid gap-4">
                 {Array.from(selectedSizes).sort().map((size) => (
-                  <div key={size} className="p-4 border rounded-lg bg-gray-50">
+                  <div key={size} className="p-4 border rounded-lg bg-slate-50">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                       <div className="font-medium">Size {size}</div>
 
@@ -279,7 +279,7 @@ export function EnhancedProductDetails({ productId, onBack, onComplete }: Enhanc
           </Button>
 
           {selectedSizes.size === 0 && (
-            <p className="text-center text-sm text-gray-500">
+            <p className="text-center text-sm text-slate-500">
               Select at least one size to continue
             </p>
           )}

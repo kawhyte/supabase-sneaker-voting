@@ -194,9 +194,9 @@ export const CATEGORY_CONFIGS: Record<ItemCategory, CategoryConfig> = {
 		labelPlural: "Watches",
 		icon: Watch,
 		color: "gray",
-		bgColor: "var(--color-gray-50)",
-		borderColor: "var(--color-gray-500)",
-		textColor: "var(--color-gray-700)",
+		bgColor: "var(--color-slate-50)",
+		borderColor: "var(--color-slate-500)",
+		textColor: "var(--color-slate-700)",
 		// Permissions
 		allowCollection: false,
 		allowPurchased: true,

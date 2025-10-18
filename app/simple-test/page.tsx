@@ -13,7 +13,7 @@ export default function SimpleTestPage() {
     <div className="container mx-auto p-6 space-y-8">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4 font-heading">Simple Test Page</h1>
-        <p className="text-gray-600 mb-6">Testing basic functionality</p>
+        <p className="text-slate-600 mb-6">Testing basic functionality</p>
       </div>
 
       {/* Basic Counter Test */}
@@ -28,7 +28,7 @@ export default function SimpleTestPage() {
             </Button>
             <Badge>{count > 5 ? 'High' : 'Low'}</Badge>
           </div>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-slate-600">
             Click the button to test React state updates
           </p>
         </CardContent>
@@ -71,7 +71,7 @@ export default function SimpleTestPage() {
               <h3 className="text-lg font-semibold mb-md">Spacing Utilities</h3>
               <div className="flex flex-wrap gap-xs items-center">
                 <div className="px-xxs py-xxs bg-blue-100 text-xs">px-xxs py-xxs (4px)</div>
-                <div className="px-xs py-xs bg-yellow-100 text-xs">px-xs py-xs (8px)</div>
+                <div className="px-xs py-xs bg-sun-100 text-xs">px-xs py-xs (8px)</div>
                 <div className="px-sm py-sm bg-purple-100 text-xs">px-sm py-sm (12px)</div>
                 <div className="px-md py-md bg-pink-100 text-xs">px-md py-md (16px)</div>
               </div>
@@ -92,8 +92,8 @@ export default function SimpleTestPage() {
                   <span className="text-xs">gap-xs (8px)</span>
                 </div>
                 <div className="flex gap-md">
-                  <div className="w-8 h-8 bg-yellow-500"></div>
-                  <div className="w-8 h-8 bg-yellow-500"></div>
+                  <div className="w-8 h-8 bg-sun-500"></div>
+                  <div className="w-8 h-8 bg-sun-500"></div>
                   <span className="text-xs">gap-md (16px)</span>
                 </div>
                 <div className="flex gap-xl">
@@ -142,7 +142,7 @@ export default function SimpleTestPage() {
                 <div className="border-l-4 border-green-500 pl-md">
                   <p className="text-base leading-tight">leading-tight (24px) - Tight text blocks and headings</p>
                 </div>
-                <div className="border-l-4 border-yellow-500 pl-md">
+                <div className="border-l-4 border-sun-500 pl-md">
                   <p className="text-base leading-normal">leading-normal (32px) - Comfortable body text for paragraphs</p>
                 </div>
                 <div className="border-l-4 border-purple-500 pl-md">

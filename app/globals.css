@@ -237,7 +237,6 @@
   --color-stone-700: oklch(0.56 0.035 85);    /* Darker */
   --color-stone-800: oklch(0.42 0.030 85);    /* Heading weight */
   --color-stone-900: oklch(0.28 0.025 85);    /* Heavy emphasis */
-  --color-stone-950: oklch(0.15 0.015 85);    /* Near black */
 
   /* Slate (Cool Gray - Utility)
      Purpose: Text, borders, neutral UI when warmth not needed */
@@ -251,7 +250,6 @@
   --color-slate-700: oklch(0.37 0 0);         /* Darker */
   --color-slate-800: oklch(0.27 0 0);         /* Very dark */
   --color-slate-900: oklch(0.15 0 0);         /* Near black - headings ⭐ */
-  --color-slate-950: oklch(0.10 0 0);         /* Darkest */
 
   /* Pure Black & White */
   --color-black: oklch(0 0 0);                /* #000000 */
@@ -273,7 +271,6 @@
   --color-sun-700: oklch(0.58 0.16 90);       /* Deep */
   --color-sun-800: oklch(0.48 0.14 90);       /* Dark */
   --color-sun-900: oklch(0.38 0.12 90);       /* Darkest */
-  --color-sun-950: oklch(0.28 0.10 90);       /* Near black */
 
   /* Terracotta (Warm Orange-Red - Secondary Accent)
      Purpose: Secondary CTAs, warm accents, complementary badges
@@ -288,7 +285,6 @@
   --color-terracotta-700: oklch(0.46 0.09 50); /* Deep */
   --color-terracotta-800: oklch(0.37 0.08 50); /* Dark */
   --color-terracotta-900: oklch(0.28 0.06 50); /* Darkest */
-  --color-terracotta-950: oklch(0.19 0.04 50); /* Near black */
 
   /* --- FUNCTIONAL COLORS (Semantic Status) --- */
 
@@ -305,7 +301,6 @@
   --color-ember-700: oklch(0.47 0.21 25);     /* Deep */
   --color-ember-800: oklch(0.39 0.18 25);     /* Dark */
   --color-ember-900: oklch(0.30 0.15 25);     /* Darkest */
-  --color-ember-950: oklch(0.22 0.12 25);     /* Near black */
 
   /* Blaze (Orange - New Releases)
      Purpose: New release badges, trending items, hot alerts
@@ -320,7 +315,6 @@
   --color-blaze-700: oklch(0.50 0.15 45);     /* Deep */
   --color-blaze-800: oklch(0.41 0.13 45);     /* Dark */
   --color-blaze-900: oklch(0.32 0.11 45);     /* Darkest */
-  --color-blaze-950: oklch(0.23 0.09 45);     /* Near black */
 
   /* Meadow (Green - Good Deals)
      Purpose: Good deal badges, positive changes, success states
@@ -335,71 +329,7 @@
   --color-meadow-700: oklch(0.46 0.14 155);   /* Deep */
   --color-meadow-800: oklch(0.38 0.12 155);   /* Dark */
   --color-meadow-900: oklch(0.30 0.10 155);   /* Darkest */
-  --color-meadow-950: oklch(0.22 0.08 155);   /* Near black */
 
-  /* --- BACKWARD COMPATIBILITY ALIASES --- */
-  /* These will be deprecated in v3.0 - migrate to new names */
-
-  /* Beige → Stone */
-  --color-beige-50: var(--color-stone-50);
-  --color-beige-100: var(--color-stone-100);
-  --color-beige-200: var(--color-stone-200);
-  --color-beige-300: var(--color-stone-300);
-
-  /* Sage → Stone (for now, may diverge in future) */
-  --color-sage-50: var(--color-stone-50);
-  --color-sage-100: var(--color-stone-100);
-  --color-sage-200: var(--color-stone-200);
-  --color-sage-300: var(--color-stone-300);
-  --color-sage-400: var(--color-stone-400);
-
-  /* Gray → Slate */
-  --color-gray-50: var(--color-slate-50);
-  --color-gray-100: var(--color-slate-100);
-  --color-gray-200: var(--color-slate-200);
-  --color-gray-300: var(--color-slate-300);
-  --color-gray-400: var(--color-slate-400);
-  --color-gray-500: var(--color-slate-500);
-  --color-gray-600: var(--color-slate-600);
-  --color-gray-700: var(--color-slate-700);
-  --color-gray-800: var(--color-slate-800);
-  --color-gray-900: var(--color-slate-900);
-
-  /* Yellow → Sun */
-  --color-yellow-100: var(--color-sun-100);
-  --color-yellow-200: var(--color-sun-200);
-  --color-yellow-300: var(--color-sun-300);
-  --color-yellow-400: var(--color-sun-400);
-  --color-yellow-500: var(--color-sun-500);
-  --color-yellow-600: var(--color-sun-600);
-  --color-yellow-700: var(--color-sun-700);
-  --color-yellow-800: var(--color-sun-800);
-
-  /* Drop → Ember */
-  --color-drop-100: var(--color-ember-100);
-  --color-drop-200: var(--color-ember-200);
-  --color-drop-400: var(--color-ember-400);
-  --color-drop-500: var(--color-ember-500);
-  --color-drop-600: var(--color-ember-600);
-
-  /* New → Blaze */
-  --color-new-100: var(--color-blaze-100);
-  --color-new-200: var(--color-blaze-200);
-  --color-new-400: var(--color-blaze-400);
-  --color-new-500: var(--color-blaze-500);
-  --color-new-600: var(--color-blaze-600);
-
-  /* Deal → Meadow */
-  --color-deal-100: var(--color-meadow-100);
-  --color-deal-200: var(--color-meadow-200);
-  --color-deal-400: var(--color-meadow-400);
-  --color-deal-500: var(--color-meadow-500);
-  --color-deal-600: var(--color-meadow-600);
-
-  /* Sold → Slate (muted gray) */
-  --color-sold-100: var(--color-slate-100);
-  --color-sold-300: var(--color-slate-300);
-  --color-sold-500: var(--color-slate-500);
 
   /* ============================================
      SEMANTIC COLORS - Shadcn/UI Compatibility

@@ -42,7 +42,7 @@ export function SizingJournalSkeleton() {
             <Skeleton className="h-16 w-full mt-md rounded-lg" />
 
             {/* Footer Badges */}
-            <div className="flex gap-xs mt-auto pt-md border-t border-gray-100">
+            <div className="flex gap-xs mt-auto pt-md border-t border-slate-100">
               <Skeleton className="h-6 w-20 rounded-md" />
               <Skeleton className="h-6 w-24 rounded-md" />
             </div>

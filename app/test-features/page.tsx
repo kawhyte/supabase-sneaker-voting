@@ -64,7 +64,7 @@ export default function TestFeaturesPage() {
     <div className="container mx-auto p-6 space-y-8">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4 font-heading">🧪 Feature Testing Dashboard</h1>
-        <p className="text-gray-600 mb-6">Test Phase 1, Phase 2.1, and Phase 3.1 implementations</p>
+        <p className="text-slate-600 mb-6">Test Phase 1, Phase 2.1, and Phase 3.1 implementations</p>
 
         <div className="flex justify-center gap-4 mb-8">
           <Badge variant="outline" className="text-sm">
@@ -106,7 +106,7 @@ export default function TestFeaturesPage() {
               {/* Multi-Photo Upload Test */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">📸 Multi-Photo Upload (Max 5 photos)</h3>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                <div className="border-2 border-dashed border-slate-300 rounded-lg p-4">
                   <MultiPhotoUpload
                     photos={photos}
                     onPhotosChange={setPhotos}
@@ -114,19 +114,19 @@ export default function TestFeaturesPage() {
                   />
                 </div>
 
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="mt-4 p-4 bg-slate-50 rounded-lg">
                   <h4 className="font-medium mb-2">Upload Test Results:</h4>
                   <div className="space-y-1 text-sm">
                     <div className="flex items-center gap-2">
-                      {photos.length > 0 ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-gray-400" />}
+                      {photos.length > 0 ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-slate-400" />}
                       Upload functionality: {photos.length > 0 ? 'Working' : 'No photos uploaded yet'}
                     </div>
                     <div className="flex items-center gap-2">
-                      {photos.some(p => p.isMain) ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-gray-400" />}
+                      {photos.some(p => p.isMain) ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-slate-400" />}
                       Main photo selection: {photos.some(p => p.isMain) ? 'Working' : 'No main photo set'}
                     </div>
                     <div className="flex items-center gap-2">
-                      {photos.length > 1 ? <CheckCircle className="w-4 h-4 text-green-600" /> : <Clock className="w-4 h-4 text-yellow-500" />}
+                      {photos.length > 1 ? <CheckCircle className="w-4 h-4 text-green-600" /> : <Clock className="w-4 h-4 text-sun-500" />}
                       Drag & drop ordering: {photos.length > 1 ? 'Testable (drag photos to reorder)' : 'Upload 2+ photos to test'}
                     </div>
                   </div>
@@ -143,7 +143,7 @@ export default function TestFeaturesPage() {
                   onPhotoClick={(photo) => alert(`Clicked photo: ${photo.id}`)}
                 />
 
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="mt-4 p-4 bg-slate-50 rounded-lg">
                   <h4 className="font-medium mb-2">Carousel Test Results:</h4>
                   <div className="space-y-1 text-sm">
                     <div className="flex items-center gap-2">
@@ -190,13 +190,13 @@ export default function TestFeaturesPage() {
                 <div className="mt-6">
                   <h4 className="font-medium mb-2">Test URLs to try:</h4>
                   <div className="space-y-2 text-sm">
-                    <div className="p-2 bg-gray-50 rounded">
+                    <div className="p-2 bg-slate-50 rounded">
                       <strong>Nike:</strong> https://www.nike.com/t/air-jordan-1-retro-high-og-shoe-Cq4277
                     </div>
-                    <div className="p-2 bg-gray-50 rounded">
+                    <div className="p-2 bg-slate-50 rounded">
                       <strong>Adidas:</strong> https://www.adidas.com/us/forum-84-low-shoes/GW0443.html
                     </div>
-                    <div className="p-2 bg-gray-50 rounded">
+                    <div className="p-2 bg-slate-50 rounded">
                       <strong>StockX:</strong> https://stockx.com/air-jordan-1-retro-high-og-chicago-lost-found
                     </div>
                   </div>
@@ -215,7 +215,7 @@ export default function TestFeaturesPage() {
                   </div>
                 )}
 
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="mt-4 p-4 bg-slate-50 rounded-lg">
                   <h4 className="font-medium mb-2">Scraping API Test Results:</h4>
                   <div className="space-y-1 text-sm">
                     <div className="flex items-center gap-2">
@@ -231,7 +231,7 @@ export default function TestFeaturesPage() {
                       Multiple site support: Nike, Adidas, StockX, SoleRetriever
                     </div>
                     <div className="flex items-center gap-2">
-                      {autoFillData ? <CheckCircle className="w-4 h-4 text-green-600" /> : <Clock className="w-4 h-4 text-yellow-500" />}
+                      {autoFillData ? <CheckCircle className="w-4 h-4 text-green-600" /> : <Clock className="w-4 h-4 text-sun-500" />}
                       Data extraction: {autoFillData ? 'Working - data extracted' : 'Test a URL above'}
                     </div>
                   </div>
@@ -254,7 +254,7 @@ export default function TestFeaturesPage() {
                 <h3 className="text-lg font-semibold mb-4">⏰ Node-Cron Installation & Setup</h3>
 
                 <div className="space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="p-4 bg-slate-50 rounded-lg">
                     <h4 className="font-medium mb-2">Installation Status:</h4>
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-2">
@@ -301,14 +301,14 @@ export default function TestFeaturesPage() {
               {/* Price Monitor Manager Test */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">💰 Price Monitoring System</h3>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                <div className="border-2 border-dashed border-slate-300 rounded-lg p-4">
                   <PriceMonitorManager
                     user_name="test_user"
                     item_id={undefined}
                   />
                 </div>
 
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="mt-4 p-4 bg-slate-50 rounded-lg">
                   <h4 className="font-medium mb-2">Price Monitoring Test Results:</h4>
                   <div className="space-y-1 text-sm">
                     <div className="flex items-center gap-2">
@@ -347,7 +347,7 @@ export default function TestFeaturesPage() {
                 <h3 className="text-lg font-semibold mb-4">🔔 Browser Notification System</h3>
 
                 <div className="space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="p-4 bg-slate-50 rounded-lg">
                     <h4 className="font-medium mb-2">Implementation Status:</h4>
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-2">
@@ -402,7 +402,7 @@ export default function TestFeaturesPage() {
         </TabsContent>
       </Tabs>
 
-      <div className="text-center text-sm text-gray-500">
+      <div className="text-center text-sm text-slate-500">
         <p>This test page verifies core functionality of implemented phases.</p>
         <p>Use browser developer tools to see detailed logs and network requests.</p>
       </div>

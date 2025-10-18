@@ -89,13 +89,13 @@ export function ArchiveReasonDialog({
 					<div className="flex items-center gap-2 mb-2">
 						<Archive
 							className="h-5 w-5"
-							style={{ color: 'var(--color-gray-600)' }}
+							style={{ color: 'var(--color-slate-600)' }}
 						/>
 						<DialogTitle style={{ color: 'var(--color-black)' }}>
 							Archive Item
 						</DialogTitle>
 					</div>
-					<DialogDescription style={{ color: 'var(--color-gray-600)' }}>
+					<DialogDescription style={{ color: 'var(--color-slate-600)' }}>
 						Why are you archiving <strong>{itemName}</strong>?
 					</DialogDescription>
 				</DialogHeader>
@@ -117,7 +117,7 @@ export function ArchiveReasonDialog({
 										className={`flex items-start space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
 											selectedReason === reason.value
 												? 'border-primary-500 bg-primary-50'
-												: 'border-gray-200 hover:border-gray-300'
+												: 'border-slate-200 hover:border-slate-300'
 										}`}
 										style={{
 											borderColor: selectedReason === reason.value
@@ -143,10 +143,10 @@ export function ArchiveReasonDialog({
 												className="flex items-center gap-2 cursor-pointer font-medium"
 												style={{ color: 'var(--color-black-soft)' }}
 											>
-												<Icon className="h-4 w-4" style={{ color: 'var(--color-gray-600)' }} />
+												<Icon className="h-4 w-4" style={{ color: 'var(--color-slate-600)' }} />
 												{reason.label}
 											</Label>
-											<p className="text-xs mt-0.5" style={{ color: 'var(--color-gray-500)' }}>
+											<p className="text-xs mt-0.5" style={{ color: 'var(--color-slate-500)' }}>
 												{reason.description}
 											</p>
 										</div>
@@ -171,7 +171,7 @@ export function ArchiveReasonDialog({
 								className="mt-2 resize-none"
 								rows={3}
 							/>
-							<p className="text-xs mt-1" style={{ color: 'var(--color-gray-400)' }}>
+							<p className="text-xs mt-1" style={{ color: 'var(--color-slate-400)' }}>
 								{otherNote.length}/200 characters
 							</p>
 						</div>

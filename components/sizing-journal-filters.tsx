@@ -58,13 +58,13 @@ export function SizingJournalFilters({
   }
 
   return (
-    <div className="flex flex-col gap-lg mb-4xl border rounded-2xl p-3 bg-gray-100 ">
+    <div className="flex flex-col gap-lg mb-4xl border rounded-2xl p-3 bg-slate-100 ">
       {/* Category Filter Section */}
-      <div className="bg-white border border-gray-200 rounded-lg p-md shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-lg p-md shadow-sm">
         <div className="flex items-center justify-between mb-md">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-gray-700 font-heading">Filter by Category</h3>
-            <span className="text-xs text-gray-500">
+            <h3 className="text-sm font-semibold text-slate-700 font-heading">Filter by Category</h3>
+            <span className="text-xs text-slate-500">
               ({selectedCategories.length} of {allCategoryIds.length} selected)
             </span>
           </div>
@@ -72,8 +72,8 @@ export function SizingJournalFilters({
             onClick={toggleAllCategories}
             className="text-xs font-medium px-3 py-1.5 rounded-md transition-colors"
             style={{
-              backgroundColor: selectedCategories.length === allCategoryIds.length ? 'var(--color-primary-100)' : 'var(--color-gray-100)',
-              color: selectedCategories.length === allCategoryIds.length ? 'var(--color-primary-900)' : 'var(--color-gray-700)',
+              backgroundColor: selectedCategories.length === allCategoryIds.length ? 'var(--color-primary-100)' : 'var(--color-slate-100)',
+              color: selectedCategories.length === allCategoryIds.length ? 'var(--color-primary-900)' : 'var(--color-slate-700)',
             }}
           >
             {selectedCategories.length === allCategoryIds.length ? 'Deselect All' : 'Select All'}
