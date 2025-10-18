@@ -64,22 +64,11 @@
   --spacing-2: 8px;         /* p-2 - Compact button padding, tight gaps */
   --spacing-3: 12px;        /* p-3 - Form element internal padding */
   --spacing-4: 16px;        /* p-4 - DEFAULT element spacing ⭐ */
-  --spacing-5: 20px;        /* p-5 - Comfortable element spacing */
   --spacing-6: 24px;        /* p-6 - Card padding, component gaps ⭐ */
-  --spacing-7: 28px;        /* p-7 - Medium component spacing */
   --spacing-8: 32px;        /* p-8 - Section separation ⭐ */
-  --spacing-10: 40px;       /* p-10 - Large section spacing */
-  --spacing-11: 44px;       /* p-11 - Min touch target + spacing */
   --spacing-12: 48px;       /* p-12 - Hero sections, major spacing ⭐ */
-  --spacing-13: 52px;       /* p-13 - Extra large spacing */
-  --spacing-14: 56px;       /* p-14 - Very large sections */
-  --spacing-15: 60px;       /* p-15 - Generous spacing */
   --spacing-16: 64px;       /* p-16 - Page-level margins ⭐ */
-  --spacing-17: 68px;       /* p-17 - Extra page spacing */
-  --spacing-18: 72px;       /* p-18 - Major section breaks */
-  --spacing-19: 76px;       /* p-19 - Large breaks */
   --spacing-20: 80px;       /* p-20 - Massive spacing ⭐ */
-  --spacing-22: 88px;       /* p-22 - Ultra spacing */
   --spacing-24: 96px;       /* p-24 - Extreme spacing */
   --spacing-32: 128px;      /* p-32 - Maximum (rare use) */
 
@@ -98,19 +87,17 @@
   --spacing-section-large: var(--spacing-20);    /* 80px - Major section breaks */
   --spacing-page: var(--spacing-16);             /* 64px - Page margins, hero padding */
 
-  /* --- BACKWARD COMPATIBILITY (Deprecated in v3.0) --- */
-  /* Migrate to numeric tokens: xxs→1, xs→2, md→4, lg→6, xl→8, etc. */
-  --spacing-xxs: var(--spacing-1);    /* DEPRECATED - Use spacing-1 */
-  --spacing-xs: var(--spacing-2);     /* DEPRECATED - Use spacing-2 */
-  --spacing-sm: var(--spacing-4);     /* DEPRECATED - Use spacing-4 */
-  --spacing-md: var(--spacing-4);     /* DEPRECATED - Use spacing-4 */
-  --spacing-lg: var(--spacing-6);     /* DEPRECATED - Use spacing-6 */
-  --spacing-xl: var(--spacing-8);     /* DEPRECATED - Use spacing-8 */
-  --spacing-2xl: var(--spacing-10);   /* DEPRECATED - Use spacing-10 */
-  --spacing-3xl: var(--spacing-12);   /* DEPRECATED - Use spacing-12 */
-  --spacing-4xl: var(--spacing-16);   /* DEPRECATED - Use spacing-16 */
-  --spacing-5xl: var(--spacing-20);   /* DEPRECATED - Use spacing-20 */
-  --spacing-6xl: var(--spacing-24);   /* DEPRECATED - Use spacing-24 */
+  /* ============================================
+     RESPONSIVE SPACING - Mobile First Design
+     Tighter spacing on smaller screens
+     ============================================ */
+
+  @media (max-width: 640px) {
+    --spacing-component: var(--spacing-4);   /* 24px → 16px on mobile */
+    --spacing-section: var(--spacing-8);     /* 48px → 32px on mobile */
+    --spacing-page: var(--spacing-12);       /* 64px → 48px on mobile */
+  }
+
 
   /* ============================================
      TYPOGRAPHY v2.0 - Perfect 8px Grid Vertical Rhythm
