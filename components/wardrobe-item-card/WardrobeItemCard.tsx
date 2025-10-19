@@ -2,7 +2,7 @@
  * WardrobeItemCard - Main orchestrator component
  *
  * Composes all sub-components to display a wardrobe item card
- * with context-aware content based on viewMode
+ * with context-aware content based on viewMode and density
  *
  * Former name: SizingJournalEntryCard (renamed for clarity)
  * Lines: ~120 (vs 719 in original)
@@ -18,6 +18,7 @@ import { getCategoryConfig } from "@/components/types/item-category";
 import { prepareItemPhotos, isItemOnSale, formatDate } from "@/lib/wardrobe-item-utils";
 import { useItemDisplayLogic } from "@/hooks/useItemDisplayLogic";
 import { useItemPermissions } from "@/hooks/useItemPermissions";
+import { useDensity } from "@/lib/view-density-context";
 import { ItemCardActions } from "./ItemCardActions";
 import { ItemCardImage } from "./ItemCardImage";
 import { ItemPricingDisplay } from "./ItemPricingDisplay";
@@ -67,11 +68,17 @@ export function WardrobeItemCard({
 	const categoryConfig = getCategoryConfig(item.category);
 	const displayLogic = useItemDisplayLogic(item);
 	const permissions = useItemPermissions(item.category);
+	const { density } = useDensity();
 
 	// Compute display values
 	const hasBeenTriedOn = item.has_been_tried;
 	const onSale = isItemOnSale(item);
 	const purchasedDate = item.purchase_date || purchaseDate;
+
+	// Show metadata based on density
+	const showDates = density === 'detailed';
+	const showNotes = density !== 'compact';
+	const showStore = density !== 'compact';
 
 	return (
 		<TooltipProvider delayDuration={300}>
@@ -107,6 +114,7 @@ export function WardrobeItemCard({
 						brand={item.brand}
 						model={item.model}
 						color={item.color}
+						density={density}
 					/>
 
 					{/* Content Section */}
@@ -136,14 +144,16 @@ export function WardrobeItemCard({
 
 						{/* Metadata Grid */}
 						<div className='flex flex-col gap-2 mt-2'>
-							{/* Date Display */}
-							<div className='text-sm text-muted-foreground flex items-center gap-1'>
-								{displayLogic.isOwned && purchasedDate ? (
-									<span>Purchased on: {formatDate(purchasedDate)}</span>
-								) : (
-									<span>Tracked since: {formatDate(item.created_at)}</span>
-								)}
-							</div>
+							{/* Date Display - Only show in detailed mode */}
+							{showDates && (
+								<div className='text-sm text-muted-foreground flex items-center gap-1'>
+									{displayLogic.isOwned && purchasedDate ? (
+										<span>Purchased on: {formatDate(purchasedDate)}</span>
+									) : (
+										<span>Tracked since: {formatDate(item.created_at)}</span>
+									)}
+								</div>
+							)}
 
 							{/* Pricing */}
 							<ItemPricingDisplay
@@ -161,17 +171,19 @@ export function WardrobeItemCard({
 								onDecrementWear={actions.onDecrementWear}
 							/>
 
-							{/* Store and Last Worn */}
-							<ItemStoreAndDate
-								storeName={item.store_name}
-								lastWornDate={item.last_worn_date}
-								viewMode={viewMode}
-								canTrackWears={permissions.canTrackWearCount}
-							/>
+							{/* Store and Last Worn - Only show if not compact */}
+							{showStore && (
+								<ItemStoreAndDate
+									storeName={item.store_name}
+									lastWornDate={item.last_worn_date}
+									viewMode={viewMode}
+									canTrackWears={permissions.canTrackWearCount}
+								/>
+							)}
 						</div>
 
-						{/* Notes */}
-						{item.notes && (
+						{/* Notes - Only show if not compact */}
+						{showNotes && item.notes && (
 							<div className='mt-3 p-2.5 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed'>
 								{item.notes}
 							</div>

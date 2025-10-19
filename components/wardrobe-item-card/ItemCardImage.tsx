@@ -13,12 +13,29 @@ import { Image as ImageIcon } from "lucide-react";
 import { PhotoCarousel } from "@/components/photo-carousel";
 import { ItemPhoto } from "@/components/types/sizing-journal-entry";
 import { getImageAltText } from "@/lib/wardrobe-item-utils";
+import { ViewDensity } from "@/lib/view-density-context";
 
 interface ItemCardImageProps {
 	photos: ItemPhoto[];
 	brand: string;
 	model: string;
 	color?: string;
+	density?: ViewDensity;
+}
+
+/**
+ * Get aspect ratio based on density
+ */
+function getAspectRatio(density?: ViewDensity): string {
+	switch (density) {
+		case "compact":
+			return "aspect-square"; // 1:1
+		case "comfortable":
+			return "aspect-[3/4]"; // 3:4 portrait
+		case "detailed":
+		default:
+			return "aspect-[4/3]"; // 4:3 landscape
+	}
 }
 
 export function ItemCardImage({
@@ -26,13 +43,15 @@ export function ItemCardImage({
 	brand,
 	model,
 	color,
+	density,
 }: ItemCardImageProps) {
 	const altText = getImageAltText(brand, model, color);
+	const aspectClass = getAspectRatio(density);
 
 	if (photos.length === 0) {
 		return (
 			<div className='relative w-full overflow-hidden'>
-				<div className='w-full aspect-[4/3] bg-gradient-to-b from-white via-white to-stone-50/30 flex items-center justify-center transition-all duration-200 card-image-container'>
+				<div className={`w-full ${aspectClass} bg-gradient-to-b from-white via-white to-stone-50/30 flex items-center justify-center transition-all duration-200 card-image-container`}>
 					<ImageIcon className='h-12 w-12 text-muted-foreground' />
 				</div>
 			</div>
@@ -41,7 +60,7 @@ export function ItemCardImage({
 
 	return (
 		<div className='relative w-full overflow-hidden'>
-			<div className='relative w-full aspect-[4/3] bg-gradient-to-b from-white via-white to-stone-50/30 flex items-center justify-center p-2 sm:p-4 lg:p-5 transition-all duration-200 card-image-container group'>
+			<div className={`relative w-full ${aspectClass} bg-gradient-to-b from-white via-white to-stone-50/30 flex items-center justify-center p-2 sm:p-4 lg:p-5 transition-all duration-200 card-image-container group`}>
 				{photos.length === 1 ? (
 					<img
 						src={photos[0].image_url}
