@@ -429,6 +429,17 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
   const displayStatus = status.includes('wishlisted') ? 'wishlisted' : status[0]
 
+  // Map status to viewMode for cards
+  const getViewMode = (): 'journal' | 'collection' | 'archive' | 'wishlist' => {
+    if (isArchivePage) return 'archive'
+    if (status.includes('owned')) return 'collection'
+    if (status.includes('wishlisted')) return 'wishlist'
+    if (status.includes('journaled')) return 'journal'
+    return 'journal'
+  }
+
+  const viewMode = getViewMode()
+
   if (isLoading) {
     return (
       <div
@@ -463,6 +474,8 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
       <DashboardGrid
         entries={filteredAndSortedEntries}
+        viewMode={viewMode}
+        isArchivePage={isArchivePage}
         onEdit={handleEditEntry}
         onDelete={handleDeleteEntry}
         onIncrementWear={handleIncrementWear}

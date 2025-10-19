@@ -28,6 +28,7 @@ import { ItemPricingDisplay } from "./ItemPricingDisplay";
 import { ItemSizeComfortWears } from "./ItemSizeComfortWears";
 import { ItemStoreAndDate } from "./ItemStoreAndDate";
 import { ItemFooterBadges } from "./ItemFooterBadges";
+import { CostPerWearProgress } from "./CostPerWearProgress";
 
 /**
  * Props for WardrobeItemCard component
@@ -183,6 +184,13 @@ function WardrobeItemCardComponent({
 									canTrackWears={permissions.canTrackWearCount}
 								/>
 							)}
+
+						{/* Cost Per Wear Progress - Only show for owned items in collection/archive views */}
+						{/* {displayLogic.isOwned && (viewMode === 'collection' || viewMode === 'archive') && (
+							<div className='mt-2'>
+								<CostPerWearProgress item={item} />jj
+							</div>
+						)} */}
 						</div>
 
 						{/* Notes - Only show if not compact */}

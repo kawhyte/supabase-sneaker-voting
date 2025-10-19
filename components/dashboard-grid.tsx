@@ -22,6 +22,8 @@ interface DashboardGridProps {
 	onArchive?: (entry: SizingJournalEntry) => void;
 	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
 	emptyState?: ReactNode;
+	viewMode?: 'journal' | 'collection' | 'archive' | 'wishlist';
+	isArchivePage?: boolean;
 }
 
 export function DashboardGrid({
@@ -34,6 +36,8 @@ export function DashboardGrid({
 	onArchive,
 	onMarkAsPurchased,
 	emptyState,
+	viewMode = 'journal',
+	isArchivePage = false,
 }: DashboardGridProps) {
 	const { density } = useDensity();
 	const gridClasses = getDensityGridClasses(density);
@@ -53,6 +57,7 @@ export function DashboardGrid({
 				<SizingJournalEntryCard
 					key={entry.id}
 					entry={entry}
+					viewMode={viewMode}
 					onEdit={onEdit}
 					onDelete={onDelete}
 					onIncrementWear={onIncrementWear}
@@ -60,6 +65,7 @@ export function DashboardGrid({
 					onMoveToWatchlist={onMoveToWatchlist}
 					onArchive={onArchive}
 					onMarkAsPurchased={onMarkAsPurchased}
+					isArchivePage={isArchivePage}
 				/>
 			))}
 		</motion.div>

@@ -75,10 +75,11 @@ export function ItemSizeComfortWears({
 							<TooltipTrigger asChild>
 								<button
 									onClick={() => setWearDrawerOpen(true)}
-									className='flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-xs transition-colors cursor-pointer'
+									className='flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/50 hover:bg-primary/20 text-forground font-semibold text-xs transition-colors cursor-pointer my-4'
 									type='button'
 									aria-label='Open wear statistics'>
-									👟 {item.wears || 0} {item.wears === 1 ? 'Wear' : 'Wears'}
+									View Cost per wear  
+									{/* {item.wears || 0} {item.wears === 1 ? 'Wear' : 'Wears'} */}
 								</button>
 							</TooltipTrigger>
 							<TooltipContent side="top" className="z-[9999]">

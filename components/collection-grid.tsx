@@ -22,6 +22,7 @@ interface CollectionGridProps {
 	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
 	isArchivePage?: boolean;
 	emptyState?: ReactNode;
+	viewMode?: 'journal' | 'collection' | 'archive' | 'wishlist';
 }
 
 export function CollectionGrid({
@@ -35,6 +36,7 @@ export function CollectionGrid({
 	onMarkAsPurchased,
 	isArchivePage,
 	emptyState,
+	viewMode = 'journal',
 }: CollectionGridProps) {
 	const { density } = useDensity();
 	const gridClasses = getDensityGridClasses(density);
@@ -49,6 +51,7 @@ export function CollectionGrid({
 				<SizingJournalEntryCard
 					key={item.id}
 					entry={item}
+					viewMode={viewMode}
 					onEdit={onEdit}
 					onDelete={onDelete}
 					onRestore={onUnarchive}
