@@ -4,6 +4,8 @@
  * Composes all sub-components to display a wardrobe item card
  * with context-aware content based on viewMode and density
  *
+ * Memoized for performance optimization in large grids.
+ *
  * Former name: SizingJournalEntryCard (renamed for clarity)
  * Lines: ~120 (vs 719 in original)
  */
@@ -19,6 +21,7 @@ import { prepareItemPhotos, isItemOnSale, formatDate } from "@/lib/wardrobe-item
 import { useItemDisplayLogic } from "@/hooks/useItemDisplayLogic";
 import { useItemPermissions } from "@/hooks/useItemPermissions";
 import { useDensity } from "@/lib/view-density-context";
+import { memo } from "react";
 import { ItemCardActions } from "./ItemCardActions";
 import { ItemCardImage } from "./ItemCardImage";
 import { ItemPricingDisplay } from "./ItemPricingDisplay";
@@ -56,7 +59,7 @@ interface WardrobeItemCardProps {
 	purchaseDate?: string | null;
 }
 
-export function WardrobeItemCard({
+function WardrobeItemCardComponent({
 	item,
 	viewMode = 'journal',
 	actions,
@@ -205,3 +208,9 @@ export function WardrobeItemCard({
 		</TooltipProvider>
 	);
 }
+
+/**
+ * Memoized WardrobeItemCard - prevents unnecessary re-renders when grid density changes
+ * or sibling cards update, improving performance with large collections
+ */
+export const WardrobeItemCard = memo(WardrobeItemCardComponent);

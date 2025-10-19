@@ -1,7 +1,8 @@
 'use client'
 
-import { SizingJournalEntryCard } from '@/components/sizing-journal-entry-card'
 import { SizingJournalEntry, ArchiveReason } from '@/components/types/sizing-journal-entry'
+import { CollectionGrid } from '@/components/collection-grid'
+import { ViewDensityToggle } from '@/components/view-density-toggle'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ArchiveReasonDialog } from '@/components/archive-reason-dialog'
@@ -268,7 +269,7 @@ export default function CollectionPage() {
               </p>
             )}
           </div>
-          
+          <ViewDensityToggle />
         </div>
 
         {/* Tabs for Active/Archived */}
@@ -367,26 +368,14 @@ export default function CollectionPage() {
                 </div>
               </div>
             ) : (
-              <div
-                className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-6"
+              <CollectionGrid
+                items={collectionItems}
                 role="list"
-                aria-label="Item collection"
-              >
-                {collectionItems.map((item) => (
-                  <SizingJournalEntryCard
-                    key={item.id}
-                    entry={item}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onToggleCollection={handleToggleCollection}
-                    onIncrementWear={handleIncrementWear}
-                    onDecrementWear={handleDecrementWear}
-                    onMoveToWatchlist={handleMoveToWatchlist}
-                    onArchive={handleArchive}
-                    viewMode="collection"
-                  />
-                ))}
-              </div>
+                ariaLabel="Item collection"
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onArchive={handleArchive}
+              />
             )}
           </TabsContent>
 
@@ -428,22 +417,15 @@ export default function CollectionPage() {
                 </div>
               </div>
             ) : (
-              <div
-                className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-6"
+              <CollectionGrid
+                items={archivedItems}
                 role="list"
-                aria-label="Archived items"
-              >
-                {archivedItems.map((item) => (
-                  <SizingJournalEntryCard
-                    key={item.id}
-                    entry={item}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onRestore={handleRestore}
-                    viewMode="archive"
-                  />
-                ))}
-              </div>
+                ariaLabel="Archived items"
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onUnarchive={handleRestore}
+                isArchivePage={true}
+              />
             )}
           </TabsContent>
         </Tabs>

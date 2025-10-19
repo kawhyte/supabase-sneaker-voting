@@ -1,16 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Search, Heart, Package, Archive } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
+import { DashboardGrid } from './dashboard-grid'
 import { EditItemModal } from './edit-item-modal'
 import { SizingJournalFiltersV2 } from './sizing-journal-filters-v2'
 import { SizingJournalStats } from './sizing-journal-stats'
-import { SizingJournalEntryCard } from './sizing-journal-entry-card'
 import { SizingJournalSkeleton } from './sizing-journal-skeleton'
 import { DeleteConfirmDialog } from './delete-confirm-dialog'
 import { PurchasedConfirmationModal } from './purchased-confirmation-modal'
@@ -27,6 +26,7 @@ interface SizingJournalDashboardProps {
 }
 
 export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isArchivePage = false }: SizingJournalDashboardProps) {
+
   // State - Data
   const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -461,40 +461,23 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
       <SizingJournalStats journalEntries={journalEntries} />
 
-      <motion.div
-        className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        {filteredAndSortedEntries.length === 0 ? (
+      <DashboardGrid
+        entries={filteredAndSortedEntries}
+        onEdit={handleEditEntry}
+        onDelete={handleDeleteEntry}
+        onIncrementWear={handleIncrementWear}
+        onDecrementWear={handleDecrementWear}
+        onMoveToWatchlist={moveItemToWishlist}
+        onArchive={handleOpenArchiveDialog}
+        emptyState={
           <EmptyState
             hasEntries={journalEntries.length > 0}
             displayStatus={displayStatus}
             isArchivePage={isArchivePage}
             onAddNew={onAddNew}
           />
-        ) : (
-          filteredAndSortedEntries.map((entry) => (
-            <SizingJournalEntryCard
-              key={entry.id}
-              entry={entry}
-              onEdit={handleEditEntry}
-              onDelete={handleDeleteEntry}
-              onToggleCollection={handleToggleCollection}
-              onMarkAsPurchased={handleOpenPurchasedModal}
-              onMoveToWatchlist={moveItemToWishlist}
-              onArchive={handleOpenArchiveDialog}
-              onUnarchive={unarchiveItem}
-              onIncrementWear={entry.status === 'owned' ? handleIncrementWear : undefined}
-              onDecrementWear={entry.status === 'owned' ? handleDecrementWear : undefined}
-              viewMode={entry.status === 'owned' ? 'collection' : 'journal'}
-              isArchivePage={isArchivePage}
-              purchaseDate={entry.purchase_date}
-            />
-          ))
-        )}
-      </motion.div>
+        }
+      />
 
       {editingEntry && (
         <EditItemModal

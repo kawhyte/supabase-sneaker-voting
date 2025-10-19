@@ -24,18 +24,11 @@ interface ItemCardImageProps {
 }
 
 /**
- * Get aspect ratio based on density
+ * Get aspect ratio - ALWAYS square (1:1) for visual consistency
+ * Density affects grid layout & metadata, NOT image size
  */
-function getAspectRatio(density?: ViewDensity): string {
-	switch (density) {
-		case "compact":
-			return "aspect-square"; // 1:1
-		case "comfortable":
-			return "aspect-[3/4]"; // 3:4 portrait
-		case "detailed":
-		default:
-			return "aspect-[4/3]"; // 4:3 landscape
-	}
+function getAspectRatio(): string {
+	return "aspect-square"; // 1:1 square - consistent across all density modes
 }
 
 export function ItemCardImage({
@@ -46,7 +39,7 @@ export function ItemCardImage({
 	density,
 }: ItemCardImageProps) {
 	const altText = getImageAltText(brand, model, color);
-	const aspectClass = getAspectRatio(density);
+	const aspectClass = getAspectRatio();
 
 	if (photos.length === 0) {
 		return (
@@ -65,7 +58,7 @@ export function ItemCardImage({
 					<img
 						src={photos[0].image_url}
 						alt={altText}
-						className='w-full h-full object-contain transition-transform duration-300 group-hover:scale-105'
+						className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
 						loading='lazy'
 					/>
 				) : (

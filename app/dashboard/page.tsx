@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ViewDensityToggle } from '@/components/view-density-toggle'
 import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
 import { FTUEChecklist } from '@/components/ftue-checklist'
 import { Package, Heart, Archive } from 'lucide-react'
@@ -110,23 +111,30 @@ function DashboardContent() {
         <div className="mt-12 mb-6">
           {/* Tabs Container with ultra-wide optimization */}
           <Tabs defaultValue={defaultTab} className="w-full max-w-[1920px] mx-auto rounded-lg p-6 ">
-          {/* --- The New Simplified Tabs --- */}
-          <TabsList className="grid w-full grid-cols-3 mb-6 justify-center">
-            <TabsTrigger value="wishlist" className="flex items-center gap-2">
-              <Heart className="h-4 w-4" />
-              Wishlist
-            </TabsTrigger>
-            <TabsTrigger value="owned" className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              Owned
-            </TabsTrigger>
-            <TabsTrigger value="archive" className="flex items-center gap-2">
-               <Archive className="h-4 w-4" />
-              Archived Items
-            </TabsTrigger>
-          </TabsList>
+          {/* Header with Tabs and Density Toggle */}
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+            {/* Tabs */}
+            <div className="flex-1">
+              <TabsList className="grid w-full grid-cols-3 justify-center">
+                <TabsTrigger value="wishlist" className="flex items-center gap-2">
+                  <Heart className="h-4 w-4" />
+                  Wishlist
+                </TabsTrigger>
+                <TabsTrigger value="owned" className="flex items-center gap-2">
+                  <Package className="h-4 w-4" />
+                  Owned
+                </TabsTrigger>
+                <TabsTrigger value="archive" className="flex items-center gap-2">
+                  <Archive className="h-4 w-4" />
+                  Archived Items
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            {/* Density Toggle */}
+            <ViewDensityToggle />
+          </div>
 
-          {/* --- The Content for the New Tabs --- */}
+          {/* --- Tab Content --- */}
             <TabsContent value="owned">
               <SizingJournalDashboard status={['owned']} />
             </TabsContent>
