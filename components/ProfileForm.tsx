@@ -146,11 +146,11 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
   }
 
   return (
-    <Card className="bg-card  border-stone-200  hover:shadow-md motion-safe:transition-shadow motion-safe:duration-300">
-      <CardHeader className="pb-6 border-b border-stone-200/50">
+    <Card className="   border-stone-200  hover:shadow-md motion-safe:transition-shadow motion-safe:duration-300">
+      {/* <CardHeader className="pb-6 border-b border-stone-200/50">
         <CardTitle className="text-2xl font-bold text-foreground">Profile Information</CardTitle>
         <CardDescription className="text-base text-muted-foreground">Update your personal details and profile picture</CardDescription>
-      </CardHeader>
+      </CardHeader> */}
       <CardContent className="pt-8">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Avatar Section */}

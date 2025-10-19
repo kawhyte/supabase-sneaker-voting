@@ -150,7 +150,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 						{navLinks.map((link) => (
 							link.isAction ? (
 								<Link key={link.href} href={link.href}>
-									<Button className='flex items-center gap-2 bg-sun-400 hover:bg-sun-500 text-slate-900 font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
+									<Button className='flex items-center gap-2 bg-sun-200 hover:bg-sun-300 text-slate-900 font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
 										<Plus className='h-4 w-4' />
 										{link.label}
 									</Button>

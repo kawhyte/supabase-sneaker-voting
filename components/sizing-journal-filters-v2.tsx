@@ -233,7 +233,7 @@ export function SizingJournalFiltersV2({
 														id={`category-${config.id}`}
 														checked={isSelected}
 														onCheckedChange={() => handleCategoryToggle(config.id)}
-														className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400"
+														className="border-stone-300  data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400"
 													/>
 													<Label
 														htmlFor={`category-${config.id}`}

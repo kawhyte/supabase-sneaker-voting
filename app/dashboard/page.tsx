@@ -112,7 +112,7 @@ function DashboardContent() {
           {/* Tabs Container with ultra-wide optimization */}
           <Tabs defaultValue={defaultTab} className="w-full max-w-[1920px] mx-auto rounded-lg p-6 ">
           {/* Header with Tabs and Density Toggle */}
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-16">
             {/* Tabs */}
             <div className="flex-1">
               <TabsList className="grid w-full grid-cols-3 justify-center">

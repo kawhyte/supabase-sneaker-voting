@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
@@ -8,33 +8,8 @@ import { ArrowRight, PawPrint } from 'lucide-react'
 
 // Dynamically import Lottie component for code splitting
 const Lottie = dynamic(() => import('react-lottie-player'), {
-  loading: () => <LottieSkeletonLoader />,
   ssr: false,
 })
-
-/**
- * Skeleton loader for Lottie animation
- * Shows animated skeleton while Lottie loads
- */
-function LottieSkeletonLoader() {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="w-full h-64 md:h-96 flex items-center justify-center"
-    >
-      <div className="w-full max-w-md aspect-square bg-gradient-to-br from-sun-100 to-sun-50 rounded-2xl">
-        {/* Animated skeleton pulse */}
-        <motion.div
-          animate={{ opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-full h-full rounded-2xl bg-gradient-to-r from-sun-200 to-sun-100"
-        />
-      </div>
-    </motion.div>
-  )
-}
 
 /**
  * Lottie Animation Wrapper with error boundary
@@ -55,7 +30,7 @@ function LottieAnimationWrapper() {
   }, [])
 
   if (hasError || !animationData) {
-    return <LottieSkeletonLoader />
+    return null
   }
 
   return (
@@ -65,22 +40,19 @@ function LottieAnimationWrapper() {
       transition={{ delay: 0.4, duration: 0.6 }}
       className="w-full flex justify-center"
     >
-      <div className="w-full max-w-[500px]">
-        <Suspense fallback={<LottieSkeletonLoader />}>
-          <Lottie
-            loop
-            play
-            animationData={animationData}
-            style={{
-              width: '100%',
-              height: 'auto',
-              maxHeight: '500px',
-            }}
-            rendererSettings={{
-              preserveAspectRatio: 'xMidYMid slice',
-            }}
-          />
-        </Suspense>
+      <div className="w-full max-w-[500px] aspect-square">
+        <Lottie
+          loop
+          play
+          animationData={animationData}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          rendererSettings={{
+            preserveAspectRatio: 'xMidYMid slice',
+          }}
+        />
       </div>
     </motion.div>
   )
@@ -118,7 +90,7 @@ export default function HomePage() {
           >
             <div className="flex flex-row items-center justify-center gap-2 sm:gap-3">
               <span>Your</span>
-              <PawPrint className="text-primary h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14" />
+              <PawPrint className="text-sun-200 h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14" />
               <span>trusted</span>
             </div>
 
@@ -157,7 +129,7 @@ export default function HomePage() {
                     '0 20px 25px -5px rgba(255, 199, 0, 0.2), 0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                 }}
                 whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-4 md:py-5 text-base md:text-lg font-semibold rounded-full bg-primary text-slate-900 hover:bg-sun-400 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-sun-300 focus:ring-offset-2 min-h-[44px]"
+                className="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-4 md:py-5 text-base md:text-lg font-semibold rounded-full bg-sun-200 text-slate-900 hover:bg-sun-300 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-sun-300 focus:ring-offset-2 min-h-[44px]"
                 aria-label="Start tracking your wardrobe"
               >
                 Start Tracking

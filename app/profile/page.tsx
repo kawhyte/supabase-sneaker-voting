@@ -52,7 +52,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-[820px] mx-auto  border border-accent-background rounded-2xl ">
-      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 mb-8 p-8">
+      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 mb-8  pt-8 px-8">
         <h1 className="text-4xl font-bold text-foreground mb-2">Profile Settings</h1>
         <p className="text-base text-muted-foreground">Manage your profile information and preferences</p>
       </div>
