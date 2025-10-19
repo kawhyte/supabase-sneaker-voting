@@ -136,18 +136,39 @@ function DashboardContent() {
 
           {/* --- Tab Content --- */}
             <TabsContent value="owned">
-              <SizingJournalDashboard status={['owned']} />
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <SizingJournalDashboard status={['owned']} />
+              </motion.div>
             </TabsContent>
 
             <TabsContent value="wishlist">
-              <SizingJournalDashboard status={['wishlisted', 'journaled']} />
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <SizingJournalDashboard status={['wishlisted', 'journaled']} />
+              </motion.div>
             </TabsContent>
 
             <TabsContent value="archive">
-              <SizingJournalDashboard
-                status={['owned', 'wishlisted', 'journaled']}
-                isArchivePage={true}
-              />
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <SizingJournalDashboard
+                  status={['owned', 'wishlisted', 'journaled']}
+                  isArchivePage={true}
+                />
+              </motion.div>
             </TabsContent>
           </Tabs>
         </div>

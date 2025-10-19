@@ -32,7 +32,6 @@ export function ViewDensityProvider({
 	children: React.ReactNode;
 }) {
 	const [density, setDensityState] = useState<ViewDensity>(DEFAULT_DENSITY);
-	const [isMounted, setIsMounted] = useState(false);
 
 	// Load from localStorage on mount
 	useEffect(() => {
@@ -45,7 +44,6 @@ export function ViewDensityProvider({
 			console.warn("Failed to read density from localStorage:", error);
 			// Silently fall back to default if localStorage unavailable
 		}
-		setIsMounted(true);
 	}, []);
 
 	const setDensity = (newDensity: ViewDensity) => {
@@ -57,10 +55,6 @@ export function ViewDensityProvider({
 			// Still updates state even if localStorage fails
 		}
 	};
-
-	if (!isMounted) {
-		return <>{children}</>;
-	}
 
 	return (
 		<ViewDensityContext.Provider value={{ density, setDensity }}>
