@@ -67,7 +67,7 @@ export const CATEGORY_CONFIGS: Record<ItemCategory, CategoryConfig> = {
 		textColor: "var(--color-blue-700)",
 		// Permissions
 		allowCollection: true,
-		allowPurchased: false,
+		allowPurchased: true,
 		allowWears: true,
 		// Field requirements
 		requiresSize: true,

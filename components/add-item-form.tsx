@@ -241,7 +241,7 @@ const itemSchema = z
 				const price = parseFloat(val);
 				return price >= 0 && price <= 10000;
 			}, "Target price must be between $0 and $10,000"),
-
+		wears: z.coerce.number().min(0).max(10000).optional().default(0),
 		notes: z.string().max(120).trim().optional().or(z.literal("")),
 	})
 	.refine(
@@ -329,11 +329,13 @@ export function AddItemForm({
 						retailPrice: initialData.retail_price?.toString() || "",
 						salePrice: initialData.sale_price?.toString() || "",
 						targetPrice: initialData.ideal_price?.toString() || "",
+						wears: initialData.wears || 0,
 						// targetPrice: initialData.target_price?.toString() || "",
 						notes: initialData.notes || "",
 				  }
 				: {
 						triedOn: false,
+						wears: 0,
 				  },
 	});
 
@@ -357,6 +359,7 @@ export function AddItemForm({
 				retailPrice: initialData.retail_price?.toString() || "",
 				salePrice: initialData.sale_price?.toString() || "",
 				targetPrice: initialData.target_price?.toString() || "",
+				wears: initialData.wears || 0,
 
 				// targetPrice: initialData.target_price?.toString() || "",
 				notes: initialData.notes || "",
@@ -540,7 +543,7 @@ export function AddItemForm({
 				sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 				notes: data.notes || null,
-				wears:0,
+				wears: data.wears || 0,
 				status: (mode === "create" ? "wishlisted" : initialData?.status) as
 					| "wishlisted"
 					| "owned"
@@ -970,6 +973,31 @@ export function AddItemForm({
 										<div>
 											<Label className='text-sm font-medium text-slate-900'>Notes ({watch("notes")?.length || 0} / 120)</Label>
 											<Textarea {...register("notes")} maxLength={120} className='mt-2' />
+										</div>
+
+										{/* Wears Counter - For tracking item usage */}
+										<div>
+											<Label className='text-sm font-medium text-slate-900'>
+												Times Worn <span className='text-xs text-muted-foreground font-normal'>(Optional)</span>
+											</Label>
+											<div className='relative mt-2'>
+												<Input
+													{...register("wears", { valueAsNumber: true })}
+													type='number'
+													min='0'
+													max='10000'
+													placeholder='0'
+													className='mt-1'
+												/>
+												<span className='text-xs text-muted-foreground mt-1 block'>
+													Track wears to calculate cost per wear value
+												</span>
+											</div>
+											{errors.wears && (
+												<p className='text-sm text-red-600 mt-1'>
+													{errors.wears.message}
+												</p>
+											)}
 										</div>
 
 										{watchedTriedOn && (

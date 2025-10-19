@@ -90,6 +90,141 @@ export function calculateCostPerWear(
 }
 
 /**
+ * Determine target CPW threshold based on item price and category
+ * Higher prices = can justify higher CPW; Lower prices = need lower CPW
+ *
+ * @param price - Item price (purchase or retail)
+ * @param category - Item category (shoes, outerwear, accessories, etc.)
+ * @returns Target cost per wear ($/wear) to consider item "worth it"
+ */
+export function getTargetCostPerWear(
+	price: number | undefined,
+	category: string | undefined
+): number {
+	if (!price || price <= 0) return 3;
+
+	// Category-aware thresholds for different wear patterns
+	const getThresholdForCategory = (p: number, cat?: string): number => {
+		const isShoes = cat === 'shoes';
+		const isOuterwear = cat === 'outerwear';
+		const isAccessories = cat === 'accessories' || cat === 'jewelry' || cat === 'watches';
+
+		// Shoes: More reasonable to have low CPW (worn frequently)
+		if (isShoes) {
+			if (p >= 300) return 8;
+			if (p >= 150) return 5;
+			if (p >= 75) return 3;
+			return 2;
+		}
+
+		// Outerwear: Higher threshold (seasonal, fewer wears expected)
+		if (isOuterwear) {
+			if (p >= 300) return 12;
+			if (p >= 150) return 8;
+			if (p >= 75) return 5;
+			return 3;
+		}
+
+		// Accessories/Jewelry: Mid-range (occasional wear)
+		if (isAccessories) {
+			if (p >= 300) return 10;
+			if (p >= 150) return 7;
+			if (p >= 75) return 4;
+			return 2.5;
+		}
+
+		// Default for other categories
+		if (p >= 300) return 10;
+		if (p >= 150) return 7;
+		if (p >= 75) return 5;
+		return 3;
+	};
+
+	const threshold = getThresholdForCategory(price, category);
+
+	// Cap very high prices at $15/wear max (luxury items)
+	return Math.min(threshold, 15);
+}
+
+/**
+ * Calculate comprehensive worth it metrics
+ * Determines if item has been worn enough to justify purchase price
+ *
+ * @param item - SizingJournalEntry with price and wear data
+ * @returns Metrics for display and decision making
+ */
+export interface WorthItMetrics {
+	isWorthIt: boolean;
+	currentCPW: number | null;
+	targetCPW: number;
+	targetWears: number;
+	progress: number; // 0-100
+	wearsRemaining: number;
+	milestoneMessage: string | null;
+	milestoneEmoji: string | null;
+}
+
+export function calculateWorthItMetrics(item: SizingJournalEntry): WorthItMetrics {
+	// Determine which price to use
+	const purchasePrice = item.purchase_price;
+	const retailPrice = item.retail_price;
+	const price = purchasePrice ?? retailPrice;
+
+	// Not applicable if no price or not owned
+	if (!price || price <= 0 || item.status !== 'owned') {
+		return {
+			isWorthIt: false,
+			currentCPW: null,
+			targetCPW: 0,
+			targetWears: 0,
+			progress: 0,
+			wearsRemaining: 0,
+			milestoneMessage: null,
+			milestoneEmoji: null,
+		};
+	}
+
+	const wears = item.wears || 0;
+	const targetCPW = getTargetCostPerWear(price, item.category);
+	const targetWears = Math.ceil(price / targetCPW);
+	const currentCPW = wears > 0 ? price / wears : null;
+	const progress = Math.min((wears / targetWears) * 100, 100);
+	const wearsRemaining = Math.max(targetWears - wears, 0);
+
+	// Determine milestone message
+	let milestoneMessage: string | null = null;
+	let milestoneEmoji: string | null = null;
+
+	if (wears === 0) {
+		milestoneMessage = 'Start wearing! Track to see value';
+		milestoneEmoji = '🚀';
+	} else if (progress >= 100) {
+		milestoneMessage = 'Worth it! Great value';
+		milestoneEmoji = '✨';
+	} else if (progress >= 75) {
+		milestoneMessage = 'Almost there!';
+		milestoneEmoji = '🚀';
+	} else if (progress >= 50) {
+		milestoneMessage = 'Halfway there!';
+		milestoneEmoji = '💪';
+	} else if (progress >= 25) {
+		milestoneMessage = 'Great start!';
+		milestoneEmoji = '🎯';
+	}
+
+	return {
+		isWorthIt: progress >= 100,
+		currentCPW,
+		targetCPW: parseFloat(targetCPW.toFixed(2)),
+		targetWears,
+		progress: parseFloat(progress.toFixed(1)),
+		wearsRemaining,
+		milestoneMessage,
+		milestoneEmoji,
+	};
+}
+
+/**
  * Extract and normalize photos from item entry
  * Prioritizes item_photos array, falls back to image_url
  *

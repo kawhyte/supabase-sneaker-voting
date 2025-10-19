@@ -275,6 +275,66 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     }
   }
 
+  const handleIncrementWear = async (entry: SizingJournalEntry) => {
+    const newWearCount = (entry.wears || 0) + 1
+    const now = new Date().toISOString()
+
+    // Optimistic update
+    setJournalEntries(prev =>
+      prev.map(item =>
+        item.id === entry.id
+          ? { ...item, wears: newWearCount, last_worn_date: now }
+          : item
+      )
+    )
+
+    // Update in database
+    const { error } = await supabase
+      .from('items')
+      .update({ wears: newWearCount, last_worn_date: now })
+      .eq('id', entry.id)
+
+    if (error) {
+      console.error('Error updating wears:', error)
+      toast.error('Failed to update wears')
+      // Revert on error
+      loadJournalEntries()
+    }
+  }
+
+  const handleDecrementWear = async (entry: SizingJournalEntry) => {
+    const currentWears = entry.wears || 0
+    if (currentWears === 0) return // Prevent negative values
+
+    const newWearCount = currentWears - 1
+    const lastWornDate = newWearCount === 0 ? null : entry.last_worn_date
+
+    // Optimistic update
+    setJournalEntries(prev =>
+      prev.map(item =>
+        item.id === entry.id
+          ? { ...item, wears: newWearCount, last_worn_date: lastWornDate }
+          : item
+      )
+    )
+
+    // Update in database
+    const { error } = await supabase
+      .from('items')
+      .update({
+        wears: newWearCount,
+        last_worn_date: lastWornDate
+      })
+      .eq('id', entry.id)
+
+    if (error) {
+      console.error('Error updating wears:', error)
+      toast.error('Failed to update wears')
+      // Revert on error
+      loadJournalEntries()
+    }
+  }
+
   const moveItemToWishlist = async (item: SizingJournalEntry) => {
     try {
       const { error } = await supabase
@@ -426,6 +486,9 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
               onMoveToWatchlist={moveItemToWishlist}
               onArchive={handleOpenArchiveDialog}
               onUnarchive={unarchiveItem}
+              onIncrementWear={entry.status === 'owned' ? handleIncrementWear : undefined}
+              onDecrementWear={entry.status === 'owned' ? handleDecrementWear : undefined}
+              viewMode={entry.status === 'owned' ? 'collection' : 'journal'}
               isArchivePage={isArchivePage}
               purchaseDate={entry.purchase_date}
             />

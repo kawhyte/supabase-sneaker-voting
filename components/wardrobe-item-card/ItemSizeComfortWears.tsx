@@ -4,20 +4,22 @@
  * Displays:
  * - Ideal/actual size
  * - Comfort rating
- * - Wear counter (collection mode only, for shoes)
- * - Cost per wear calculation
+ * - Clickable wears badge (opens drawer for detailed tracking)
+ *
+ * Wear tracking details are in a separate drawer for cleaner card layout.
  */
 
 "use client";
 
-import { Minus, Plus } from "lucide-react";
+import { useState } from "react";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
-import { getComfortLabel, calculateCostPerWear } from "@/lib/wardrobe-item-utils";
+import { getComfortLabel } from "@/lib/wardrobe-item-utils";
+import { WearStatsDrawer } from "./WearStatsDrawer";
 
 interface ItemSizeComfortWearsProps {
 	item: SizingJournalEntry;
@@ -34,101 +36,67 @@ export function ItemSizeComfortWears({
 	onIncrementWear,
 	onDecrementWear,
 }: ItemSizeComfortWearsProps) {
+	const [wearDrawerOpen, setWearDrawerOpen] = useState(false);
 	const comfortInfo = item.comfort_rating ? getComfortLabel(item.comfort_rating) : null;
-	const showWearCounter = viewMode === 'collection' && canTrackWears && onIncrementWear && onDecrementWear;
+	const showWearsBadge = viewMode === 'collection' && canTrackWears && onIncrementWear && onDecrementWear;
 
 	return (
-		<div className='flex items-center gap-2 text-sm flex-wrap'>
-			{/* Size Display */}
-			{item.size_tried && (
-				<>
-					<span className='badge-size-highlight text-muted-foreground'>
-						{viewMode === 'collection' ? 'Size' : 'Ideal Size'}: {item.size_tried}
-					</span>
-					{(comfortInfo || showWearCounter) && (
-						<span className='hidden sm:inline text-muted-foreground mx-0.5'>|</span>
-					)}
-				</>
-			)}
-
-			{/* Comfort Rating */}
-			{comfortInfo && (
-				<div className='flex items-center gap-1.5'>
-					<span className='text-muted-foreground'>Comfort:</span>
-					<span className={`${comfortInfo.color} font-medium text-sm`}>
-						{comfortInfo.label}
-					</span>
-				</div>
-			)}
-
-			{/* Wear Counter (Collection Mode Only) */}
-			{showWearCounter && (
-				<>
-					{comfortInfo && (
-						<span className='hidden sm:inline text-muted-foreground mx-0.5'>|</span>
-					)}
-					<div className='flex items-center gap-1.5'>
-						<span className='text-muted-foreground text-xs'>Wears:</span>
-
-						{/* Decrement Button */}
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									onClick={() => onDecrementWear!(item)}
-									disabled={!item.wears || item.wears === 0}
-									className='h-5 w-5 rounded-full flex items-center justify-center transition-all hover:bg-stone-100 active:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground'
-									type='button'
-									aria-label='Subtract one wear'>
-									<Minus className='h-3 w-3' />
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="top" className="z-[9999]">
-								<p>Subtract wear (-1)</p>
-							</TooltipContent>
-						</Tooltip>
-
-						{/* Count Display */}
-						<span className='font-bold text-sm text-foreground'>
-							{item.wears || 0}
+		<>
+			<div className='flex items-center gap-2 text-sm flex-wrap'>
+				{/* Size Display */}
+				{item.size_tried && (
+					<>
+						<span className='badge-size-highlight text-muted-foreground'>
+							{viewMode === 'collection' ? 'Size' : 'Ideal Size'}: {item.size_tried}
 						</span>
+						{(comfortInfo || showWearsBadge) && (
+							<span className='hidden sm:inline text-muted-foreground mx-0.5'>|</span>
+						)}
+					</>
+				)}
 
-						{/* Increment Button */}
+				{/* Comfort Rating */}
+				{comfortInfo && (
+					<div className='flex items-center gap-1.5'>
+						<span className='text-muted-foreground'>Comfort:</span>
+						<span className={`${comfortInfo.color} font-medium text-sm`}>
+							{comfortInfo.label}
+						</span>
+					</div>
+				)}
+
+				{/* Wears Badge (Collection Mode Only) - Clickable */}
+				{showWearsBadge && (
+					<>
+						{comfortInfo && (
+							<span className='hidden sm:inline text-muted-foreground mx-0.5'>|</span>
+						)}
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<button
-									onClick={() => onIncrementWear!(item)}
-									className='h-5 w-5 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 bg-primary text-white'
+									onClick={() => setWearDrawerOpen(true)}
+									className='flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-xs transition-colors cursor-pointer'
 									type='button'
-									aria-label='Add one wear'>
-									<Plus className='h-3 w-3' />
+									aria-label='Open wear statistics'>
+									👟 {item.wears || 0} {item.wears === 1 ? 'Wear' : 'Wears'}
 								</button>
 							</TooltipTrigger>
 							<TooltipContent side="top" className="z-[9999]">
-								<p>Add wear (+1)</p>
+								<p>Click to view wear tracking details</p>
 							</TooltipContent>
 						</Tooltip>
+					</>
+				)}
+			</div>
 
-						{/* Cost Per Wear */}
-						<span className='text-muted-foreground mx-1'>•</span>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<span
-									className='text-xs font-medium cursor-help text-muted-foreground'
-								>
-									${calculateCostPerWear(item.purchase_price, item.retail_price, item.wears)}/wear
-								</span>
-							</TooltipTrigger>
-							<TooltipContent side="top" className="z-[9999]">
-								<p className="text-xs">
-									{item.purchase_price || item.retail_price
-										? `$${item.purchase_price || item.retail_price} ÷ ${item.wears || 0} wears`
-										: 'Set a price to calculate cost per wear'}
-								</p>
-							</TooltipContent>
-						</Tooltip>
-					</div>
-				</>
-			)}
-		</div>
+			{/* Wear Stats Drawer */}
+			<WearStatsDrawer
+				item={item}
+				isOpen={wearDrawerOpen}
+				onOpenChange={setWearDrawerOpen}
+				onIncrementWear={onIncrementWear}
+				onDecrementWear={onDecrementWear}
+			/>
+		</>
 	);
 }
