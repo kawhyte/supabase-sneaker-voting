@@ -14,6 +14,184 @@ export type Database = {
   }
   public: {
     Tables: {
+      brands: {
+        Row: {
+          brand_logo: string | null
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          brand_logo?: string | null
+          created_at?: string
+          id?: number
+          name: string
+        }
+        Update: {
+          brand_logo?: string | null
+          created_at?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      item_photos: {
+        Row: {
+          cloudinary_id: string | null
+          created_at: string | null
+          id: string
+          image_order: number
+          image_url: string
+          is_main_image: boolean
+          item_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          cloudinary_id?: string | null
+          created_at?: string | null
+          id?: string
+          image_order?: number
+          image_url: string
+          is_main_image?: boolean
+          item_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          cloudinary_id?: string | null
+          created_at?: string | null
+          id?: string
+          image_order?: number
+          image_url?: string
+          is_main_image?: boolean
+          item_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sneaker_photos_sneaker_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      items: {
+        Row: {
+          archive_reason: string | null
+          archived_at: string | null
+          brand: string
+          brand_id: number | null
+          category: string | null
+          cloudinary_id: string | null
+          color: string | null
+          comfort_rating: number | null
+          created_at: string
+          has_been_tried: boolean
+          id: string
+          image_order: number | null
+          image_url: string | null
+          is_archived: boolean | null
+          is_main_image: boolean | null
+          last_worn_date: string | null
+          model: string
+          notes: string | null
+          product_url: string | null
+          purchase_date: string | null
+          purchase_price: number | null
+          retail_price: number | null
+          sale_price: number | null
+          size_tried: string | null
+          size_type: string | null
+          sku: string | null
+          status: Database["public"]["Enums"]["item_status"]
+          store_name: string | null
+          target_price: number | null
+          try_on_date: string | null
+          updated_at: string
+          user_id: string | null
+          wears: number | null
+        }
+        Insert: {
+          archive_reason?: string | null
+          archived_at?: string | null
+          brand: string
+          brand_id?: number | null
+          category?: string | null
+          cloudinary_id?: string | null
+          color?: string | null
+          comfort_rating?: number | null
+          created_at?: string
+          has_been_tried?: boolean
+          id?: string
+          image_order?: number | null
+          image_url?: string | null
+          is_archived?: boolean | null
+          is_main_image?: boolean | null
+          last_worn_date?: string | null
+          model: string
+          notes?: string | null
+          product_url?: string | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          retail_price?: number | null
+          sale_price?: number | null
+          size_tried?: string | null
+          size_type?: string | null
+          sku?: string | null
+          status?: Database["public"]["Enums"]["item_status"]
+          store_name?: string | null
+          target_price?: number | null
+          try_on_date?: string | null
+          updated_at?: string
+          user_id?: string | null
+          wears?: number | null
+        }
+        Update: {
+          archive_reason?: string | null
+          archived_at?: string | null
+          brand?: string
+          brand_id?: number | null
+          category?: string | null
+          cloudinary_id?: string | null
+          color?: string | null
+          comfort_rating?: number | null
+          created_at?: string
+          has_been_tried?: boolean
+          id?: string
+          image_order?: number | null
+          image_url?: string | null
+          is_archived?: boolean | null
+          is_main_image?: boolean | null
+          last_worn_date?: string | null
+          model?: string
+          notes?: string | null
+          product_url?: string | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          retail_price?: number | null
+          sale_price?: number | null
+          size_tried?: string | null
+          size_type?: string | null
+          sku?: string | null
+          status?: Database["public"]["Enums"]["item_status"]
+          store_name?: string | null
+          target_price?: number | null
+          try_on_date?: string | null
+          updated_at?: string
+          user_id?: string | null
+          wears?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "items_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       price_history: {
         Row: {
           checked_at: string | null
@@ -97,10 +275,64 @@ export type Database = {
             foreignKeyName: "price_monitors_sneaker_id_fkey"
             columns: ["sneaker_id"]
             isOneToOne: false
-            referencedRelation: "sneakers"
+            referencedRelation: "items"
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string | null
+          endpoint: string
+          id: string
+          is_active: boolean | null
+          p256dh: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          auth: string
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          is_active?: boolean | null
+          p256dh: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          auth?: string
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          is_active?: boolean | null
+          p256dh?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       size_preferences: {
         Row: {
@@ -110,7 +342,7 @@ export type Database = {
           id: string
           notes: string | null
           preferred_size: string
-          user_name: string
+          user_id: string | null
         }
         Insert: {
           brand: string
@@ -119,7 +351,7 @@ export type Database = {
           id?: string
           notes?: string | null
           preferred_size: string
-          user_name: string
+          user_id?: string | null
         }
         Update: {
           brand?: string
@@ -128,85 +360,7 @@ export type Database = {
           id?: string
           notes?: string | null
           preferred_size?: string
-          user_name?: string
-        }
-        Relationships: []
-      }
-      sneakers: {
-        Row: {
-          brand: string
-          cloudinary_id: string | null
-          colorway: string | null
-          comfort_rating: number | null
-          created_at: string
-          fit_rating: number | null
-          id: string
-          ideal_price: number | null
-          image_order: number | null
-          image_url: string | null
-          interaction_type: string | null
-          interested_in_buying: boolean | null
-          is_main_image: boolean | null
-          model: string
-          notes: string | null
-          product_url: string | null
-          retail_price: number | null
-          size_tried: string | null
-          store_name: string | null
-          try_on_date: string | null
-          updated_at: string
-          user_name: string
-          would_buy_at_price: number | null
-        }
-        Insert: {
-          brand: string
-          cloudinary_id?: string | null
-          colorway?: string | null
-          comfort_rating?: number | null
-          created_at?: string
-          fit_rating?: number | null
-          id?: string
-          ideal_price?: number | null
-          image_order?: number | null
-          image_url?: string | null
-          interaction_type?: string | null
-          interested_in_buying?: boolean | null
-          is_main_image?: boolean | null
-          model: string
-          notes?: string | null
-          product_url?: string | null
-          retail_price?: number | null
-          size_tried?: string | null
-          store_name?: string | null
-          try_on_date?: string | null
-          updated_at?: string
-          user_name: string
-          would_buy_at_price?: number | null
-        }
-        Update: {
-          brand?: string
-          cloudinary_id?: string | null
-          colorway?: string | null
-          comfort_rating?: number | null
-          created_at?: string
-          fit_rating?: number | null
-          id?: string
-          ideal_price?: number | null
-          image_order?: number | null
-          image_url?: string | null
-          interaction_type?: string | null
-          interested_in_buying?: boolean | null
-          is_main_image?: boolean | null
-          model?: string
-          notes?: string | null
-          product_url?: string | null
-          retail_price?: number | null
-          size_tried?: string | null
-          store_name?: string | null
-          try_on_date?: string | null
-          updated_at?: string
-          user_name?: string
-          would_buy_at_price?: number | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -236,7 +390,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      item_status: "owned" | "wishlisted" | "journaled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -363,14 +517,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      item_status: ["owned", "wishlisted", "journaled"],
+    },
   },
 } as const
-
-// Helper type exports
-export type Sneaker = Tables<'sneakers'>
-export type SneakerInsert = TablesInsert<'sneakers'>
-export type SneakerUpdate = TablesUpdate<'sneakers'>
-export type SizePreference = Tables<'size_preferences'>
-export type PriceMonitor = Tables<'price_monitors'>
-export type PriceHistory = Tables<'price_history'>

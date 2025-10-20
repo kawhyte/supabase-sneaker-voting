@@ -146,6 +146,7 @@ import { createClient } from "@/utils/supabase/client";
 import { MultiPhotoUpload } from "@/components/multi-photo-upload";
 import { ImageConfirmationModal } from "@/components/image-confirmation-modal";
 import { BrandCombobox } from "@/components/brand-combobox";
+import { useBrands } from "@/hooks/useBrands";
 import { SizeCombobox } from "@/components/size-combobox";
 import { ClothingSizeCombobox } from "@/components/clothing-size-combobox";
 import { ComfortRating } from "@/components/comfort-rating";
@@ -203,6 +204,7 @@ const itemSchema = z
 		//     .optional()
 		//     .or(z.literal("")),
 		enableNotifications: z.boolean().default(false),
+		brandId: z.number().int().positive("Brand is required"),
 		brand: z.string().min(1, "Brand is required").max(50).trim(),
 		model: z.string().min(2, "Item name is required").max(100).trim(),
 		sku: z.string().max(50).optional().or(z.literal("")),
@@ -320,6 +322,7 @@ export function AddItemForm({
 				? {
 						triedOn: initialData.has_been_tried || false,
 						category: initialData.category || undefined,
+						brandId: initialData.brand_id || undefined,
 						brand: initialData.brand || "",
 						model: initialData.model || "",
 						sku: initialData.sku || "",
@@ -344,12 +347,15 @@ export function AddItemForm({
 	const watchedRetailPrice = watch("retailPrice");
 	const watchedSalePrice = watch("salePrice");
 	const watchedBrand = watch("brand");
+	const watchedBrandId = watch("brandId");
+	const { brands } = useBrands();
 
 	useEffect(() => {
 		if (mode === "edit" && initialData) {
 			reset({
 				triedOn: initialData.has_been_tried || false,
 				category: initialData.category || undefined,
+				brandId: initialData.brand_id || undefined,
 				brand: initialData.brand || "",
 				model: initialData.model || "",
 				sku: initialData.sku || "",
@@ -531,6 +537,7 @@ export function AddItemForm({
 			const experienceData = {
 				user_id: user.id,
 				brand: data.brand,
+				brand_id: data.brandId || null,
 				model: data.model,
 				color: data.color || null,
 				sku: data.sku || null,
@@ -772,16 +779,19 @@ export function AddItemForm({
 									<div>
 										<Label className='text-sm font-medium text-slate-900'>Brand <span className='text-red-500'>*</span></Label>
 										<BrandCombobox
-										
-											value={watchedBrand}
-											onChange={(v) =>
-												setValue("brand", v, { shouldValidate: true })
-											}
-										 
+											value={watchedBrandId}
+											onChange={(brandId) => {
+												setValue("brandId", brandId, { shouldValidate: true })
+												// Also set the brand name for display/scraping purposes
+												const selectedBrand = brands.find(b => b.id === brandId)
+												if (selectedBrand?.name) {
+													setValue("brand", selectedBrand.name, { shouldValidate: true })
+												}
+											}}
 										/>
-										{errors.brand && (
+										{errors.brandId && (
 											<p className='text-sm text-red-600 mt-1'>
-												{errors.brand.message}
+												{errors.brandId.message}
 											</p>
 										)}
 									</div>

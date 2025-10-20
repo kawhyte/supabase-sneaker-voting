@@ -7,6 +7,12 @@ export interface ItemPhoto {
   is_main_image: boolean
 }
 
+export interface BrandData {
+  id: number
+  name: string | null
+  brand_logo: string | null
+}
+
 export type ArchiveReason = 'sold' | 'donated' | 'worn_out' | 'other'
 
 export interface SizingJournalEntry {
@@ -14,6 +20,7 @@ export interface SizingJournalEntry {
   created_at: string
   user_id: string
   brand: string
+  brand_id: number | null
   model: string
   color: string
   category: ItemCategory
@@ -38,6 +45,7 @@ export interface SizingJournalEntry {
   is_archived?: boolean
   archive_reason?: ArchiveReason | null
   archived_at?: string | null
+  brands?: BrandData | null
 
   // Current schema fields
   status: 'owned' | 'wishlisted' | 'journaled'

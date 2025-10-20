@@ -123,9 +123,20 @@ function WardrobeItemCardComponent({
 
 					{/* Content Section */}
 					<CardContent className='flex-1 p-4 flex flex-col gap-3 md:border-l md:border-stone-200'>
-						{/* Brand */}
-						<div className='text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
-							{item.brand}
+						{/* Brand - With Logo if Available */}
+						<div className='flex items-center gap-2'>
+							{item.brands?.brand_logo && (
+								<div className='relative w-6 h-6 flex-shrink-0'>
+									<img
+										src={item.brands.brand_logo}
+										alt={item.brands.name || 'Brand logo'}
+										className='w-full h-full object-contain'
+									/>
+								</div>
+							)}
+							<div className='text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
+								{item.brands?.name || item.brand}
+							</div>
 						</div>
 
 						{/* Archive Reason - Archive page only */}

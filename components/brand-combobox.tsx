@@ -1,7 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import Image from 'next/image'
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,57 +18,49 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-
-const COMMON_BRANDS = [
-  { value: 'Nike', label: 'Nike' },
-  { value: 'Jordan', label: 'Jordan' },
-  { value: 'Adidas', label: 'Adidas' },
-  { value: 'New Balance', label: 'New Balance' },
-  { value: 'Asics', label: 'Asics' },
-  { value: 'Puma', label: 'Puma' },
-  { value: 'Vans', label: 'Vans' },
-  { value: 'Converse', label: 'Converse' },
-  { value: 'Reebok', label: 'Reebok' },
-  { value: 'Under Armour', label: 'Under Armour' },
-  { value: 'Saucony', label: 'Saucony' },
-  { value: 'Brooks', label: 'Brooks' },
-  { value: 'Hoka', label: 'Hoka' },
-  { value: 'On Running', label: 'On Running' },
-  { value: 'Salomon', label: 'Salomon' },
-]
+import { useBrands } from '@/hooks/useBrands'
 
 interface BrandComboboxProps {
-  value?: string
-  onChange: (value: string) => void
+  value?: number | null
+  onChange: (value: number) => void
   disabled?: boolean
+  placeholder?: string
 }
 
-export function BrandCombobox({ value, onChange, disabled }: BrandComboboxProps) {
+/**
+ * BrandCombobox Component
+ *
+ * A searchable dropdown component for selecting pre-defined brands from the database.
+ * Fetches brands from the /api/brands endpoint and displays them with logos.
+ *
+ * Features:
+ * - Loads brands dynamically from the API via useBrands hook
+ * - Displays brand logos (if available) alongside brand names
+ * - Searchable list with filtering
+ * - Loading and error states
+ * - Responsive sizing
+ *
+ * @param value - The currently selected brand ID (number)
+ * @param onChange - Callback function when a brand is selected (receives brand ID)
+ * @param disabled - Whether the component is disabled
+ * @param placeholder - Custom placeholder text
+ */
+export function BrandCombobox({
+  value,
+  onChange,
+  disabled,
+  placeholder = 'Select a brand...',
+}: BrandComboboxProps) {
   const [open, setOpen] = React.useState(false)
-  const [searchValue, setSearchValue] = React.useState('')
+  const { brands, isLoading, error } = useBrands()
 
-  // Allow custom brand entry
-  const handleSelect = (selectedValue: string) => {
-    onChange(selectedValue)
+  // Find the selected brand object to display its logo
+  const selectedBrand = value ? brands.find((b) => b.id === value) : undefined
+
+  const handleSelect = (selectedBrandId: number) => {
+    onChange(selectedBrandId)
     setOpen(false)
-    setSearchValue('')
   }
-
-  const handleSearchChange = (search: string) => {
-    setSearchValue(search)
-  }
-
-  // If user types something not in the list and presses Enter, use that as custom brand
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && searchValue && !COMMON_BRANDS.find(b => b.value.toLowerCase() === searchValue.toLowerCase())) {
-      e.preventDefault()
-      onChange(searchValue)
-      setOpen(false)
-      setSearchValue('')
-    }
-  }
-
-  const displayValue = value || 'Select brand...'
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -75,60 +68,79 @@ export function BrandCombobox({ value, onChange, disabled }: BrandComboboxProps)
         <Button
           variant="outline"
           role="combobox"
-          size='sm'
+          size="sm"
           aria-expanded={open}
-          disabled={disabled}
-          className="w-full justify-between h-10 mt-2" 
+          disabled={disabled || isLoading}
+          className="w-full justify-between h-10 mt-2"
         >
-          {displayValue}
-          <ChevronsUpDown className="ml-[var(--space-xs)] h-2 w-2 shrink-0 opacity-50" />
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {selectedBrand?.brand_logo && (
+              <div className="relative w-5 h-5 flex-shrink-0">
+                <Image
+                  src={selectedBrand.brand_logo}
+                  alt={selectedBrand.name || 'Brand logo'}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            )}
+            <span className="truncate">
+              {isLoading ? 'Loading brands...' : value || placeholder}
+            </span>
+          </div>
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 shrink-0 opacity-50 animate-spin" />
+          ) : (
+            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
         <Command>
-          <CommandInput
-            placeholder="Search or type brand..."
-            value={searchValue}
-            onValueChange={handleSearchChange}
-            onKeyDown={handleKeyDown}
-          />
+          <CommandInput placeholder="Search brands..." />
           <CommandList>
             <CommandEmpty>
-              {searchValue ? (
-                <div className="py-6 text-center text-sm">
-                  <p className="text-muted-foreground mb-[var(--space-xs)]">Brand not found</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleSelect(searchValue)}
-                    className="mt-[var(--space-xs)]"
-                  >
-                    Use "{searchValue}"
-                  </Button>
-                </div>
+              {error ? (
+                <p className="py-6 text-center text-sm text-red-600">
+                  Failed to load brands. Please try again.
+                </p>
               ) : (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  Start typing to search brands
+                <p className="py-6 text-center text-sm text-muted-foreground">
+                  {isLoading ? 'Loading brands...' : 'No brands found.'}
                 </p>
               )}
             </CommandEmpty>
-            <CommandGroup>
-              {COMMON_BRANDS.map((brand) => (
-                <CommandItem
-                  key={brand.value}
-                  value={brand.value}
-                  onSelect={() => handleSelect(brand.value)}
-                >
-                  <Check
-                    className={cn(
-                      'mr-[var(--space-xs)] h-2 w-2',
-                      value === brand.value ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                  {brand.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {!isLoading && !error && brands.length > 0 && (
+              <CommandGroup>
+                {brands.map((brand) => (
+                  <CommandItem
+                    key={brand.id}
+                    value={brand.id.toString()}
+                    onSelect={() => handleSelect(brand.id)}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        value === brand.id ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                    <div className="flex items-center gap-2 flex-1">
+                      {brand.brand_logo && (
+                        <div className="relative w-5 h-5 flex-shrink-0">
+                          <Image
+                            src={brand.brand_logo}
+                            alt={brand.name || 'Brand logo'}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      )}
+                      <span className="flex-1">{brand.name}</span>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

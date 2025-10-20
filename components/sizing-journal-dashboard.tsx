@@ -58,7 +58,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
       setIsLoading(true)
       let query = supabase
         .from('items')
-        .select(`*, item_photos (id, image_url, image_order, is_main_image)`)
+        .select(`*, item_photos (id, image_url, image_order, is_main_image), brands (id, name, brand_logo)`)
         .eq('is_archived', isArchivePage)
         .in('status', status)
         .order('image_order', { foreignTable: 'item_photos', ascending: true })
@@ -68,7 +68,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
       if (error && error.message?.includes('item_photos')) {
         let basicQuery = supabase
           .from('items')
-          .select('*')
+          .select(`*, brands (id, name, brand_logo)`)
           .eq('is_archived', isArchivePage)
           .in('status', status)
         const basicResult = await basicQuery.order('created_at', { ascending: false })
