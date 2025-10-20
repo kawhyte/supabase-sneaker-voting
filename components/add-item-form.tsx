@@ -180,8 +180,6 @@ const itemSchema = z
 				"bottoms",
 				"outerwear",
 				"accessories",
-				"jewelry",
-				"watches",
 			],
 			{
 				required_error: "Please select the item category",
@@ -714,7 +712,7 @@ export function AddItemForm({
 												<Eye className='h-4 w-4 text-slate-600 flex-shrink-0' />
 												<Label className='block text-sm font-semibold text-slate-900'> Did you try on this item ? </Label>
 											</div>
-											<div className='flex items-center gap-3'>
+											<div className='flex items-center gap-3 '>
 												<Switch
 													checked={watchedTriedOn}
 													onCheckedChange={(checked) =>

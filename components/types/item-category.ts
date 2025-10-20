@@ -19,8 +19,7 @@ export type ItemCategory =
 	| "bottoms"
 	| "outerwear"
 	| "accessories"
-	| "jewelry"
-	| "watches";
+;
 
 export type SizeType = "shoe" | "clothing" | "onesize";
 
@@ -166,50 +165,8 @@ export const CATEGORY_CONFIGS: Record<ItemCategory, CategoryConfig> = {
 		sizeLabel: "Size (Optional)",
 		sizePlaceholder: "One Size, or specify",
 	},
-	jewelry: {
-		id: "jewelry",
-		label: "Jewelry",
-		labelPlural: "Jewelry",
-		icon: Gem,
-		color: "indigo",
-		bgColor: "var(--color-indigo-50)",
-		borderColor: "var(--color-indigo-500)",
-		textColor: "var(--color-indigo-700)",
-		// Permissions
-		allowCollection: false,
-		allowPurchased: true,
-		allowWears: false,
-		// Field requirements
-		requiresSize: false,
-		requiresFit: false,
-		requiresComfort: false,
-		sizeType: "onesize",
-		// UX hints
-		sizeLabel: "Size (Optional)",
-		sizePlaceholder: "Ring size, chain length, etc.",
-	},
-	watches: {
-		id: "watches",
-		label: "Watch",
-		labelPlural: "Watches",
-		icon: Watch,
-		color: "gray",
-		bgColor: "var(--color-slate-50)",
-		borderColor: "var(--color-slate-500)",
-		textColor: "var(--color-slate-700)",
-		// Permissions
-		allowCollection: false,
-		allowPurchased: true,
-		allowWears: false,
-		// Field requirements
-		requiresSize: false,
-		requiresFit: false,
-		requiresComfort: false,
-		sizeType: "onesize",
-		// UX hints
-		sizeLabel: "Band Size (Optional)",
-		sizePlaceholder: "Wrist size or band length",
-	},
+		
+	
 };
 
 // ============================================================================

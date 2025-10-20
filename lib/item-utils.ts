@@ -132,26 +132,6 @@ export function detectCategoryFromUrl(url: string): ItemCategory | null {
 			return "shoes";
 		}
 
-		// Watch retailers
-		if (
-			hostname.includes("watchbox.com") ||
-			hostname.includes("chrono24.com") ||
-			hostname.includes("hodinkee.com") ||
-			urlLower.includes("/watches/")
-		) {
-			return "watches";
-		}
-
-		// Jewelry
-		if (
-			hostname.includes("tiffany.com") ||
-			hostname.includes("cartier.com") ||
-			hostname.includes("bluenile.com") ||
-			urlLower.includes("/jewelry/") ||
-			urlLower.includes("/jewellery/")
-		) {
-			return "jewelry";
-		}
 
 		// Accessories (bags, hats, etc.)
 		if (
@@ -161,7 +141,9 @@ export function detectCategoryFromUrl(url: string): ItemCategory | null {
 			urlLower.includes("/backpack/") ||
 			urlLower.includes("/accessories/") ||
 			urlLower.includes("/hats/") ||
-			urlLower.includes("/belts/")
+			urlLower.includes("/belts/")||
+			urlLower.includes("/watch/") ||
+			urlLower.includes("/socks/")
 		) {
 			return "accessories";
 		}
@@ -225,8 +207,7 @@ export function formatCategory(category: ItemCategory): string {
 		bottoms: "Bottoms",
 		outerwear: "Outerwear",
 		accessories: "Accessory",
-		jewelry: "Jewelry",
-		watches: "Watch",
+		
 	};
 	return labels[category] || category;
 }
@@ -241,8 +222,7 @@ export function formatCategoryPlural(category: ItemCategory): string {
 		bottoms: "Bottoms",
 		outerwear: "Outerwear",
 		accessories: "Accessories",
-		jewelry: "Jewelry",
-		watches: "Watches",
+		
 	};
 	return labels[category] || category;
 }
@@ -257,8 +237,7 @@ export function getCategoryEmoji(category: ItemCategory): string {
 		bottoms: "👖",
 		outerwear: "🧥",
 		accessories: "🎒",
-		jewelry: "💍",
-		watches: "⌚",
+	
 	};
 	return emojis[category] || "📦";
 }

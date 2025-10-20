@@ -85,7 +85,7 @@ export function BrandCombobox({
               </div>
             )}
             <span className="truncate">
-              {isLoading ? 'Loading brands...' : value || placeholder}
+              {isLoading ? 'Loading brands...' : selectedBrand?.name || placeholder}
             </span>
           </div>
           {isLoading ? (
