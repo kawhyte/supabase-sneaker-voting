@@ -12,14 +12,13 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import {
-	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerTrigger,
-} from '@/components/ui/drawer'
+	Sheet,
+	SheetContent,
+	SheetFooter,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from '@/components/ui/sheet'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { CATEGORY_CONFIGS, type ItemCategory } from '@/components/types/item-category'
@@ -179,8 +178,8 @@ export function SizingJournalFiltersV2({
 				</div>
 
 				{/* Filter Button - Opens Drawer */}
-				<Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-					<DrawerTrigger asChild>
+				<Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+					<SheetTrigger asChild>
 						<Button
 							variant="outline"
 							className="h-10 gap-2 border-stone-300 text-slate-900 hover:bg-stone-100 relative whitespace-nowrap shadow-sm transition-all duration-200 hover:scale-105 active:scale-95"
@@ -193,21 +192,21 @@ export function SizingJournalFiltersV2({
 								</span>
 							)}
 						</Button>
-					</DrawerTrigger>
+					</SheetTrigger>
 
 					{/* Filter Drawer Content */}
-					<DrawerContent className="bg-white border-t border-stone-300 shadow-lg animate-in slide-in-from-bottom duration-300">
-						<div className="w-full h-full flex flex-col px-4 sm:px-6 md:px-8">
-							<DrawerHeader className="border-b border-stone-200 bg-stone-50 shrink-0">
-								<DrawerTitle className="text-lg font-semibold text-slate-900">
+					<SheetContent side="left" className="w-full sm:w-96 bg-white border-r border-stone-300 shadow-lg flex flex-col p-0">
+						<div className="w-full h-full flex flex-col">
+							<SheetHeader className="border-b border-stone-200 bg-stone-50 shrink-0 px-6 py-4">
+								<SheetTitle className="text-lg font-semibold text-slate-900">
 									Filters
-								</DrawerTitle>
-							</DrawerHeader>
+								</SheetTitle>
+							</SheetHeader>
 
 							{/* Filter Sections */}
-							<div className="flex-1 overflow-y-auto py-6 space-y-6 min-w-0">
+							<div className="flex-1 overflow-y-auto py-6 px-6 space-y-8 min-w-0">
 								{/* Category Filter */}
-								<div className="space-y-3">
+								<div className="space-y-4">
 									<div className="flex items-center justify-between gap-4 w-full min-w-0">
 										<h3 className="text-sm font-semibold text-slate-900">
 											Category
@@ -221,23 +220,23 @@ export function SizingJournalFiltersV2({
 												: 'Select All'}
 										</button>
 									</div>
-									<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+									<div className="space-y-3">
 										{Object.values(CATEGORY_CONFIGS).map((config) => {
 											const isSelected = selectedCategories.includes(config.id)
 											return (
 												<div
 													key={config.id}
-													className="flex items-center space-x-2"
+													className="flex items-center space-x-3 py-2"
 												>
 													<Checkbox
 														id={`category-${config.id}`}
 														checked={isSelected}
 														onCheckedChange={() => handleCategoryToggle(config.id)}
-														className="border-stone-300  data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400"
+														className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400 h-5 w-5 flex-shrink-0"
 													/>
 													<Label
 														htmlFor={`category-${config.id}`}
-														className="text-sm font-normal text-slate-700 cursor-pointer hover:text-slate-900 transition-colors duration-150"
+														className="text-sm font-normal text-slate-700 cursor-pointer hover:text-slate-900 transition-colors duration-150 whitespace-nowrap flex-shrink-0"
 													>
 														{config.label}
 													</Label>
@@ -248,7 +247,7 @@ export function SizingJournalFiltersV2({
 								</div>
 
 								{/* Brand Filter - Multi-Select Dropdown */}
-								<div className="space-y-3">
+								<div className="space-y-4">
 									<h3 className="text-sm font-semibold text-slate-900">
 										Brand
 									</h3>
@@ -258,7 +257,7 @@ export function SizingJournalFiltersV2({
 											handleBrandToggle(value)
 										}}
 									>
-										<SelectTrigger className="h-10 border-stone-300 text-slate-900 bg-white hover:bg-stone-50 focus:ring-sun-400 transition-all duration-200 hover:border-sun-200">
+										<SelectTrigger className="h-11 border-stone-300 text-slate-900 bg-white hover:bg-stone-50 focus:ring-sun-400 transition-all duration-200 hover:border-sun-200">
 											<SelectValue
 												placeholder={
 													selectedBrandsList.length > 0
@@ -274,16 +273,16 @@ export function SizingJournalFiltersV2({
 													<SelectItem
 														key={brand}
 														value={brand}
-														className="cursor-pointer"
+														className="cursor-pointer py-3"
 													>
-														<div className="flex items-center gap-2">
+														<div className="flex items-center gap-3">
 															<Checkbox
 																checked={isSelected}
 																onClick={(e) => {
 																	e.stopPropagation()
 																	handleBrandToggle(brand)
 																}}
-																className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400"
+																className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400 h-5 w-5 flex-shrink-0"
 																onChange={() => {}}
 															/>
 															<span>{brand}</span>
@@ -296,7 +295,7 @@ export function SizingJournalFiltersV2({
 
 									{/* Show selected brands */}
 									{selectedBrandsList.length > 0 && (
-										<div className="flex flex-wrap gap-2 mt-2">
+										<div className="flex flex-wrap gap-2 mt-3">
 											{selectedBrandsList.map((brand) => (
 												<div
 													key={brand}
@@ -318,7 +317,7 @@ export function SizingJournalFiltersV2({
 							</div>
 
 							{/* Filter Actions */}
-							<DrawerFooter className="border-t border-stone-200 bg-stone-50 flex-row gap-3 justify-end p-4 shrink-0">
+							<SheetFooter className="border-t border-stone-200 bg-stone-50 flex-row gap-3 justify-end px-6 py-4 shrink-0">
 								<Button
 									variant="outline"
 									onClick={handleClearFilters}
@@ -332,10 +331,10 @@ export function SizingJournalFiltersV2({
 								>
 									Apply Filters
 								</Button>
-							</DrawerFooter>
+							</SheetFooter>
 						</div>
-					</DrawerContent>
-				</Drawer>
+					</SheetContent>
+				</Sheet>
 
 				{/* Sort Dropdown - Full width on mobile, fixed width on desktop */}
 				<Select value={sortBy} onValueChange={onSortChange}>

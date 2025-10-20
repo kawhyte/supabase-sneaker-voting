@@ -115,7 +115,7 @@ function DashboardContent() {
           <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-16">
             {/* Tabs */}
             <div className="flex-1">
-              <TabsList className="grid w-full grid-cols-3 justify-center">
+              <TabsList className="grid w-full grid-cols-3 justify-center gap-x-4">
                 <TabsTrigger value="wishlist" className="flex items-center gap-2">
                   <Heart className="h-4 w-4" />
                   Wishlist

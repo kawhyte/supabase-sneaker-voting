@@ -10,14 +10,13 @@
 
 "use client";
 
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import {
 	Sheet,
 	SheetContent,
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-	SheetClose,
 } from "@/components/ui/sheet";
 import {
 	Tooltip,
@@ -51,22 +50,10 @@ export function WearStatsDrawer({
 			<SheetContent side="right" className="w-full sm:w-96 p-0 flex flex-col">
 				{/* Header */}
 				<SheetHeader className="px-6 pt-6 pb-4 border-b border-stone-200">
-					<div className="flex items-start justify-between gap-4">
-						<div className="flex-1">
-							<SheetTitle className="text-lg font-semibold">Wear Statistics</SheetTitle>
-							<SheetDescription className="text-xs mt-1 text-muted-foreground">
-								{item.brand} {item.model}
-							</SheetDescription>
-						</div>
-						<SheetClose asChild>
-							<button
-								type="button"
-								className="h-8 w-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors text-muted-foreground"
-								aria-label="Close wear stats drawer">
-								<X className="h-4 w-4" />
-							</button>
-						</SheetClose>
-					</div>
+					<SheetTitle className="text-lg font-semibold">Wear Statistics</SheetTitle>
+					<SheetDescription className="text-xs text-muted-foreground">
+						{item.brand} {item.model}
+					</SheetDescription>
 				</SheetHeader>
 
 				{/* Content */}
@@ -79,12 +66,12 @@ export function WearStatsDrawer({
 							{/* Counter Controls */}
 							<div className="flex items-center justify-between gap-4 bg-stone-50 p-4 rounded-lg">
 								{/* Decrement Button */}
-								<Tooltip>
+								<Tooltip delayDuration={200}>
 									<TooltipTrigger asChild>
 										<button
 											onClick={() => onDecrementWear?.(item)}
 											disabled={!item.wears || item.wears === 0}
-											className="h-10 w-10 rounded-lg flex items-center justify-center transition-all hover:bg-stone-200 active:bg-stone-300 disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground font-semibold"
+											className="h-10 w-10 rounded-lg flex items-center justify-center transition-all bg-stone-100 hover:bg-stone-200 active:bg-stone-300 disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground font-semibold"
 											type="button"
 											aria-label="Decrease wear count">
 											<Minus className="h-5 w-5" />
@@ -104,7 +91,7 @@ export function WearStatsDrawer({
 								</div>
 
 								{/* Increment Button */}
-								<Tooltip>
+								<Tooltip delayDuration={200}>
 									<TooltipTrigger asChild>
 										<button
 											onClick={() => onIncrementWear?.(item)}

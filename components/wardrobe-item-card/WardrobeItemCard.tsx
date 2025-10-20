@@ -200,14 +200,53 @@ function WardrobeItemCardComponent({
 							</div>
 						)}
 
-						{/* Footer Badges */}
+						{/* Status Badges - Below notes, above footer */}
+						<div className='flex items-center gap-2 flex-wrap mt-3'>
+							{/* Tried On / Didn't Try Badge - Journal View Only */}
+							{viewMode === 'journal' && (
+								<span className='inline-flex items-center justify-center text-xs px-2 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-slate-700'>
+									{hasBeenTriedOn ? "Tried On" : "Didn't Try"}
+								</span>
+							)}
+
+							{/* Category Badge */}
+							{categoryConfig && (
+								<span className='inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-slate-700'>
+									<categoryConfig.icon className='h-3 w-3' />
+									<span>{categoryConfig.label}</span>
+								</span>
+							)}
+
+							{/* Archive Metadata - Archive View Only */}
+							{viewMode === 'archive' && item.archive_reason && (
+								<>
+									<span className='inline-flex items-center text-xs px-2 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-slate-700'>
+										{item.archive_reason === 'sold' ? 'Sold' :
+										 item.archive_reason === 'donated' ? 'Donated' :
+										 item.archive_reason === 'worn_out' ? 'Worn Out' :
+										 'Other'}
+									</span>
+									{item.archived_at && (
+										<span className='text-xs text-muted-foreground'>
+											{new Date(item.archived_at).toLocaleDateString("en-US", {
+												month: "short",
+												day: "numeric",
+												year: "numeric",
+											})}
+										</span>
+									)}
+								</>
+							)}
+						</div>
+
+						{/* Footer - Cost Per Wear Button */}
 						<div className='flex items-center gap-2 flex-wrap mt-auto pt-4 border-t border-stone-200'>
 							<ItemFooterBadges
 								item={item}
-								hasBeenTriedOn={hasBeenTriedOn}
 								viewMode={viewMode}
-								categoryConfig={categoryConfig}
-								isArchivePage={isArchivePage}
+								canTrackWears={permissions.canTrackWearCount}
+								onIncrementWear={actions.onIncrementWear}
+								onDecrementWear={actions.onDecrementWear}
 							/>
 						</div>
 					</CardContent>
