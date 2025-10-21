@@ -7,7 +7,7 @@
 "use client";
 
 import { useDensity, getDensityGridClasses } from "@/lib/view-density-context";
-import { SizingJournalEntry, ArchiveReason } from "./types/sizing-journal-entry";
+import { SizingJournalEntry } from "./types/sizing-journal-entry";
 import { SizingJournalEntryCard } from "./sizing-journal-entry-card";
 import { ReactNode } from "react";
 
@@ -17,7 +17,7 @@ interface CollectionGridProps {
 	ariaLabel: string;
 	onEdit: (entry: SizingJournalEntry) => void;
 	onDelete: (entry: SizingJournalEntry) => void;
-	onArchive?: (entry: SizingJournalEntry, reason: ArchiveReason) => void;
+	onArchive?: (entry: SizingJournalEntry) => void;
 	onUnarchive?: (entry: SizingJournalEntry) => void;
 	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
 	isArchivePage?: boolean;
@@ -54,6 +54,8 @@ export function CollectionGrid({
 					viewMode={viewMode}
 					onEdit={onEdit}
 					onDelete={onDelete}
+					onArchive={onArchive}
+					onMarkAsPurchased={onMarkAsPurchased}
 					onRestore={onUnarchive}
 					isArchivePage={isArchivePage}
 				/>

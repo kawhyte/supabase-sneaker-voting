@@ -547,7 +547,7 @@ export function AddItemForm({
 				retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
 				sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
-				notes: data.notes || null,
+				notes: data.notes && data.notes.trim() ? data.notes : "no note added",
 				wears: data.wears || 0,
 				status: (mode === "create" ? "wishlisted" : initialData?.status) as
 					| "wishlisted"
@@ -712,7 +712,7 @@ export function AddItemForm({
 												<Eye className='h-4 w-4 text-slate-600 flex-shrink-0' />
 												<Label className='block text-sm font-semibold text-slate-900'> Did you try on this item ? </Label>
 											</div>
-											<div className='flex items-center gap-3 '>
+											<div className='flex items-center gap-3'>
 												<Switch
 													checked={watchedTriedOn}
 													onCheckedChange={(checked) =>
@@ -734,6 +734,7 @@ export function AddItemForm({
 														"No"
 													)}
 												</Label>
+												
 											</div>
 											{watchedTriedOn && (
 												<p className='text-xs text-meadow-600 mt-2'>

@@ -20,7 +20,6 @@ export interface SizingJournalEntryCardProps {
 	entry: SizingJournalEntry;
 	onEdit: (entry: SizingJournalEntry) => void;
 	onDelete: (entry: SizingJournalEntry) => void;
-	onToggleCollection?: (entry: SizingJournalEntry) => void;
 	viewMode?: 'journal' | 'collection' | 'archive' | 'wishlist';
 	onIncrementWear?: (entry: SizingJournalEntry) => void;
 	onDecrementWear?: (entry: SizingJournalEntry) => void;
@@ -62,7 +61,6 @@ export function SizingJournalEntryCard({
 	entry,
 	onEdit,
 	onDelete,
-	onToggleCollection,
 	viewMode = 'journal',
 	onIncrementWear,
 	onDecrementWear,

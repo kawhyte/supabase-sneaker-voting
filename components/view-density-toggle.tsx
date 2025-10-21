@@ -60,8 +60,8 @@ export function ViewDensityToggle() {
 						</button>
 					</TooltipTrigger>
 					<TooltipContent side="bottom">
-						<p className="text-xs font-medium">{label}</p>
-						<p className="text-xs text-muted-foreground">{description}</p>
+						{/* <p className="text-xs font-medium">{label}</p> */}
+						<p className="text-xs text-white">{description}</p>
 					</TooltipContent>
 				</Tooltip>
 			))}

@@ -481,6 +481,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         onIncrementWear={handleIncrementWear}
         onDecrementWear={handleDecrementWear}
         onMoveToWatchlist={moveItemToWishlist}
+        onMarkAsPurchased={handleOpenPurchasedModal}
         onArchive={handleOpenArchiveDialog}
         emptyState={
           <EmptyState
