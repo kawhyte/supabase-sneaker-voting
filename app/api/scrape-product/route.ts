@@ -108,24 +108,18 @@ function detectCategory(url: string, title: string, breadcrumbs: string = ''): I
     return 'outerwear'
   }
 
-  // Jewelry
+  // Jewelry & Watches (map to accessories)
   if (
     combined.includes('jewelry') ||
     combined.includes('necklace') ||
     combined.includes('bracelet') ||
     combined.includes('ring') ||
     combined.includes('earring') ||
-    combined.includes('pendant')
-  ) {
-    return 'jewelry'
-  }
-
-  // Watches
-  if (
+    combined.includes('pendant') ||
     combined.includes('watch') ||
     combined.includes('timepiece')
   ) {
-    return 'watches'
+    return 'accessories'
   }
 
   // Accessories (catch-all for bags, hats, etc.)
