@@ -16,7 +16,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Archive } from "lucide-react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
-import { getCategoryConfig } from "@/components/types/item-category";
 import { prepareItemPhotos, isItemOnSale, formatDate } from "@/lib/wardrobe-item-utils";
 import { useItemDisplayLogic } from "@/hooks/useItemDisplayLogic";
 import { useItemPermissions } from "@/hooks/useItemPermissions";
@@ -69,7 +68,6 @@ function WardrobeItemCardComponent({
 }: WardrobeItemCardProps) {
 	// Prepare data
 	const itemPhotos = prepareItemPhotos(item);
-	const categoryConfig = getCategoryConfig(item.category);
 	const displayLogic = useItemDisplayLogic(item);
 	const permissions = useItemPermissions(item.category);
 	const { density } = useDensity();
@@ -204,8 +202,8 @@ function WardrobeItemCardComponent({
 						)} */}
 						</div>
 
-						{/* Notes - Only show if not compact */}
-						{showNotes && item.notes && (
+						{/* Notes - Only show if not compact and has meaningful content */}
+						{showNotes && item.notes && item.notes.trim() && item.notes.toLowerCase() !== 'no note added' && (
 							<div className='mt-3 p-2.5 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed'>
 								{item.notes}
 							</div>
@@ -217,14 +215,6 @@ function WardrobeItemCardComponent({
 							{viewMode === 'journal' && (
 								<span className='inline-flex items-center justify-center text-xs px-2 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-slate-700'>
 									{hasBeenTriedOn ? "Tried On" : "Didn't Try"}
-								</span>
-							)}
-
-							{/* Category Badge */}
-							{categoryConfig && (
-								<span className='inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-slate-700'>
-									<categoryConfig.icon className='h-3 w-3' />
-									<span>{categoryConfig.label}</span>
 								</span>
 							)}
 
