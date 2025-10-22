@@ -96,7 +96,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -146,6 +146,8 @@ import { createClient } from "@/utils/supabase/client";
 import { MultiPhotoUpload } from "@/components/multi-photo-upload";
 import { ImageConfirmationModal } from "@/components/image-confirmation-modal";
 import { BrandCombobox } from "@/components/brand-combobox";
+import { ValidationStatusCard } from "@/components/validation-status-card";
+import { useValidationVisibility } from "@/hooks/useValidationVisibility";
 import { useBrands } from "@/hooks/useBrands";
 import { SizeCombobox } from "@/components/size-combobox";
 import { ClothingSizeCombobox } from "@/components/clothing-size-combobox";
@@ -296,6 +298,8 @@ export function AddItemForm({
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [openAccordionItem, setOpenAccordionItem] = useState<string>("");
 	const [isSavingPhotos, setIsSavingPhotos] = useState(false);
+	const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+	const formRef = useRef<HTMLFormElement>(null);
 	const supabase = createClient();
 
 	const {
@@ -340,6 +344,13 @@ export function AddItemForm({
 	const watchedBrand = watch("brand");
 	const watchedBrandId = watch("brandId");
 	const { brands } = useBrands();
+
+	// Validation card visibility hook for smart display
+	const { shouldShowCard, isSticky, isMobile } = useValidationVisibility({
+		formRef,
+		isDirty,
+		attemptedSubmit,
+	});
 
 	useEffect(() => {
 		if (mode === "edit" && initialData) {
@@ -641,7 +652,14 @@ export function AddItemForm({
 			toast.error((error as Error).message);
 		} finally {
 			setIsLoading(false);
+			setAttemptedSubmit(false);
 		}
+	};
+
+	// Wrapper to handle form submission with validation card visibility
+	const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		setAttemptedSubmit(true);
+		handleSubmit(onSubmit)(e);
 	};
 
 	// --- START of other useEffects and helper functions ---
@@ -720,7 +738,33 @@ export function AddItemForm({
 							</Button>
 						</div>
 					) : (
-						<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+						<form onSubmit={handleFormSubmit} className='space-y-6' ref={formRef}>
+							{/* Validation Status Card - Smart floating sidebar */}
+							<ValidationStatusCard
+								errors={errors}
+								watchedValues={{
+									brand: watchedBrand,
+									brandId: watchedBrandId,
+									model: watch("model"),
+									category: watchedCategory,
+									retailPrice: watchedRetailPrice,
+									triedOn: watchedTriedOn,
+									sizeTried: watch("sizeTried"),
+									comfortRating: watch("comfortRating"),
+									photos: photos.length,
+								}}
+								photosLength={photos.length}
+								isDirty={isDirty}
+								isValid={isValid}
+								mode={mode}
+								initialDataStatus={initialData?.status}
+								shouldShowCard={shouldShowCard}
+								isSticky={isSticky}
+								isMobile={isMobile}
+								attemptedSubmit={attemptedSubmit}
+								onDismiss={() => setAttemptedSubmit(false)}
+							/>
+
 							{/* Product Details Section */}
 							<div className='space-y-6'>
 								<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
