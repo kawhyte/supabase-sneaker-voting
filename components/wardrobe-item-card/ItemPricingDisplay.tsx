@@ -29,7 +29,7 @@ export function ItemPricingDisplay({
 		return (
 			<div className='flex items-center gap-1'>
 				<span className='text-sm text-muted-foreground'>
-					Purchased for:
+					Paid:
 				</span>
 				<span className='text-sm font-semibold text-foreground'>
 					${item.purchase_price}
@@ -43,7 +43,7 @@ export function ItemPricingDisplay({
 		<div className='flex flex-col gap-1.5'>
 			{item.retail_price && (
 				<div className='flex items-center gap-1 flex-wrap'>
-					<span className='text-sm text-muted-foreground'>Retail price:</span>
+					<span className='text-sm text-muted-foreground'>Retail:</span>
 					{isOnSale ? (
 						<>
 							<span className='text-sm line-through text-muted-foreground'>
@@ -68,7 +68,7 @@ export function ItemPricingDisplay({
 			)}
 			{item.target_price && (
 				<div className='flex items-center gap-1'>
-					<span className='text-sm text-muted-foreground'>My Target Price:</span>
+					<span className='text-sm text-muted-foreground'>Target:</span>
 					<span className='text-sm font-semibold text-foreground'>
 						${item.target_price}
 					</span>
