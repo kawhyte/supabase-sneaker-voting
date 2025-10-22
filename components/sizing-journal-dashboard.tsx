@@ -15,7 +15,7 @@ import { DeleteConfirmDialog } from './delete-confirm-dialog'
 import { PurchasedConfirmationModal } from './purchased-confirmation-modal'
 import { ArchiveReasonDialog } from './archive-reason-dialog'
 import { SizingJournalEntry } from './types/sizing-journal-entry'
-import { filterJournalEntries, sortJournalEntries, getUniqueBrands } from '@/lib/sizing-journal-utils'
+import { filterJournalEntries, sortJournalEntries } from '@/lib/sizing-journal-utils'
 import { type ItemCategory } from '@/components/types/item-category'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
 
@@ -425,7 +425,6 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     filterJournalEntries(journalEntries, searchTerm, new Set<string>(), selectedBrands, selectedCategories),
     sortBy
   )
-  const availableBrands = getUniqueBrands(journalEntries)
 
   const displayStatus = status.includes('wishlisted') ? 'wishlisted' : status[0]
 
@@ -465,7 +464,6 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         onBrandChange={setSelectedBrands}
         sortBy={sortBy}
         onSortChange={setSortBy}
-        availableBrands={availableBrands}
         selectedCategories={selectedCategories}
         onCategoriesChange={setSelectedCategories}
       />

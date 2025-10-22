@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { X, Sliders } from 'lucide-react'
+import Image from 'next/image'
+import { X, Sliders, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,6 +23,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { CATEGORY_CONFIGS, type ItemCategory } from '@/components/types/item-category'
+import { useBrands } from '@/hooks/useBrands'
 
 interface SizingJournalFiltersV2Props {
 	searchTerm: string
@@ -30,7 +32,6 @@ interface SizingJournalFiltersV2Props {
 	onBrandChange: (brands: Set<string>) => void
 	sortBy: string
 	onSortChange: (value: string) => void
-	availableBrands: string[]
 	selectedCategories: ItemCategory[]
 	onCategoriesChange: (categories: ItemCategory[]) => void
 }
@@ -51,7 +52,6 @@ export function SizingJournalFiltersV2({
 	onBrandChange,
 	sortBy,
 	onSortChange,
-	availableBrands,
 	selectedCategories,
 	onCategoriesChange,
 }: SizingJournalFiltersV2Props) {
@@ -60,6 +60,7 @@ export function SizingJournalFiltersV2({
 		Array.from(selectedBrands)
 	)
 	const [isMounted, setIsMounted] = useState(false)
+	const { brands, isLoading: isBrandsLoading } = useBrands()
 
 	// Load filters from localStorage on mount
 	useEffect(() => {
@@ -246,33 +247,52 @@ export function SizingJournalFiltersV2({
 									</div>
 								</div>
 
-								{/* Brand Filter - Multi-Select Dropdown */}
+								{/* Brand Filter - Multi-Select Dropdown with Smart Disclosure Pattern
+									 * Smart Disclosure: Shows brand logos in dropdown for fast visual scanning,
+									 * but displays clean text-only tags when selected. This reduces visual clutter
+									 * when many brands are chosen while maintaining rich info during exploration.
+									 * Pattern commonly used in Gmail labels, Material Design apps, and Intuit products.
+									 * Fetches complete brand master list from Supabase instead of derived list.
+									 */}
 								<div className="space-y-4">
-									<h3 className="text-sm font-semibold text-slate-900">
-										Brand
-									</h3>
+									<div className="flex items-center justify-between gap-4">
+										<h3 className="text-sm font-semibold text-slate-900">
+											Brand
+										</h3>
+										{isBrandsLoading && (
+											<Loader2 className="h-4 w-4 animate-spin text-sun-500" />
+										)}
+									</div>
 									<Select
 										value={selectedBrandsList[0] || ''}
 										onValueChange={(value) => {
 											handleBrandToggle(value)
 										}}
+										disabled={isBrandsLoading}
 									>
-										<SelectTrigger className="h-11 border-stone-300 text-slate-900 bg-white hover:bg-stone-50 focus:ring-sun-400 transition-all duration-200 hover:border-sun-200">
+										<SelectTrigger className="h-11 border-stone-300 text-slate-900 bg-white hover:bg-stone-50 focus:ring-sun-400 transition-all duration-200 hover:border-sun-200 disabled:opacity-50 disabled:cursor-not-allowed">
 											<SelectValue
 												placeholder={
-													selectedBrandsList.length > 0
-														? `${selectedBrandsList.length} brand${selectedBrandsList.length > 1 ? 's' : ''} selected`
-														: 'Select brands...'
+													isBrandsLoading
+														? 'Loading brands...'
+														: selectedBrandsList.length > 0
+															? `${selectedBrandsList.length} brand${selectedBrandsList.length > 1 ? 's' : ''} selected`
+															: 'Select brands...'
 												}
 											/>
 										</SelectTrigger>
 										<SelectContent className="bg-white border-stone-300">
-											{availableBrands.map((brand) => {
-												const isSelected = selectedBrandsList.includes(brand)
+											{brands.length === 0 && !isBrandsLoading && (
+												<div className="py-6 text-center text-sm text-slate-500">
+													No brands available
+												</div>
+											)}
+											{brands.map((brand) => {
+												const isSelected = selectedBrandsList.includes(brand.name || '')
 												return (
 													<SelectItem
-														key={brand}
-														value={brand}
+														key={brand.id}
+														value={brand.name || ''}
 														className="cursor-pointer py-3"
 													>
 														<div className="flex items-center gap-3">
@@ -280,12 +300,22 @@ export function SizingJournalFiltersV2({
 																checked={isSelected}
 																onClick={(e) => {
 																	e.stopPropagation()
-																	handleBrandToggle(brand)
+																	handleBrandToggle(brand.name || '')
 																}}
 																className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400 h-5 w-5 flex-shrink-0"
 																onChange={() => {}}
 															/>
-															<span>{brand}</span>
+															{brand.brand_logo && (
+																<div className="relative w-5 h-5 flex-shrink-0">
+																	<Image
+																		src={brand.brand_logo}
+																		alt={brand.name || 'Brand logo'}
+																		fill
+																		className="object-contain"
+																	/>
+																</div>
+															)}
+															<span>{brand.name}</span>
 														</div>
 													</SelectItem>
 												)
@@ -293,7 +323,7 @@ export function SizingJournalFiltersV2({
 										</SelectContent>
 									</Select>
 
-									{/* Show selected brands */}
+									{/* Show selected brands - Clean tags without logos (Smart Disclosure) */}
 									{selectedBrandsList.length > 0 && (
 										<div className="flex flex-wrap gap-2 mt-3">
 											{selectedBrandsList.map((brand) => (
