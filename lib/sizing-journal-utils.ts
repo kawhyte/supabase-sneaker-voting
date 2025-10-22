@@ -1,6 +1,24 @@
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 import { type ItemCategory } from '@/components/types/item-category'
 
+/**
+ * Safely checks if a string value matches the search term.
+ * Handles null/undefined values by treating them as empty strings.
+ * This ensures the filter doesn't crash when searching for entries with missing fields.
+ *
+ * @param value - The string value to search in (can be null/undefined)
+ * @param searchTerm - The search term to match
+ * @returns true if the value matches the search term, false otherwise
+ *
+ * @example
+ * safeStringMatch('Jordan', 'jordan') // true
+ * safeStringMatch(null, 'test') // true (null treated as empty string)
+ * safeStringMatch('Nike Air', 'Air') // true
+ */
+function safeStringMatch(value: string | null | undefined, searchTerm: string): boolean {
+  return (value ?? '').toLowerCase().includes(searchTerm.toLowerCase())
+}
+
 export function filterJournalEntries(
   entries: SizingJournalEntry[],
   searchTerm: string,
@@ -10,9 +28,9 @@ export function filterJournalEntries(
 ): SizingJournalEntry[] {
   return entries.filter(entry => {
     const matchesSearch = searchTerm === '' ||
-      entry.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.color.toLowerCase().includes(searchTerm.toLowerCase())
+      safeStringMatch(entry.brand, searchTerm) ||
+      safeStringMatch(entry.model, searchTerm) ||
+      safeStringMatch(entry.color, searchTerm)
 
     // Note: User filtering is now handled at the database level via RLS and queries
     // The selectedUsers parameter is kept for backward compatibility but no longer used
