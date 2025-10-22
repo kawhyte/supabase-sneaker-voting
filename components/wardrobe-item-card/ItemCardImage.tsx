@@ -58,7 +58,7 @@ export function ItemCardImage({
 					<img
 						src={photos[0].image_url}
 						alt={altText}
-						className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
+						className='w-full h-full object-contain object-center transition-transform duration-300 group-hover:scale-105'
 						loading='lazy'
 					/>
 				) : (
