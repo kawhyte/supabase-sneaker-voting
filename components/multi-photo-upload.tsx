@@ -26,14 +26,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Upload, X, GripVertical, Image as ImageIcon, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-
-interface PhotoItem {
-  id: string
-  file: File
-  preview: string
-  isMain: boolean
-  order: number
-}
+import { PhotoItem } from '@/components/types/photo-item'
 
 interface MultiPhotoUploadProps {
   photos: PhotoItem[]
@@ -127,11 +120,14 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
         </div>
 
         {/* Photo Info */}
-        <div className="p-2 bg-stone-50 text-xs text-slate-600">
+        <div className={`p-2 text-xs ${photo.isExisting ? 'bg-blue-50 text-blue-700' : 'bg-stone-50 text-slate-600'}`}>
           <div className="flex items-center justify-between">
-            <span className="truncate">{photo.file?.name || 'Existing photo'}</span>
+            <span className="truncate font-medium">{photo.file?.name || 'Existing photo'}</span>
             <span>#{photo.order}</span>
           </div>
+          {photo.isExisting && (
+            <span className="text-xs text-blue-600 mt-1 block">From database</span>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -160,15 +160,7 @@ import {
 	getSizeType,
 } from "@/components/types/item-category";
 import { detectCategoryFromUrl } from "@/lib/item-utils";
-
-interface PhotoItem {
-	id: string;
-	file: File;
-	preview: string;
-	isMain: boolean;
-	order: number;
-	isExisting?: boolean;
-}
+import { PhotoItem } from "@/components/types/photo-item";
 
 const itemSchema = z
 	.object({
@@ -303,6 +295,7 @@ export function AddItemForm({
 	const [scrapedImages, setScrapedImages] = useState<string[]>([]);
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [openAccordionItem, setOpenAccordionItem] = useState<string>("");
+	const [isSavingPhotos, setIsSavingPhotos] = useState(false);
 	const supabase = createClient();
 
 	const {
@@ -508,6 +501,7 @@ export function AddItemForm({
 			}
 
 			const newPhotos = photos.filter((p) => !p.isExisting);
+			const existingPhotos = photos.filter((p) => p.isExisting);
 			const uploadedPhotoData: {
 				url: string;
 				cloudinaryId: string;
@@ -547,7 +541,7 @@ export function AddItemForm({
 				retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
 				sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
-				notes: data.notes && data.notes.trim() ? data.notes : "no note added",
+				notes: data.notes && data.notes.trim() ? data.notes : "",
 				wears: data.wears || 0,
 				status: (mode === "create" ? "wishlisted" : initialData?.status) as
 					| "wishlisted"
@@ -580,6 +574,29 @@ export function AddItemForm({
 				if (deletedPhotoIds.length > 0) {
 					await supabase.from("item_photos").delete().in("id", deletedPhotoIds);
 				}
+
+				// 🔧 PHASE 2 FIX: Update metadata for existing photos (order, isMain)
+				// This ensures reordered photos and main image changes persist
+				if (existingPhotos.length > 0) {
+					setIsSavingPhotos(true);
+					try {
+						for (const photo of existingPhotos) {
+							const { error: updateError } = await supabase
+								.from("item_photos")
+								.update({
+									image_order: photo.order,
+									is_main_image: photo.isMain,
+								})
+								.eq("id", photo.id);
+							if (updateError) {
+								console.error(`Failed to update photo ${photo.id}:`, updateError);
+								throw new Error(`Failed to update image order: ${updateError.message}`);
+							}
+						}
+					} finally {
+						setIsSavingPhotos(false);
+					}
+				}
 			} else {
 				const { data: insertedItem, error } = await supabase
 					.from("items")
@@ -604,9 +621,17 @@ export function AddItemForm({
 				if (photoError) throw photoError;
 			}
 
-			toast.success(
-				`Item ${mode === "edit" ? "updated" : "added"} successfully!`
-			);
+			// 🎉 PHASE 3: Enhanced success feedback
+			const successMessage = mode === "edit"
+				? `Item updated successfully!${existingPhotos.length > 0 ? " Photos reordered." : ""}`
+				: "Item added successfully!";
+
+			toast.success(successMessage, {
+				description: mode === "edit"
+					? "Your changes have been saved and synced to the database."
+					: undefined,
+			});
+
 			if (mode === "create") {
 				router.push("/dashboard?tab=wishlist");
 			} else {
@@ -1063,12 +1088,16 @@ export function AddItemForm({
 								<Button
 									type='submit'
 									disabled={
-										isLoading || (!isValid && isDirty) || photos.length === 0
+										isLoading || isSavingPhotos || (!isValid && isDirty) || photos.length === 0
 									}>
-									{isLoading && (
+									{(isLoading || isSavingPhotos) && (
 										<Loader2 className='h-4 w-4 mr-2 animate-spin' />
 									)}
-									{mode === "edit" ? "Update Item" : "Save Item"}
+									{isSavingPhotos
+										? "Saving photos..."
+										: mode === "edit"
+										? "Update Item"
+										: "Save Item"}
 								</Button>
 							</div>
 						</form>
