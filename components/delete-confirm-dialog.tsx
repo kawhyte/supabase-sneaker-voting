@@ -29,7 +29,7 @@ export function DeleteConfirmDialog({
             <Trash2 className="h-5 w-5 text-red-600" />
           </div>
           <div>
-            <h3 className="text-lg font-medium text-slate-900 font-heading">Delete Journal Entry</h3>
+            <h3 className="text-lg font-medium text-slate-900 font-heading">Delete Item</h3>
             <p className="text-sm text-slate-500">This action cannot be undone.</p>
           </div>
         </div>
@@ -48,7 +48,7 @@ export function DeleteConfirmDialog({
         </div>
 
         <p className="text-sm text-slate-600 mb-6">
-          Are you sure you want to delete this journal entry? This will permanently remove it from your sizing journal and analytics.
+          Are you sure you want to delete this Item? This will permanently remove it from your Inventory and analytics.
         </p>
 
         <div className="flex gap-3">

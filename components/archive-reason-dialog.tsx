@@ -84,13 +84,13 @@ export function ArchiveReasonDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md p-6">
 				<DialogHeader>
-					<div className="flex items-center gap-2 mb-2">
-						<Archive
+					<div className="flex items-center justify-baseline align-bottom gap-2 mb-2">
+						{/* <Archive
 							className="h-5 w-5"
 							style={{ color: 'var(--color-slate-600)' }}
-						/>
+						/> */}
 						<DialogTitle style={{ color: 'var(--color-black)' }}>
 							Archive Item
 						</DialogTitle>
@@ -146,7 +146,7 @@ export function ArchiveReasonDialog({
 												<Icon className="h-4 w-4" style={{ color: 'var(--color-slate-600)' }} />
 												{reason.label}
 											</Label>
-											<p className="text-xs mt-0.5" style={{ color: 'var(--color-slate-500)' }}>
+											<p className="text-xs mt-1.5" style={{ color: 'var(--color-slate-500)' }}>
 												{reason.description}
 											</p>
 										</div>

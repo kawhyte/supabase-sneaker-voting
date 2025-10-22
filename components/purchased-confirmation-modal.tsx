@@ -67,7 +67,7 @@ export function PurchasedConfirmationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md md:max-w-lg">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md md:max-w-lg p-6">
         <DialogHeader className="space-y-3">
           <DialogTitle className="text-lg sm:text-xl font-semibold">Mark as Purchased</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
