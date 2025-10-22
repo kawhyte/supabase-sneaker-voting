@@ -233,7 +233,7 @@ export function SizingJournalFiltersV2({
 														id={`category-${config.id}`}
 														checked={isSelected}
 														onCheckedChange={() => handleCategoryToggle(config.id)}
-														className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400 h-5 w-5 flex-shrink-0"
+														className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400 h-4 w-4 flex-shrink-0"
 													/>
 													<Label
 														htmlFor={`category-${config.id}`}
@@ -302,7 +302,7 @@ export function SizingJournalFiltersV2({
 																	e.stopPropagation()
 																	handleBrandToggle(brand.name || '')
 																}}
-																className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400 h-5 w-5 flex-shrink-0"
+																className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400 h-4 w-4 flex-shrink-0"
 																onChange={() => {}}
 															/>
 															{brand.brand_logo && (

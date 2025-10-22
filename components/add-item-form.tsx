@@ -968,7 +968,7 @@ export function AddItemForm({
 												<Input {...register("color")} className='mt-2' />
 											</div>
 
-											{isSizeRequired(watchedCategory) && (
+											{isSizeRequired(watchedCategory) && watchedTriedOn && (
 													<div>
 														<Label className='text-sm font-medium text-slate-900 '>Size Tried</Label>
 														{watchedCategory === "shoes" ? (
@@ -1010,29 +1010,31 @@ export function AddItemForm({
 										</div>
 
 										{/* Wears Counter - For tracking item usage */}
-										<div>
-											<Label className='text-sm font-medium text-slate-900'>
-												Times Worn <span className='text-xs text-muted-foreground font-normal'>(Optional)</span>
-											</Label>
-											<div className='relative mt-2'>
-												<Input
-													{...register("wears", { valueAsNumber: true })}
-													type='number'
-													min='0'
-													max='10000'
-													placeholder='0'
-													className='mt-1'
-												/>
-												<span className='text-xs text-muted-foreground mt-1 block'>
-													Track wears to calculate cost per wear value
-												</span>
+										{mode === "edit" && initialData?.status === "owned" && (
+											<div>
+												<Label className='text-sm font-medium text-slate-900'>
+													Times Worn <span className='text-xs text-muted-foreground font-normal'>(Optional)</span>
+												</Label>
+												<div className='relative mt-2'>
+													<Input
+														{...register("wears", { valueAsNumber: true })}
+														type='number'
+														min='0'
+														max='10000'
+														placeholder='0'
+														className='mt-1'
+													/>
+													<span className='text-xs text-muted-foreground mt-1 block'>
+														Track wears to calculate cost per wear value
+													</span>
+												</div>
+												{errors.wears && (
+													<p className='text-sm text-red-600 mt-1'>
+														{errors.wears.message}
+													</p>
+												)}
 											</div>
-											{errors.wears && (
-												<p className='text-sm text-red-600 mt-1'>
-													{errors.wears.message}
-												</p>
-											)}
-										</div>
+										)}
 
 										{watchedTriedOn && (
 											<div className='space-y-6 grid grid-cols-1 '>
