@@ -42,7 +42,6 @@ interface ValidationStatusCardProps {
 		brand?: string
 		brandId?: number
 		model?: string
-		style?: string
 		category?: string
 		retailPrice?: string
 		triedOn?: boolean
@@ -143,18 +142,11 @@ export function ValidationStatusCard({
 				hint: 'Sneaker model, shoe name, or item description',
 			},
 			{
-				id: 'style',
-				label: 'SKU / Style',
-				status: isMissing(watchedValues.style) ? 'pending' : 'complete',
-				required: true,
-				hint: 'Product style code or SKU number',
-			},
-			{
 				id: 'retailPrice',
 				label: 'Retail Price',
 				status: isMissing(watchedValues.retailPrice) ? 'pending' : 'complete',
 				required: true,
-				hint: 'Help calculate potential savings',
+				hint: 'Must be valid price format (e.g., 170 or 170.00)',
 			},
 		]
 
