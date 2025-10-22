@@ -14,7 +14,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Archive } from "lucide-react";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
 import { prepareItemPhotos, isItemOnSale, formatDate } from "@/lib/wardrobe-item-utils";
 import { useItemDisplayLogic } from "@/hooks/useItemDisplayLogic";
@@ -204,16 +204,23 @@ function WardrobeItemCardComponent({
 
 						{/* Notes - Only show if not compact and has meaningful content */}
 						{showNotes && item.notes && item.notes.trim() && item.notes.toLowerCase() !== 'no note added' && (
-							<div className='mt-3 p-2.5 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed'>
-								{item.notes}
-							</div>
+							<Tooltip delayDuration={300}>
+								<TooltipTrigger asChild>
+									<div className='mt-3 p-2.5 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed cursor-help transition-colors hover:bg-stone-100'>
+										{item.notes}
+									</div>
+								</TooltipTrigger>
+								<TooltipContent side="top" className="max-w-xs">
+									<p className="text-sm">{item.notes}</p>
+								</TooltipContent>
+							</Tooltip>
 						)}
 
 						{/* Status Badges - Below notes, above footer */}
 						<div className='flex items-center gap-2 flex-wrap mt-3'>
 							{/* Tried On / Didn't Try Badge - Journal View Only */}
 							{viewMode === 'journal' && (
-								<span className='inline-flex items-center justify-center text-xs px-2 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-slate-700'>
+								<span className='inline-flex items-center justify-center text-xs px-2 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-slate-700 transition-all duration-200'>
 									{hasBeenTriedOn ? "Tried On" : "Didn't Try"}
 								</span>
 							)}
@@ -221,14 +228,14 @@ function WardrobeItemCardComponent({
 							{/* Archive Metadata - Archive View Only */}
 							{viewMode === 'archive' && item.archive_reason && (
 								<>
-									<span className='inline-flex items-center text-xs px-2 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-slate-700'>
+									<span className='inline-flex items-center text-xs px-2 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-slate-700 transition-all duration-200'>
 										{item.archive_reason === 'sold' ? 'Sold' :
 										 item.archive_reason === 'donated' ? 'Donated' :
 										 item.archive_reason === 'worn_out' ? 'Worn Out' :
 										 'Other'}
 									</span>
 									{item.archived_at && (
-										<span className='text-xs text-muted-foreground'>
+										<span className='text-xs text-muted-foreground transition-all duration-200'>
 											{new Date(item.archived_at).toLocaleDateString("en-US", {
 												month: "short",
 												day: "numeric",

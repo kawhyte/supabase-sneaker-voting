@@ -27,7 +27,7 @@ export function ItemPricingDisplay({
 		if (!item.purchase_price) return null;
 
 		return (
-			<div className='flex items-center gap-1.5'>
+			<div className='flex items-center gap-1.5 px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
 				<span className='text-sm text-muted-foreground'>
 					Paid:
 				</span>
@@ -42,7 +42,7 @@ export function ItemPricingDisplay({
 	return (
 		<div className='flex flex-col gap-1.5'>
 			{item.retail_price && (
-				<div className='flex items-center gap-1.5 flex-wrap'>
+				<div className='flex items-center gap-1.5 flex-wrap px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
 					<span className='text-sm text-muted-foreground'>Retail:</span>
 					{isOnSale ? (
 						<>
@@ -54,7 +54,7 @@ export function ItemPricingDisplay({
 							</span>
 							<Badge
 								variant='outline'
-								className='text-xs px-1.5 py-0 rounded-md border-meadow-400 bg-meadow-50 text-meadow-600'
+								className='text-xs px-1.5 py-0 rounded-md border-meadow-400 bg-meadow-50 text-meadow-600 transition-all duration-200'
 							>
 								On Sale!
 							</Badge>
@@ -67,7 +67,7 @@ export function ItemPricingDisplay({
 				</div>
 			)}
 			{item.target_price && (
-				<div className='flex items-center gap-1.5'>
+				<div className='flex items-center gap-1.5 px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
 					<span className='text-sm text-muted-foreground'>Target:</span>
 					<span className='text-base font-semibold text-foreground'>
 						${item.target_price}
