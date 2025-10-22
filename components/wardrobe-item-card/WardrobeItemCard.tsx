@@ -85,11 +85,11 @@ function WardrobeItemCardComponent({
 	return (
 		<TooltipProvider delayDuration={300}>
 			<Card
-				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full border border-stone-200 shadow-sm hover:shadow-md hover:border-stone-300 will-change-transform focus-visible:ring-2 focus-visible:ring-sun-400 focus-visible:ring-offset-2'
+				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full min-h-[420px] border border-stone-200 shadow-sm hover:shadow-md hover:border-stone-300 will-change-transform focus-visible:ring-2 focus-visible:ring-sun-400 focus-visible:ring-offset-2'
 				tabIndex={0}
 				role='article'
 				aria-label={`${item.brand} ${item.model}`}>
-				<div className='flex flex-col'>
+				<div className='flex flex-col h-full'>
 					{/* Actions Menu */}
 					<ItemCardActions
 						item={item}
