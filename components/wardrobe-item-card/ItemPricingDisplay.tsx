@@ -27,11 +27,11 @@ export function ItemPricingDisplay({
 		if (!item.purchase_price) return null;
 
 		return (
-			<div className='flex items-center gap-1'>
+			<div className='flex items-center gap-1.5'>
 				<span className='text-sm text-muted-foreground'>
 					Paid:
 				</span>
-				<span className='text-sm font-semibold text-foreground'>
+				<span className='text-base font-semibold text-foreground'>
 					${item.purchase_price}
 				</span>
 			</div>
@@ -42,14 +42,14 @@ export function ItemPricingDisplay({
 	return (
 		<div className='flex flex-col gap-1.5'>
 			{item.retail_price && (
-				<div className='flex items-center gap-1 flex-wrap'>
+				<div className='flex items-center gap-1.5 flex-wrap'>
 					<span className='text-sm text-muted-foreground'>Retail:</span>
 					{isOnSale ? (
 						<>
 							<span className='text-sm line-through text-muted-foreground'>
 								${item.retail_price}
 							</span>
-							<span className='text-sm font-bold text-meadow-600'>
+							<span className='text-base font-bold text-meadow-600'>
 								${item.sale_price}
 							</span>
 							<Badge
@@ -60,16 +60,16 @@ export function ItemPricingDisplay({
 							</Badge>
 						</>
 					) : (
-						<span className='text-sm font-semibold text-foreground'>
+						<span className='text-base font-semibold text-foreground'>
 							${item.retail_price}
 						</span>
 					)}
 				</div>
 			)}
 			{item.target_price && (
-				<div className='flex items-center gap-1'>
+				<div className='flex items-center gap-1.5'>
 					<span className='text-sm text-muted-foreground'>Target:</span>
-					<span className='text-sm font-semibold text-foreground'>
+					<span className='text-base font-semibold text-foreground'>
 						${item.target_price}
 					</span>
 				</div>

@@ -156,7 +156,7 @@ function WardrobeItemCardComponent({
 						</h3>
 
 						{/* Metadata Grid */}
-						<div className='flex flex-col gap-2 mt-2'>
+						<div className='flex flex-col gap-2.5 mt-3'>
 							{/* Date Display - Only show in detailed mode */}
 							{showDates && (
 								<div className='text-sm text-muted-foreground flex items-center gap-1'>
