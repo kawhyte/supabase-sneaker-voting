@@ -102,6 +102,7 @@ export function ArchiveReasonDialog({
 
 				<div className="py-4">
 					<RadioGroup
+					
 						value={selectedReason || ''}
 						onValueChange={(value) => {
 							setSelectedReason(value as ArchiveReason)
@@ -136,6 +137,7 @@ export function ArchiveReasonDialog({
 											value={reason.value}
 											id={reason.value}
 											className="mt-0.5"
+											size={'sm'}
 										/>
 										<div className="flex-1">
 											<Label
@@ -197,11 +199,11 @@ export function ArchiveReasonDialog({
 					<Button
 						type="button"
 						onClick={handleConfirm}
-						className="sm:w-auto w-full font-semibold"
-						style={{
-							backgroundColor: 'var(--color-primary-500)',
-							color: 'var(--color-black)',
-						}}
+						className="sm:w-auto w-full font-semibold "
+						// style={{
+						// 	backgroundColor: 'var(--color-primary-500)',
+						// 	color: 'var(--color-black)',
+						// }}
 					>
 						<Archive className="h-4 w-4 mr-2" />
 						Archive Item
