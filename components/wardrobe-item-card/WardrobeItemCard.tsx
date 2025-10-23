@@ -105,7 +105,7 @@ function WardrobeItemCardComponent({
 					{/* Archived Badge - Show when archived but not in archive view */}
 					{item.is_archived && viewMode !== 'archive' && (
 						<div className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1 bg-stone-100 text-slate-600'>
-							<Archive className='h-2 w-2' />
+							<Archive className='h-3 w-3' />
 							Archived
 						</div>
 					)}

@@ -99,7 +99,7 @@ export function PhotoCarousel({
   if (sortedPhotos.length === 1) {
     const photo = sortedPhotos[0]
     return (
-      <Card className={className}>
+      <Card className={`dense ${className}`}>
         <CardContent className="p-0 relative">
           {photo.is_main_image && (
             <Badge className="absolute top-3 left-3 z-10 bg-blue-600">
@@ -137,7 +137,7 @@ export function PhotoCarousel({
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`dense relative ${className}`}>
       {/* Main Carousel */}
       <div className="relative h-full">
         <div className="overflow-hidden h-full" ref={emblaRef}>
