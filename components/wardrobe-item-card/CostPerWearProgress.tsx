@@ -48,18 +48,18 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 
 	const tooltipContent = (
 		<div className='space-y-2 text-xs'>
-			<div className='font-semibold text-slate-900'>
+			<div className='font-semibold text-white'>
 				Cost Per Wear Breakdown
 			</div>
-			<div className='space-y-1 text-slate-600'>
+			<div className='space-y-1 text-white/90'>
 				<div>Purchase Price: ${item.purchase_price?.toFixed(2)}</div>
 				<div>Times Worn: {item.wears && item.wears > 0 ? item.wears : 0}</div>
 				<div>Target Wears: {metrics.targetWears}</div>
 				{currentCPW && (
-					<div className='border-t border-slate-300 pt-1 mt-1'>
+					<div className='border-t border-white/20 pt-1 mt-1'>
 						<div>Current: ${currentCPW.toFixed(2)}/wear</div>
 						<div>Target: ${targetCPW.toFixed(2)}/wear</div>
-						<div className='text-slate-500 mt-1'>
+						<div className='text-white/70 mt-1'>
 							${item.purchase_price?.toFixed(2)} ÷ {item.wears && item.wears > 0 ? item.wears : 0} wears
 						</div>
 					</div>
