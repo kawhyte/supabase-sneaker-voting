@@ -3,16 +3,16 @@
 -- All journaled items (try-on notes) are moved to wishlist
 
 -- Step 1: Migrate all 'journaled' items to 'wishlisted'
-UPDATE sneakers
+UPDATE items
 SET status = 'wishlisted'
 WHERE status = 'journaled';
 
 -- Step 2: Update the status check constraint to only allow 'owned' and 'wishlisted'
-ALTER TABLE sneakers
-DROP CONSTRAINT IF EXISTS sneakers_status_check;
+ALTER TABLE items
+DROP CONSTRAINT IF EXISTS items_status_check;
 
-ALTER TABLE sneakers
-ADD CONSTRAINT sneakers_status_check
+ALTER TABLE items
+ADD CONSTRAINT items_status_check
 CHECK (status IN ('owned', 'wishlisted'));
 
 -- Step 3: Document the migration
