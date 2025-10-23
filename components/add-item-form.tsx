@@ -556,8 +556,7 @@ export function AddItemForm({
 				wears: data.wears || 0,
 				status: (mode === "create" ? "wishlisted" : initialData?.status) as
 					| "wishlisted"
-					| "owned"
-					| "journaled",
+					| "owned",
 				has_been_tried: data.triedOn,
 
 				// target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,

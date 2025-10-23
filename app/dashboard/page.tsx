@@ -118,7 +118,7 @@ function DashboardContent() {
               <TabsList className="grid w-full grid-cols-3 justify-center gap-x-4">
                 <TabsTrigger value="wishlist" className="flex items-center gap-2">
                   <Heart className="h-4 w-4" />
-                  Wishlist
+                  Want to Buy
                 </TabsTrigger>
                 <TabsTrigger value="owned" className="flex items-center gap-2">
                   <Package className="h-4 w-4" />
@@ -153,7 +153,7 @@ function DashboardContent() {
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.3 }}
               >
-                <SizingJournalDashboard status={['wishlisted', 'journaled']} />
+                <SizingJournalDashboard status={['wishlisted']} />
               </motion.div>
             </TabsContent>
 
@@ -165,7 +165,7 @@ function DashboardContent() {
                 transition={{ duration: 0.3 }}
               >
                 <SizingJournalDashboard
-                  status={['owned', 'wishlisted', 'journaled']}
+                  status={['owned', 'wishlisted']}
                   isArchivePage={true}
                 />
               </motion.div>

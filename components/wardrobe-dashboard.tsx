@@ -21,7 +21,7 @@ import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyCont
 
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
-  status: ('owned' | 'wishlisted' | 'journaled'| 'archive')[]
+  status: ('owned' | 'wishlisted' | 'archive')[]
   isArchivePage?: boolean
 }
 
@@ -179,7 +179,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
   }
 
   const handleToggleCollection = async (entry: SizingJournalEntry) => {
-    const newStatus = entry.status === 'owned' ? 'journaled' : 'owned'
+    const newStatus = entry.status === 'owned' ? 'wishlisted' : 'owned'
 
     if (newStatus === 'owned' && entry.category === 'shoes' && !entry.purchase_price && !entry.retail_price) {
       toast.error('Please set a price before adding to collection', {
@@ -429,12 +429,11 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
   const displayStatus = status.includes('wishlisted') ? 'wishlisted' : status[0]
 
   // Map status to viewMode for cards
-  const getViewMode = (): 'journal' | 'collection' | 'archive' | 'wishlist' => {
+  const getViewMode = (): 'collection' | 'archive' | 'wishlist' => {
     if (isArchivePage) return 'archive'
     if (status.includes('owned')) return 'collection'
     if (status.includes('wishlisted')) return 'wishlist'
-    if (status.includes('journaled')) return 'journal'
-    return 'journal'
+    return 'wishlist'
   }
 
   const viewMode = getViewMode()
@@ -532,19 +531,15 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 }
 
 // Sub-components
-function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journaled' | 'archive' }) {
+function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'archive' }) {
   const titles = {
     owned: {
       title: 'Owned Items',
       description: 'Items you own and have purchased'
     },
     wishlisted: {
-      title: 'Wishlist',
+      title: 'Want to Buy',
       description: 'Track items you\'re interested in and monitor price changes'
-    },
-    journaled: {
-      title: 'Tried Items',
-      description: 'Items you\'ve tried on or seen in person'
     },
     archive: {
       title: 'Archived Items',
@@ -566,7 +561,7 @@ function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'journal
 
 interface EmptyStateProps {
   hasEntries: boolean
-  displayStatus: 'owned' | 'wishlisted' | 'journaled' | 'archive'
+  displayStatus: 'owned' | 'wishlisted' | 'archive'
   isArchivePage: boolean
   onAddNew?: () => void
 }

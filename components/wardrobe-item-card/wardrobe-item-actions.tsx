@@ -3,7 +3,7 @@
  *
  * Displays different actions based on:
  * - Archive page vs normal view
- * - Item status (owned, wishlisted, journaled)
+ * - Item status (owned, wishlisted)
  * - Available callbacks
  */
 
@@ -47,7 +47,7 @@ export function ItemCardActions({
 	onMoveToWatchlist,
 	onArchive,
 }: ItemCardActionsProps) {
-	const isWishlisted = item.status === 'wishlisted' || item.status === 'journaled';
+	const isWishlisted = item.status === 'wishlisted';
 	const isOwned = item.status === 'owned';
 
 	return (

@@ -22,7 +22,7 @@ export interface ItemDisplayLogic {
  */
 export function useItemDisplayLogic(item: SizingJournalEntry): ItemDisplayLogic {
 	const isOwned = item.status === 'owned';
-	const isWishlist = item.status === 'wishlisted' || item.status === 'journaled';
+	const isWishlist = item.status === 'wishlisted';
 	const isOnSale = !!(
 		item.sale_price &&
 		item.retail_price &&

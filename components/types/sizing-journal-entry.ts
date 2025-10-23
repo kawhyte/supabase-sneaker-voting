@@ -48,6 +48,6 @@ export interface SizingJournalEntry {
   brands?: BrandData | null
 
   // Current schema fields
-  status: 'owned' | 'wishlisted' | 'journaled'
+  status: 'owned' | 'wishlisted'
   has_been_tried: boolean
 }

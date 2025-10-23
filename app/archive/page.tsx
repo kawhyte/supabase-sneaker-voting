@@ -25,7 +25,7 @@ export default function ArchivePage() {
         </div>
 
         <SizingJournalDashboard
-          status={['owned', 'wishlisted', 'journaled']}
+          status={['owned', 'wishlisted']}
           isArchivePage={true}
         />
       </motion.div>

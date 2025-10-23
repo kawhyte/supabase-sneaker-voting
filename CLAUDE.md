@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Price Monitoring**: Watch wishlist items and get notified when prices drop
 - **Photo Management**: Multi-photo upload with drag-and-drop ordering, Cloudinary integration
 - **Size & Comfort Tracking**: Record sizing information and comfort ratings for future reference
-- **View Modes**: Dashboard tabs for Owned, Wishlist, Journal, and Archive views
+- **View Modes**: Dashboard tabs for Owned, Want to Buy, and Archive views
 - **Brand Integration**: Brand logos and master brand list for visual recognition
 
 ## Development Commands
@@ -48,7 +48,7 @@ app/                           # Next.js App Router
   ├── (login)/                 # Auth pages (grouped route)
   │   ├── login/page.tsx
   │   └── signup/page.tsx
-  ├── dashboard/page.tsx       # Main wardrobe dashboard (4 tabs)
+  ├── dashboard/page.tsx       # Main wardrobe dashboard (3 tabs)
   ├── collection/page.tsx      # Collection view (owned items)
   ├── archive/page.tsx         # Archived items view
   ├── add-new-item/page.tsx    # Add item form
@@ -94,7 +94,6 @@ lib/
   ├── cloudinary.ts            # Image upload/optimization
   ├── product-cache.ts         # Price scraping cache
   ├── notification-service.ts  # Price drop notifications
-  ├── size-analytics.ts        # Size recommendation engine
   ├── view-density-context.tsx # Compact/comfortable view toggle
   └── utils.ts                 # General utilities (cn, etc.)
 
@@ -367,6 +366,38 @@ The `fit_rating` feature has been deprecated. All UI components and analytics no
 - `lib/sizing-journal-utils.ts`
 
 **Bundle improvements**: Dashboard component reduced from 9.84 kB to 4.96 kB (49% reduction)
+
+### Phase 1: Foundation Cleanup (October 2025) ✅ COMPLETED
+Consolidated and simplified the codebase for improved maintainability and clarity. All changes implement the PurrView Strategic Audit Phase 1 plan.
+
+**Status**: ✅ Code cleanup complete, database migration created, TypeScript build passing
+
+**Changes made**:
+- **Deleted** `lib/size-analytics.ts` (348 lines) - Used deprecated `fit_rating` field
+- **Deleted** `components/fit-profile-dashboard.tsx` - Unused UI component
+- **Merged** Journal and Wishlist statuses - Consolidated 'journaled' into 'wishlisted' status
+- **Created** Migration 013 (`013_merge_journal_into_wishlisted.sql`) - Auto-migrates all journaled items to wishlisted
+- **Renamed** Dashboard tab from "Wishlist" → "Want to Buy" - Clearer user intent
+- **Updated** TypeScript types - Removed 'journaled' status option (now: 'owned' | 'wishlisted' only)
+
+**Files updated**:
+- `components/types/sizing-journal-entry.ts` - Removed 'journaled' from status union type
+- `app/dashboard/page.tsx` - Updated tab name and status array
+- `components/wardrobe-dashboard.tsx` - Removed journaled checks and updated types
+- `components/wardrobe-item-card/wardrobe-item-actions.tsx` - Simplified status logic
+- `components/add-item-form.tsx` - Removed journaled from type casting
+- `hooks/useItemDisplayLogic.ts` - Simplified wishlist check
+- `app/archive/page.tsx` - Removed journaled from status array
+- `CLAUDE.md` - Updated documentation
+
+**Bundle improvements**: Removed ~19KB of unused code (size-analytics + fit-profile-dashboard)
+
+**Database migration**:
+```sql
+-- Migration 013_merge_journal_into_wishlisted.sql
+UPDATE sneakers SET status = 'wishlisted' WHERE status = 'journaled';
+ALTER TABLE sneakers ADD CONSTRAINT sneakers_status_check CHECK (status IN ('owned', 'wishlisted'));
+```
 
 ## Styling & UI Guidelines
 
