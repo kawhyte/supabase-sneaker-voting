@@ -194,7 +194,7 @@ export function resolveOverlap(
  * Get all items sorted by z-index (back to front)
  * Used for rendering items in correct layer order
  */
-export function sortByZIndex(items: Array<{ z_index: number }>): Array<{ z_index: number }> {
+export function sortByZIndex<T extends { z_index: number }>(items: T[]): T[] {
   return [...items].sort((a, b) => a.z_index - b.z_index)
 }
 
@@ -223,7 +223,14 @@ export function autoArrangeOutfit(
     {} as Record<string, SizingJournalEntry[]>
   )
 
-  const result = []
+  const result: Array<{
+    item_id: string
+    position_x: number
+    position_y: number
+    z_index: number
+    display_width: number
+    display_height: number
+  }> = []
 
   // Process each category
   for (const [category, categoryItems] of Object.entries(itemsByCategory)) {

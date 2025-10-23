@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Slider } from '@/components/ui/slider'
 import { X } from 'lucide-react'
 
 interface CropArea {

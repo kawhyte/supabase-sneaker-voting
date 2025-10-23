@@ -132,3 +132,13 @@ export interface CategoryLayerConfig {
   yPercent: number // Where to place vertically (0.1 = top, 0.9 = bottom)
   zIndex: number
 }
+
+/**
+ * Crop area for manual crop tool
+ */
+export interface CropArea {
+  x: number // 0-1 normalized
+  y: number // 0-1 normalized
+  width: number // 0-1 normalized
+  height: number // 0-1 normalized
+}
