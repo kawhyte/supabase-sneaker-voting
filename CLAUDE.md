@@ -399,6 +399,75 @@ UPDATE sneakers SET status = 'wishlisted' WHERE status = 'journaled';
 ALTER TABLE sneakers ADD CONSTRAINT sneakers_status_check CHECK (status IN ('owned', 'wishlisted'));
 ```
 
+### Phase 2: Outfit Visualization Core (October 2025) ✅ COMPLETED
+Complete outfit composition and visualization system with smart layout, manual cropping, and wear tracking.
+
+**Status**: ✅ All components built and integrated, database schema created, TypeScript build passing, ready for testing
+
+**Features Implemented**:
+1. **Outfit Creation Studio** - Modal interface for composing outfits with live canvas preview
+2. **iPhone Mockup Canvas** - 375×667px phone display with draggable items and z-index layering
+3. **Smart Auto-Arrange** - Category-based automatic positioning (shoes bottom, tops middle, outerwear top)
+4. **Manual Crop Tool** - Rectangle-based photo cropping with corner handles and live preview
+5. **Outfit Gallery** - Grid/list view for all created outfits with detail modal
+6. **Wear Tracking** - Mark outfits as worn, track times worn and last worn date
+7. **Dashboard Integration** - New "Outfits" tab in main dashboard with creation CTA
+8. **Purchase Prevention Quiz** - "Can You Style This?" modal gate (3 outfit minimum before wishlist add)
+
+**Database Schemas Created**:
+- **outfits** table: id, user_id, name, description, occasion, background_color, date_created, date_worn, times_worn, is_archived, created_at, updated_at
+- **outfit_items** table: id, outfit_id, item_id, position_x/y (normalized 0-1), z_index, crop coordinates, display_width/height, item_order
+- **RLS Policies**: Users can only access their own outfits and outfit items
+
+**API Endpoints Created**:
+- `POST /api/outfits` - Create new outfit with items (validates auth, name, ≥1 item)
+- `GET /api/outfits` - Fetch all user outfits (non-archived, with items and item details)
+- `GET /api/outfits/:id` - Fetch single outfit with full details
+- `PUT /api/outfits/:id` - Update outfit (times_worn, last_worn, occasion, name)
+- `DELETE /api/outfits/:id` - Archive outfit (soft delete via is_archived flag)
+
+**Components Created**:
+- `components/outfit-studio/OutfitStudio.tsx` (~360 lines) - Main creation modal orchestrator
+- `components/outfit-studio/OutfitCanvas.tsx` (~250 lines) - Phone mockup with draggable items
+- `components/outfit-studio/ManualCropTool.tsx` (~280 lines) - Crop tool with resize handles
+- `components/outfit-studio/CanYouStyleThisQuiz.tsx` (~180 lines) - Psychology-driven purchase gate
+- `components/outfit-studio/OutfitListView.tsx` (~280 lines) - Gallery with detail modal
+- `components/outfit-studio/OutfitsDashboard.tsx` (~230 lines) - Dashboard tab integration
+- `lib/outfit-layout-engine.ts` (~250 lines) - Smart positioning and normalization
+
+**UI Features**:
+- Outfit canvas: Draggable items, delete buttons, reset auto-arrange, z-index visibility
+- Item cards: Brand name, color, category, size info, crop status
+- Detail view: Full canvas preview, item list, outfit metadata, wear tracking
+- Grid view: Card layout with preview, occasion, times worn, quick actions
+- "Mark as Worn" button with toast feedback and instant UI update
+- "Create Outfit" button on wardrobe cards (Sparkles icon, sun-400 color)
+
+**Type System**:
+- `Outfit` interface: Base outfit data
+- `OutfitWithItems`: Outfit with resolved item relationships
+- `OutfitItem`: Individual item with positioning (0-1 normalized coordinates)
+- `CropArea`: Normalized crop rectangle (x, y, width, height in 0-1 range)
+- `OutfitOccasion`: Union type for 9 occasion categories
+- Generic `sortByZIndex<T>()` function for reusable z-index sorting
+
+**Key Design Decisions**:
+1. **Normalized Positioning**: Store 0-1 coordinates for responsive rendering across screen sizes
+2. **Smart Auto-Arrange**: Category layer map with automatic spacing (shoes bottom, outerwear top)
+3. **Soft Delete**: Archive outfits instead of hard delete for audit trail
+4. **Quiz Gate**: Psychology-driven modal to reduce impulse buying of wishlist items
+5. **Draggable Canvas**: Real-time position updates without server round-trips
+6. **Type-Safe Layout Engine**: Generic functions prevent runtime position type errors
+
+**Files Modified**:
+- `app/dashboard/page.tsx` - Added Outfits tab with Sparkles icon, grid-cols-4
+- `components/wardrobe-item-card/wardrobe-item-footer.tsx` - Added "Create Outfit" button
+- `components/wardrobe-item-card/wardrobe-item-card.tsx` - Added outfit callbacks/props
+- `app/api/outfits/route.ts` - Created POST/GET handlers
+- `app/api/outfits/[id]/route.ts` - Created GET/PUT/DELETE handlers
+
+**Build Status**: ✅ TypeScript: passing, Next.js: passing, bundle size: +13.5KB dashboard (new OutfitsDashboard component)
+
 ## Styling & UI Guidelines
 
 ### Component Patterns

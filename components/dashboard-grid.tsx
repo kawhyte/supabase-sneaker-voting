@@ -21,9 +21,11 @@ interface DashboardGridProps {
 	onMoveToWatchlist?: (entry: SizingJournalEntry) => void;
 	onArchive?: (entry: SizingJournalEntry) => void;
 	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
+	onCreateOutfit?: (entry: SizingJournalEntry) => void;
 	emptyState?: ReactNode;
 	viewMode?: "journal" | "collection" | "archive" | "wishlist";
 	isArchivePage?: boolean;
+	userWardrobe?: SizingJournalEntry[];
 }
 
 export function DashboardGrid({
@@ -35,9 +37,11 @@ export function DashboardGrid({
 	onMoveToWatchlist,
 	onArchive,
 	onMarkAsPurchased,
+	onCreateOutfit,
 	emptyState,
 	viewMode = "journal",
 	isArchivePage = false,
+	userWardrobe = [],
 }: DashboardGridProps) {
 	const { density } = useDensity();
 	const gridClasses = getDensityGridClasses(density);
@@ -64,7 +68,9 @@ export function DashboardGrid({
 					onMoveToWatchlist={onMoveToWatchlist}
 					onArchive={onArchive}
 					onMarkAsPurchased={onMarkAsPurchased}
+					onCreateOutfit={onCreateOutfit}
 					isArchivePage={isArchivePage}
+					userWardrobe={userWardrobe}
 				/>
 			))}
 		</motion.div>

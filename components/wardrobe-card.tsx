@@ -28,8 +28,10 @@ export interface SizingJournalEntryCardProps {
 	onRestore?: (entry: SizingJournalEntry) => void;
 	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
 	onUnarchive?: (entry: SizingJournalEntry) => void;
+	onCreateOutfit?: (entry: SizingJournalEntry) => void;
 	isArchivePage?: boolean;
 	purchaseDate?: string | null;
+	userWardrobe?: SizingJournalEntry[];
 }
 
 /**
@@ -69,8 +71,10 @@ export function WardrobeCard({
 	onRestore,
 	onMarkAsPurchased,
 	onUnarchive,
+	onCreateOutfit,
 	isArchivePage = false,
 	purchaseDate,
+	userWardrobe = [],
 }: SizingJournalEntryCardProps) {
 	return (
 		<WardrobeItemCard
@@ -85,9 +89,11 @@ export function WardrobeCard({
 				onArchive,
 				onUnarchive,
 				onMarkAsPurchased,
+				onCreateOutfit,
 			}}
 			isArchivePage={isArchivePage}
 			purchaseDate={purchaseDate}
+			userWardrobe={userWardrobe}
 		/>
 	);
 }

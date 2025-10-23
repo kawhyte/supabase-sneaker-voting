@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
-import { Outfit, OutfitItem, OutfitOccasion, CropArea } from '@/components/types/outfit'
+import { Outfit, OutfitWithItems, OutfitItem, OutfitOccasion, CropArea } from '@/components/types/outfit'
 import { OutfitCanvas } from './OutfitCanvas'
 import { ManualCropTool } from './ManualCropTool'
 import { CanYouStyleThisQuiz } from './CanYouStyleThisQuiz'
@@ -49,7 +49,7 @@ interface OutfitStudioProps {
   onClose: () => void
   userWardrobe: SizingJournalEntry[]
   outfitsCreated?: number
-  onOutfitCreated?: (outfit: Outfit) => void
+  onOutfitCreated?: (outfit: Outfit | OutfitWithItems) => void
   // When adding wishlist item
   newWishlistItem?: SizingJournalEntry | null
 }
@@ -201,30 +201,42 @@ export function OutfitStudio({
 
     setIsSaving(true)
     try {
-      // TODO: Call API to save outfit
-      // const response = await fetch('/api/outfits', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     name: outfitName,
-      //     occasion,
-      //     background_color: backgroundColor,
-      //     outfit_items: outfitItems.map(item => ({
-      //       item_id: item.item_id,
-      //       position_x: item.position_x,
-      //       position_y: item.position_y,
-      //       z_index: item.z_index,
-      //       display_width: item.display_width,
-      //       display_height: item.display_height,
-      //       crop_x: item.crop_x,
-      //       crop_y: item.crop_y,
-      //       crop_width: item.crop_width,
-      //       crop_height: item.crop_height,
-      //     })),
-      //   }),
-      // })
+      const response = await fetch('/api/outfits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: outfitName.trim(),
+          description: '',
+          occasion,
+          background_color: backgroundColor,
+          outfit_items: outfitItems.map(item => ({
+            item_id: item.item_id,
+            position_x: item.position_x,
+            position_y: item.position_y,
+            z_index: item.z_index,
+            display_width: item.display_width,
+            display_height: item.display_height,
+            crop_x: item.crop_x,
+            crop_y: item.crop_y,
+            crop_width: item.crop_width,
+            crop_height: item.crop_height,
+            cropped_image_url: item.cropped_image_url,
+          })),
+        }),
+      })
 
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to save outfit')
+      }
+
+      const data = await response.json()
       toast.success('Outfit created successfully!')
+
+      // Call callback if provided
+      if (onOutfitCreated && data.outfit) {
+        onOutfitCreated(data.outfit)
+      }
 
       // Reset form
       setOutfitName('Untitled Outfit')
@@ -234,8 +246,9 @@ export function OutfitStudio({
 
       onClose()
     } catch (error) {
-      toast.error('Failed to save outfit')
-      console.error(error)
+      const message = error instanceof Error ? error.message : 'Failed to save outfit'
+      toast.error(message)
+      console.error('Outfit save error:', error)
     } finally {
       setIsSaving(false)
     }

@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ViewDensityToggle } from '@/components/view-density-toggle'
 import { SizingJournalDashboard } from '@/components/wardrobe-dashboard'
 import { FTUEChecklist } from '@/components/onboarding-checklist'
-import { Package, Heart, Archive } from 'lucide-react'
+import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
+import { Package, Heart, Archive, Sparkles } from 'lucide-react'
 
 /*
   ✅ DASHBOARD DESIGN SYSTEM v2.0 IMPLEMENTATION
@@ -115,14 +116,18 @@ function DashboardContent() {
           <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-16">
             {/* Tabs */}
             <div className="flex-1">
-              <TabsList className="grid w-full grid-cols-3 justify-center gap-x-4">
+              <TabsList className="grid w-full grid-cols-4 justify-center gap-x-4">
+                <TabsTrigger value="owned" className="flex items-center gap-2">
+                  <Package className="h-4 w-4" />
+                  Owned
+                </TabsTrigger>
                 <TabsTrigger value="wishlist" className="flex items-center gap-2">
                   <Heart className="h-4 w-4" />
                   Want to Buy
                 </TabsTrigger>
-                <TabsTrigger value="owned" className="flex items-center gap-2">
-                  <Package className="h-4 w-4" />
-                  Owned
+                <TabsTrigger value="outfits" className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Outfits
                 </TabsTrigger>
                 <TabsTrigger value="archive" className="flex items-center gap-2">
                   <Archive className="h-4 w-4" />
@@ -154,6 +159,17 @@ function DashboardContent() {
                 transition={{ duration: 0.3 }}
               >
                 <SizingJournalDashboard status={['wishlisted']} />
+              </motion.div>
+            </TabsContent>
+
+            <TabsContent value="outfits">
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <OutfitsDashboard />
               </motion.div>
             </TabsContent>
 

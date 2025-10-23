@@ -54,9 +54,11 @@ interface WardrobeItemCardProps {
 		onArchive?: (item: SizingJournalEntry) => void;
 		onUnarchive?: (item: SizingJournalEntry) => void;
 		onMarkAsPurchased?: (item: SizingJournalEntry) => void;
+		onCreateOutfit?: (item: SizingJournalEntry) => void;
 	};
 	isArchivePage?: boolean;
 	purchaseDate?: string | null;
+	userWardrobe?: SizingJournalEntry[];
 }
 
 function WardrobeItemCardComponent({
@@ -65,6 +67,7 @@ function WardrobeItemCardComponent({
 	actions,
 	isArchivePage = false,
 	purchaseDate,
+	userWardrobe = [],
 }: WardrobeItemCardProps) {
 	// Prepare data
 	const itemPhotos = prepareItemPhotos(item);
@@ -247,7 +250,7 @@ function WardrobeItemCardComponent({
 							)}
 						</div>
 
-						{/* Footer - Cost Per Wear Button */}
+						{/* Footer - Outfit Creation & Cost Per Wear Button */}
 						<div className='flex items-center gap-2 flex-wrap mt-auto pt-4 border-t border-stone-200'>
 							<ItemFooterBadges
 								item={item}
@@ -255,6 +258,8 @@ function WardrobeItemCardComponent({
 								canTrackWears={permissions.canTrackWearCount}
 								onIncrementWear={actions.onIncrementWear}
 								onDecrementWear={actions.onDecrementWear}
+								onCreateOutfit={actions.onCreateOutfit}
+								userWardrobe={userWardrobe}
 							/>
 						</div>
 					</CardContent>

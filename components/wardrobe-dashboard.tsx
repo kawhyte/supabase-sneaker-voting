@@ -14,6 +14,7 @@ import { SizingJournalSkeleton } from './sizing-journal-skeleton'
 import { DeleteConfirmDialog } from './delete-confirm-dialog'
 import { PurchasedConfirmationModal } from './purchased-confirmation-modal'
 import { ArchiveReasonDialog } from './archive-reason-dialog'
+import { OutfitStudio } from './outfit-studio/OutfitStudio'
 import { SizingJournalEntry } from './types/sizing-journal-entry'
 import { filterJournalEntries, sortJournalEntries } from '@/lib/sizing-journal-utils'
 import { type ItemCategory } from '@/components/types/item-category'
@@ -46,6 +47,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
   const [selectedItemForAction, setSelectedItemForAction] = useState<SizingJournalEntry | null>(null)
   const [isPurchasedModalOpen, setIsPurchasedModalOpen] = useState(false)
   const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false)
+  const [isOutfitStudioOpen, setIsOutfitStudioOpen] = useState(false)
 
   const supabase = createClient()
 
@@ -480,6 +482,8 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         onMoveToWatchlist={moveItemToWishlist}
         onMarkAsPurchased={handleOpenPurchasedModal}
         onArchive={handleOpenArchiveDialog}
+        onCreateOutfit={() => setIsOutfitStudioOpen(true)}
+        userWardrobe={journalEntries.filter(e => e.status === 'owned')}
         emptyState={
           <EmptyState
             hasEntries={journalEntries.length > 0}
@@ -525,6 +529,13 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         }}
         onConfirm={archiveItem}
         itemName={selectedItemForAction ? `${selectedItemForAction.brand} ${selectedItemForAction.model}` : ''}
+      />
+
+      {/* Outfit Studio Modal */}
+      <OutfitStudio
+        isOpen={isOutfitStudioOpen}
+        onClose={() => setIsOutfitStudioOpen(false)}
+        userWardrobe={journalEntries.filter(e => e.status === 'owned')}
       />
     </div>
   )
