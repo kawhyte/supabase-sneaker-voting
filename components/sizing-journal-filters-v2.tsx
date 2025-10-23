@@ -221,7 +221,7 @@ export function SizingJournalFiltersV2({
 												: 'Select All'}
 										</button>
 									</div>
-									<div className="space-y-3">
+									<div className="dense space-y-3">
 										{Object.values(CATEGORY_CONFIGS).map((config) => {
 											const isSelected = selectedCategories.includes(config.id)
 											return (
@@ -281,7 +281,7 @@ export function SizingJournalFiltersV2({
 												}
 											/>
 										</SelectTrigger>
-										<SelectContent className="bg-white border-stone-300">
+										<SelectContent className="dense bg-white border-stone-300">
 											{brands.length === 0 && !isBrandsLoading && (
 												<div className="py-6 text-center text-sm text-slate-500">
 													No brands available

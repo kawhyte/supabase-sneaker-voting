@@ -146,7 +146,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					</Link>
 
 					{/* Desktop Navigation Links - INSIDE PILL */}
-					<div className='hidden lg:flex md:justify-evenly items-center gap-6 px-16 py-4 rounded-4xl bg-white/80 border border-border/30 shadow-lg backdrop-blur-sm motion-safe:transition-all motion-safe:duration-150'>
+					<div className='dense hidden lg:flex md:justify-evenly items-center gap-6 px-16 py-4 rounded-4xl bg-white/80 border border-border/30 shadow-lg backdrop-blur-sm motion-safe:transition-all motion-safe:duration-150'>
 						{navLinks.map((link) => (
 							link.isAction ? (
 								<Link key={link.href} href={link.href}>
@@ -179,7 +179,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					</div>
 
 					{/* Mobile Menu Button - h-5 w-5 = 20px (accessible touch target) */}
-					<div className='lg:hidden rounded-full bg-muted p-2'>
+					<div className='dense lg:hidden rounded-full bg-muted p-2'>
 						<Button
 							variant='ghost'
 							className='text-foreground hover:text-primary h-5 w-5 p-0 motion-safe:transition-all motion-safe:duration-150'
@@ -196,7 +196,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 				{/* Mobile Menu - py-6 = 24px (spacing-component), gap-6 = 24px for consistency */}
 				{isMobileMenuOpen && (
-					<div className='md:hidden py-6 border-t border-border/40 motion-safe:animate-in motion-safe:duration-200'>
+					<div className='dense md:hidden py-6 border-t border-border/40 motion-safe:animate-in motion-safe:duration-200'>
 						<div className='flex flex-col gap-6'>
 							{navLinks.map((link) => (
 								link.isAction ? (

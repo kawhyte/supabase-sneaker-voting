@@ -69,15 +69,15 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
         <div
           {...attributes}
           {...listeners}
-          className="absolute top-2 left-2 z-10 p-1 bg-slate-900/60 rounded cursor-grab active:cursor-grabbing hover:bg-slate-900/80 transition-colors"
+          className="absolute top-1.5 left-1.5 z-10 p-0.5 bg-slate-900/50 rounded cursor-grab active:cursor-grabbing hover:bg-slate-900/70 transition-colors"
         >
-          <GripVertical className="h-2 w-2 text-white" />
+          <GripVertical className="h-3.5 w-3.5 text-white" />
         </div>
 
         {/* Main Photo Badge */}
         {photo.isMain && (
-          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/40 to-black/0 z-10 flex items-center justify-center pt-3">
-            <Badge className="bg-sun-400 text-slate-900 px-3 py-2 font-semibold shadow-md">
+          <div className="absolute top-1 left-0 right-0 z-10 flex items-center justify-center">
+            <Badge className="bg-sun-400 text-slate-900 px-1.5 py-0.5 text-[10px] font-semibold shadow-sm">
               Main
             </Badge>
           </div>
@@ -86,12 +86,12 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
         {/* Remove Button */}
         <Button
           variant="destructive"
-          size="sm"
-          className="absolute top-2 right-2 z-10 h-6 w-6 p-0 rounded-full hover:scale-110 transition-transform"
+          className="absolute top-1.5 right-1.5 z-10 size-6 p-0 rounded-full hover:scale-105 transition-transform focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
           title="Remove photo"
+          aria-label="Remove photo"
           onClick={() => onRemove(photo.id)}
         >
-          <X className="h-5 w-5" />
+          <X className="h-3 w-3" />
         </Button>
 
         {/* Photo */}
@@ -309,7 +309,7 @@ export function MultiPhotoUpload({
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={photos.map(p => p.id)} strategy={rectSortingStrategy}>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+              <div className="dense grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 {photos.map((photo, index) => (
                   <SortablePhoto
                     key={photo.id}

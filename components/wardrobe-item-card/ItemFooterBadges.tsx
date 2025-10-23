@@ -33,7 +33,7 @@ export function ItemFooterBadges({
 
 	return (
 		<>
-			<div className='flex items-center gap-2 flex-wrap'>
+			<div className='dense flex items-center gap-2 flex-wrap'>
 				{/* View Cost Per Wear Button - Collection View Only */}
 				{showWearButton && (
 					<Button

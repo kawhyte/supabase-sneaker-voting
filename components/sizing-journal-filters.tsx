@@ -80,7 +80,7 @@ export function SizingJournalFilters({
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="dense flex flex-wrap gap-3">
           {Object.values(CATEGORY_CONFIGS).map((config) => {
             const IconComponent = config.icon
             const isSelected = selectedCategories.includes(config.id)

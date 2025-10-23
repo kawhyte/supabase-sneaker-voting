@@ -64,7 +64,7 @@ export function WearStatsDrawer({
 							<h3 className="text-sm font-semibold text-foreground">Wear Count</h3>
 
 							{/* Counter Controls */}
-							<div className="flex items-center justify-between gap-4 bg-stone-50 p-4 rounded-lg">
+							<div className="dense flex items-center justify-between gap-4 bg-stone-50 p-4 rounded-lg">
 								{/* Decrement Button */}
 								<Tooltip delayDuration={200}>
 									<TooltipTrigger asChild>

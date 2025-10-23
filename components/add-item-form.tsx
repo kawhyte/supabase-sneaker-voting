@@ -775,7 +775,7 @@ export function AddItemForm({
 
 								{/* Row 1: Experience & Item Category */}
 								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-									<div className='flex items-center gap-3 p-4 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors h-fit'>
+									<div className='dense flex items-center gap-3 p-4 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors h-fit'>
 										<div className='w-full'>
 											<div className='flex items-center gap-2 mb-2'>
 												<Eye className='h-4 w-4 text-slate-600 flex-shrink-0' />
