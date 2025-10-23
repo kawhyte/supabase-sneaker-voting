@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { Button } from './ui/button'
-import { UserMenu } from './UserMenu'
+import { UserMenu } from './user-menu'
 
 // Helper function to generate initials from display name or email
 function getInitials(displayName: string | null, email: string | undefined): string {

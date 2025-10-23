@@ -10,7 +10,7 @@
 "use client";
 
 import { SizingJournalEntry } from "./types/sizing-journal-entry";
-import { WardrobeItemCard } from "./wardrobe-item-card/WardrobeItemCard";
+import { WardrobeItemCard } from "./wardrobe-item-card/wardrobe-item-card";
 
 /**
  * @deprecated - Props interface kept for backwards compatibility
@@ -57,7 +57,7 @@ export interface SizingJournalEntryCardProps {
  *   }}
  * />
  */
-export function SizingJournalEntryCard({
+export function WardrobeCard({
 	entry,
 	onEdit,
 	onDelete,
@@ -93,4 +93,4 @@ export function SizingJournalEntryCard({
 }
 
 // Export WardrobeItemCard directly for new implementations
-export { WardrobeItemCard } from "./wardrobe-item-card/WardrobeItemCard";
+export { WardrobeItemCard } from "./wardrobe-item-card/wardrobe-item-card";

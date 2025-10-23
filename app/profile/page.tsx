@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { ProfileForm } from '@/components/ProfileForm'
+import { ProfileForm } from '@/components/profile-form'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {

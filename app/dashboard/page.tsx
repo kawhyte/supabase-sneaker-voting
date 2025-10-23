@@ -5,8 +5,8 @@ import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ViewDensityToggle } from '@/components/view-density-toggle'
-import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
-import { FTUEChecklist } from '@/components/ftue-checklist'
+import { SizingJournalDashboard } from '@/components/wardrobe-dashboard'
+import { FTUEChecklist } from '@/components/onboarding-checklist'
 import { Package, Heart, Archive } from 'lucide-react'
 
 /*

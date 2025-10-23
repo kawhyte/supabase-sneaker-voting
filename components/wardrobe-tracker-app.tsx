@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { AddItemForm } from './add-item-form'
-import { SizingJournalDashboard } from './sizing-journal-dashboard'
+import { SizingJournalDashboard } from './wardrobe-dashboard'
 import { Zap, BarChart3 } from 'lucide-react'
 
 type ViewMode = 'entry' | 'dashboard'

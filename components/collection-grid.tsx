@@ -8,7 +8,7 @@
 
 import { useDensity, getDensityGridClasses } from "@/lib/view-density-context";
 import { SizingJournalEntry } from "./types/sizing-journal-entry";
-import { SizingJournalEntryCard } from "./sizing-journal-entry-card";
+import { WardrobeCard } from "./wardrobe-card";
 import { ReactNode } from "react";
 
 interface CollectionGridProps {
@@ -22,7 +22,7 @@ interface CollectionGridProps {
 	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
 	isArchivePage?: boolean;
 	emptyState?: ReactNode;
-	viewMode?: 'journal' | 'collection' | 'archive' | 'wishlist';
+	viewMode?: "journal" | "collection" | "archive" | "wishlist";
 }
 
 export function CollectionGrid({
@@ -36,7 +36,7 @@ export function CollectionGrid({
 	onMarkAsPurchased,
 	isArchivePage,
 	emptyState,
-	viewMode = 'journal',
+	viewMode = "journal",
 }: CollectionGridProps) {
 	const { density } = useDensity();
 	const gridClasses = getDensityGridClasses(density);
@@ -48,7 +48,7 @@ export function CollectionGrid({
 	return (
 		<div className={`grid ${gridClasses}`} role={role} aria-label={ariaLabel}>
 			{items.map((item) => (
-				<SizingJournalEntryCard
+				<WardrobeCard
 					key={item.id}
 					entry={item}
 					viewMode={viewMode}

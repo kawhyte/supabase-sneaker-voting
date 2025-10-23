@@ -21,13 +21,13 @@ import { useItemDisplayLogic } from "@/hooks/useItemDisplayLogic";
 import { useItemPermissions } from "@/hooks/useItemPermissions";
 import { useDensity } from "@/lib/view-density-context";
 import { memo } from "react";
-import { ItemCardActions } from "./ItemCardActions";
-import { ItemCardImage } from "./ItemCardImage";
-import { ItemPricingDisplay } from "./ItemPricingDisplay";
-import { ItemSizeComfortWears } from "./ItemSizeComfortWears";
-import { ItemStoreAndDate } from "./ItemStoreAndDate";
-import { ItemFooterBadges } from "./ItemFooterBadges";
-import { CostPerWearProgress } from "./CostPerWearProgress";
+import { ItemCardActions } from "./wardrobe-item-actions";
+import { ItemCardImage } from "./wardrobe-item-image";
+import { ItemPricingDisplay } from "./wardrobe-item-pricing";
+import { ItemSizeComfortWears } from "./wardrobe-item-metadata";
+import { ItemStoreAndDate } from "./wardrobe-item-purchase-info";
+import { ItemFooterBadges } from "./wardrobe-item-footer";
+import { CostPerWearProgress } from "./cost-per-wear-progress";
 
 /**
  * Props for WardrobeItemCard component

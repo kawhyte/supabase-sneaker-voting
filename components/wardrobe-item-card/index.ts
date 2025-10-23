@@ -4,13 +4,15 @@
  * Clean exports for modular wardrobe item display
  */
 
-export { WardrobeItemCard } from './WardrobeItemCard';
-export type { WardrobeItemCard as WardrobeItemCardType } from './WardrobeItemCard';
+export { WardrobeItemCard } from './wardrobe-item-card';
+export type { WardrobeItemCard as WardrobeItemCardType } from './wardrobe-item-card';
 
 // Sub-components (for composition if needed)
-export { ItemCardActions } from './ItemCardActions';
-export { ItemCardImage } from './ItemCardImage';
-export { ItemPricingDisplay } from './ItemPricingDisplay';
-export { ItemSizeComfortWears } from './ItemSizeComfortWears';
-export { ItemStoreAndDate } from './ItemStoreAndDate';
-export { ItemFooterBadges } from './ItemFooterBadges';
+export { ItemCardActions } from './wardrobe-item-actions';
+export { ItemCardImage } from './wardrobe-item-image';
+export { ItemPricingDisplay } from './wardrobe-item-pricing';
+export { ItemSizeComfortWears } from './wardrobe-item-metadata';
+export { ItemStoreAndDate } from './wardrobe-item-purchase-info';
+export { ItemFooterBadges } from './wardrobe-item-footer';
+export { WearStatsDrawer } from './wear-stats-drawer';
+export { CostPerWearProgress } from './cost-per-wear-progress';

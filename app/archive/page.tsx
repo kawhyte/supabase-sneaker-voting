@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { SizingJournalDashboard } from '@/components/sizing-journal-dashboard'
+import { SizingJournalDashboard } from '@/components/wardrobe-dashboard'
 import { Archive } from 'lucide-react'
 
 export default function ArchivePage() {

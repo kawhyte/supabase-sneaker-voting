@@ -9,7 +9,7 @@
 
 import { useState } from "react";
 import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
-import { WearStatsDrawer } from "./WearStatsDrawer";
+import { WearStatsDrawer } from "./wear-stats-drawer";
 import { Button } from "@/components/ui/button";
 import { TrendingDown } from "lucide-react";
 

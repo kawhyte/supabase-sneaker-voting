@@ -77,7 +77,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
-import { AddProductClient } from '@/components/add-product-client'
+import { AddProductClient } from '@/components/add-product-form-wrapper'
 
 export default async function AddProductPage() {
   let user = null;

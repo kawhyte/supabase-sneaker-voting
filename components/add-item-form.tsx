@@ -146,7 +146,7 @@ import { createClient } from "@/utils/supabase/client";
 import { MultiPhotoUpload } from "@/components/multi-photo-upload";
 import { ImageConfirmationModal } from "@/components/image-confirmation-modal";
 import { BrandCombobox } from "@/components/brand-combobox";
-import { ValidationStatusCard } from "@/components/validation-status-card";
+import { ValidationStatusCard } from "@/components/item-validation-status-card";
 import { useValidationVisibility } from "@/hooks/useValidationVisibility";
 import { useBrands } from "@/hooks/useBrands";
 import { SizeCombobox } from "@/components/size-combobox";

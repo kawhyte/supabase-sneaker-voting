@@ -9,7 +9,7 @@
 import { motion } from "framer-motion";
 import { useDensity, getDensityGridClasses } from "@/lib/view-density-context";
 import { SizingJournalEntry } from "./types/sizing-journal-entry";
-import { SizingJournalEntryCard } from "./sizing-journal-entry-card";
+import { WardrobeCard } from "./wardrobe-card";
 import { ReactNode } from "react";
 
 interface DashboardGridProps {
@@ -22,7 +22,7 @@ interface DashboardGridProps {
 	onArchive?: (entry: SizingJournalEntry) => void;
 	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
 	emptyState?: ReactNode;
-	viewMode?: 'journal' | 'collection' | 'archive' | 'wishlist';
+	viewMode?: "journal" | "collection" | "archive" | "wishlist";
 	isArchivePage?: boolean;
 }
 
@@ -36,7 +36,7 @@ export function DashboardGrid({
 	onArchive,
 	onMarkAsPurchased,
 	emptyState,
-	viewMode = 'journal',
+	viewMode = "journal",
 	isArchivePage = false,
 }: DashboardGridProps) {
 	const { density } = useDensity();
@@ -51,10 +51,9 @@ export function DashboardGrid({
 			className={`grid ${gridClasses}`}
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
-			transition={{ duration: 0.3 }}
-		>
+			transition={{ duration: 0.3 }}>
 			{entries.map((entry) => (
-				<SizingJournalEntryCard
+				<WardrobeCard
 					key={entry.id}
 					entry={entry}
 					viewMode={viewMode}

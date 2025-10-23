@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/tooltip";
 import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
 import { getComfortLabel, calculateCostPerWear } from "@/lib/wardrobe-item-utils";
-import { CostPerWearProgress } from "./CostPerWearProgress";
+import { CostPerWearProgress } from "./cost-per-wear-progress";
 
 interface WearStatsDrawerProps {
 	item: SizingJournalEntry;

@@ -1,4 +1,4 @@
-import AuthButton from "@/components/AuthButton";
+import AuthButton from "@/components/auth-button";
 import { NavbarClient } from "@/components/navbar-client";
 import { createClient } from "@/utils/supabase/server";
 
