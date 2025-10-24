@@ -378,6 +378,11 @@ export function OutfitStudio({
               {/* Add Item Dropdown */}
               <div className="space-y-2">
                 <Label className="text-sm">Add Item</Label>
+                {userWardrobe.length === 0 && (
+                  <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
+                    ⚠️ No items in wardrobe. Add items to your collection first.
+                  </div>
+                )}
                 <Select
                   value={selectedItemToAdd?.id || ''}
                   onValueChange={(itemId) => {
@@ -389,13 +394,15 @@ export function OutfitStudio({
                     <SelectValue placeholder="Select item to add..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {userWardrobe
-                      .filter(item => !outfitItems.find(oi => oi.item_id === item.id))
-                      .map(item => (
+                    {(() => {
+                      const availableItems = userWardrobe.filter(item => !outfitItems.find(oi => oi.item_id === item.id))
+                      console.log('Available items for dropdown:', availableItems.length, availableItems)
+                      return availableItems.map(item => (
                         <SelectItem key={item.id} value={item.id}>
                           {item.brand} {item.model} - {item.color}
                         </SelectItem>
-                      ))}
+                      ))
+                    })()}
                   </SelectContent>
                 </Select>
               </div>

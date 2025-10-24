@@ -58,6 +58,7 @@ export function OutfitsDashboard() {
             console.error('Error fetching wardrobe:', error)
             toast.error('Failed to load wardrobe items')
           } else {
+            console.log('Fetched wardrobe items:', items?.length || 0, items)
             setUserWardrobe(items || [])
           }
         } catch (error) {
