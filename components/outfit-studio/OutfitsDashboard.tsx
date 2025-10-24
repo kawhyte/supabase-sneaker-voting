@@ -43,10 +43,26 @@ export function OutfitsDashboard() {
         setOutfits(outfitsData.outfits || [])
 
         // Fetch wardrobe (owned items only for outfit creation)
-        const wardrobeResponse = await fetch('/api/sizing-journal?status=owned')
-        if (wardrobeResponse.ok) {
-          const wardrobeData = await wardrobeResponse.json()
-          setUserWardrobe(wardrobeData.items || [])
+        // Using direct Supabase client instead of non-existent API endpoint
+        try {
+          const { createClient } = await import('@/utils/supabase/client')
+          const supabase = createClient()
+          const { data: items, error } = await supabase
+            .from('items')
+            .select('*')
+            .eq('status', 'owned')
+            .eq('is_archived', false)
+            .order('created_at', { ascending: false })
+
+          if (error) {
+            console.error('Error fetching wardrobe:', error)
+            toast.error('Failed to load wardrobe items')
+          } else {
+            setUserWardrobe(items || [])
+          }
+        } catch (error) {
+          console.error('Failed to import Supabase client:', error)
+          toast.error('Failed to load wardrobe items')
         }
       } catch (error) {
         console.error('Failed to load data:', error)
