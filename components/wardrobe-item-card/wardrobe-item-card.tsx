@@ -28,6 +28,7 @@ import { ItemSizeComfortWears } from "./wardrobe-item-metadata";
 import { ItemStoreAndDate } from "./wardrobe-item-purchase-info";
 import { ItemFooterBadges } from "./wardrobe-item-footer";
 import { CostPerWearProgress } from "./cost-per-wear-progress";
+import { CoolingOffBadge } from "./cooling-off-badge";
 
 /**
  * Props for WardrobeItemCard component
@@ -194,6 +195,15 @@ function WardrobeItemCardComponent({
 									lastWornDate={item.last_worn_date}
 									viewMode={viewMode}
 									canTrackWears={permissions.canTrackWearCount}
+								/>
+							)}
+
+							{/* Cooling-Off Badge - Only for wishlist items in cooling-off period */}
+							{item.status === 'wishlisted' && item.created_at && (
+								<CoolingOffBadge
+									createdAt={item.created_at}
+									canPurchaseAfter={item.can_purchase_after || null}
+									coolingOffDays={item.cooling_off_days}
 								/>
 							)}
 

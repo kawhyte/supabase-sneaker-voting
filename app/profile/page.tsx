@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from '@/components/profile-form'
+import { PurchasePreventionSettings } from '@/components/purchase-prevention-settings'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -51,13 +52,21 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="max-w-[820px] mx-auto  border border-accent-background rounded-2xl ">
-      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 mb-8  pt-8 px-8">
+    <div className="max-w-[820px] mx-auto space-y-8">
+      {/* Header */}
+      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500">
         <h1 className="text-4xl font-bold text-foreground mb-2">Profile Settings</h1>
         <p className="text-base text-muted-foreground">Manage your profile information and preferences</p>
       </div>
-      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700 p-8">
+
+      {/* Profile Form */}
+      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700 border border-accent-background rounded-2xl p-8">
         <ProfileForm profile={profile} user={user} />
+      </div>
+
+      {/* Purchase Prevention Settings */}
+      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
+        <PurchasePreventionSettings />
       </div>
     </div>
   )

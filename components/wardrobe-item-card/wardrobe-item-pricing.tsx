@@ -4,12 +4,14 @@
  * Displays different pricing based on item status:
  * - Owned items: Purchase price + cost per wear
  * - Wishlist items: Retail, sale (if on sale), and target prices
+ * - Shows stale price warning for wishlist items
  */
 
 "use client";
 
 import { Badge } from "@/components/ui/badge";
 import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
+import { StalePriceWarning } from "./stale-price-warning";
 
 interface ItemPricingDisplayProps {
 	item: SizingJournalEntry;
@@ -40,7 +42,7 @@ export function ItemPricingDisplay({
 
 	// WISHLIST ITEMS: Show retail/sale price and target price
 	return (
-		<div className='flex flex-col gap-1.5'>
+		<div className='flex flex-col gap-2.5'>
 			{item.retail_price && (
 				<div className='flex items-center gap-1.5 flex-wrap px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
 					<span className='text-sm text-muted-foreground'>Retail:</span>
@@ -74,6 +76,15 @@ export function ItemPricingDisplay({
 					</span>
 				</div>
 			)}
+
+			{/* Stale price warning for wishlist items */}
+			<StalePriceWarning
+				itemId={item.id}
+				itemName={`${item.brand} ${item.model}`}
+				lastPriceCheckAt={item.last_price_check_at || null}
+				isAutoTrackingEnabled={item.auto_price_tracking_enabled !== false}
+				priceCheckFailures={item.price_check_failures || 0}
+			/>
 		</div>
 	);
 }

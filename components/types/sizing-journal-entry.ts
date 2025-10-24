@@ -50,4 +50,14 @@ export interface SizingJournalEntry {
   // Current schema fields
   status: 'owned' | 'wishlisted'
   has_been_tried: boolean
+
+  // Phase 3: Smart Purchase Prevention
+  // Cooling-off period
+  cooling_off_days?: number
+  can_purchase_after?: string | null
+  // Price tracking
+  lowest_price_seen?: number | null
+  auto_price_tracking_enabled?: boolean
+  price_check_failures?: number | null
+  last_price_check_at?: string | null
 }

@@ -80,12 +80,15 @@ export type Database = {
         Row: {
           archive_reason: string | null
           archived_at: string | null
+          auto_price_tracking_enabled: boolean | null
           brand: string
           brand_id: number | null
+          can_purchase_after: string | null
           category: string | null
           cloudinary_id: string | null
           color: string | null
           comfort_rating: number | null
+          cooling_off_days: number | null
           created_at: string
           has_been_tried: boolean
           id: string
@@ -93,9 +96,12 @@ export type Database = {
           image_url: string | null
           is_archived: boolean | null
           is_main_image: boolean | null
+          last_price_check_at: string | null
           last_worn_date: string | null
+          lowest_price_seen: number | null
           model: string
           notes: string | null
+          price_check_failures: number | null
           product_url: string | null
           purchase_date: string | null
           purchase_price: number | null
@@ -115,12 +121,15 @@ export type Database = {
         Insert: {
           archive_reason?: string | null
           archived_at?: string | null
+          auto_price_tracking_enabled?: boolean | null
           brand: string
           brand_id?: number | null
+          can_purchase_after?: string | null
           category?: string | null
           cloudinary_id?: string | null
           color?: string | null
           comfort_rating?: number | null
+          cooling_off_days?: number | null
           created_at?: string
           has_been_tried?: boolean
           id?: string
@@ -128,9 +137,12 @@ export type Database = {
           image_url?: string | null
           is_archived?: boolean | null
           is_main_image?: boolean | null
+          last_price_check_at?: string | null
           last_worn_date?: string | null
+          lowest_price_seen?: number | null
           model: string
           notes?: string | null
+          price_check_failures?: number | null
           product_url?: string | null
           purchase_date?: string | null
           purchase_price?: number | null
@@ -150,12 +162,15 @@ export type Database = {
         Update: {
           archive_reason?: string | null
           archived_at?: string | null
+          auto_price_tracking_enabled?: boolean | null
           brand?: string
           brand_id?: number | null
+          can_purchase_after?: string | null
           category?: string | null
           cloudinary_id?: string | null
           color?: string | null
           comfort_rating?: number | null
+          cooling_off_days?: number | null
           created_at?: string
           has_been_tried?: boolean
           id?: string
@@ -163,9 +178,12 @@ export type Database = {
           image_url?: string | null
           is_archived?: boolean | null
           is_main_image?: boolean | null
+          last_price_check_at?: string | null
           last_worn_date?: string | null
+          lowest_price_seen?: number | null
           model?: string
           notes?: string | null
+          price_check_failures?: number | null
           product_url?: string | null
           purchase_date?: string | null
           purchase_price?: number | null
@@ -191,6 +209,126 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      outfit_items: {
+        Row: {
+          created_at: string | null
+          crop_height: number | null
+          crop_width: number | null
+          crop_x: number | null
+          crop_y: number | null
+          cropped_image_url: string | null
+          display_height: number | null
+          display_width: number | null
+          id: string
+          item_id: string
+          item_order: number | null
+          outfit_id: string
+          position_x: number | null
+          position_y: number | null
+          updated_at: string | null
+          z_index: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          crop_height?: number | null
+          crop_width?: number | null
+          crop_x?: number | null
+          crop_y?: number | null
+          cropped_image_url?: string | null
+          display_height?: number | null
+          display_width?: number | null
+          id?: string
+          item_id: string
+          item_order?: number | null
+          outfit_id: string
+          position_x?: number | null
+          position_y?: number | null
+          updated_at?: string | null
+          z_index?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          crop_height?: number | null
+          crop_width?: number | null
+          crop_x?: number | null
+          crop_y?: number | null
+          cropped_image_url?: string | null
+          display_height?: number | null
+          display_width?: number | null
+          id?: string
+          item_id?: string
+          item_order?: number | null
+          outfit_id?: string
+          position_x?: number | null
+          position_y?: number | null
+          updated_at?: string | null
+          z_index?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outfit_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outfit_items_outfit_id_fkey"
+            columns: ["outfit_id"]
+            isOneToOne: false
+            referencedRelation: "outfits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      outfits: {
+        Row: {
+          background_color: string | null
+          created_at: string | null
+          date_created: string | null
+          date_worn: string | null
+          description: string | null
+          id: string
+          is_archived: boolean | null
+          last_worn: string | null
+          name: string
+          occasion: string | null
+          times_worn: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          background_color?: string | null
+          created_at?: string | null
+          date_created?: string | null
+          date_worn?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean | null
+          last_worn?: string | null
+          name?: string
+          occasion?: string | null
+          times_worn?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          background_color?: string | null
+          created_at?: string | null
+          date_created?: string | null
+          date_worn?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean | null
+          last_worn?: string | null
+          name?: string
+          occasion?: string | null
+          times_worn?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       price_history: {
         Row: {
@@ -284,19 +422,25 @@ export type Database = {
         Row: {
           avatar_url: string | null
           display_name: string | null
+          enable_duplication_warnings: boolean | null
           id: string
+          preferred_cooling_off_days: number | null
           updated_at: string | null
         }
         Insert: {
           avatar_url?: string | null
           display_name?: string | null
+          enable_duplication_warnings?: boolean | null
           id: string
+          preferred_cooling_off_days?: number | null
           updated_at?: string | null
         }
         Update: {
           avatar_url?: string | null
           display_name?: string | null
+          enable_duplication_warnings?: boolean | null
           id?: string
+          preferred_cooling_off_days?: number | null
           updated_at?: string | null
         }
         Relationships: []
