@@ -51,7 +51,7 @@ export function OutfitsDashboard() {
           const supabase = createClient()
           const { data: items, error } = await supabase
             .from('items')
-            .select('*')
+            .select('*, item_photos(*)')
             .eq('status', 'owned')
             .eq('is_archived', false)
             .order('created_at', { ascending: false })

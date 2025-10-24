@@ -37,6 +37,11 @@ export function OutfitListView({
   const [outfitsList, setOutfitsList] = useState(outfits)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
+  // Update outfitsList when props change
+  useEffect(() => {
+    setOutfitsList(outfits)
+  }, [outfits])
+
   const selectedOutfit = outfitsList.find(o => o.id === selectedOutfitId)
 
   const handleDeleteOutfit = async () => {

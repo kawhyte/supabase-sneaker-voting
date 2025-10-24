@@ -233,9 +233,13 @@ export function OutfitStudio({
       const data = await response.json()
       toast.success('Outfit created successfully!')
 
-      // Call callback if provided
+      // Call callback if provided - pass outfit with items
       if (onOutfitCreated && data.outfit) {
-        onOutfitCreated(data.outfit)
+        const outfitWithItems = {
+          ...data.outfit,
+          outfit_items: data.outfit_items || [],
+        }
+        onOutfitCreated(outfitWithItems)
       }
 
       // Reset form
