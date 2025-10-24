@@ -76,6 +76,15 @@ export function StalePriceWarning({
     }
   };
 
+  // Display message based on whether we can calculate days
+  const displayText = daysSince !== null
+    ? `⚠️ ${daysSince} ${daysSince === 1 ? 'day' : 'days'} old`
+    : '⚠️ Price not checked';
+
+  const tooltipText = daysSince !== null
+    ? `Price data is ${daysSince} days old and may not reflect current prices.`
+    : 'Price has never been checked. Product may have been recently added.';
+
   return (
     <div className="space-y-2">
       <Tooltip>
@@ -83,12 +92,12 @@ export function StalePriceWarning({
           <div className="flex items-center gap-2 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-md w-fit">
             <AlertCircle className="h-3.5 w-3.5 text-amber-600" />
             <span className="text-xs font-medium text-amber-700">
-              {daysSince} {daysSince === 1 ? 'day' : 'days'} old
+              {displayText}
             </span>
           </div>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs">
-          <p>Price data is {daysSince} days old and may not reflect current prices.</p>
+          <p>{tooltipText}</p>
           <p className="text-xs opacity-90 mt-1">
             Prices are checked automatically every Sunday, or you can refresh manually.
           </p>

@@ -7,8 +7,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitListView } from './OutfitListView'
 import { OutfitStudio } from './OutfitStudio'
+import { OutfitCalendar } from './OutfitCalendar'
+import { OutfitShuffle } from './OutfitShuffle'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
-import { Sparkles, Plus } from 'lucide-react'
+import { Sparkles, Plus, Calendar, Shuffle } from 'lucide-react'
 
 /**
  * OutfitsDashboard - Main outfits tab in the dashboard
@@ -17,12 +19,15 @@ import { Sparkles, Plus } from 'lucide-react'
  * - Create new outfit
  * - Delete outfits
  */
+type DashboardTab = 'gallery' | 'calendar' | 'shuffle'
+
 export function OutfitsDashboard() {
   const [outfits, setOutfits] = useState<OutfitWithItems[]>([])
   const [userWardrobe, setUserWardrobe] = useState<SizingJournalEntry[]>([])
   const [isListViewOpen, setIsListViewOpen] = useState(false)
   const [isStudioOpen, setIsStudioOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<DashboardTab>('gallery')
 
   // Fetch outfits and wardrobe on mount
   useEffect(() => {
@@ -69,6 +74,73 @@ export function OutfitsDashboard() {
     setOutfits(outfits.filter(o => o.id !== outfitId))
   }
 
+  const handleSaveOutfitFromShuffle = async (
+    items: SizingJournalEntry[],
+    occasion: string
+  ) => {
+    try {
+      const response = await fetch('/api/outfits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${occasion} outfit`,
+          occasion,
+          items: items.map(item => ({ item_id: item.id })),
+        }),
+      })
+
+      if (!response.ok) throw new Error('Failed to save outfit')
+      const data = await response.json()
+      const newOutfit = data.outfit as OutfitWithItems
+      setOutfits([newOutfit, ...outfits])
+      toast.success('Outfit saved!')
+      return newOutfit
+    } catch (error) {
+      console.error('Error saving outfit:', error)
+      toast.error('Failed to save outfit')
+      return null
+    }
+  }
+
+  const handleOutfitWorn = async (outfitId: string) => {
+    try {
+      const response = await fetch(`/api/outfits/${outfitId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          times_worn: (outfits.find(o => o.id === outfitId)?.times_worn || 0) + 1,
+          last_worn: new Date().toISOString(),
+        }),
+      })
+
+      if (!response.ok) throw new Error('Failed to mark outfit as worn')
+      const data = await response.json()
+      setOutfits(outfits.map(o => o.id === outfitId ? data.outfit : o))
+      toast.success('Outfit marked as worn!')
+    } catch (error) {
+      console.error('Error marking outfit as worn:', error)
+      toast.error('Failed to mark outfit as worn')
+    }
+  }
+
+  const handleUnscheduleOutfit = async (outfitId: string) => {
+    try {
+      const response = await fetch(`/api/outfits/${outfitId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date_worn: null }),
+      })
+
+      if (!response.ok) throw new Error('Failed to unschedule outfit')
+      const data = await response.json()
+      setOutfits(outfits.map(o => o.id === outfitId ? data.outfit : o))
+      toast.success('Outfit unscheduled')
+    } catch (error) {
+      console.error('Error unscheduling outfit:', error)
+      toast.error('Failed to unschedule outfit')
+    }
+  }
+
   return (
     <>
       {/* Main Content */}
@@ -84,119 +156,184 @@ export function OutfitsDashboard() {
               {outfits.length} outfit{outfits.length !== 1 ? 's' : ''} created
             </p>
           </div>
-          <Button
-            onClick={() => setIsStudioOpen(true)}
-            className="bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-md hover:shadow-lg transition-all"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Outfit
-          </Button>
+          {activeTab === 'gallery' && (
+            <Button
+              onClick={() => setIsStudioOpen(true)}
+              className="bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-md hover:shadow-lg transition-all"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Outfit
+            </Button>
+          )}
         </div>
 
-        {/* Empty State */}
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sun-400"></div>
-          </div>
-        ) : outfits.length === 0 ? (
-          <Card className="border-2 border-dashed border-slate-300">
-            <CardContent className="py-12 text-center">
-              <Sparkles className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No outfits yet</h3>
-              <p className="text-muted-foreground mb-6">
-                Start creating outfits to visualize your style combinations
-              </p>
-              <Button
-                onClick={() => setIsStudioOpen(true)}
-                className="bg-sun-400 text-slate-900 hover:bg-sun-500"
-              >
-                Create Your First Outfit
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          // Outfit Grid
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {outfits.map(outfit => (
-              <Card
-                key={outfit.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-                onClick={() => setIsListViewOpen(true)}
-              >
-                <CardContent className="p-4 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold line-clamp-2 group-hover:text-sun-400 transition-colors">
-                        {outfit.name}
-                      </h3>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {outfit.outfit_items?.length || 0} item
-                        {outfit.outfit_items?.length !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </div>
+        {/* Tab Navigation */}
+        <div className="flex gap-2 border-b border-stone-200">
+          <button
+            onClick={() => setActiveTab('gallery')}
+            className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 ${ activeTab === 'gallery'
+              ? 'text-sun-600 border-b-sun-400'
+              : 'text-muted-foreground border-b-transparent hover:text-foreground'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Gallery
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab('calendar')}
+            className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 ${
+              activeTab === 'calendar'
+                ? 'text-sun-600 border-b-sun-400'
+                : 'text-muted-foreground border-b-transparent hover:text-foreground'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Calendar
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab('shuffle')}
+            className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 ${
+              activeTab === 'shuffle'
+                ? 'text-sun-600 border-b-sun-400'
+                : 'text-muted-foreground border-b-transparent hover:text-foreground'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Shuffle className="h-4 w-4" />
+              Shuffle
+            </div>
+          </button>
+        </div>
 
-                  {/* Outfit Preview */}
-                  <div
-                    className="h-40 rounded-lg border border-slate-200 flex items-center justify-center text-sm text-muted-foreground overflow-hidden"
-                    style={{
-                      backgroundColor: outfit.background_color,
-                    }}
-                  >
-                    {outfit.outfit_items && outfit.outfit_items.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2 p-2 w-full h-full">
-                        {outfit.outfit_items.slice(0, 4).map((item, idx) => (
-                          <div
-                            key={item.id}
-                            className="bg-slate-100 rounded flex items-center justify-center text-xs font-medium p-1 text-center line-clamp-2"
-                          >
-                            {item.item?.brand}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <span>No items</span>
-                    )}
-                  </div>
-
-                  {/* Metadata */}
-                  <div className="space-y-1 text-xs text-muted-foreground border-t border-slate-200 pt-3">
-                    <div className="flex justify-between">
-                      <span>Occasion:</span>
-                      <span className="font-medium capitalize">
-                        {outfit.occasion || 'General'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Times Worn:</span>
-                      <span className="font-medium">{outfit.times_worn || 0}</span>
-                    </div>
-                    {outfit.last_worn && (
-                      <div className="flex justify-between">
-                        <span>Last Worn:</span>
-                        <span className="font-medium">
-                          {new Date(outfit.last_worn).toLocaleDateString()}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Button */}
+        {/* Content based on active tab */}
+        {activeTab === 'gallery' && (
+          <>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sun-400"></div>
+              </div>
+            ) : outfits.length === 0 ? (
+              <Card className="border-2 border-dashed border-slate-300">
+                <CardContent className="py-12 text-center">
+                  <Sparkles className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No outfits yet</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Start creating outfits to visualize your style combinations
+                  </p>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-2"
-                    onClick={e => {
-                      e.stopPropagation()
-                      setIsListViewOpen(true)
-                    }}
+                    onClick={() => setIsStudioOpen(true)}
+                    className="bg-sun-400 text-slate-900 hover:bg-sun-500"
                   >
-                    View Details
+                    Create Your First Outfit
                   </Button>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+            ) : (
+              // Outfit Grid
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {outfits.map(outfit => (
+                  <Card
+                    key={outfit.id}
+                    className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+                    onClick={() => setIsListViewOpen(true)}
+                  >
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold line-clamp-2 group-hover:text-sun-400 transition-colors">
+                            {outfit.name}
+                          </h3>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {outfit.outfit_items?.length || 0} item
+                            {outfit.outfit_items?.length !== 1 ? 's' : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Outfit Preview */}
+                      <div
+                        className="h-40 rounded-lg border border-slate-200 flex items-center justify-center text-sm text-muted-foreground overflow-hidden"
+                        style={{
+                          backgroundColor: outfit.background_color,
+                        }}
+                      >
+                        {outfit.outfit_items && outfit.outfit_items.length > 0 ? (
+                          <div className="grid grid-cols-2 gap-2 p-2 w-full h-full">
+                            {outfit.outfit_items.slice(0, 4).map((item) => (
+                              <div
+                                key={item.id}
+                                className="bg-slate-100 rounded flex items-center justify-center text-xs font-medium p-1 text-center line-clamp-2"
+                              >
+                                {item.item?.brand}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span>No items</span>
+                        )}
+                      </div>
+
+                      {/* Metadata */}
+                      <div className="space-y-1 text-xs text-muted-foreground border-t border-slate-200 pt-3">
+                        <div className="flex justify-between">
+                          <span>Occasion:</span>
+                          <span className="font-medium capitalize">
+                            {outfit.occasion || 'General'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Times Worn:</span>
+                          <span className="font-medium">{outfit.times_worn || 0}</span>
+                        </div>
+                        {outfit.last_worn && (
+                          <div className="flex justify-between">
+                            <span>Last Worn:</span>
+                            <span className="font-medium">
+                              {new Date(outfit.last_worn).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={e => {
+                          e.stopPropagation()
+                          setIsListViewOpen(true)
+                        }}
+                      >
+                        View Details
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Calendar Tab */}
+        {activeTab === 'calendar' && (
+          <OutfitCalendar
+            outfits={outfits}
+            onOutfitWorn={handleOutfitWorn}
+            onUnscheduleOutfit={handleUnscheduleOutfit}
+          />
+        )}
+
+        {/* Shuffle Tab */}
+        {activeTab === 'shuffle' && (
+          <OutfitShuffle
+            wardrobe={userWardrobe}
+            onSaveOutfit={handleSaveOutfitFromShuffle}
+          />
         )}
       </div>
 
