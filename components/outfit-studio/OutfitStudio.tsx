@@ -383,28 +383,42 @@ export function OutfitStudio({
                     ⚠️ No items in wardrobe. Add items to your collection first.
                   </div>
                 )}
-                <Select
-                  value={selectedItemToAdd?.id || ''}
-                  onValueChange={(itemId) => {
-                    const item = userWardrobe.find(i => i.id === itemId)
-                    if (item) handleAddItem(item)
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select item to add..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(() => {
-                      const availableItems = userWardrobe.filter(item => !outfitItems.find(oi => oi.item_id === item.id))
-                      console.log('Available items for dropdown:', availableItems.length, availableItems)
-                      return availableItems.map(item => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.brand} {item.model} - {item.color}
-                        </SelectItem>
-                      ))
-                    })()}
-                  </SelectContent>
-                </Select>
+                {userWardrobe.length > 0 && (
+                  <Select
+                    value=""
+                    onValueChange={(itemId) => {
+                      const item = userWardrobe.find(i => i.id === itemId)
+                      if (item) {
+                        console.log('Selected item:', item.brand, item.model)
+                        handleAddItem(item)
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select item to add..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(() => {
+                        const availableItems = userWardrobe.filter(item => !outfitItems.find(oi => oi.item_id === item.id))
+                        console.log('Available items for dropdown:', availableItems.length, availableItems)
+
+                        if (availableItems.length === 0) {
+                          return (
+                            <div className="p-2 text-xs text-slate-600">
+                              All items already added to outfit
+                            </div>
+                          )
+                        }
+
+                        return availableItems.map(item => (
+                          <SelectItem key={item.id} value={item.id}>
+                            {item.brand} {item.model} - {item.color}
+                          </SelectItem>
+                        ))
+                      })()}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
             </div>
           </div>
