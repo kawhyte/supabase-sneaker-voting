@@ -104,6 +104,131 @@ export function OutfitListView({
     }
   }
 
+  const handleUpdateItemPosition = async (itemId: string, positionX: number, positionY: number) => {
+    if (!selectedOutfit) return
+
+    // Update local state immediately for responsive UI
+    setOutfitsList(
+      outfitsList.map(outfit =>
+        outfit.id === selectedOutfit.id
+          ? {
+              ...outfit,
+              outfit_items: (outfit.outfit_items || []).map(item =>
+                item.id === itemId
+                  ? { ...item, position_x: positionX, position_y: positionY }
+                  : item
+              ),
+            }
+          : outfit
+      )
+    )
+
+    // Save to database
+    try {
+      const updatedItem = (selectedOutfit.outfit_items || []).find(i => i.id === itemId)
+      if (!updatedItem) return
+
+      await fetch(`/api/outfit-items/${itemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          position_x: positionX,
+          position_y: positionY,
+        }),
+      })
+    } catch (error) {
+      console.error('Failed to update item position:', error)
+      toast.error('Failed to save position change')
+    }
+  }
+
+  const handleRemoveItem = async (itemId: string) => {
+    if (!selectedOutfit) return
+
+    // Update local state immediately
+    setOutfitsList(
+      outfitsList.map(outfit =>
+        outfit.id === selectedOutfit.id
+          ? {
+              ...outfit,
+              outfit_items: (outfit.outfit_items || []).filter(i => i.id !== itemId),
+            }
+          : outfit
+      )
+    )
+
+    // Delete from database
+    try {
+      await fetch(`/api/outfit-items/${itemId}`, {
+        method: 'DELETE',
+      })
+      toast.success('Item removed from outfit')
+    } catch (error) {
+      console.error('Failed to remove item:', error)
+      toast.error('Failed to remove item')
+    }
+  }
+
+  const handleResetAutoArrange = async () => {
+    if (!selectedOutfit || !selectedOutfit.outfit_items?.length) return
+
+    // Call auto-arrange logic (same as OutfitStudio)
+    const { autoArrangeOutfit } = await import('@/lib/outfit-layout-engine')
+    const items = (selectedOutfit.outfit_items || []).map(oi => oi.item).filter(Boolean)
+    const arranged = autoArrangeOutfit(items)
+
+    // Update all items with new positions
+    const updates = (selectedOutfit.outfit_items || []).map((item, index) => {
+      const arrangedItem = arranged[index]
+      return {
+        id: item.id,
+        position_x: arrangedItem?.position_x || item.position_x,
+        position_y: arrangedItem?.position_y || item.position_y,
+        z_index: arrangedItem?.z_index || item.z_index,
+        display_width: arrangedItem?.display_width || item.display_width,
+        display_height: arrangedItem?.display_height || item.display_height,
+      }
+    })
+
+    // Update local state
+    setOutfitsList(
+      outfitsList.map(outfit =>
+        outfit.id === selectedOutfit.id
+          ? {
+              ...outfit,
+              outfit_items: (outfit.outfit_items || []).map(item => {
+                const update = updates.find(u => u.id === item.id)
+                return update ? { ...item, ...update } : item
+              }),
+            }
+          : outfit
+      )
+    )
+
+    // Save all updates to database
+    try {
+      await Promise.all(
+        updates.map(update =>
+          fetch(`/api/outfit-items/${update.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              position_x: update.position_x,
+              position_y: update.position_y,
+              z_index: update.z_index,
+              display_width: update.display_width,
+              display_height: update.display_height,
+            }),
+          })
+        )
+      )
+      toast.success('Reset to auto-arrange')
+    } catch (error) {
+      console.error('Failed to reset auto-arrange:', error)
+      toast.error('Failed to reset arrangement')
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -163,15 +288,19 @@ export function OutfitListView({
               </div>
             </div>
 
-            {/* Canvas Preview */}
+            {/* Canvas - Editable */}
             <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
               <OutfitCanvas
                 items={selectedOutfit.outfit_items || []}
                 backgroundColor={selectedOutfit.background_color}
-                onUpdateItemPosition={() => {}} // Read-only in this view
-                onRemoveItem={() => {}}
-                onResetAutoArrange={() => {}}
+                onUpdateItemPosition={handleUpdateItemPosition}
+                onRemoveItem={handleRemoveItem}
+                onResetAutoArrange={handleResetAutoArrange}
+                readOnly={false}
               />
+              <p className="text-xs text-slate-600 mt-3">
+                💡 Drag items to reposition, or click the X to remove items. Changes are auto-saved.
+              </p>
             </div>
 
             {/* Item Details */}

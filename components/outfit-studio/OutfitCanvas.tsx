@@ -189,16 +189,20 @@ function OutfitCanvasItem({
 
   return (
     <div
-      className={`absolute group transition-transform ${isDragging ? 'scale-105' : ''}`}
+      className={`absolute group cursor-grab active:cursor-grabbing transition-all ${
+        isDragging ? 'scale-110 shadow-xl' : 'hover:shadow-lg'
+      }`}
       style={{
         left: `${pixelX}px`,
         top: `${pixelY}px`,
         width: `${pixelWidth}px`,
         height: `${pixelHeight}px`,
         zIndex: item.z_index,
-        transform: isDragging ? 'scale(1.05)' : 'scale(1)',
+        transform: isDragging ? 'scale(1.1)' : 'scale(1)',
+        cursor: isDragging ? 'grabbing' : 'grab',
       }}
       onMouseDown={onMouseDown}
+      title="Drag to move, hover for options"
     >
       {/* Image */}
       {imageUrl ? (
@@ -218,14 +222,15 @@ function OutfitCanvasItem({
 
       {/* Delete Button (hover only) */}
       {!readOnly && (
-        <div className="dense absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="dense absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
           <button
             onClick={e => {
               e.stopPropagation()
               onRemove()
             }}
-            className="bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md"
+            className="bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md hover:shadow-lg hover:scale-110 transition-all"
             aria-label="Remove item"
+            title="Click to remove from outfit"
           >
             <X className="h-3 w-3" />
           </button>
