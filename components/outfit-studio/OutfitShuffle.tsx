@@ -159,24 +159,24 @@ export function OutfitShuffle({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Shuffle className="h-5 w-5 text-sun-400" />
-            <CardTitle>Outfit Shuffle</CardTitle>
+            <Shuffle className="h-4 sm:h-5 w-4 sm:w-5 text-sun-400" />
+            <CardTitle className="text-lg sm:text-xl">Outfit Shuffle</CardTitle>
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground bg-sun-50 px-2 py-1 rounded">
             {savedCount} saved
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        {/* Filters */}
-        <div className="grid grid-cols-2 gap-4">
+      <CardContent className="space-y-4 sm:space-y-6">
+        {/* Filters - Responsive Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Occasion</label>
+            <label className="text-xs sm:text-sm font-medium">Occasion</label>
             <Select value={occasion} onValueChange={(v) => setOccasion(v as OutfitOccasion)}>
-              <SelectTrigger>
+              <SelectTrigger className="text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -190,9 +190,9 @@ export function OutfitShuffle({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Season</label>
+            <label className="text-xs sm:text-sm font-medium">Season</label>
             <Select value={season} onValueChange={(v) => setSeason(v as OutfitSeason)}>
-              <SelectTrigger>
+              <SelectTrigger className="text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -256,43 +256,46 @@ export function OutfitShuffle({
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex gap-2">
+        {/* Actions - Responsive */}
+        <div className="grid grid-cols-2 sm:flex gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handleSkip}
-            className="flex-1 gap-2"
+            className="gap-1.5 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9"
           >
-            <ThumbsDown className="h-4 w-4" />
-            Skip
+            <ThumbsDown className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
+            <span className="hidden sm:inline">Skip</span>
+            <span className="sm:hidden">Skip</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
             onClick={generateOutfit}
-            className="gap-2"
+            className="sm:order-3 gap-1.5 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9"
+            title="Refresh"
           >
-            <RotateCw className="h-4 w-4" />
+            <RotateCw className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
 
           <Button
             size="sm"
             onClick={handleSaveOutfit}
             disabled={isSaving}
-            className="flex-1 gap-2"
+            className="col-span-2 sm:col-span-1 sm:flex-1 gap-1.5 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9"
           >
-            <ThumbsUp className="h-4 w-4" />
-            Save Outfit
+            <ThumbsUp className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
+            Save
+            <span className="hidden sm:inline">Outfit</span>
           </Button>
         </div>
 
         {/* Help Text */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 sm:p-3">
           <p className="text-xs text-blue-800">
-            💡 <strong>Tip:</strong> Shuffle generates random combinations from your wardrobe.
-            Like it? Save it! Don't like it? Skip to the next suggestion.
+            💡 <strong>Tip:</strong> Shuffle generates random combinations. Like it? Save it! Don't like it? Skip.
           </p>
         </div>
       </CardContent>

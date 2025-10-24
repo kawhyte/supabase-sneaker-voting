@@ -146,67 +146,71 @@ export function OutfitsDashboard() {
       {/* Main Content */}
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-sun-400" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              <Sparkles className="h-5 sm:h-6 w-5 sm:w-6 text-sun-400" />
               My Outfits
             </h2>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-muted-foreground text-sm mt-1">
               {outfits.length} outfit{outfits.length !== 1 ? 's' : ''} created
             </p>
           </div>
           {activeTab === 'gallery' && (
             <Button
               onClick={() => setIsStudioOpen(true)}
-              className="bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-md hover:shadow-lg transition-all"
+              className="bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+              size="sm"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Create Outfit
+              Create
             </Button>
           )}
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-2 border-b border-stone-200">
-          <button
-            onClick={() => setActiveTab('gallery')}
-            className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 ${ activeTab === 'gallery'
-              ? 'text-sun-600 border-b-sun-400'
-              : 'text-muted-foreground border-b-transparent hover:text-foreground'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              Gallery
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 ${
-              activeTab === 'calendar'
+        {/* Tab Navigation - Responsive */}
+        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <div className="flex gap-1 sm:gap-2 border-b border-stone-200 min-w-min sm:min-w-0">
+            <button
+              onClick={() => setActiveTab('gallery')}
+              className={`px-3 sm:px-4 py-3 font-medium text-xs sm:text-sm transition-colors border-b-2 whitespace-nowrap ${ activeTab === 'gallery'
                 ? 'text-sun-600 border-b-sun-400'
                 : 'text-muted-foreground border-b-transparent hover:text-foreground'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Calendar
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('shuffle')}
-            className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 ${
-              activeTab === 'shuffle'
-                ? 'text-sun-600 border-b-sun-400'
-                : 'text-muted-foreground border-b-transparent hover:text-foreground'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Shuffle className="h-4 w-4" />
-              Shuffle
-            </div>
-          </button>
+              }`}
+            >
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Sparkles className="h-3.5 sm:h-4 w-3.5 sm:w-4 flex-shrink-0" />
+                <span className="hidden sm:inline">Gallery</span>
+                <span className="sm:hidden">Gallery</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`px-3 sm:px-4 py-3 font-medium text-xs sm:text-sm transition-colors border-b-2 whitespace-nowrap ${
+                activeTab === 'calendar'
+                  ? 'text-sun-600 border-b-sun-400'
+                  : 'text-muted-foreground border-b-transparent hover:text-foreground'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Calendar className="h-3.5 sm:h-4 w-3.5 sm:w-4 flex-shrink-0" />
+                <span>Calendar</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('shuffle')}
+              className={`px-3 sm:px-4 py-3 font-medium text-xs sm:text-sm transition-colors border-b-2 whitespace-nowrap ${
+                activeTab === 'shuffle'
+                  ? 'text-sun-600 border-b-sun-400'
+                  : 'text-muted-foreground border-b-transparent hover:text-foreground'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Shuffle className="h-3.5 sm:h-4 w-3.5 sm:w-4 flex-shrink-0" />
+                <span>Shuffle</span>
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* Content based on active tab */}
@@ -233,18 +237,18 @@ export function OutfitsDashboard() {
                 </CardContent>
               </Card>
             ) : (
-              // Outfit Grid
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              // Outfit Grid - Responsive
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {outfits.map(outfit => (
                   <Card
                     key={outfit.id}
                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
                     onClick={() => setIsListViewOpen(true)}
                   >
-                    <CardContent className="p-4 space-y-3">
-                      <div className="flex items-start justify-between">
+                    <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                      <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold line-clamp-2 group-hover:text-sun-400 transition-colors">
+                          <h3 className="font-semibold text-sm sm:text-base line-clamp-2 group-hover:text-sun-400 transition-colors">
                             {outfit.name}
                           </h3>
                           <p className="text-xs text-muted-foreground mt-1">
@@ -256,13 +260,13 @@ export function OutfitsDashboard() {
 
                       {/* Outfit Preview */}
                       <div
-                        className="h-40 rounded-lg border border-slate-200 flex items-center justify-center text-sm text-muted-foreground overflow-hidden"
+                        className="h-32 sm:h-40 rounded-lg border border-slate-200 flex items-center justify-center text-xs sm:text-sm text-muted-foreground overflow-hidden"
                         style={{
                           backgroundColor: outfit.background_color,
                         }}
                       >
                         {outfit.outfit_items && outfit.outfit_items.length > 0 ? (
-                          <div className="grid grid-cols-2 gap-2 p-2 w-full h-full">
+                          <div className="grid grid-cols-2 gap-1 sm:gap-2 p-2 w-full h-full">
                             {outfit.outfit_items.slice(0, 4).map((item) => (
                               <div
                                 key={item.id}
@@ -278,10 +282,10 @@ export function OutfitsDashboard() {
                       </div>
 
                       {/* Metadata */}
-                      <div className="space-y-1 text-xs text-muted-foreground border-t border-slate-200 pt-3">
+                      <div className="space-y-1 text-xs text-muted-foreground border-t border-slate-200 pt-2 sm:pt-3">
                         <div className="flex justify-between">
                           <span>Occasion:</span>
-                          <span className="font-medium capitalize">
+                          <span className="font-medium capitalize truncate">
                             {outfit.occasion || 'General'}
                           </span>
                         </div>
@@ -290,9 +294,9 @@ export function OutfitsDashboard() {
                           <span className="font-medium">{outfit.times_worn || 0}</span>
                         </div>
                         {outfit.last_worn && (
-                          <div className="flex justify-between">
+                          <div className="flex justify-between gap-2">
                             <span>Last Worn:</span>
-                            <span className="font-medium">
+                            <span className="font-medium text-right">
                               {new Date(outfit.last_worn).toLocaleDateString()}
                             </span>
                           </div>
@@ -303,7 +307,7 @@ export function OutfitsDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full mt-2"
+                        className="w-full mt-2 text-xs sm:text-sm h-8 sm:h-9"
                         onClick={e => {
                           e.stopPropagation()
                           setIsListViewOpen(true)

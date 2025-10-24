@@ -80,20 +80,22 @@ export function OutfitCanvas({
   const sortedItems = sortByZIndex(items)
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Canvas Container */}
+    <div className="flex flex-col gap-3 sm:gap-4">
+      {/* Canvas Container - Responsive */}
       <div
         ref={canvasRef}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        className="relative mx-auto select-none"
+        className="relative mx-auto select-none max-w-full"
         style={{
           width: `${CANVAS_WIDTH}px`,
           height: `${CANVAS_HEIGHT}px`,
+          maxWidth: '100%',
+          aspectRatio: '375 / 667',
           backgroundColor,
-          border: '8px solid #000',
-          borderRadius: '40px',
+          border: '6px solid #000',
+          borderRadius: '30px',
           overflow: 'hidden',
           cursor: draggingItemId ? 'grabbing' : 'grab',
         }}
@@ -124,15 +126,16 @@ export function OutfitCanvas({
 
       {/* Controls */}
       {!readOnly && (
-        <div className="flex gap-2 justify-center">
+        <div className="flex gap-2 justify-center px-2">
           <Button
             variant="outline"
             size="sm"
             onClick={onResetAutoArrange}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9"
           >
-            <RotateCcw className="h-4 w-4" />
-            Reset Auto-Arrange
+            <RotateCcw className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
+            <span className="hidden sm:inline">Reset Auto-Arrange</span>
+            <span className="sm:hidden">Reset</span>
           </Button>
         </div>
       )}

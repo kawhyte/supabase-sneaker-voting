@@ -123,74 +123,79 @@ export function OutfitCalendar({
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-sun-400" />
-          <CardTitle>Outfit Calendar</CardTitle>
-        </div>
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 sm:h-5 w-4 sm:w-5 text-sun-400" />
+            <CardTitle className="text-lg sm:text-xl">Outfit Calendar</CardTitle>
+          </div>
 
-        {/* View Toggle */}
-        <div className="flex gap-2">
-          <Button
-            variant={view === 'month' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setView('month')}
-          >
-            Month
-          </Button>
-          <Button
-            variant={view === 'week' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setView('week')}
-          >
-            Week
-          </Button>
+          {/* View Toggle */}
+          <div className="flex gap-2">
+            <Button
+              variant={view === 'month' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setView('month')}
+              className="text-xs sm:text-sm h-8 sm:h-9"
+            >
+              Month
+            </Button>
+            <Button
+              variant={view === 'week' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setView('week')}
+              className="text-xs sm:text-sm h-8 sm:h-9"
+            >
+              Week
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        {/* Header with Month Navigation */}
-        <div className="flex items-center justify-between">
+      <CardContent className="space-y-4 sm:space-y-6">
+        {/* Header with Month Navigation - Responsive */}
+        <div className="flex items-center justify-between gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handlePrevMonth}
-            className="flex items-center gap-1"
+            className="flex items-center gap-0.5 sm:gap-1 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
           >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
+            <ChevronLeft className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
+            <span className="hidden sm:inline">Previous</span>
           </Button>
 
-          <h3 className="text-lg font-semibold">{monthName}</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-center flex-1">{monthName}</h3>
 
           <Button
             variant="outline"
             size="sm"
             onClick={handleNextMonth}
-            className="flex items-center gap-1"
+            className="flex items-center gap-0.5 sm:gap-1 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
           >
-            Next
-            <ChevronRight className="h-4 w-4" />
+            <span className="hidden sm:inline">Next</span>
+            <ChevronRight className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
           </Button>
         </div>
 
         {/* Calendar Grid */}
         {view === 'month' && (
-          <div className="space-y-4">
+          <div className="space-y-2 sm:space-y-4">
             {/* Day Headers */}
-            <div className="grid grid-cols-7 gap-2 text-center">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
                 <div
                   key={day}
-                  className="text-xs font-semibold text-muted-foreground py-2"
+                  className="text-xs font-semibold text-muted-foreground py-1 sm:py-2"
                 >
-                  {day}
+                  <span className="hidden sm:inline">{day}</span>
+                  <span className="sm:hidden">{day.slice(0, 1)}</span>
                 </div>
               ))}
             </div>
 
             {/* Calendar Days */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2">
               {/* Empty Days */}
               {emptyDays.map((i) => (
                 <div
@@ -213,15 +218,15 @@ export function OutfitCalendar({
                 return (
                   <div
                     key={day}
-                    className={`aspect-square rounded-lg border-2 p-2 flex flex-col ${
+                    className={`aspect-square rounded-lg border-2 p-1 sm:p-2 flex flex-col text-xs sm:text-sm transition-colors ${
                       isToday
                         ? 'border-sun-400 bg-sun-50'
-                        : 'border-stone-200 bg-white'
+                        : 'border-stone-200 bg-white hover:bg-stone-50'
                     }`}
                   >
                     {/* Day Number */}
                     <div
-                      className={`text-xs font-semibold ${
+                      className={`font-semibold ${
                         isToday ? 'text-sun-600' : 'text-slate-700'
                       }`}
                     >
@@ -229,7 +234,7 @@ export function OutfitCalendar({
                     </div>
 
                     {/* Outfits Stack */}
-                    <div className="flex-1 flex flex-col gap-1 mt-1 overflow-hidden">
+                    <div className="flex-1 flex flex-col gap-0.5 mt-0.5 sm:mt-1 overflow-hidden">
                       {dayOutfits.length > 0 ? (
                         dayOutfits.map((item) => (
                           <OutfitDayBadge
@@ -241,7 +246,7 @@ export function OutfitCalendar({
                           />
                         ))
                       ) : (
-                        <div className="text-xs text-stone-300 flex-1 flex items-center justify-center">
+                        <div className="text-stone-300 flex-1 flex items-center justify-center">
                           -
                         </div>
                       )}
