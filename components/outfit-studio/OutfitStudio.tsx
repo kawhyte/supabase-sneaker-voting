@@ -352,7 +352,7 @@ export function OutfitStudio({
               {/* Items in Outfit */}
               <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                 <h3 className="font-semibold text-sm mb-3">Items ({outfitItems.length})</h3>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
+                <div className="dense space-y-2 max-h-48 overflow-y-auto">
                   {outfitItems.map(item => (
                     <div
                       key={item.id}

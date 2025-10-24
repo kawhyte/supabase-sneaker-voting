@@ -127,7 +127,7 @@ export function OutfitListView({
                   {selectedOutfit.outfit_items?.length || 0} items
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="dense flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -275,7 +275,7 @@ export function OutfitListView({
                     <p>Worn {outfit.times_worn || 0} time{outfit.times_worn !== 1 ? 's' : ''}</p>
                   </div>
 
-                  <div className="flex gap-2 pt-2 border-t border-slate-200">
+                  <div className="dense flex gap-2 pt-2 border-t border-slate-200">
                     <Button
                       size="sm"
                       variant="outline"
@@ -321,7 +321,7 @@ export function OutfitListView({
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter className="gap-2">
+          <DialogFooter className="dense gap-2">
             <Button
               variant="outline"
               onClick={() => setShowDeleteConfirm(false)}

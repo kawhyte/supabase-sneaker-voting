@@ -131,7 +131,7 @@ export function OutfitCalendar({
           </div>
 
           {/* View Toggle */}
-          <div className="flex gap-2">
+          <div className="dense flex gap-2">
             <Button
               variant={view === 'month' ? 'default' : 'outline'}
               size="sm"
@@ -154,7 +154,7 @@ export function OutfitCalendar({
 
       <CardContent className="space-y-4 sm:space-y-6">
         {/* Header with Month Navigation - Responsive */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="dense flex items-center justify-between gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -414,7 +414,7 @@ function OutfitWeekView({
                       )}
                     </div>
 
-                    <div className="flex gap-1">
+                    <div className="dense flex gap-1">
                       {item.outfit.times_worn === 0 && (
                         <Button
                           variant="ghost"

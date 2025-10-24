@@ -126,7 +126,7 @@ export function OutfitCanvas({
 
       {/* Controls */}
       {!readOnly && (
-        <div className="flex gap-2 justify-center px-2">
+        <div className="dense flex gap-2 justify-center px-2">
           <Button
             variant="outline"
             size="sm"
@@ -218,16 +218,18 @@ function OutfitCanvasItem({
 
       {/* Delete Button (hover only) */}
       {!readOnly && (
-        <button
-          onClick={e => {
-            e.stopPropagation()
-            onRemove()
-          }}
-          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md"
-          aria-label="Remove item"
-        >
-          <X className="h-3 w-3" />
-        </button>
+        <div className="dense absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={e => {
+              e.stopPropagation()
+              onRemove()
+            }}
+            className="bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md"
+            aria-label="Remove item"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </div>
       )}
     </div>
   )

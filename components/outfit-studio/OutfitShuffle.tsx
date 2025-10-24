@@ -257,7 +257,7 @@ export function OutfitShuffle({
         )}
 
         {/* Actions - Responsive */}
-        <div className="grid grid-cols-2 sm:flex gap-2">
+        <div className="dense grid grid-cols-2 sm:flex gap-2">
           <Button
             variant="outline"
             size="sm"

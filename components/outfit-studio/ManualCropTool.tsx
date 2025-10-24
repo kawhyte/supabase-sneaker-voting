@@ -241,7 +241,7 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2 justify-end">
+      <div className="dense flex gap-2 justify-end">
         <Button variant="outline" onClick={onCancel} size="sm">
           Cancel
         </Button>
