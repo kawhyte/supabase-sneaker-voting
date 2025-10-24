@@ -35,6 +35,7 @@ export function OutfitListView({
   const [isDeleting, setIsDeleting] = useState(false)
   const [isMarkingWorn, setIsMarkingWorn] = useState(false)
   const [outfitsList, setOutfitsList] = useState(outfits)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const selectedOutfit = outfitsList.find(o => o.id === selectedOutfitId)
 
@@ -147,7 +148,7 @@ export function OutfitListView({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleDeleteOutfit}
+                  onClick={() => setShowDeleteConfirm(true)}
                   disabled={isDeleting}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
@@ -309,6 +310,37 @@ export function OutfitListView({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Outfit?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{selectedOutfit?.name}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                setShowDeleteConfirm(false)
+                await handleDeleteOutfit()
+              }}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   )
 }

@@ -39,6 +39,7 @@ export function OutfitCalendar({
   const [currentDate, setCurrentDate] = useState(new Date())
   const [scheduledOutfits, setScheduledOutfits] = useState<DayOutfit[]>([])
   const [view, setView] = useState<'month' | 'week'>('month')
+  const [loadingOutfitId, setLoadingOutfitId] = useState<string | null>(null)
 
   // Get all days in current month
   const getDaysInMonth = (date: Date) => {
@@ -71,15 +72,19 @@ export function OutfitCalendar({
   const emptyDays = Array.from({ length: firstDay }, (_, i) => i)
 
   const handleMarkAsWorn = async (outfitId: string) => {
+    setLoadingOutfitId(outfitId)
     try {
       await onOutfitWorn(outfitId)
       toast.success('Outfit marked as worn!')
     } catch (error) {
       toast.error('Failed to mark outfit as worn')
+    } finally {
+      setLoadingOutfitId(null)
     }
   }
 
   const handleUnschedule = async (outfitId: string) => {
+    setLoadingOutfitId(outfitId)
     try {
       await onUnscheduleOutfit(outfitId)
       setScheduledOutfits(
@@ -88,6 +93,8 @@ export function OutfitCalendar({
       toast.success('Outfit unscheduled')
     } catch (error) {
       toast.error('Failed to unschedule outfit')
+    } finally {
+      setLoadingOutfitId(null)
     }
   }
 
@@ -228,6 +235,7 @@ export function OutfitCalendar({
                           <OutfitDayBadge
                             key={item.outfit.id}
                             outfit={item.outfit}
+                            isLoading={loadingOutfitId === item.outfit.id}
                             onWorn={() => handleMarkAsWorn(item.outfit.id)}
                             onRemove={() => handleUnschedule(item.outfit.id)}
                           />
@@ -250,6 +258,7 @@ export function OutfitCalendar({
           <OutfitWeekView
             currentDate={currentDate}
             scheduledOutfits={scheduledOutfits}
+            loadingOutfitId={loadingOutfitId}
             onWorn={handleMarkAsWorn}
             onRemove={handleUnschedule}
           />
@@ -271,6 +280,7 @@ export function OutfitCalendar({
 
 interface OutfitDayBadgeProps {
   outfit: OutfitWithItems
+  isLoading?: boolean
   onWorn: () => void
   onRemove: () => void
 }
@@ -278,30 +288,40 @@ interface OutfitDayBadgeProps {
 /**
  * OutfitDayBadge - Small compact badge for calendar day
  */
-function OutfitDayBadge({ outfit, onWorn, onRemove }: OutfitDayBadgeProps) {
+function OutfitDayBadge({ outfit, isLoading, onWorn, onRemove }: OutfitDayBadgeProps) {
   return (
-    <div className="group flex items-center gap-1 bg-sun-100 rounded px-1 py-0.5 text-xs">
-      <span className="truncate flex-1 font-medium text-sun-700 line-clamp-1">
+    <div className="group flex items-center gap-1 bg-sun-100 rounded px-1 py-0.5 text-xs opacity-100">
+      <span className={`truncate flex-1 font-medium text-sun-700 line-clamp-1 ${isLoading ? 'opacity-60' : ''}`}>
         {outfit.name}
       </span>
 
-      <div className="hidden group-hover:flex gap-0.5">
+      <div className={`hidden group-hover:flex gap-0.5 ${isLoading ? 'pointer-events-none opacity-50' : ''}`}>
         {outfit.times_worn === 0 && (
           <button
             onClick={onWorn}
-            className="p-0.5 hover:bg-sun-200 rounded text-sun-600 transition-colors"
+            disabled={isLoading}
+            className="p-0.5 hover:bg-sun-200 rounded text-sun-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             title="Mark as worn"
           >
-            <Check className="h-3 w-3" />
+            {isLoading ? (
+              <div className="h-3 w-3 border-2 border-sun-600 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Check className="h-3 w-3" />
+            )}
           </button>
         )}
 
         <button
           onClick={onRemove}
-          className="p-0.5 hover:bg-red-200 rounded text-red-600 transition-colors"
+          disabled={isLoading}
+          className="p-0.5 hover:bg-red-200 rounded text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title="Unschedule"
         >
-          <Trash2 className="h-3 w-3" />
+          {isLoading ? (
+            <div className="h-3 w-3 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <Trash2 className="h-3 w-3" />
+          )}
         </button>
       </div>
     </div>
@@ -311,6 +331,7 @@ function OutfitDayBadge({ outfit, onWorn, onRemove }: OutfitDayBadgeProps) {
 interface OutfitWeekViewProps {
   currentDate: Date
   scheduledOutfits: DayOutfit[]
+  loadingOutfitId: string | null
   onWorn: (outfitId: string) => void
   onRemove: (outfitId: string) => void
 }
@@ -321,6 +342,7 @@ interface OutfitWeekViewProps {
 function OutfitWeekView({
   currentDate,
   scheduledOutfits,
+  loadingOutfitId,
   onWorn,
   onRemove,
 }: OutfitWeekViewProps) {
@@ -393,9 +415,14 @@ function OutfitWeekView({
                           variant="ghost"
                           size="sm"
                           onClick={() => onWorn(item.outfit.id)}
-                          className="h-6 w-6 p-0"
+                          disabled={loadingOutfitId === item.outfit.id}
+                          className="h-6 w-6 p-0 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Check className="h-3 w-3 text-sun-600" />
+                          {loadingOutfitId === item.outfit.id ? (
+                            <div className="h-3 w-3 border-2 border-sun-600 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Check className="h-3 w-3 text-sun-600" />
+                          )}
                         </Button>
                       )}
 
@@ -403,9 +430,14 @@ function OutfitWeekView({
                         variant="ghost"
                         size="sm"
                         onClick={() => onRemove(item.outfit.id)}
-                        className="h-6 w-6 p-0"
+                        disabled={loadingOutfitId === item.outfit.id}
+                        className="h-6 w-6 p-0 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Trash2 className="h-3 w-3 text-red-600" />
+                        {loadingOutfitId === item.outfit.id ? (
+                          <div className="h-3 w-3 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3 w-3 text-red-600" />
+                        )}
                       </Button>
                     </div>
                   </div>
