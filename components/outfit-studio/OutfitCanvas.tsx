@@ -176,6 +176,17 @@ function OutfitCanvasItem({
   // Use cropped image if available, otherwise use original
   const imageUrl = item.cropped_image_url || item.item?.image_url || item.item?.item_photos?.[0]?.image_url
 
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`OutfitCanvasItem ${item.item?.brand} ${item.item?.model}:`, {
+      cropped_image_url: item.cropped_image_url,
+      image_url: item.item?.image_url,
+      item_photos_count: item.item?.item_photos?.length || 0,
+      first_photo_url: item.item?.item_photos?.[0]?.image_url,
+      final_imageUrl: imageUrl,
+    })
+  }
+
   return (
     <div
       className={`absolute group transition-transform ${isDragging ? 'scale-105' : ''}`}
@@ -190,14 +201,19 @@ function OutfitCanvasItem({
       onMouseDown={onMouseDown}
     >
       {/* Image */}
-      {imageUrl && (
+      {imageUrl ? (
         <Image
           src={imageUrl}
           alt={`${item.item?.brand} ${item.item?.model}`}
           fill
           className="object-contain rounded-md shadow-md"
           sizes={`${pixelWidth}px`}
+          onError={() => console.error(`Failed to load image: ${imageUrl}`)}
         />
+      ) : (
+        <div className="absolute inset-0 bg-slate-200 rounded-md flex items-center justify-center text-xs text-slate-600">
+          No image
+        </div>
       )}
 
       {/* Delete Button (hover only) */}

@@ -128,14 +128,17 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Fetch user's outfits with items
+    // Fetch user's outfits with items and item photos
     const { data: outfits, error } = await supabase
       .from('outfits')
       .select(
         `*,
         outfit_items(
           *,
-          item:items(*)
+          item:items(
+            *,
+            item_photos(*)
+          )
         )`
       )
       .eq('user_id', user.id)
