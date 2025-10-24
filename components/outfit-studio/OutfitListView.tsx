@@ -75,12 +75,14 @@ export function OutfitListView({
 
     setIsMarkingWorn(true)
     try {
+      const today = new Date()
       const response = await fetch(`/api/outfits/${selectedOutfit.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           times_worn: (selectedOutfit.times_worn || 0) + 1,
-          last_worn: new Date().toISOString(),
+          last_worn: today.toISOString(),
+          date_worn: today.toISOString(), // Set date_worn so outfit appears on calendar
         }),
       })
 

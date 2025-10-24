@@ -185,7 +185,7 @@ export async function PUT(
 
     // Parse request body
     const body = await request.json()
-    const { times_worn, last_worn, occasion, name } = body
+    const { times_worn, last_worn, date_worn, occasion, name } = body
 
     // Verify outfit belongs to user
     const { data: outfit, error: fetchError } = await supabase
@@ -212,6 +212,7 @@ export async function PUT(
     const updateData: any = {}
     if (times_worn !== undefined) updateData.times_worn = times_worn
     if (last_worn !== undefined) updateData.last_worn = last_worn
+    if (date_worn !== undefined) updateData.date_worn = date_worn
     if (occasion !== undefined) updateData.occasion = occasion
     if (name !== undefined) updateData.name = name
 

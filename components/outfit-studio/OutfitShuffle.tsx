@@ -100,9 +100,9 @@ export function OutfitShuffle({
       }
     })
 
-    // Get color palette
+    // Get color palette (filter out null/undefined colors)
     const colorPalette = Array.from(
-      new Set(selectedItems.map((item) => item.color))
+      new Set(selectedItems.map((item) => item.color).filter((color) => color != null))
     )
 
     setSuggestedOutfit({
@@ -332,13 +332,15 @@ function OutfitShuffleItem({ item }: OutfitShuffleItemProps) {
       <div className="space-y-1">
         <p className="text-xs font-medium truncate">{item.brand}</p>
         <p className="text-xs text-muted-foreground line-clamp-1">{item.model}</p>
-        <div className="flex items-center gap-1">
-          <div
-            className="h-2 w-2 rounded-full border border-stone-300"
-            style={{ backgroundColor: getColorHex(item.color) }}
-          />
-          <p className="text-xs text-muted-foreground">{item.color}</p>
-        </div>
+        {item.color && (
+          <div className="flex items-center gap-1">
+            <div
+              className="h-2 w-2 rounded-full border border-stone-300"
+              style={{ backgroundColor: getColorHex(item.color) }}
+            />
+            <p className="text-xs text-muted-foreground">{item.color}</p>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -347,7 +349,7 @@ function OutfitShuffleItem({ item }: OutfitShuffleItemProps) {
 /**
  * Helper: Convert color name to hex
  */
-function getColorHex(colorName: string): string {
+function getColorHex(colorName: string | null | undefined): string {
   const colorMap: Record<string, string> = {
     black: '#000000',
     white: '#FFFFFF',
@@ -370,5 +372,6 @@ function getColorHex(colorName: string): string {
     default: '#94A3B8',
   }
 
+  if (!colorName) return colorMap.default
   return colorMap[colorName.toLowerCase()] || colorMap.default
 }

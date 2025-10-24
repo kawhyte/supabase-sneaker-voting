@@ -98,19 +98,40 @@ export function OutfitsDashboard() {
     occasion: string
   ) => {
     try {
+      // Import outfit layout engine for auto-arrange
+      const { autoArrangeOutfit } = await import('@/lib/outfit-layout-engine')
+      const arrangedItems = autoArrangeOutfit(items)
+
       const response = await fetch('/api/outfits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: `${occasion} outfit`,
           occasion,
-          items: items.map(item => ({ item_id: item.id })),
+          background_color: '#FFFFFF',
+          outfit_items: items.map((item, index) => {
+            const arranged = arrangedItems[index]
+            return {
+              item_id: item.id,
+              position_x: arranged?.position_x || 0.5,
+              position_y: arranged?.position_y || 0.5,
+              z_index: arranged?.z_index || 0,
+              display_width: arranged?.display_width || 0.3,
+              display_height: arranged?.display_height || 0.3,
+            }
+          }),
         }),
       })
 
       if (!response.ok) throw new Error('Failed to save outfit')
       const data = await response.json()
-      const newOutfit = data.outfit as OutfitWithItems
+
+      // Fetch the full outfit with related item data
+      const getResponse = await fetch(`/api/outfits/${data.outfit.id}`)
+      if (!getResponse.ok) throw new Error('Failed to fetch saved outfit')
+      const fullData = await getResponse.json()
+      const newOutfit = fullData.outfit as OutfitWithItems
+
       setOutfits([newOutfit, ...outfits])
       toast.success('Outfit saved!')
       return newOutfit
