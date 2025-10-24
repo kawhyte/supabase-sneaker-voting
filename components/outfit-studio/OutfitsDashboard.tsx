@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { ErrorBoundary } from '@/components/error-boundary'
+import { OutfitStudioErrorBoundary } from '@/components/outfit-studio-error-boundary'
 import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitListView } from './OutfitListView'
 import { OutfitStudio } from './OutfitStudio'
@@ -231,31 +233,32 @@ export function OutfitsDashboard() {
         </div>
 
         {/* Content based on active tab */}
-        {activeTab === 'gallery' && (
-          <>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sun-400"></div>
-              </div>
-            ) : outfits.length === 0 ? (
-              <Card className="border-2 border-dashed border-slate-300">
-                <CardContent className="py-12 text-center">
-                  <Sparkles className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No outfits yet</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Start creating outfits to visualize your style combinations
-                  </p>
-                  <Button
-                    onClick={() => setIsStudioOpen(true)}
-                    className="bg-sun-400 text-slate-900 hover:bg-sun-500"
-                  >
-                    Create Your First Outfit
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              // Outfit Grid - Responsive
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <ErrorBoundary level="section">
+          {activeTab === 'gallery' && (
+            <>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sun-400"></div>
+                </div>
+              ) : outfits.length === 0 ? (
+                <Card className="border-2 border-dashed border-slate-300">
+                  <CardContent className="py-12 text-center">
+                    <Sparkles className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No outfits yet</h3>
+                    <p className="text-muted-foreground mb-6">
+                      Start creating outfits to visualize your style combinations
+                    </p>
+                    <Button
+                      onClick={() => setIsStudioOpen(true)}
+                      className="bg-sun-400 text-slate-900 hover:bg-sun-500"
+                    >
+                      Create Your First Outfit
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                // Outfit Grid - Responsive
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {outfits.map(outfit => (
                   <Card
                     key={outfit.id}
@@ -340,40 +343,49 @@ export function OutfitsDashboard() {
           </>
         )}
 
-        {/* Calendar Tab */}
-        {activeTab === 'calendar' && (
-          <OutfitCalendar
-            outfits={outfits}
-            onOutfitWorn={handleOutfitWorn}
-            onUnscheduleOutfit={handleUnscheduleOutfit}
-          />
-        )}
+          {/* Calendar Tab */}
+          {activeTab === 'calendar' && (
+            <ErrorBoundary level="section">
+              <OutfitCalendar
+                outfits={outfits}
+                onOutfitWorn={handleOutfitWorn}
+                onUnscheduleOutfit={handleUnscheduleOutfit}
+              />
+            </ErrorBoundary>
+          )}
 
-        {/* Shuffle Tab */}
-        {activeTab === 'shuffle' && (
-          <OutfitShuffle
-            wardrobe={userWardrobe}
-            onSaveOutfit={handleSaveOutfitFromShuffle}
-          />
-        )}
+          {/* Shuffle Tab */}
+          {activeTab === 'shuffle' && (
+            <ErrorBoundary level="section">
+              <OutfitShuffle
+                wardrobe={userWardrobe}
+                onSaveOutfit={handleSaveOutfitFromShuffle}
+              />
+            </ErrorBoundary>
+          )}
+        </ErrorBoundary>
       </div>
 
       {/* Outfit List View Modal */}
-      <OutfitListView
-        isOpen={isListViewOpen}
-        onClose={() => setIsListViewOpen(false)}
-        outfits={outfits}
-        onDelete={handleOutfitDeleted}
-      />
+      <ErrorBoundary level="component">
+        <OutfitListView
+          isOpen={isListViewOpen}
+          onClose={() => setIsListViewOpen(false)}
+          outfits={outfits}
+          onDelete={handleOutfitDeleted}
+        />
+      </ErrorBoundary>
 
       {/* Outfit Studio Modal */}
-      <OutfitStudio
-        isOpen={isStudioOpen}
-        onClose={() => setIsStudioOpen(false)}
-        userWardrobe={userWardrobe}
-        outfitsCreated={outfits.length}
-        onOutfitCreated={handleOutfitCreated}
-      />
+      <OutfitStudioErrorBoundary onClose={() => setIsStudioOpen(false)}>
+        <OutfitStudio
+          isOpen={isStudioOpen}
+          onClose={() => setIsStudioOpen(false)}
+          userWardrobe={userWardrobe}
+          outfitsCreated={outfits.length}
+          onOutfitCreated={handleOutfitCreated}
+        />
+      </OutfitStudioErrorBoundary>
     </>
   )
 }
