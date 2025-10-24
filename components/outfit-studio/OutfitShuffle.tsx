@@ -321,6 +321,7 @@ function OutfitShuffleItem({ item }: OutfitShuffleItemProps) {
             src={imageUrl}
             alt={`${item.brand} ${item.model}`}
             className="w-full h-full object-contain"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-xs text-stone-400">

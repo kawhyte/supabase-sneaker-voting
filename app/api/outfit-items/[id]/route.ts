@@ -1,14 +1,19 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
+interface RouteParams {
+  id: string
+}
+
 /**
  * PATCH /api/outfit-items/[id]
  * Update an outfit item (position, size, z-index, etc.)
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<RouteParams> }
 ) {
+  const params = await context.params
   try {
     const supabase = await createClient()
 
@@ -85,8 +90,9 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<RouteParams> }
 ) {
+  const params = await context.params
   try {
     const supabase = await createClient()
 

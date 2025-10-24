@@ -212,6 +212,7 @@ function OutfitCanvasItem({
           fill
           className="object-contain rounded-md shadow-md"
           sizes={`${pixelWidth}px`}
+          loading="lazy"
           onError={() => console.error(`Failed to load image: ${imageUrl}`)}
         />
       ) : (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -9,10 +9,12 @@ import { OutfitStudioErrorBoundary } from '@/components/outfit-studio-error-boun
 import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitListView } from './OutfitListView'
 import { OutfitStudio } from './OutfitStudio'
-import { OutfitCalendar } from './OutfitCalendar'
-import { OutfitShuffle } from './OutfitShuffle'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 import { Sparkles, Plus, Calendar, Shuffle } from 'lucide-react'
+
+// Lazy load heavy outfit components (only loaded when tabs are active)
+const OutfitCalendar = lazy(() => import('./OutfitCalendar').then(mod => ({ default: mod.OutfitCalendar })))
+const OutfitShuffle = lazy(() => import('./OutfitShuffle').then(mod => ({ default: mod.OutfitShuffle })))
 
 /**
  * OutfitsDashboard - Main outfits tab in the dashboard
@@ -367,21 +369,33 @@ export function OutfitsDashboard() {
           {/* Calendar Tab */}
           {activeTab === 'calendar' && (
             <ErrorBoundary level="section">
-              <OutfitCalendar
-                outfits={outfits}
-                onOutfitWorn={handleOutfitWorn}
-                onUnscheduleOutfit={handleUnscheduleOutfit}
-              />
+              <Suspense fallback={
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sun-400"></div>
+                </div>
+              }>
+                <OutfitCalendar
+                  outfits={outfits}
+                  onOutfitWorn={handleOutfitWorn}
+                  onUnscheduleOutfit={handleUnscheduleOutfit}
+                />
+              </Suspense>
             </ErrorBoundary>
           )}
 
           {/* Shuffle Tab */}
           {activeTab === 'shuffle' && (
             <ErrorBoundary level="section">
-              <OutfitShuffle
-                wardrobe={userWardrobe}
-                onSaveOutfit={handleSaveOutfitFromShuffle}
-              />
+              <Suspense fallback={
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sun-400"></div>
+                </div>
+              }>
+                <OutfitShuffle
+                  wardrobe={userWardrobe}
+                  onSaveOutfit={handleSaveOutfitFromShuffle}
+                />
+              </Suspense>
             </ErrorBoundary>
           )}
         </ErrorBoundary>
