@@ -140,6 +140,10 @@ import {
 	Star,
 	RefreshCw,
 	X,
+	TrendingDown,
+	CheckCircle2,
+	XCircle,
+	Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
@@ -163,6 +167,13 @@ import {
 } from "@/components/types/item-category";
 import { detectCategoryFromUrl } from "@/lib/item-utils";
 import { PhotoItem } from "@/components/types/photo-item";
+import {
+	validateProductUrl,
+	getSupportedRetailers,
+	isSupportedRetailer,
+	type UrlValidationResult,
+} from "@/lib/retailer-url-validator";
+import { SupportedRetailersDialog } from "@/components/supported-retailers-dialog";
 
 const itemSchema = z
 	.object({
@@ -185,16 +196,7 @@ const itemSchema = z
 			.max(500)
 			.optional()
 			.or(z.literal("")),
-		// targetPrice: z
-		//     .string()
-		//     .regex(/^\d+(\.\d{1,2})?$/)
-		//     .refine((val) => {
-		//         if (val === "") return true;
-		//         const price = parseFloat(val);
-		//         return price >= 0 && price <= 10000;
-		//     })
-		//     .optional()
-		//     .or(z.literal("")),
+		auto_price_tracking_enabled: z.boolean().default(false),
 		enableNotifications: z.boolean().default(false),
 		brandId: z.number().int().positive("Brand is required"),
 		brand: z.string().min(1, "Brand is required").max(50).trim(),
@@ -270,6 +272,19 @@ const itemSchema = z
 			message: "Sale price cannot be higher than retail price",
 			path: ["salePrice"],
 		}
+	)
+	.refine(
+		(data) => {
+			// If price tracking enabled, product URL must be provided
+			if (data.auto_price_tracking_enabled) {
+				return data.productUrl && data.productUrl.trim().length > 0;
+			}
+			return true;
+		},
+		{
+			message: "Product URL is required when price tracking is enabled",
+			path: ["productUrl"],
+		}
 	);
 
 type ItemFormData = z.infer<typeof itemSchema>;
@@ -297,6 +312,12 @@ export function AddItemForm({
 	const [scrapedImages, setScrapedImages] = useState<string[]>([]);
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [openAccordionItem, setOpenAccordionItem] = useState<string>("");
+	const [urlValidation, setUrlValidation] = useState<UrlValidationResult>({
+		status: "idle",
+		message: "",
+		canSave: true,
+	});
+	const [showRetailersDialog, setShowRetailersDialog] = useState(false);
 	const [isSavingPhotos, setIsSavingPhotos] = useState(false);
 	const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 	const formRef = useRef<HTMLFormElement>(null);
@@ -369,6 +390,8 @@ export function AddItemForm({
 				salePrice: initialData.sale_price?.toString() || "",
 				targetPrice: initialData.target_price?.toString() || "",
 				wears: initialData.wears || 0,
+				productUrl: initialData.product_url || "",
+				auto_price_tracking_enabled: initialData.auto_price_tracking_enabled || false,
 
 				// targetPrice: initialData.target_price?.toString() || "",
 				notes: initialData.notes || "",
@@ -398,6 +421,25 @@ export function AddItemForm({
 			setOpenAccordionItem("");
 		}
 	}, [watchedTriedOn]);
+
+	// Real-time URL validation when price tracking is enabled
+	useEffect(() => {
+		const productUrl = watch("productUrl");
+		const trackingEnabled = watch("auto_price_tracking_enabled");
+
+		// Only validate if tracking is enabled and URL has content
+		if (trackingEnabled && productUrl) {
+			const validationResult = validateProductUrl(productUrl);
+			setUrlValidation(validationResult);
+		} else if (!productUrl) {
+			// Reset validation if URL is empty
+			setUrlValidation({
+				status: "idle",
+				message: "",
+				canSave: true,
+			});
+		}
+	}, [watch("productUrl"), watch("auto_price_tracking_enabled"), watch]);
 
 	// Cleanup object URLs on unmount to prevent memory leaks
 	useEffect(() => {
@@ -450,6 +492,17 @@ export function AddItemForm({
 						shouldValidate: true,
 						shouldDirty: true,
 					});
+
+				// Auto-enable price tracking if URL is from supported retailer
+				if (isSupportedRetailer(url)) {
+					setValue("auto_price_tracking_enabled", true, {
+						shouldValidate: true,
+						shouldDirty: true,
+					});
+					// Trigger validation immediately
+					const validationResult = validateProductUrl(url);
+					setUrlValidation(validationResult);
+				}
 
 				setIsFormVisible(true);
 				if (data.images && data.images.length > 0) {
@@ -554,6 +607,7 @@ export function AddItemForm({
 				sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 				product_url: data.productUrl || null,
+				auto_price_tracking_enabled: data.auto_price_tracking_enabled || false,
 				notes: data.notes && data.notes.trim() ? data.notes : "",
 				wears: data.wears || 0,
 				status: (mode === "create" ? "wishlisted" : initialData?.status) as
@@ -986,6 +1040,116 @@ export function AddItemForm({
 								</div>
 							</div>
 
+							{/* Price Tracking Section - Only for Wishlisted Items */}
+							{(mode === 'create' || initialData?.status === 'wishlisted') && (
+								<div className='space-y-6 mt-12'>
+									<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
+										<TrendingDown className='relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0' />
+										<h3 className='font-semibold font-heading text-base text-slate-900 leading-5'>
+											Price Tracking
+										</h3>
+									</div>
+
+									<div className='space-y-4'>
+										{/* Toggle Switch */}
+										<div className='flex items-start justify-between gap-4'>
+											<div className='flex-1'>
+												<Label className='text-sm font-medium text-slate-900'>
+													Track price changes automatically
+												</Label>
+												<p className='text-xs text-muted-foreground mt-1'>
+													We'll check prices weekly and notify you when prices drop
+												</p>
+											</div>
+											<Switch
+												checked={watch('auto_price_tracking_enabled')}
+												onCheckedChange={(checked) =>
+													setValue('auto_price_tracking_enabled', checked, {
+														shouldValidate: true
+													})
+												}
+												id='auto_price_tracking_enabled'
+											/>
+										</div>
+
+										{/* Failure Warning for Edit Mode */}
+										{mode === 'edit' &&
+											initialData?.auto_price_tracking_enabled &&
+											(initialData?.price_check_failures ?? 0) >= 2 && (
+												<div className='flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200'>
+													<AlertTriangle className='h-4 w-4 text-red-600 mt-0.5 flex-shrink-0' />
+													<div className='flex-1'>
+														<p className='text-sm font-semibold text-red-800'>
+															Price tracking has failed {initialData.price_check_failures} times
+														</p>
+														<p className='text-xs text-red-700 mt-1'>
+															The product URL may be invalid or the retailer's website has changed.
+															Consider updating the URL or disabling tracking.
+														</p>
+													</div>
+												</div>
+											)}
+
+										{/* Conditional feedback and help when toggle is ON */}
+										{watch('auto_price_tracking_enabled') && (
+											<div className='space-y-3 p-4 rounded-lg bg-blue-50 border border-blue-200'>
+												{/* Validation Feedback */}
+												{urlValidation.status !== 'idle' && (
+													<div>
+														{urlValidation.status === 'success' && (
+															<div className='flex items-center gap-2 text-sm text-green-700'>
+																<CheckCircle2 className='h-4 w-4' />
+																<span>{urlValidation.message}</span>
+															</div>
+														)}
+														{urlValidation.status === 'warning' && (
+															<div className='flex items-center gap-2 text-sm text-orange-700'>
+																<AlertTriangle className='h-4 w-4' />
+																<span>{urlValidation.message}</span>
+															</div>
+														)}
+														{urlValidation.status === 'error' && (
+															<div className='flex items-center gap-2 text-sm text-red-700'>
+																<XCircle className='h-4 w-4' />
+																<span>{urlValidation.message}</span>
+															</div>
+														)}
+													</div>
+												)}
+
+												{/* Reminder to add URL if empty */}
+												{!watch('productUrl') && (
+													<div className='flex items-start gap-2 text-sm text-blue-700'>
+														<Info className='h-4 w-4 mt-0.5 flex-shrink-0' />
+														<div>
+															<p className='font-medium'>Add a product URL above to enable tracking</p>
+															<button
+																type='button'
+																onClick={() => setShowRetailersDialog(true)}
+																className='text-xs text-primary hover:underline mt-1 block'
+															>
+																See supported retailers ({getSupportedRetailers().length})
+															</button>
+														</div>
+													</div>
+												)}
+
+												{/* See supported retailers link (if URL is present) */}
+												{watch('productUrl') && (
+													<button
+														type='button'
+														onClick={() => setShowRetailersDialog(true)}
+														className='text-xs text-primary hover:underline block'
+													>
+														See all supported retailers ({getSupportedRetailers().length})
+													</button>
+												)}
+											</div>
+										)}
+									</div>
+								</div>
+							)}
+
 							{/* Photos Section */}
 							<div className='space-y-6 mt-16'>
 								<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
@@ -1188,6 +1352,11 @@ export function AddItemForm({
 				onOpenChange={setShowImageModal}
 				images={scrapedImages}
 				onConfirm={handleImageConfirm}
+			/>
+
+			<SupportedRetailersDialog
+				open={showRetailersDialog}
+				onOpenChange={setShowRetailersDialog}
 			/>
 		</div>
 	);
