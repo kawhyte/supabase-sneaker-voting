@@ -8,11 +8,12 @@ import { ViewDensityToggle } from '@/components/view-density-toggle'
 import { SizingJournalDashboard } from '@/components/wardrobe-dashboard'
 import { FTUEChecklist } from '@/components/onboarding-checklist'
 import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
+import { PriceAlertsNotification } from '@/components/price-alerts-notification'
 import { WearRemindersContainer } from '@/components/wear-reminder-notifications'
 import { InsteadOfShoppingModal, useInsteadOfShoppingModal } from '@/components/instead-of-shopping-modal'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 import { createClient } from '@/utils/supabase/client'
-import { Package, Heart, Archive, Sparkles } from 'lucide-react'
+import { Package, Heart, Archive, Sparkles, Bell } from 'lucide-react'
 
 /*
   ✅ DASHBOARD DESIGN SYSTEM v2.0 IMPLEMENTATION
@@ -116,6 +117,15 @@ function DashboardContent() {
         {/* FTUE Checklist Section */}
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
           <FTUEChecklist />
+        </div>
+
+        {/* Price Alerts Section */}
+        <div className="mt-8 max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Bell className="h-5 w-5 text-red-500" />
+            <h2 className="text-lg font-semibold text-foreground">Price Drop Alerts</h2>
+          </div>
+          <PriceAlertsNotification />
         </div>
 
         {/* Section spacing between dashboard sections (48px) - Optimized for all screen sizes */}

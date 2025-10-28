@@ -330,6 +330,7 @@ export function AddItemForm({
 						wears: initialData.wears || 0,
 						// targetPrice: initialData.target_price?.toString() || "",
 						notes: initialData.notes || "",
+						productUrl: initialData.product_url || "",
 				  }
 				: {
 						triedOn: false,
@@ -552,6 +553,7 @@ export function AddItemForm({
 				retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
 				sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
+				product_url: data.productUrl || null,
 				notes: data.notes && data.notes.trim() ? data.notes : "",
 				wears: data.wears || 0,
 				status: (mode === "create" ? "wishlisted" : initialData?.status) as
@@ -871,6 +873,37 @@ export function AddItemForm({
 											</p>
 										)}
 									</div>
+								</div>
+
+								{/* Product URL Field */}
+								<div>
+									<Label htmlFor='productUrl' className='text-xs text-muted-foreground'>
+										Product URL (Optional - for price tracking)
+									</Label>
+									<div className='flex flex-col sm:flex-row gap-2 mt-2'>
+										<Input
+											id='productUrl'
+											{...register("productUrl")}
+											placeholder='https://nike.com/...'
+											className='flex-1'
+											disabled={isScrapingUrl}
+										/>
+										<Button
+											type='button'
+											onClick={() => handleUrlScrape(watch("productUrl") || "")}
+											disabled={isScrapingUrl || !watch("productUrl")}
+											variant='outline'>
+											{isScrapingUrl && (
+												<Loader2 className='h-4 w-4 mr-2 animate-spin' />
+											)}
+											{isScrapingUrl ? "Importing..." : "Import"}
+										</Button>
+									</div>
+									{uploadProgress && (
+										<p className='text-sm text-muted-foreground mt-2'>
+											{uploadProgress}
+										</p>
+									)}
 								</div>
 
 								{/* Row 2: Retail Price & Target Price */}

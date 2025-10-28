@@ -208,8 +208,16 @@ export async function PUT(
       )
     }
 
-    // Build update object
-    const updateData: any = {}
+    // Build update object with proper typing
+    interface OutfitUpdateData {
+      times_worn?: number
+      last_worn?: string | null
+      date_worn?: string | null
+      occasion?: string
+      name?: string
+    }
+
+    const updateData: OutfitUpdateData = {}
     if (times_worn !== undefined) updateData.times_worn = times_worn
     if (last_worn !== undefined) updateData.last_worn = last_worn
     if (date_worn !== undefined) updateData.date_worn = date_worn

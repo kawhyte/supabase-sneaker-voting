@@ -7,13 +7,89 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **PurrView** is a modern wardrobe management and price tracking application built with Next.js 15+ and Supabase. The app helps users catalog their clothing items, track wear statistics, calculate cost-per-wear metrics, and monitor prices for wishlist items.
 
 ### Core Features
-- **Wardrobe Management**: Track owned items, wishlist, journal (try-on notes), and archived items
-- **Cost Per Wear Tracking**: Monitor how well items justify their purchase price through wear statistics
-- **Price Monitoring**: Watch wishlist items and get notified when prices drop
-- **Photo Management**: Multi-photo upload with drag-and-drop ordering, Cloudinary integration
-- **Size & Comfort Tracking**: Record sizing information and comfort ratings for future reference
-- **View Modes**: Dashboard tabs for Owned, Want to Buy, and Archive views
-- **Brand Integration**: Brand logos and master brand list for visual recognition
+
+#### 1. Wardrobe Management (Phase 1-3)
+- **Multi-Category Support**: Shoes, tops, bottoms, outerwear, accessories, jewelry, watches
+- **Item Status Tracking**: Owned, Wishlisted (Want to Buy), or Archived
+- **Archive Management**: Soft delete with archive reasons (sold, donated, worn out, other)
+- **Advanced Filtering**: By category, brand, color, size, status
+- **Search Functionality**: Real-time search across brand, model, color
+- **Sorting Options**: By date added, name, brand, wear count, cost per wear
+- **Bulk Operations**: Archive, delete, edit multiple items
+- **Duplication Warnings**: Alert users before adding similar items (configurable)
+- **Size Preferences**: Store preferred sizes per brand for future reference
+
+#### 2. Cost Per Wear Tracking (Phase 1)
+- **Smart Calculations**: (Retail Price or Purchase Price) ÷ Wears = Cost Per Wear
+- **Dynamic Targets**:
+  - Budget items (<$50): $2/wear target
+  - Mid-range ($50-$150): $5/wear target
+  - Premium ($150+): $10/wear target
+- **Progress Visualization**: Progress bars with milestone celebrations
+- **Wear History**: Track wear count, last worn date, and frequency
+- **Cost Justification**: Visual indicator of whether item is "worth it"
+- **Financial Insights**: Total spend, average cost per wear, spending trends
+
+#### 3. Outfit Studio (Phase 2)
+- **Outfit Creation**: Compose outfits from wardrobe items on iPhone mockup canvas
+- **Smart Auto-Arrange**: Automatic positioning by category (shoes bottom, outerwear top)
+- **Manual Layout**: Drag-and-drop items to custom positions
+- **Z-Index Layering**: Control item layering for realistic visualization
+- **Manual Cropping**: Rectangle-based photo cropping with corner handles
+- **Outfit Gallery**: View all created outfits in grid or list view
+- **Wear Tracking**: Mark outfits as worn, track times worn and last worn date
+- **Outfit Details**: Name, description, occasion, background color
+- **Purchase Prevention**: "Can You Style This?" quiz before adding to wishlist
+- **Occasion Tracking**: Categorize outfits by occasion (casual, work, party, etc.)
+
+#### 4. Price Monitoring System (Phase 7.1-7.3)
+- **Automated Price Scraping**: Edge function checks prices weekly for wishlisted items
+- **Multi-Retailer Support**: Nike, Adidas, Foot Locker, Shopify stores, and more
+- **Product URL Tracking**: Users add product URLs to wishlist items
+- **Price History**: Stores historical price data for trend analysis
+- **Drop Detection**: Identifies price drops with severity levels (low/medium/high)
+- **Alert System**: Creates alerts when prices drop with percentage off
+- **Failure Handling**: Auto-disables tracking after 3 consecutive failures
+- **Database Tracking**: Logs all price checks and failures
+- **Notification UI**: Displays unread price alerts on dashboard with severity indicators
+- **Dismiss Feature**: Users can mark alerts as read
+
+#### 5. Photo Management (Phase 1-2)
+- **Multi-Photo Support**: Up to 5 photos per item
+- **Drag-and-Drop Reordering**: Intuitive photo ordering with DnD Kit
+- **Main Image Selection**: Designate primary photo for display
+- **Cloudinary Integration**: Automatic image optimization and CDN delivery
+- **Image Cropping**: Manual crop tool for outfit items
+- **Responsive Images**: Automatic format and size optimization
+- **Photo Gallery**: Carousel view with keyboard navigation
+
+#### 6. Size & Comfort Tracking (Phase 1)
+- **Try-On Recording**: Mark items as tried on with date
+- **Size Tracking**: Record sizes across different measurement systems (US, EU, UK, etc.)
+- **Comfort Rating**: 1-5 scale rating for item comfort
+- **Size Type Management**: Different systems for shoes vs clothing
+- **Size Recommendations**: Store preferred sizes per brand
+
+#### 7. Purchase Prevention (Phase 3)
+- **Cooling Off Period**: Configurable delay before purchase (default: 7 days)
+- **Quiz Gate**: "Can You Style This?" modal before adding to wishlist (requires 3+ outfits)
+- **Smart Warnings**: Psychology-driven messaging to reduce impulse buying
+- **Duplication Detection**: Warn about similar items already owned
+- **Budget Tracking**: Monitor spending against budget preferences
+
+#### 8. Dashboard & Views (Phase 1-2)
+- **Tabbed Interface**: Owned | Want to Buy | Outfits | Archived Items
+- **Dashboard Widgets**: FTUE checklist, price alerts, wear reminders
+- **View Density Toggle**: Compact or comfortable view modes
+- **Statistics Display**: Item counts, total spend, cost per wear metrics
+- **Responsive Grid**: Auto-adjusting card layout for all screen sizes
+
+#### 9. User Authentication & Profiles (Phase 1)
+- **Email/Password Auth**: Supabase authentication
+- **Session Management**: Automatic token refresh
+- **User Profiles**: Display name, avatar, preferences
+- **Privacy Controls**: Account-level access control
+- **Data Ownership**: RLS policies ensure users access only their data
 
 ## Development Commands
 

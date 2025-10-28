@@ -61,22 +61,38 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create outfit items
-    const outfitItemsData = outfit_items.map((item: any, index: number) => ({
-      outfit_id: outfit.id,
-      item_id: item.item_id,
-      position_x: item.position_x || 0.5,
-      position_y: item.position_y || 0.5,
-      z_index: item.z_index || 0,
-      display_width: item.display_width || 0.3,
-      display_height: item.display_height || 0.3,
-      item_order: index,
-      crop_x: item.crop_x || null,
-      crop_y: item.crop_y || null,
-      crop_width: item.crop_width || null,
-      crop_height: item.crop_height || null,
-      cropped_image_url: item.cropped_image_url || null,
-    }))
+    // Create outfit items with proper typing
+    interface OutfitItemRequest {
+      item_id: string
+      position_x?: number
+      position_y?: number
+      z_index?: number
+      display_width?: number
+      display_height?: number
+      crop_x?: number | null
+      crop_y?: number | null
+      crop_width?: number | null
+      crop_height?: number | null
+      cropped_image_url?: string | null
+    }
+
+    const outfitItemsData = (outfit_items as OutfitItemRequest[]).map(
+      (item: OutfitItemRequest, index: number) => ({
+        outfit_id: outfit.id,
+        item_id: item.item_id,
+        position_x: item.position_x || 0.5,
+        position_y: item.position_y || 0.5,
+        z_index: item.z_index || 0,
+        display_width: item.display_width || 0.3,
+        display_height: item.display_height || 0.3,
+        item_order: index,
+        crop_x: item.crop_x || null,
+        crop_y: item.crop_y || null,
+        crop_width: item.crop_width || null,
+        crop_height: item.crop_height || null,
+        cropped_image_url: item.cropped_image_url || null,
+      })
+    )
 
     const { data: createdItems, error: itemsError } = await supabase
       .from('outfit_items')
