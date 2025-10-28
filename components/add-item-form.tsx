@@ -1052,7 +1052,7 @@ export function AddItemForm({
 
 									<div className='space-y-4'>
 										{/* Toggle Switch */}
-										<div className='flex items-start justify-between gap-4'>
+										<div className='dense flex items-start justify-between gap-4'>
 											<div className='flex-1'>
 												<Label className='text-sm font-medium text-slate-900'>
 													Track price changes automatically
