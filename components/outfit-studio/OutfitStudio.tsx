@@ -253,7 +253,6 @@ export function OutfitStudio({
 
       // Check for outfit creation milestones
       const newOutfitCount = (outfitsCreated || 0) + 1
-      celebrate('outfit_created')
 
       // Reset form
       setOutfitName('Untitled Outfit')
@@ -261,7 +260,15 @@ export function OutfitStudio({
       setBackgroundColor('#FFFFFF')
       setOutfitItems([])
 
-      onClose()
+      // Trigger celebration before closing
+      console.log('🎉 Triggering outfit_created celebration')
+      celebrate('outfit_created')
+
+      // Close studio after a short delay to let celebration show
+      setTimeout(() => {
+        console.log('🎉 Closing outfit studio')
+        onClose()
+      }, 100)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to save outfit'
       toast.error(message)

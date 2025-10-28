@@ -34,6 +34,7 @@ export function OutfitsDashboard() {
   const [isStudioOpen, setIsStudioOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<DashboardTab>('gallery')
+  const [selectedOutfitId, setSelectedOutfitId] = useState<string | null>(null)
 
   // Fetch outfits and wardrobe on mount
   useEffect(() => {
@@ -276,7 +277,10 @@ export function OutfitsDashboard() {
                   <Card
                     key={outfit.id}
                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-                    onClick={() => setIsListViewOpen(true)}
+                    onClick={() => {
+                      setSelectedOutfitId(outfit.id)
+                      setIsListViewOpen(true)
+                    }}
                   >
                     <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
                       <div className="flex items-start justify-between gap-2">
@@ -343,6 +347,7 @@ export function OutfitsDashboard() {
                         className="w-full mt-2 text-xs sm:text-sm h-8 sm:h-9"
                         onClick={e => {
                           e.stopPropagation()
+                          setSelectedOutfitId(outfit.id)
                           setIsListViewOpen(true)
                         }}
                       >
@@ -395,8 +400,12 @@ export function OutfitsDashboard() {
       <ErrorBoundary level="component">
         <OutfitListView
           isOpen={isListViewOpen}
-          onClose={() => setIsListViewOpen(false)}
+          onClose={() => {
+            setIsListViewOpen(false)
+            setSelectedOutfitId(null)
+          }}
           outfits={outfits}
+          initialSelectedOutfitId={selectedOutfitId}
           onDelete={handleOutfitDeleted}
         />
       </ErrorBoundary>

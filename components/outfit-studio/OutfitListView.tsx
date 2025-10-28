@@ -22,6 +22,7 @@ interface OutfitListViewProps {
   outfits: OutfitWithItems[]
   onDelete?: (outfitId: string) => void
   onUpdate?: (outfit: Outfit) => void
+  initialSelectedOutfitId?: string | null
 }
 
 export function OutfitListView({
@@ -30,8 +31,9 @@ export function OutfitListView({
   outfits,
   onDelete,
   onUpdate,
+  initialSelectedOutfitId,
 }: OutfitListViewProps) {
-  const [selectedOutfitId, setSelectedOutfitId] = useState<string | null>(null)
+  const [selectedOutfitId, setSelectedOutfitId] = useState<string | null>(initialSelectedOutfitId || null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isMarkingWorn, setIsMarkingWorn] = useState(false)
   const [outfitsList, setOutfitsList] = useState(outfits)
@@ -41,6 +43,13 @@ export function OutfitListView({
   useEffect(() => {
     setOutfitsList(outfits)
   }, [outfits])
+
+  // Update selectedOutfitId when initialSelectedOutfitId prop changes
+  useEffect(() => {
+    if (initialSelectedOutfitId) {
+      setSelectedOutfitId(initialSelectedOutfitId)
+    }
+  }, [initialSelectedOutfitId])
 
   const selectedOutfit = outfitsList.find(o => o.id === selectedOutfitId)
 

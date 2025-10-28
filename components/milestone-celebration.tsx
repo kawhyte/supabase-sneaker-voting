@@ -2,8 +2,9 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import confetti from 'canvas-confetti'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 export interface MilestoneCelebration {
   type:
@@ -84,11 +85,13 @@ export function MilestoneCelebrationModal({
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
+    console.log('🎉 MilestoneCelebrationModal - isOpen:', isOpen, 'milestone:', milestone?.type)
     if (isOpen && canvasRef.current) {
       // Trigger confetti animation
+      console.log('🎉 Triggering confetti animation')
       triggerConfetti(canvasRef.current)
     }
-  }, [isOpen])
+  }, [isOpen, milestone])
 
   const triggerConfetti = (canvas: HTMLCanvasElement) => {
     const confettiInstance = confetti.create(canvas, {
@@ -130,6 +133,9 @@ export function MilestoneCelebrationModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
+        <VisuallyHidden asChild>
+          <DialogTitle>{milestone.title}</DialogTitle>
+        </VisuallyHidden>
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full pointer-events-none"
@@ -177,10 +183,14 @@ export function useMilestoneCelebration() {
   const [milestone, setMilestone] = useState<MilestoneCelebration | null>(null)
 
   const celebrate = (milestoneType: keyof typeof MILESTONES) => {
+    console.log('🎉 useMilestoneCelebration.celebrate called with:', milestoneType)
     const selectedMilestone = MILESTONES[milestoneType]
     if (selectedMilestone) {
+      console.log('🎉 Setting milestone and opening:', selectedMilestone.type)
       setMilestone(selectedMilestone)
       setIsOpen(true)
+    } else {
+      console.warn('🎉 Milestone not found:', milestoneType)
     }
   }
 
