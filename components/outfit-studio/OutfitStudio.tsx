@@ -25,6 +25,7 @@ import { Outfit, OutfitWithItems, OutfitItem, OutfitOccasion, CropArea } from '@
 import { OutfitCanvas } from './OutfitCanvas'
 import { ManualCropTool } from './ManualCropTool'
 import { CanYouStyleThisQuiz } from './CanYouStyleThisQuiz'
+import { MilestoneCelebrationModal, useMilestoneCelebration } from '@/components/milestone-celebration'
 import {
   calculateAutoPosition,
   calculateSuggestedSize,
@@ -84,6 +85,14 @@ export function OutfitStudio({
   const [croppingItemId, setCroppingItemId] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [showQuiz, setShowQuiz] = useState(false)
+
+  // Milestone celebrations
+  const {
+    isOpen: showCelebration,
+    milestone: celebrationMilestone,
+    celebrate,
+    closeCelebration,
+  } = useMilestoneCelebration()
 
   // Calculate items by category in current outfit
   const itemsByCategory = outfitItems.reduce(
@@ -242,6 +251,10 @@ export function OutfitStudio({
         onOutfitCreated(outfitWithItems)
       }
 
+      // Check for outfit creation milestones
+      const newOutfitCount = (outfitsCreated || 0) + 1
+      celebrate('outfit_created')
+
       // Reset form
       setOutfitName('Untitled Outfit')
       setOccasion('casual')
@@ -263,6 +276,15 @@ export function OutfitStudio({
 
   return (
     <>
+      {/* Milestone Celebration Modal */}
+      {showCelebration && celebrationMilestone && (
+        <MilestoneCelebrationModal
+          isOpen={showCelebration}
+          milestone={celebrationMilestone}
+          onClose={closeCelebration}
+        />
+      )}
+
       {/* Main Outfit Studio Modal */}
       <Dialog open={isOpen && !showQuizModal} onOpenChange={onClose}>
         <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">

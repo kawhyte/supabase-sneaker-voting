@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -8,6 +8,10 @@ import { ViewDensityToggle } from '@/components/view-density-toggle'
 import { SizingJournalDashboard } from '@/components/wardrobe-dashboard'
 import { FTUEChecklist } from '@/components/onboarding-checklist'
 import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
+import { WearRemindersContainer } from '@/components/wear-reminder-notifications'
+import { InsteadOfShoppingModal, useInsteadOfShoppingModal } from '@/components/instead-of-shopping-modal'
+import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import { createClient } from '@/utils/supabase/client'
 import { Package, Heart, Archive, Sparkles } from 'lucide-react'
 
 /*
@@ -95,6 +99,12 @@ function DashboardContent() {
   const searchParams = useSearchParams()
   // Default to 'owned' if no tab is specified in the URL
   const defaultTab = searchParams.get('tab') || 'owned'
+
+  // Shopping nudge modal
+  const {
+    isOpen: showShoppingNudge,
+    closeModal: closeShoppingNudge,
+  } = useInsteadOfShoppingModal()
 
   return (
     <div className="w-full min-h-screen">
@@ -189,6 +199,36 @@ function DashboardContent() {
           </Tabs>
         </div>
       </motion.div>
+
+      {/* Shopping Nudge Modal */}
+      {showShoppingNudge && (
+        <InsteadOfShoppingModal
+          isOpen={showShoppingNudge}
+          onClose={closeShoppingNudge}
+          activities={[
+            {
+              label: 'Create an Outfit',
+              hint: 'Mix and match pieces you already own',
+              action: () => closeShoppingNudge(),
+            },
+            {
+              label: 'Clean Your Closet',
+              hint: 'You might rediscover forgotten favorites',
+              action: () => closeShoppingNudge(),
+            },
+            {
+              label: 'Shuffle Outfits',
+              hint: 'Try random outfit suggestions',
+              action: () => closeShoppingNudge(),
+            },
+            {
+              label: 'Check Cost-Per-Wear',
+              hint: 'See which items are earning their keep',
+              action: () => closeShoppingNudge(),
+            },
+          ]}
+        />
+      )}
     </div>
   )
 }

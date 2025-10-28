@@ -10,6 +10,8 @@ import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitListView } from './OutfitListView'
 import { OutfitStudio } from './OutfitStudio'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import { OutfitsEmptyState } from '@/components/empty-state-illustrations'
+import { CatLoadingSpinner } from '@/components/cat-loading-animation'
 import { Sparkles, Plus, Calendar, Shuffle } from 'lucide-react'
 
 // Lazy load heavy outfit components (only loaded when tabs are active)
@@ -261,24 +263,12 @@ export function OutfitsDashboard() {
             <>
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sun-400"></div>
+                  <CatLoadingSpinner size="md" />
                 </div>
               ) : outfits.length === 0 ? (
-                <Card className="border-2 border-dashed border-slate-300">
-                  <CardContent className="py-12 text-center">
-                    <Sparkles className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No outfits yet</h3>
-                    <p className="text-muted-foreground mb-6">
-                      Start creating outfits to visualize your style combinations
-                    </p>
-                    <Button
-                      onClick={() => setIsStudioOpen(true)}
-                      className="bg-sun-400 text-slate-900 hover:bg-sun-500"
-                    >
-                      Create Your First Outfit
-                    </Button>
-                  </CardContent>
-                </Card>
+                <div className="flex justify-center py-12">
+                  <OutfitsEmptyState onCreateOutfit={() => setIsStudioOpen(true)} />
+                </div>
               ) : (
                 // Outfit Grid - Responsive
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -371,7 +361,7 @@ export function OutfitsDashboard() {
             <ErrorBoundary level="section">
               <Suspense fallback={
                 <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sun-400"></div>
+                  <CatLoadingSpinner size="md" />
                 </div>
               }>
                 <OutfitCalendar
@@ -388,7 +378,7 @@ export function OutfitsDashboard() {
             <ErrorBoundary level="section">
               <Suspense fallback={
                 <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sun-400"></div>
+                  <CatLoadingSpinner size="md" />
                 </div>
               }>
                 <OutfitShuffle

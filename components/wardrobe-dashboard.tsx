@@ -19,6 +19,13 @@ import { SizingJournalEntry } from './types/sizing-journal-entry'
 import { filterJournalEntries, sortJournalEntries } from '@/lib/sizing-journal-utils'
 import { type ItemCategory } from '@/components/types/item-category'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
+import {
+  WardrobeEmptyState,
+  WishlistEmptyState,
+  ArchiveEmptyState,
+} from './empty-state-illustrations'
+import { WearRemindersContainer } from './wear-reminder-notifications'
+import { SeasonalSuggestionsCard } from './seasonal-suggestions'
 
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
@@ -471,6 +478,38 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
 
       <SizingJournalStats journalEntries={journalEntries} />
 
+      {/* Seasonal Suggestions - Show only for owned items */}
+      {status.includes('owned') && journalEntries.length > 0 && (
+        <div className="mb-8">
+          <SeasonalSuggestionsCard
+            onViewOutfits={() => {
+              // Scroll to outfits or navigate
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+            onOrganizeWardrobe={() => {
+              // Trigger filter or view change
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+          />
+        </div>
+      )}
+
+      {/* Wear Reminders - Show only for owned items */}
+      {status.includes('owned') && journalEntries.length > 0 && (
+        <div className="mb-8">
+          <WearRemindersContainer
+            items={journalEntries}
+            onWear={(itemId) => {
+              // Update last_worn_date for the item
+              const item = journalEntries.find(e => e.id === itemId)
+              if (item) {
+                handleIncrementWear(item)
+              }
+            }}
+          />
+        </div>
+      )}
+
       <DashboardGrid
         entries={filteredAndSortedEntries}
         viewMode={viewMode}
@@ -600,68 +639,24 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
   // Show different empty states based on the section
   if (isArchivePage) {
     return (
-      <div className="col-span-full flex justify-center">
-        <Empty className="max-w-md border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Archive />
-            </EmptyMedia>
-            <EmptyTitle>No Archived Items</EmptyTitle>
-            <EmptyDescription>
-              Items you archive will appear here. Archive items you're no longer interested in to keep your main lists organized.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+      <div className="col-span-full flex justify-center py-12">
+        <ArchiveEmptyState />
       </div>
     )
   }
 
   if (displayStatus === 'wishlisted') {
     return (
-      <div className="col-span-full flex justify-center">
-        <Empty className="max-w-md border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Heart />
-            </EmptyMedia>
-            <EmptyTitle>Your Wishlist is Empty</EmptyTitle>
-            <EmptyDescription>
-              Start tracking items you're interested in. Add products to monitor prices and keep track of items you want.
-            </EmptyDescription>
-          </EmptyHeader>
-          {onAddNew && (
-            <EmptyContent>
-              <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700">
-                Add Your First Item
-              </Button>
-            </EmptyContent>
-          )}
-        </Empty>
+      <div className="col-span-full flex justify-center py-12">
+        <WishlistEmptyState />
       </div>
     )
   }
 
   if (displayStatus === 'owned') {
     return (
-      <div className="col-span-full flex justify-center">
-        <Empty className="max-w-md border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Package />
-            </EmptyMedia>
-            <EmptyTitle>Your Wardrobe is Empty</EmptyTitle>
-            <EmptyDescription>
-              You haven't added any items to your collection yet. Start by adding items you own to track your wardrobe.
-            </EmptyDescription>
-          </EmptyHeader>
-          {onAddNew && (
-            <EmptyContent>
-              <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700">
-                Add Your First Item
-              </Button>
-            </EmptyContent>
-          )}
-        </Empty>
+      <div className="col-span-full flex justify-center py-12">
+        <WardrobeEmptyState />
       </div>
     )
   }
