@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/navbar";
 import { ViewDensityProvider } from "@/lib/view-density-context";
+import { FormModeProvider } from "@/lib/form-mode-context";
 
 const defaultUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
@@ -117,25 +118,27 @@ export default function RootLayout({
     📚 Full documentation in globals.css (lines 97-315, 404-476)
   */}
   <body className="min-h-screen bg-background text-foreground border-t-6 border-primary">
-    <ViewDensityProvider>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
+    <FormModeProvider>
+      <ViewDensityProvider>
+        <div className="flex flex-col min-h-screen">
+          <Navbar />
 
-        {/* Main content inherits bg-background from body, no need to repeat */}
-        <main className="flex-1  sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 container mx-auto px-6 w-full">
-          {children}
-        </main>
+          {/* Main content inherits bg-background from body, no need to repeat */}
+          <main className="flex-1  sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 container mx-auto px-6 w-full">
+            {children}
+          </main>
 
-        {/* Footer uses card color for subtle differentiation */}
-        <footer className="border-t bg-card text-card-foreground py-8 px-8">
-          <p className="text-sm text-muted-foreground">
-            © 2025 Your Company. Built with love and Tailwind v4.
-          </p>
-        </footer>
+          {/* Footer uses card color for subtle differentiation */}
+          <footer className="border-t bg-card text-card-foreground py-8 px-8">
+            <p className="text-sm text-muted-foreground">
+              © 2025 Your Company. Built with love and Tailwind v4.
+            </p>
+          </footer>
 
-        <Toaster />
-      </div>
-    </ViewDensityProvider>
+          <Toaster />
+        </div>
+      </ViewDensityProvider>
+    </FormModeProvider>
   </body>
 </html>
 

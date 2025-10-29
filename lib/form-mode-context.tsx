@@ -34,7 +34,6 @@ interface FormModeProviderProps {
  */
 export function FormModeProvider({ children }: FormModeProviderProps) {
   const [modeState, setModeState] = useState<FormMode>(DEFAULT_MODE)
-  const [isHydrated, setIsHydrated] = useState(false)
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -42,7 +41,6 @@ export function FormModeProvider({ children }: FormModeProviderProps) {
     if (stored && ['quick', 'advanced'].includes(stored)) {
       setModeState(stored)
     }
-    setIsHydrated(true)
   }, [])
 
   // Save to localStorage when mode changes
@@ -51,11 +49,8 @@ export function FormModeProvider({ children }: FormModeProviderProps) {
     localStorage.setItem(STORAGE_KEY, newMode)
   }
 
-  // Prevent hydration mismatch - return null until hydrated
-  if (!isHydrated) {
-    return <>{children}</>
-  }
-
+  // Always provide context - even during hydration with default value
+  // This prevents "useFormMode must be used within FormModeProvider" errors
   return (
     <FormModeContext.Provider value={{ mode: modeState, setMode }}>
       {children}
