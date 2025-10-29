@@ -1,11 +1,31 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { Logger } from '@/lib/logger'
+import { apiErrorHandler } from '@/lib/api-error-handler'
+import { dbErrorHandler } from '@/lib/db-error-handler'
+import { retryUtils } from '@/lib/retry-utils'
+import { getCircuitBreaker } from '@/lib/circuit-breaker'
+import { ApiEndpointType, getApiClientConfig } from '@/lib/api-client-config'
+
+const logger = new Logger()
+
+/**
+ * Circuit breaker for outfit creation (write operation)
+ */
+const outfitCreateBreaker = getCircuitBreaker('outfit-create', {
+  failureThreshold: 4,
+  successThreshold: 2,
+  timeout: 45000,
+})
 
 /**
  * POST /api/outfits
  * Save a new outfit with items to the database
  */
 export async function POST(request: NextRequest) {
+  const requestId = Logger.generateRequestId()
+  const config = getApiClientConfig(ApiEndpointType.WRITE)
+
   try {
     const supabase = await createClient()
 
@@ -16,8 +36,13 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     if (authError || !user) {
+      logger.warn('Unauthorized outfit creation attempt', {
+        component: 'OutfitsAPI',
+        requestId,
+        error: authError?.message,
+      })
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        apiErrorHandler.createErrorResponse('UNAUTHORIZED', undefined, undefined, requestId),
         { status: 401 }
       )
     }
@@ -33,33 +58,45 @@ export async function POST(request: NextRequest) {
     } = body
 
     // Validate required fields
-    if (!name || !Array.isArray(outfit_items) || outfit_items.length === 0) {
+    const validationError = apiErrorHandler.validateRequired(
+      { name, outfit_items },
+      ['name', 'outfit_items']
+    )
+    if (validationError || !Array.isArray(outfit_items) || outfit_items.length === 0) {
+      logger.warn('Invalid outfit creation request', {
+        component: 'OutfitsAPI',
+        requestId,
+        error: validationError || 'Items required',
+      })
       return NextResponse.json(
-        { error: 'Outfit name and at least one item required' },
+        apiErrorHandler.createErrorResponse('VALIDATION_ERROR', 'Outfit name and at least one item required', undefined, requestId),
         { status: 400 }
       )
     }
 
-    // Create outfit
-    const { data: outfit, error: outfitError } = await supabase
-      .from('outfits')
-      .insert({
-        user_id: user.id,
-        name: name.trim(),
-        description: description?.trim() || null,
-        occasion: occasion || 'casual',
-        background_color: background_color || '#FFFFFF',
-      })
-      .select()
-      .single()
+    // Create outfit with retry and circuit breaker
+    const outfit = await outfitCreateBreaker.execute(async () => {
+      return await retryUtils.retry(
+        async () => {
+          const { data, error } = await supabase
+            .from('outfits')
+            .insert({
+              user_id: user.id,
+              name: name.trim(),
+              description: description?.trim() || null,
+              occasion: occasion || 'casual',
+              background_color: background_color || '#FFFFFF',
+            })
+            .select()
+            .single()
 
-    if (outfitError) {
-      console.error('Failed to create outfit:', outfitError)
-      return NextResponse.json(
-        { error: 'Failed to create outfit' },
-        { status: 500 }
+          if (error) throw error
+          return data
+        },
+        'Create outfit',
+        config.retryConfig
       )
-    }
+    })
 
     // Create outfit items with proper typing
     interface OutfitItemRequest {
@@ -94,20 +131,29 @@ export async function POST(request: NextRequest) {
       })
     )
 
-    const { data: createdItems, error: itemsError } = await supabase
-      .from('outfit_items')
-      .insert(outfitItemsData)
-      .select()
+    const createdItems = await outfitCreateBreaker.execute(async () => {
+      return await retryUtils.retry(
+        async () => {
+          const { data, error } = await supabase
+            .from('outfit_items')
+            .insert(outfitItemsData)
+            .select()
 
-    if (itemsError) {
-      console.error('Failed to create outfit items:', itemsError)
-      // Optionally delete the outfit if items fail
-      await supabase.from('outfits').delete().eq('id', outfit.id)
-      return NextResponse.json(
-        { error: 'Failed to add items to outfit' },
-        { status: 500 }
+          if (error) throw error
+          return data
+        },
+        'Create outfit items',
+        config.retryConfig
       )
-    }
+    })
+
+    logger.info('Outfit created successfully', {
+      component: 'OutfitsAPI',
+      requestId,
+      userId: user.id,
+      outfitId: outfit.id,
+      itemCount: createdItems?.length || 0,
+    })
 
     // Return created outfit with items
     return NextResponse.json({
@@ -115,19 +161,38 @@ export async function POST(request: NextRequest) {
       outfit_items: createdItems,
     })
   } catch (error) {
-    console.error('Outfit creation error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    logger.error('Outfit creation error', error instanceof Error ? error : new Error(String(error)), {
+      component: 'OutfitsAPI',
+      requestId,
+      route: '/api/outfits',
+      method: 'POST',
+    })
+
+    return apiErrorHandler.handleError(error, {
+      route: '/api/outfits',
+      method: 'POST',
+      requestId,
+    })
   }
 }
+
+/**
+ * Circuit breaker for outfit reads (fast read operation)
+ */
+const outfitReadBreaker = getCircuitBreaker('outfit-read', {
+  failureThreshold: 5,
+  successThreshold: 2,
+  timeout: 30000,
+})
 
 /**
  * GET /api/outfits
  * Fetch user's outfits
  */
 export async function GET(request: NextRequest) {
+  const requestId = Logger.generateRequestId()
+  const config = getApiClientConfig(ApiEndpointType.FAST_READ)
+
   try {
     const supabase = await createClient()
 
@@ -138,43 +203,65 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     if (authError || !user) {
+      logger.warn('Unauthorized outfit fetch attempt', {
+        component: 'OutfitsAPI',
+        requestId,
+        error: authError?.message,
+      })
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        apiErrorHandler.createErrorResponse('UNAUTHORIZED', undefined, undefined, requestId),
         { status: 401 }
       )
     }
 
-    // Fetch user's outfits with items and item photos
-    const { data: outfits, error } = await supabase
-      .from('outfits')
-      .select(
-        `*,
-        outfit_items(
-          *,
-          item:items(
-            *,
-            item_photos(*)
-          )
-        )`
-      )
-      .eq('user_id', user.id)
-      .eq('is_archived', false)
-      .order('created_at', { ascending: false })
+    // Fetch user's outfits with items and item photos using retry and circuit breaker
+    const outfits = await outfitReadBreaker.execute(async () => {
+      return await retryUtils.retry(
+        async () => {
+          const { data, error } = await supabase
+            .from('outfits')
+            .select(
+              `*,
+              outfit_items(
+                *,
+                item:items(
+                  *,
+                  item_photos(*)
+                )
+              )`
+            )
+            .eq('user_id', user.id)
+            .eq('is_archived', false)
+            .order('created_at', { ascending: false })
 
-    if (error) {
-      console.error('Failed to fetch outfits:', error)
-      return NextResponse.json(
-        { error: 'Failed to fetch outfits' },
-        { status: 500 }
+          if (error) throw error
+          return data
+        },
+        'Fetch outfits',
+        config.retryConfig
       )
-    }
+    })
+
+    logger.info('Outfits fetched successfully', {
+      component: 'OutfitsAPI',
+      requestId,
+      userId: user.id,
+      count: outfits?.length || 0,
+    })
 
     return NextResponse.json({ outfits })
   } catch (error) {
-    console.error('Outfit fetch error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    logger.error('Outfit fetch error', error instanceof Error ? error : new Error(String(error)), {
+      component: 'OutfitsAPI',
+      requestId,
+      route: '/api/outfits',
+      method: 'GET',
+    })
+
+    return apiErrorHandler.handleError(error, {
+      route: '/api/outfits',
+      method: 'GET',
+      requestId,
+    })
   }
 }

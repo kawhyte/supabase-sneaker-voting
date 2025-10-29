@@ -5,6 +5,7 @@ import { AlertCircle, RefreshCw, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
+import { logger } from '@/lib/logger'
 
 interface Props {
   children: ReactNode
@@ -48,7 +49,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details for debugging
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    logger.error('ErrorBoundary caught an error', error, {
+      component: 'ErrorBoundary',
+      level: this.props.level,
+      componentStack: errorInfo.componentStack,
+    })
 
     // Call optional error handler
     this.props.onError?.(error, errorInfo)

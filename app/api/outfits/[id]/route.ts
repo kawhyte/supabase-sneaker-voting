@@ -1,9 +1,31 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { Logger } from '@/lib/logger'
+import { apiErrorHandler } from '@/lib/api-error-handler'
+import { retryUtils } from '@/lib/retry-utils'
+import { getCircuitBreaker } from '@/lib/circuit-breaker'
+import { ApiEndpointType, getApiClientConfig } from '@/lib/api-client-config'
+
+const logger = new Logger()
 
 interface RouteParams {
   id: string
 }
+
+/**
+ * Circuit breakers for outfit operations
+ */
+const outfitReadBreaker = getCircuitBreaker('outfit-read', {
+  failureThreshold: 5,
+  successThreshold: 2,
+  timeout: 30000,
+})
+
+const outfitWriteBreaker = getCircuitBreaker('outfit-write', {
+  failureThreshold: 4,
+  successThreshold: 2,
+  timeout: 45000,
+})
 
 /**
  * DELETE /api/outfits/:id
@@ -14,6 +36,9 @@ export async function DELETE(
   context: { params: Promise<RouteParams> }
 ) {
   const params = await context.params
+  const requestId = Logger.generateRequestId()
+  const config = getApiClientConfig(ApiEndpointType.WRITE)
+
   try {
     const supabase = await createClient()
 
@@ -24,8 +49,13 @@ export async function DELETE(
     } = await supabase.auth.getUser()
 
     if (authError || !user) {
+      logger.warn('Unauthorized outfit delete attempt', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+        error: authError?.message,
+      })
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        apiErrorHandler.createErrorResponse('UNAUTHORIZED', undefined, undefined, requestId),
         { status: 401 }
       )
     }
@@ -33,54 +63,97 @@ export async function DELETE(
     const outfitId = params.id
 
     if (!outfitId) {
+      logger.warn('Outfit ID required for delete', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+      })
       return NextResponse.json(
-        { error: 'Outfit ID required' },
+        apiErrorHandler.createErrorResponse('VALIDATION_ERROR', 'Outfit ID required', undefined, requestId),
         { status: 400 }
       )
     }
 
-    // Verify outfit belongs to user
-    const { data: outfit, error: fetchError } = await supabase
-      .from('outfits')
-      .select('id, user_id')
-      .eq('id', outfitId)
-      .single()
+    // Verify outfit belongs to user with retry
+    const outfit = await outfitReadBreaker.execute(async () => {
+      return await retryUtils.retry(
+        async () => {
+          const { data, error } = await supabase
+            .from('outfits')
+            .select('id, user_id')
+            .eq('id', outfitId)
+            .single()
 
-    if (fetchError || !outfit) {
+          if (error) throw error
+          return data
+        },
+        'Fetch outfit for delete authorization',
+        config.retryConfig
+      )
+    })
+
+    if (!outfit) {
+      logger.info('Outfit not found for delete', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+        outfitId,
+      })
       return NextResponse.json(
-        { error: 'Outfit not found' },
+        apiErrorHandler.createErrorResponse('NOT_FOUND', 'Outfit not found', undefined, requestId),
         { status: 404 }
       )
     }
 
     if (outfit.user_id !== user.id) {
+      logger.warn('Unauthorized outfit delete attempt - ownership check', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+        outfitId,
+        userId: user.id,
+      })
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        apiErrorHandler.createErrorResponse('FORBIDDEN', undefined, undefined, requestId),
         { status: 403 }
       )
     }
 
-    // Archive the outfit (soft delete)
-    const { error: deleteError } = await supabase
-      .from('outfits')
-      .update({ is_archived: true })
-      .eq('id', outfitId)
+    // Archive the outfit (soft delete) with retry
+    await outfitWriteBreaker.execute(async () => {
+      return await retryUtils.retry(
+        async () => {
+          const { error } = await supabase
+            .from('outfits')
+            .update({ is_archived: true })
+            .eq('id', outfitId)
 
-    if (deleteError) {
-      console.error('Failed to delete outfit:', deleteError)
-      return NextResponse.json(
-        { error: 'Failed to delete outfit' },
-        { status: 500 }
+          if (error) throw error
+          return true
+        },
+        'Archive outfit',
+        config.retryConfig
       )
-    }
+    })
+
+    logger.info('Outfit archived successfully', {
+      component: 'OutfitsDetailAPI',
+      requestId,
+      outfitId,
+      userId: user.id,
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Outfit delete error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    logger.error('Outfit delete error', error instanceof Error ? error : new Error(String(error)), {
+      component: 'OutfitsDetailAPI',
+      requestId,
+      route: '/api/outfits/[id]',
+      method: 'DELETE',
+    })
+
+    return apiErrorHandler.handleError(error, {
+      route: '/api/outfits/[id]',
+      method: 'DELETE',
+      requestId,
+    })
   }
 }
 
@@ -93,6 +166,9 @@ export async function GET(
   context: { params: Promise<RouteParams> }
 ) {
   const params = await context.params
+  const requestId = Logger.generateRequestId()
+  const config = getApiClientConfig(ApiEndpointType.FAST_READ)
+
   try {
     const supabase = await createClient()
 
@@ -103,8 +179,13 @@ export async function GET(
     } = await supabase.auth.getUser()
 
     if (authError || !user) {
+      logger.warn('Unauthorized outfit fetch attempt', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+        error: authError?.message,
+      })
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        apiErrorHandler.createErrorResponse('UNAUTHORIZED', undefined, undefined, requestId),
         { status: 401 }
       )
     }
@@ -112,40 +193,75 @@ export async function GET(
     const outfitId = params.id
 
     if (!outfitId) {
+      logger.warn('Outfit ID required for fetch', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+      })
       return NextResponse.json(
-        { error: 'Outfit ID required' },
+        apiErrorHandler.createErrorResponse('VALIDATION_ERROR', 'Outfit ID required', undefined, requestId),
         { status: 400 }
       )
     }
 
-    // Fetch outfit with items
-    const { data: outfit, error } = await supabase
-      .from('outfits')
-      .select(
-        `*,
-        outfit_items(
-          *,
-          item:items(*)
-        )`
-      )
-      .eq('id', outfitId)
-      .eq('user_id', user.id)
-      .single()
+    // Fetch outfit with items using retry
+    const outfit = await outfitReadBreaker.execute(async () => {
+      return await retryUtils.retry(
+        async () => {
+          const { data, error } = await supabase
+            .from('outfits')
+            .select(
+              `*,
+              outfit_items(
+                *,
+                item:items(*)
+              )`
+            )
+            .eq('id', outfitId)
+            .eq('user_id', user.id)
+            .single()
 
-    if (error || !outfit) {
+          if (error) throw error
+          return data
+        },
+        'Fetch outfit details',
+        config.retryConfig
+      )
+    })
+
+    if (!outfit) {
+      logger.info('Outfit not found for fetch', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+        outfitId,
+        userId: user.id,
+      })
       return NextResponse.json(
-        { error: 'Outfit not found' },
+        apiErrorHandler.createErrorResponse('NOT_FOUND', 'Outfit not found', undefined, requestId),
         { status: 404 }
       )
     }
 
+    logger.info('Outfit fetched successfully', {
+      component: 'OutfitsDetailAPI',
+      requestId,
+      outfitId,
+      userId: user.id,
+    })
+
     return NextResponse.json({ outfit })
   } catch (error) {
-    console.error('Outfit fetch error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    logger.error('Outfit fetch error', error instanceof Error ? error : new Error(String(error)), {
+      component: 'OutfitsDetailAPI',
+      requestId,
+      route: '/api/outfits/[id]',
+      method: 'GET',
+    })
+
+    return apiErrorHandler.handleError(error, {
+      route: '/api/outfits/[id]',
+      method: 'GET',
+      requestId,
+    })
   }
 }
 
@@ -158,6 +274,9 @@ export async function PUT(
   context: { params: Promise<RouteParams> }
 ) {
   const params = await context.params
+  const requestId = Logger.generateRequestId()
+  const config = getApiClientConfig(ApiEndpointType.WRITE)
+
   try {
     const supabase = await createClient()
 
@@ -168,8 +287,13 @@ export async function PUT(
     } = await supabase.auth.getUser()
 
     if (authError || !user) {
+      logger.warn('Unauthorized outfit update attempt', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+        error: authError?.message,
+      })
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        apiErrorHandler.createErrorResponse('UNAUTHORIZED', undefined, undefined, requestId),
         { status: 401 }
       )
     }
@@ -177,8 +301,12 @@ export async function PUT(
     const outfitId = params.id
 
     if (!outfitId) {
+      logger.warn('Outfit ID required for update', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+      })
       return NextResponse.json(
-        { error: 'Outfit ID required' },
+        apiErrorHandler.createErrorResponse('VALIDATION_ERROR', 'Outfit ID required', undefined, requestId),
         { status: 400 }
       )
     }
@@ -188,22 +316,44 @@ export async function PUT(
     const { times_worn, last_worn, date_worn, occasion, name } = body
 
     // Verify outfit belongs to user
-    const { data: outfit, error: fetchError } = await supabase
-      .from('outfits')
-      .select('id, user_id')
-      .eq('id', outfitId)
-      .single()
+    const outfit = await outfitReadBreaker.execute(async () => {
+      return await retryUtils.retry(
+        async () => {
+          const { data, error } = await supabase
+            .from('outfits')
+            .select('id, user_id')
+            .eq('id', outfitId)
+            .single()
 
-    if (fetchError || !outfit) {
+          if (error) throw error
+          return data
+        },
+        'Fetch outfit for update authorization',
+        config.retryConfig
+      )
+    })
+
+    if (!outfit) {
+      logger.info('Outfit not found for update', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+        outfitId,
+      })
       return NextResponse.json(
-        { error: 'Outfit not found' },
+        apiErrorHandler.createErrorResponse('NOT_FOUND', 'Outfit not found', undefined, requestId),
         { status: 404 }
       )
     }
 
     if (outfit.user_id !== user.id) {
+      logger.warn('Unauthorized outfit update attempt - ownership check', {
+        component: 'OutfitsDetailAPI',
+        requestId,
+        outfitId,
+        userId: user.id,
+      })
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        apiErrorHandler.createErrorResponse('FORBIDDEN', undefined, undefined, requestId),
         { status: 403 }
       )
     }
@@ -224,34 +374,52 @@ export async function PUT(
     if (occasion !== undefined) updateData.occasion = occasion
     if (name !== undefined) updateData.name = name
 
-    // Update outfit
-    const { data: updatedOutfit, error: updateError } = await supabase
-      .from('outfits')
-      .update(updateData)
-      .eq('id', outfitId)
-      .select(
-        `*,
-        outfit_items(
-          *,
-          item:items(*)
-        )`
-      )
-      .single()
+    // Update outfit with retry
+    const updatedOutfit = await outfitWriteBreaker.execute(async () => {
+      return await retryUtils.retry(
+        async () => {
+          const { data, error } = await supabase
+            .from('outfits')
+            .update(updateData)
+            .eq('id', outfitId)
+            .select(
+              `*,
+              outfit_items(
+                *,
+                item:items(*)
+              )`
+            )
+            .single()
 
-    if (updateError) {
-      console.error('Failed to update outfit:', updateError)
-      return NextResponse.json(
-        { error: 'Failed to update outfit' },
-        { status: 500 }
+          if (error) throw error
+          return data
+        },
+        'Update outfit',
+        config.retryConfig
       )
-    }
+    })
+
+    logger.info('Outfit updated successfully', {
+      component: 'OutfitsDetailAPI',
+      requestId,
+      outfitId,
+      userId: user.id,
+      updatedFields: Object.keys(updateData),
+    })
 
     return NextResponse.json({ outfit: updatedOutfit })
   } catch (error) {
-    console.error('Outfit update error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    logger.error('Outfit update error', error instanceof Error ? error : new Error(String(error)), {
+      component: 'OutfitsDetailAPI',
+      requestId,
+      route: '/api/outfits/[id]',
+      method: 'PUT',
+    })
+
+    return apiErrorHandler.handleError(error, {
+      route: '/api/outfits/[id]',
+      method: 'PUT',
+      requestId,
+    })
   }
 }
