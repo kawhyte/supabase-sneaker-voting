@@ -89,27 +89,36 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { X, Sparkles, ShoppingBag, Heart, Link2 } from 'lucide-react'
+import { Sparkles, ShoppingBag, Heart, Link2, ChevronUp, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+/**
+ * FTUEChecklist - First Time User Experience Checklist
+ *
+ * NEW: Collapsible instead of dismissible
+ * - Persists collapsed/expanded state to localStorage (purrview_ftue_collapsed)
+ * - Users can collapse but not permanently dismiss
+ * - Icon toggles: ChevronUp (expanded) → ChevronDown (collapsed)
+ */
 export function FTUEChecklist() {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    // Check localStorage for dismissal state
-    const hasDismissed = localStorage.getItem('hasDismissedFTUE')
+    // Check localStorage for collapsed state
+    const collapsedState = localStorage.getItem('purrview_ftue_collapsed')
 
-    if (!hasDismissed || hasDismissed === 'false') {
-      setIsVisible(true)
+    if (collapsedState === 'true') {
+      setIsCollapsed(true)
     }
 
     setIsLoaded(true)
   }, [])
 
-  const handleDismiss = () => {
-    localStorage.setItem('hasDismissedFTUE', 'true')
-    setIsVisible(false)
+  const handleToggleCollapse = () => {
+    const newState = !isCollapsed
+    setIsCollapsed(newState)
+    localStorage.setItem('purrview_ftue_collapsed', newState.toString())
   }
 
   // Don't render anything until we've checked localStorage
@@ -119,41 +128,45 @@ export function FTUEChecklist() {
 
   return (
     <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Card className="mb-6 border-2 border-sun-400 bg-white p-6">
-            <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4 p-0">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-sun-100">
-                  <Sparkles className="h-5 w-5 text-sun-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-bold text-foreground">
-                    Getting Started
-                  </CardTitle>
-                  <CardDescription className="text-sm mt-1 text-muted-foreground">
-                    Welcome! Here are some things you can try to get the most out of your wardrobe tracker
-                  </CardDescription>
-                </div>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card className="mb-6 border-2 border-sun-400 bg-white p-6">
+          <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4 p-0">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="p-2 rounded-lg bg-sun-100">
+                <Sparkles className="h-5 w-5 text-sun-600" />
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDismiss}
-                className="h-8 w-8 p-0 text-foreground hover:text-primary"
-                aria-label="Dismiss getting started guide"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </CardHeader>
+              <div>
+                <CardTitle className="text-xl font-bold text-foreground">
+                  Getting Started
+                </CardTitle>
+                <CardDescription className="text-sm mt-1 text-muted-foreground">
+                  Welcome! Here are some things you can try to get the most out of your wardrobe tracker
+                </CardDescription>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleToggleCollapse}
+              className="h-8 w-8 p-0 text-foreground hover:text-primary ml-2 flex-shrink-0"
+              aria-label={isCollapsed ? "Expand getting started guide" : "Collapse getting started guide"}
+            >
+              {isCollapsed ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronUp className="h-4 w-4" />
+              )}
+            </Button>
+          </CardHeader>
 
-            <CardContent className="p-0">
-              <div className="space-y-6">
+            {!isCollapsed && (
+              <CardContent className="p-0">
+                <div className="space-y-6">
                 {/* Checklist Item 1 */}
                 <div className="flex items-start gap-3 p-4 rounded-lg transition-colors bg-stone-50 hover:bg-stone-100">
                   <div className="flex-shrink-0 w-6 h-6 rounded border border-stone-300 flex items-center justify-center mt-0.5 bg-white">
@@ -209,16 +222,16 @@ export function FTUEChecklist() {
                 </div>
               </div>
 
-              {/* Dismissal Info Footer - border-sun-300 for visibility */}
+              {/* Collapse Info Footer */}
               <div className="mt-6 pt-6 border-t border-sun-300">
                 <p className="text-xs text-center text-slate-500">
-                  You can dismiss this guide anytime by clicking the × button above
+                  Collapse this guide using the button above to reduce dashboard clutter
                 </p>
               </div>
             </CardContent>
-          </Card>
-        </motion.div>
-      )}
+            )}
+        </Card>
+      </motion.div>
     </AnimatePresence>
   )
 }

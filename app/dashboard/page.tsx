@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ViewDensityToggle } from '@/components/view-density-toggle'
 import { SizingJournalDashboard } from '@/components/wardrobe-dashboard'
@@ -13,7 +14,7 @@ import { WearRemindersContainer } from '@/components/wear-reminder-notifications
 import { InsteadOfShoppingModal, useInsteadOfShoppingModal } from '@/components/instead-of-shopping-modal'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 import { createClient } from '@/utils/supabase/client'
-import { Package, Heart, Archive, Sparkles, Bell } from 'lucide-react'
+import { Package, Heart, Archive, Sparkles, Bell, ChevronUp, ChevronDown } from 'lucide-react'
 
 /*
   ✅ DASHBOARD DESIGN SYSTEM v2.0 IMPLEMENTATION
@@ -101,11 +102,28 @@ function DashboardContent() {
   // Default to 'owned' if no tab is specified in the URL
   const defaultTab = searchParams.get('tab') || 'owned'
 
+  // Price Alerts collapse state
+  const [isPriceAlertsCollapsed, setIsPriceAlertsCollapsed] = useState(false)
+
   // Shopping nudge modal
   const {
     isOpen: showShoppingNudge,
     closeModal: closeShoppingNudge,
   } = useInsteadOfShoppingModal()
+
+  // Load price alerts collapsed state from localStorage
+  useEffect(() => {
+    const collapsedState = localStorage.getItem('purrview_price_alerts_collapsed')
+    if (collapsedState === 'true') {
+      setIsPriceAlertsCollapsed(true)
+    }
+  }, [])
+
+  const handleTogglePriceAlerts = () => {
+    const newState = !isPriceAlertsCollapsed
+    setIsPriceAlertsCollapsed(newState)
+    localStorage.setItem('purrview_price_alerts_collapsed', newState.toString())
+  }
 
   return (
     <div className="w-full min-h-screen">
@@ -121,11 +139,26 @@ function DashboardContent() {
 
         {/* Price Alerts Section */}
         <div className="mt-8 max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Bell className="h-5 w-5 text-red-500" />
-            <h2 className="text-lg font-semibold text-foreground">Price Drop Alerts</h2>
+          <div className="flex items-center gap-2 mb-4 justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-red-500" />
+              <h2 className="text-lg font-semibold text-foreground">Price Drop Alerts</h2>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleTogglePriceAlerts}
+              className="h-8 w-8 p-0"
+              aria-label={isPriceAlertsCollapsed ? "Expand price alerts" : "Collapse price alerts"}
+            >
+              {isPriceAlertsCollapsed ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronUp className="h-4 w-4" />
+              )}
+            </Button>
           </div>
-          <PriceAlertsNotification />
+          {!isPriceAlertsCollapsed && <PriceAlertsNotification />}
         </div>
 
         {/* Section spacing between dashboard sections (48px) - Optimized for all screen sizes */}
