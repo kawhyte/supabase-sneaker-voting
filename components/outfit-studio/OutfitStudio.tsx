@@ -31,6 +31,7 @@ import {
   calculateSuggestedSize,
   autoArrangeOutfit,
 } from '@/lib/outfit-layout-engine'
+import { createClient } from '@/utils/supabase/client'
 import { Plus, X } from 'lucide-react'
 
 const OUTFIT_OCCASIONS: OutfitOccasion[] = [
@@ -93,6 +94,54 @@ export function OutfitStudio({
     celebrate,
     closeCelebration,
   } = useMilestoneCelebration()
+
+  // Initialize Supabase client for quiz callbacks
+  const supabase = createClient()
+
+  // 🎯 STEP 3.5c: Quiz modal callbacks for OutfitStudio
+  const handleQuizProceed = async () => {
+    if (!newWishlistItem) {
+      setShowQuiz(false)
+      return
+    }
+
+    try {
+      setIsSaving(true)
+
+      // Get current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) {
+        toast.error('Authentication Error')
+        return
+      }
+
+      // Update item status to 'wishlisted'
+      const { error } = await supabase
+        .from('sneakers')
+        .update({ status: 'wishlisted', purchase_date: null })
+        .eq('id', newWishlistItem.id)
+        .eq('user_id', user.id)
+
+      if (error) throw error
+
+      toast.success('Added to wishlist! Time to style some outfits 🎉')
+      setShowQuiz(false)
+    } catch (error) {
+      toast.error((error as Error).message || 'Failed to add to wishlist')
+      console.error('[OutfitStudio] Quiz proceed error:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleQuizSkip = () => {
+    // Just close the quiz modal without saving
+    // User decided not to add item to wishlist
+    setShowQuiz(false)
+    // TODO: Track skip event for analytics (optional)
+  }
 
   // Calculate items by category in current outfit
   const itemsByCategory = outfitItems.reduce(
@@ -480,15 +529,9 @@ export function OutfitStudio({
           itemBrand={newWishlistItem?.brand}
           itemModel={newWishlistItem?.model}
           itemPrice={newWishlistItem?.purchase_price}
-          onProceed={() => {
-            setShowQuiz(false)
-            // TODO: Add to wishlist
-          }}
+          onProceed={handleQuizProceed}
           onCreateOutfits={() => setShowQuiz(false)}
-          onSkip={() => {
-            setShowQuiz(false)
-            // TODO: Track skip event
-          }}
+          onSkip={handleQuizSkip}
         />
       )}
     </>

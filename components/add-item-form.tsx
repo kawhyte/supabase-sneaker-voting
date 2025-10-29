@@ -176,6 +176,8 @@ import {
 import { SupportedRetailersDialog } from "@/components/supported-retailers-dialog";
 import { useFormMode } from "@/lib/form-mode-context";
 import { useSmartDefaults } from "@/hooks/useSmartDefaults";
+import { CanYouStyleThisQuiz } from "@/components/outfit-studio/CanYouStyleThisQuiz";
+import { getOutfitCount } from "@/lib/outfit-count-utils";
 
 const itemSchema = z
 	.object({
@@ -322,6 +324,10 @@ export function AddItemForm({
 	const [showRetailersDialog, setShowRetailersDialog] = useState(false);
 	const [isSavingPhotos, setIsSavingPhotos] = useState(false);
 	const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+	// Quiz modal state for wishlist items (Step 3.5)
+	const [showQuizModal, setShowQuizModal] = useState(false);
+	const [outfitCount, setOutfitCount] = useState(0);
+	const [pendingWishlistItem, setPendingWishlistItem] = useState<any>(null);
 	const formRef = useRef<HTMLFormElement>(null);
 	const supabase = createClient();
 
@@ -474,6 +480,24 @@ export function AddItemForm({
 			});
 		};
 	}, []);
+
+	// Load outfit count for quiz modal (Step 3.5)
+	useEffect(() => {
+		const loadOutfitCount = async () => {
+			try {
+				const count = await getOutfitCount();
+				setOutfitCount(count);
+			} catch (error) {
+				console.error('[AddItemForm] Failed to load outfit count:', error);
+				// Default to 0 (will show quiz modal)
+				setOutfitCount(0);
+			}
+		};
+
+		if (mode === 'create') {
+			loadOutfitCount();
+		}
+	}, [mode]);
 
 	const handleUrlScrape = async (url: string) => {
 		if (!url.trim()) return;
@@ -641,6 +665,20 @@ export function AddItemForm({
 				// target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
 			};
 
+			// 🎯 STEP 3.5: Quiz modal gate for new wishlist items
+			// If creating new item as wishlist AND user has < 3 outfits: show quiz modal
+			if (mode === "create" && experienceData.status === "wishlisted" && outfitCount < 3) {
+				// Store the pending item data and photos, show quiz
+				setPendingWishlistItem({
+					...experienceData,
+					photos: newPhotos,
+					uploadedPhotoData,
+				});
+				setShowQuizModal(true);
+				setIsLoading(false);
+				return; // Don't continue with save yet
+			}
+
 			let resultItem: any;
 			if (mode === "edit" && initialData?.id) {
 				const { data: updatedItem, error } = await supabase
@@ -732,6 +770,77 @@ export function AddItemForm({
 			setIsLoading(false);
 			setAttemptedSubmit(false);
 		}
+	};
+
+	// 🎯 STEP 3.5: Quiz modal callbacks
+	const handleQuizProceed = async () => {
+		if (!pendingWishlistItem) {
+			setShowQuizModal(false);
+			return;
+		}
+
+		try {
+			setIsLoading(true);
+
+			// Get user for context
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+			if (!user) {
+				toast.error("Authentication Error");
+				return;
+			}
+
+			// Save the item to database
+			const { data: insertedItem, error } = await supabase
+				.from("items")
+				.insert(pendingWishlistItem)
+				.select()
+				.single();
+			if (error) throw error;
+
+			// Save photos if any
+			if (pendingWishlistItem.uploadedPhotoData?.length > 0) {
+				const photoRecords = pendingWishlistItem.uploadedPhotoData.map((p: any) => ({
+					item_id: insertedItem.id,
+					image_url: p.url,
+					cloudinary_id: p.cloudinaryId,
+					image_order: p.order,
+					is_main_image: p.isMain,
+				}));
+				const { error: photoError } = await supabase
+					.from("item_photos")
+					.insert(photoRecords);
+				if (photoError) throw photoError;
+			}
+
+			toast.success("Added to wishlist! Time to style some outfits 🎉");
+			setShowQuizModal(false);
+			setPendingWishlistItem(null);
+			setIsLoading(false);
+
+			// Redirect to wishlist tab
+			router.push("/dashboard?tab=wishlist");
+		} catch (error) {
+			toast.error((error as Error).message);
+			setIsLoading(false);
+		}
+	};
+
+	const handleQuizSkip = () => {
+		// Just close the quiz modal without saving
+		// User can either close the form or try a different action
+		setShowQuizModal(false);
+		setPendingWishlistItem(null);
+		setIsLoading(false);
+	};
+
+	const handleCreateOutfits = () => {
+		// Close quiz and navigate to outfit creation
+		setShowQuizModal(false);
+		setPendingWishlistItem(null);
+		setIsLoading(false);
+		router.push("/dashboard?tab=outfits");
 	};
 
 	// Wrapper to handle form submission with validation card visibility
@@ -1416,6 +1525,20 @@ export function AddItemForm({
 				open={showRetailersDialog}
 				onOpenChange={setShowRetailersDialog}
 			/>
+
+			{/* 🎯 STEP 3.5: Quiz modal for purchase prevention */}
+			{showQuizModal && pendingWishlistItem && (
+				<CanYouStyleThisQuiz
+					isOpen={showQuizModal}
+					outfitsCreated={outfitCount}
+					itemBrand={pendingWishlistItem.brand}
+					itemModel={pendingWishlistItem.model}
+					itemPrice={pendingWishlistItem.retail_price || undefined}
+					onProceed={handleQuizProceed}
+					onSkip={handleQuizSkip}
+					onCreateOutfits={handleCreateOutfits}
+				/>
+			)}
 		</div>
 	);
 }
