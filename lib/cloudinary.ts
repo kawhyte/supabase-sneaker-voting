@@ -98,10 +98,16 @@ export async function uploadWithStandardization(
     )
 
     const aspectRatio = getCategoryAspectRatio(category)
-    const dimensions =
-      aspectRatio.width === aspectRatio.height
-        ? STANDARD_DIMENSIONS.square
-        : STANDARD_DIMENSIONS.portrait
+
+    // Select dimensions based on aspect ratio
+    let dimensions
+    if (aspectRatio.width === 2 && aspectRatio.height === 1) {
+      dimensions = STANDARD_DIMENSIONS.wide // Shoes (2:1)
+    } else if (aspectRatio.width === aspectRatio.height) {
+      dimensions = STANDARD_DIMENSIONS.square // Accessories (1:1)
+    } else {
+      dimensions = STANDARD_DIMENSIONS.portrait // Clothing (2:3)
+    }
 
     // Convert File to base64 data URL
     const fileBuffer = await file.arrayBuffer()
@@ -115,7 +121,7 @@ export async function uploadWithStandardization(
         {
           width: dimensions.width,
           height: dimensions.height,
-          crop: 'fill',
+          crop: 'fit',
           gravity: 'center',
           quality: 'auto:good',
           fetch_format: 'auto'

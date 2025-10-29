@@ -41,17 +41,18 @@ export function OutfitCardCanvas({
 
   return (
     <div
-      className={`relative w-full aspect-[5/6] rounded-lg overflow-hidden ${className}`}
-      style={{ backgroundColor }}
+      className={`relative rounded-lg ${className}`}
+      style={{
+        backgroundColor,
+        width: `${CARD_CANVAS_WIDTH}px`,
+        height: `${CARD_CANVAS_HEIGHT}px`,
+        maxWidth: '100%',
+        aspectRatio: `${CARD_CANVAS_WIDTH} / ${CARD_CANVAS_HEIGHT}`,
+        overflow: 'visible'
+      }}
     >
       {/* Render items in z-index order */}
       {items.map(item => {
-        // Denormalize positions to pixels
-        const pixelX = item.position_x * CARD_CANVAS_WIDTH
-        const pixelY = item.position_y * CARD_CANVAS_HEIGHT
-        const pixelWidth = item.display_width * CARD_CANVAS_WIDTH
-        const pixelHeight = item.display_height * CARD_CANVAS_HEIGHT
-
         // Get image source (prefer cropped, fallback to original)
         const imageUrl =
           item.cropped_image_url ||
@@ -66,29 +67,31 @@ export function OutfitCardCanvas({
           item.item?.category || 'other'
         )
 
+        // Calculate pixel positions (same as CanvasItem)
+        const pixelX = item.position_x * CARD_CANVAS_WIDTH
+        const pixelY = item.position_y * CARD_CANVAS_HEIGHT
+        const pixelWidth = item.display_width * CARD_CANVAS_WIDTH
+        const pixelHeight = item.display_height * CARD_CANVAS_HEIGHT
+
         return (
           <div
             key={item.id}
             className="absolute"
             style={{
-              left: `${(pixelX / CARD_CANVAS_WIDTH) * 100}%`,
-              top: `${(pixelY / CARD_CANVAS_HEIGHT) * 100}%`,
-              width: `${(pixelWidth / CARD_CANVAS_WIDTH) * 100}%`,
-              height: `${(pixelHeight / CARD_CANVAS_HEIGHT) * 100}%`,
-              transform: 'translate(-50%, -50%)',
+              left: `${pixelX}px`,
+              top: `${pixelY}px`,
+              width: `${pixelWidth}px`,
+              height: `${pixelHeight}px`,
               zIndex: item.z_index || 0
             }}
           >
-            <div className="relative w-full h-full">
-              <Image
-                src={standardizedUrl}
-                alt={`${item.item?.brand} ${item.item?.model}`}
-                fill
-                sizes={`${pixelWidth}px`}
-                className="object-contain drop-shadow-md"
-                quality={85}
-              />
-            </div>
+            <Image
+              src={standardizedUrl}
+              alt={`${item.item?.brand} ${item.item?.model}`}
+              fill
+              className="object-contain drop-shadow-md"
+              quality={85}
+            />
           </div>
         )
       })}

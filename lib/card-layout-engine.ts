@@ -16,8 +16,11 @@ export const CARD_CANVAS_RATIO = CARD_CANVAS_WIDTH / CARD_CANVAS_HEIGHT
 export const MAX_CARD_ITEMS = 6
 
 /**
- * Nike/JD Sports positioning template
- * All positions normalized (0-1 range)
+ * Nike/JD Sports positioning template for 400×480px card
+ * All positions normalized (0-1 range) using top-left corner as reference
+ *
+ * Card canvas: 400px wide × 480px tall (5:6 aspect ratio)
+ * Positions are conservative to ensure items fit within bounds
  */
 export const CARD_LAYOUT_TEMPLATE: Record<string, {
   x: number
@@ -27,47 +30,52 @@ export const CARD_LAYOUT_TEMPLATE: Record<string, {
   zIndex: number
 }> = {
   // Shoes: Bottom-right (signature Nike position)
+  // Positioned to stay within bounds: (x + w ≤ 1, y + h ≤ 1)
   shoes: {
-    x: 0.7, // 70% from left
-    y: 0.75, // 75% from top
-    width: 0.28, // 28% of canvas width
-    height: 0.25,
+    x: 0.50, // 200px from left
+    y: 0.60, // 288px from top
+    width: 0.30, // 120px wide
+    height: 0.30, // 144px tall
     zIndex: 10
   },
 
   // Bottoms: Center-left
+  // Positioned in middle-left area
   bottoms: {
-    x: 0.25,
-    y: 0.55,
-    width: 0.3,
-    height: 0.4,
+    x: 0.05,
+    y: 0.40,
+    width: 0.32,
+    height: 0.40,
     zIndex: 20
   },
 
-  // Tops: Top-center
+  // Tops: Top-center (covers about half the card)
+  // Centered with margin on sides
   tops: {
-    x: 0.5,
-    y: 0.3,
-    width: 0.32,
-    height: 0.35,
+    x: 0.28,
+    y: 0.08,
+    width: 0.44,
+    height: 0.38,
     zIndex: 30
   },
 
   // Outerwear: Top (layered over tops)
+  // Large item, positioned at very top with margins
   outerwear: {
-    x: 0.5,
-    y: 0.18,
-    width: 0.4,
+    x: 0.20,
+    y: 0.00,
+    width: 0.60,
     height: 0.42,
     zIndex: 40
   },
 
   // Accessories: Top-right
+  // Smaller accent item
   accessories: {
-    x: 0.85, // Top-right
-    y: 0.2,
-    width: 0.12,
-    height: 0.12,
+    x: 0.70,
+    y: 0.10,
+    width: 0.20,
+    height: 0.15,
     zIndex: 50
   }
 }
