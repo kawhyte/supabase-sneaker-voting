@@ -9,6 +9,7 @@ import { OutfitStudioErrorBoundary } from '@/components/outfit-studio-error-boun
 import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitListView } from './OutfitListView'
 import { OutfitStudio } from './OutfitStudio'
+import { OutfitCardPreview } from './OutfitCardPreview'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 import { OutfitsEmptyState } from '@/components/empty-state-illustrations'
 import { CatLoadingSpinner } from '@/components/cat-loading-animation'
@@ -232,28 +233,12 @@ export function OutfitsDashboard() {
                         </div>
                       </div>
 
-                      {/* Outfit Preview */}
-                      <div
-                        className="h-32 sm:h-40 rounded-lg border border-slate-200 flex items-center justify-center text-xs sm:text-sm text-muted-foreground overflow-hidden"
-                        style={{
-                          backgroundColor: outfit.background_color,
-                        }}
-                      >
-                        {outfit.outfit_items && outfit.outfit_items.length > 0 ? (
-                          <div className="grid grid-cols-2 gap-1 sm:gap-2 p-2 w-full h-full">
-                            {outfit.outfit_items.slice(0, 4).map((item) => (
-                              <div
-                                key={item.id}
-                                className="bg-slate-100 rounded flex items-center justify-center text-xs font-medium p-1 text-center line-clamp-2"
-                              >
-                                {item.item?.brand}
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <span>No items</span>
-                        )}
-                      </div>
+                      {/* Outfit Preview - Nike/JD Sports style flat-lay */}
+                      <OutfitCardPreview
+                        outfit={outfit}
+                        priority={outfits.indexOf(outfit) < 3}
+                        className="border border-slate-200 h-32 sm:h-40 transition-transform group-hover:scale-[1.02]"
+                      />
 
                       {/* Metadata */}
                       <div className="space-y-1 text-xs text-muted-foreground border-t border-slate-200 pt-2 sm:pt-3">

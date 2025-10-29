@@ -22,6 +22,7 @@ export interface UploadOptions {
   transformation?: object[]
   quality?: string | number
   format?: string
+  tags?: string[]
 }
 
 /**
@@ -81,6 +82,62 @@ export function generateImageUrl(
     transformation: transformations.length > 0 ? transformations : defaultTransformations,
     secure: true
   })
+}
+
+/**
+ * Upload image with standardized aspect ratio (FREE tier only)
+ * Uses category-specific dimensions for consistent sizing
+ */
+export async function uploadWithStandardization(
+  file: File,
+  category: string
+): Promise<CloudinaryUploadResult> {
+  try {
+    const { getCategoryAspectRatio, STANDARD_DIMENSIONS } = await import(
+      './image-standardization'
+    )
+
+    const aspectRatio = getCategoryAspectRatio(category)
+    const dimensions =
+      aspectRatio.width === aspectRatio.height
+        ? STANDARD_DIMENSIONS.square
+        : STANDARD_DIMENSIONS.portrait
+
+    // Convert File to base64 data URL
+    const fileBuffer = await file.arrayBuffer()
+    const base64 = Buffer.from(fileBuffer).toString('base64')
+    const dataURL = `data:${file.type};base64,${base64}`
+
+    // Upload with standardized transformations (all FREE tier)
+    const result = await cloudinary.uploader.upload(dataURL, {
+      folder: 'sneaker-tracker/products',
+      transformation: [
+        {
+          width: dimensions.width,
+          height: dimensions.height,
+          crop: 'fill',
+          gravity: 'center',
+          quality: 'auto:good',
+          fetch_format: 'auto'
+        }
+      ],
+      tags: ['product-image', 'sneaker', `category-${category}`]
+    })
+
+    return {
+      public_id: result.public_id,
+      secure_url: result.secure_url,
+      width: result.width,
+      height: result.height,
+      format: result.format,
+      bytes: result.bytes
+    }
+  } catch (error) {
+    console.error('Cloudinary upload error:', error)
+    throw new Error(
+      `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
+  }
 }
 
 /**

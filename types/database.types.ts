@@ -294,6 +294,10 @@ export type Database = {
           last_worn: string | null
           name: string
           occasion: string | null
+          preview_error: string | null
+          preview_generated_at: string | null
+          preview_status: string | null
+          preview_url: string | null
           times_worn: number | null
           updated_at: string | null
           user_id: string
@@ -309,6 +313,10 @@ export type Database = {
           last_worn?: string | null
           name?: string
           occasion?: string | null
+          preview_error?: string | null
+          preview_generated_at?: string | null
+          preview_status?: string | null
+          preview_url?: string | null
           times_worn?: number | null
           updated_at?: string | null
           user_id: string
@@ -324,11 +332,118 @@ export type Database = {
           last_worn?: string | null
           name?: string
           occasion?: string | null
+          preview_error?: string | null
+          preview_generated_at?: string | null
+          preview_status?: string | null
+          preview_url?: string | null
           times_worn?: number | null
           updated_at?: string | null
           user_id?: string
         }
         Relationships: []
+      }
+      price_alerts: {
+        Row: {
+          created_at: string
+          current_price: number
+          id: string
+          is_read: boolean | null
+          item_id: string
+          message: string
+          percentage_off: number | null
+          previous_price: number | null
+          read_at: string | null
+          severity: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_price: number
+          id?: string
+          is_read?: boolean | null
+          item_id: string
+          message: string
+          percentage_off?: number | null
+          previous_price?: number | null
+          read_at?: string | null
+          severity?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_price?: number
+          id?: string
+          is_read?: boolean | null
+          item_id?: string
+          message?: string
+          percentage_off?: number | null
+          previous_price?: number | null
+          read_at?: string | null
+          severity?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_alerts_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_check_log: {
+        Row: {
+          checked_at: string
+          created_at: string
+          error_category: string | null
+          error_message: string | null
+          http_status_code: number | null
+          id: string
+          item_id: string
+          price: number | null
+          retailer: string | null
+          source: string
+          success: boolean
+          user_id: string
+        }
+        Insert: {
+          checked_at?: string
+          created_at?: string
+          error_category?: string | null
+          error_message?: string | null
+          http_status_code?: number | null
+          id?: string
+          item_id: string
+          price?: number | null
+          retailer?: string | null
+          source: string
+          success: boolean
+          user_id: string
+        }
+        Update: {
+          checked_at?: string
+          created_at?: string
+          error_category?: string | null
+          error_message?: string | null
+          http_status_code?: number | null
+          id?: string
+          item_id?: string
+          price?: number | null
+          retailer?: string | null
+          source?: string
+          success?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_check_log_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_history: {
         Row: {

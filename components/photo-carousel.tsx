@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { getStandardizedImageUrl } from '@/lib/image-standardization'
 
 interface Photo {
   id: string
@@ -20,6 +21,7 @@ interface PhotoCarouselProps {
   autoHeight?: boolean
   showControls?: boolean
   showIndicators?: boolean
+  category?: string
   onPhotoClick?: (photo: Photo) => void
 }
 
@@ -29,6 +31,7 @@ export function PhotoCarousel({
   autoHeight = false,
   showControls = true,
   showIndicators = true,
+  category,
   onPhotoClick
 }: PhotoCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -98,6 +101,7 @@ export function PhotoCarousel({
 
   if (sortedPhotos.length === 1) {
     const photo = sortedPhotos[0]
+    const displayUrl = category ? getStandardizedImageUrl(photo.image_url, category) : photo.image_url
     return (
       <Card className={`dense ${className}`}>
         <CardContent className="p-0 relative">
@@ -112,7 +116,7 @@ export function PhotoCarousel({
             onClick={() => onPhotoClick?.(photo)}
           >
             <img
-              src={photo.image_url}
+              src={displayUrl}
               alt="Item photo"
               className="w-full h-full object-contain rounded-lg"
               style={{ aspectRatio: autoHeight ? 'auto' : '1 / 1' }}
@@ -142,7 +146,9 @@ export function PhotoCarousel({
       <div className="relative h-full">
         <div className="overflow-hidden h-full" ref={emblaRef}>
             <div className="flex h-full">
-              {sortedPhotos.map((photo, index) => (
+              {sortedPhotos.map((photo, index) => {
+                const displayUrl = category ? getStandardizedImageUrl(photo.image_url, category) : photo.image_url
+                return (
                 <div
                   key={photo.id}
                   className="flex-[0_0_100%] min-w-0 relative h-full"
@@ -152,7 +158,7 @@ export function PhotoCarousel({
                     onClick={() => onPhotoClick?.(photo)}
                   >
                     <img
-                      src={photo.image_url}
+                      src={displayUrl}
                       alt={`Item photo ${index + 1}`}
                       className="w-full h-full object-contain"
                     />
@@ -171,7 +177,8 @@ export function PhotoCarousel({
                     )}
                   </div>
                 </div>
-              ))}
+              )
+              })}
             </div>
           </div>
 
@@ -208,7 +215,9 @@ export function PhotoCarousel({
       {/* Thumbnail Indicators - Hidden for dashboard cards */}
       {showIndicators && sortedPhotos.length > 1 && false && (
         <div className="flex justify-center space-x-2 mt-4">
-          {sortedPhotos.map((photo, index) => (
+          {sortedPhotos.map((photo, index) => {
+            const displayUrl = category ? getStandardizedImageUrl(photo.image_url, category) : photo.image_url
+            return (
             <button
               key={photo.id}
               className={`
@@ -221,7 +230,7 @@ export function PhotoCarousel({
               onClick={() => scrollTo(index)}
             >
               <img
-                src={photo.image_url}
+                src={displayUrl}
                 alt={`Thumbnail ${index + 1}`}
                 className="w-12 h-12 object-cover"
               />
@@ -229,7 +238,8 @@ export function PhotoCarousel({
                 <div className="absolute top-0 right-0 w-2 h-2 bg-blue-600 rounded-full"></div>
               )}
             </button>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

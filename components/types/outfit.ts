@@ -21,6 +21,12 @@ export interface Outfit {
   // Status
   is_archived: boolean
 
+  // Preview generation (for flat-lay card preview)
+  preview_url?: string | null
+  preview_status?: 'pending' | 'generating' | 'generated' | 'failed'
+  preview_generated_at?: string | null
+  preview_error?: string | null
+
   // Metadata
   created_at: string
   updated_at: string
