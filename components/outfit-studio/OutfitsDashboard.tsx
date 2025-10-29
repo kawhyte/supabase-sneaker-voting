@@ -12,11 +12,10 @@ import { OutfitStudio } from './OutfitStudio'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 import { OutfitsEmptyState } from '@/components/empty-state-illustrations'
 import { CatLoadingSpinner } from '@/components/cat-loading-animation'
-import { Sparkles, Plus, Calendar, Shuffle } from 'lucide-react'
+import { Sparkles, Plus, Calendar } from 'lucide-react'
 
 // Lazy load heavy outfit components (only loaded when tabs are active)
 const OutfitCalendar = lazy(() => import('./OutfitCalendar').then(mod => ({ default: mod.OutfitCalendar })))
-const OutfitShuffle = lazy(() => import('./OutfitShuffle').then(mod => ({ default: mod.OutfitShuffle })))
 
 /**
  * OutfitsDashboard - Main outfits tab in the dashboard
@@ -25,7 +24,7 @@ const OutfitShuffle = lazy(() => import('./OutfitShuffle').then(mod => ({ defaul
  * - Create new outfit
  * - Delete outfits
  */
-type DashboardTab = 'gallery' | 'calendar' | 'shuffle'
+type DashboardTab = 'gallery' | 'calendar'
 
 export function OutfitsDashboard() {
   const [outfits, setOutfits] = useState<OutfitWithItems[]>([])
@@ -96,55 +95,6 @@ export function OutfitsDashboard() {
 
   const handleOutfitDeleted = (outfitId: string) => {
     setOutfits(outfits.filter(o => o.id !== outfitId))
-  }
-
-  const handleSaveOutfitFromShuffle = async (
-    items: SizingJournalEntry[],
-    occasion: string
-  ) => {
-    try {
-      // Import outfit layout engine for auto-arrange
-      const { autoArrangeOutfit } = await import('@/lib/outfit-layout-engine')
-      const arrangedItems = autoArrangeOutfit(items)
-
-      const response = await fetch('/api/outfits', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `${occasion} outfit`,
-          occasion,
-          background_color: '#FFFFFF',
-          outfit_items: items.map((item, index) => {
-            const arranged = arrangedItems[index]
-            return {
-              item_id: item.id,
-              position_x: arranged?.position_x || 0.5,
-              position_y: arranged?.position_y || 0.5,
-              z_index: arranged?.z_index || 0,
-              display_width: arranged?.display_width || 0.3,
-              display_height: arranged?.display_height || 0.3,
-            }
-          }),
-        }),
-      })
-
-      if (!response.ok) throw new Error('Failed to save outfit')
-      const data = await response.json()
-
-      // Fetch the full outfit with related item data
-      const getResponse = await fetch(`/api/outfits/${data.outfit.id}`)
-      if (!getResponse.ok) throw new Error('Failed to fetch saved outfit')
-      const fullData = await getResponse.json()
-      const newOutfit = fullData.outfit as OutfitWithItems
-
-      setOutfits([newOutfit, ...outfits])
-      toast.success('Outfit saved!')
-      return newOutfit
-    } catch (error) {
-      console.error('Error saving outfit:', error)
-      toast.error('Failed to save outfit')
-      return null
-    }
   }
 
   const handleOutfitWorn = async (outfitId: string) => {
@@ -240,19 +190,6 @@ export function OutfitsDashboard() {
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <Calendar className="h-3.5 sm:h-4 w-3.5 sm:w-4 flex-shrink-0" />
                 <span>Calendar</span>
-              </div>
-            </button>
-            <button
-              onClick={() => setActiveTab('shuffle')}
-              className={`px-3 sm:px-4 py-3 font-medium text-xs sm:text-sm transition-colors border-b-2 whitespace-nowrap ${
-                activeTab === 'shuffle'
-                  ? 'text-sun-600 border-b-sun-400'
-                  : 'text-muted-foreground border-b-transparent hover:text-foreground'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <Shuffle className="h-3.5 sm:h-4 w-3.5 sm:w-4 flex-shrink-0" />
-                <span>Shuffle</span>
               </div>
             </button>
           </div>
@@ -373,22 +310,6 @@ export function OutfitsDashboard() {
                   outfits={outfits}
                   onOutfitWorn={handleOutfitWorn}
                   onUnscheduleOutfit={handleUnscheduleOutfit}
-                />
-              </Suspense>
-            </ErrorBoundary>
-          )}
-
-          {/* Shuffle Tab */}
-          {activeTab === 'shuffle' && (
-            <ErrorBoundary level="section">
-              <Suspense fallback={
-                <div className="flex items-center justify-center py-12">
-                  <CatLoadingSpinner size="md" />
-                </div>
-              }>
-                <OutfitShuffle
-                  wardrobe={userWardrobe}
-                  onSaveOutfit={handleSaveOutfitFromShuffle}
                 />
               </Suspense>
             </ErrorBoundary>
