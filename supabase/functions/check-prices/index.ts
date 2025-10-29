@@ -35,23 +35,6 @@ interface RetailerConfig {
 
 const RETAILER_CONFIGS: RetailerConfig[] = [
   {
-    domain: 'nike.com',
-    name: 'Nike',
-    selectors: {
-      price: ['[data-test="product-price"]', '.product-price__wrapper', '[class*="product-price"]', 'meta[property="product:price:amount"]', 'meta[property="og:price:amount"]']
-    },
-    requiresJS: true,
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-  },
-  {
-    domain: 'adidas.com',
-    name: 'Adidas',
-    selectors: {
-      price: ['[data-auto-id="product-price"]', '.gl-price', 'meta[property="og:price:amount"]']
-    },
-    requiresJS: true
-  },
-  {
     domain: 'footlocker.com',
     name: 'Foot Locker',
     selectors: {
@@ -84,22 +67,6 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
   {
-    domain: 'jdsports.com',
-    name: 'JD Sports',
-    selectors: {
-      price: ['[data-e2e="product-price"]', '.price', '[itemprop="price"]']
-    },
-    requiresJS: true
-  },
-  {
-    domain: 'eastbay.com',
-    name: 'Eastbay',
-    selectors: {
-      price: ['[data-test="product-price"]', '.ProductPrice']
-    },
-    requiresJS: false
-  },
-  {
     domain: 'hibbett.com',
     name: 'Hibbett',
     selectors: {
@@ -108,36 +75,12 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
   {
-    domain: 'dickssportinggoods.com',
-    name: "Dick's",
-    selectors: {
-      price: ['[data-testid="product-price"]', '.dsg-price']
-    },
-    requiresJS: true
-  },
-  {
-    domain: 'oldnavy.gap.com',
-    name: 'Old Navy',
-    selectors: {
-      price: ['[data-test="product-price"]', '.product-price', '[class*="ProductPrice"]', 'meta[property="og:price:amount"]']
-    },
-    requiresJS: true
-  },
-  {
     domain: 'shoepalace.com',
     name: 'Shoe Palace',
     selectors: {
       price: ['.product-price', '[data-product-price]', '[itemprop="price"]', 'meta[property="og:price:amount"]']
     },
     requiresJS: false
-  },
-  {
-    domain: 'hollister.com',
-    name: 'Hollister',
-    selectors: {
-      price: ['[data-test="product-price"]', '.product-price', 'meta[property="og:price:amount"]']
-    },
-    requiresJS: true
   },
   {
     domain: 'stance.com',
@@ -156,10 +99,130 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
   {
-    domain: 'houseofheat.co',
-    name: 'House of Heat',
+    domain: 'gap.com',
+    name: 'Gap',
     selectors: {
-      price: ['.product-price', '[data-product-price]', 'meta[property="og:price:amount"]']
+      price: ['[data-test="product-price"]', '.product-price', '[class*="ProductPrice"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'levi.com',
+    name: "Levi's",
+    selectors: {
+      price: ['.product-price', '[data-price]', '[itemprop="price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'bananarepublic.gap.com',
+    name: 'Banana Republic',
+    selectors: {
+      price: ['[data-test="product-price"]', '.product-price', '[class*="ProductPrice"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'abercrombie.com',
+    name: 'Abercrombie',
+    selectors: {
+      price: ['[data-test="product-price"]', '.product-price', '[class*="price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'hollisterco.com',
+    name: 'Hollister',
+    selectors: {
+      price: ['[data-test="product-price"]', '.product-price', '[class*="Price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'h-m.com',
+    name: "H&M",
+    selectors: {
+      price: ['[data-price]', '.price', '[class*="price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'uniqlo.com',
+    name: 'UNIQLO',
+    selectors: {
+      price: ['[data-testid="product-price"]', '.product-price', '[class*="Price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'zara.com',
+    name: 'Zara',
+    selectors: {
+      price: ['.product-price', '[data-price]', '[class*="price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'ae.com',
+    name: 'American Eagle',
+    selectors: {
+      price: ['[data-test="product-price"]', '.product-price', '[class*="Price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'jcpenney.com',
+    name: 'JCPenney',
+    selectors: {
+      price: ['.product-price', '[data-price]', '[class*="price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'kohls.com',
+    name: "Kohl's",
+    selectors: {
+      price: ['.product-price', '[data-test="product-price"]', '[class*="Price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'saucony.com',
+    name: 'Saucony',
+    selectors: {
+      price: ['[data-product-price]', '.product-price', '[class*="price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'reebok.com',
+    name: 'Reebok',
+    selectors: {
+      price: ['[data-test="product-price"]', '.product-price', '[class*="Price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'converse.com',
+    name: 'Converse',
+    selectors: {
+      price: ['.product-price', '[data-price]', '[class*="price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'newbalance.com',
+    name: 'New Balance',
+    selectors: {
+      price: ['[data-product-price]', '.product-price', '[class*="Price"]', 'meta[property="og:price:amount"]']
+    },
+    requiresJS: false
+  },
+  {
+    domain: 'joesnewbalanceoutlet.com',
+    name: "Joe's New Balance Outlet",
+    selectors: {
+      price: ['.product-price', '[data-price]', '[class*="price"]', 'meta[property="og:price:amount"]']
     },
     requiresJS: false
   }
@@ -458,7 +521,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log('\n🚀 Starting weekly price check...')
+    console.log('\n🚀 Starting price check...')
     console.log(`⏰ Timestamp: ${new Date().toISOString()}`)
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -469,6 +532,43 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // TEST MODE: Check if testUrl parameter is provided
+    const body = await req.json().catch(() => ({}))
+    if (body.testUrl && body.testUrl.trim()) {
+      console.log('🧪 TEST MODE: Testing single URL')
+      console.log(`🔗 URL: ${body.testUrl}`)
+
+      const testResult = await scrapePrice(body.testUrl, body.retailPrice)
+      const config = getRetailerConfig(body.testUrl)
+      const retailerName = config?.name || 'Unknown'
+
+      const retailerStats: Record<string, { success: number; failure: number }> = {}
+      retailerStats[retailerName] = {
+        success: testResult.success ? 1 : 0,
+        failure: testResult.success ? 0 : 1
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: testResult.success,
+          checked: 1,
+          successCount: testResult.success ? 1 : 0,
+          failureCount: testResult.success ? 0 : 1,
+          successRate: testResult.success ? '100.0%' : '0.0%',
+          alertsCreated: 0,
+          retailerStats,
+          testResult: {
+            price: testResult.price,
+            error: testResult.error,
+            method: testResult.method,
+            retailer: retailerName
+          },
+          timestamp: new Date().toISOString()
+        }),
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+    }
 
     console.log('📋 Fetching items to check...')
 
@@ -519,24 +619,27 @@ serve(async (req) => {
         retailerStats[retailerKey].success++
         console.log(`✅ SUCCESS: $${result.price} via ${result.method}`)
 
-        // Get previous price
-        const { data: priceHistory } = await supabase
-          .from('price_history')
+        // Get previous price from price_check_log
+        const { data: previousLog } = await supabase
+          .from('price_check_log')
           .select('price')
           .eq('item_id', item.id)
+          .eq('success', true)
           .order('checked_at', { ascending: false })
           .limit(1)
           .single()
 
-        const previousPrice = priceHistory?.price || item.retail_price
+        const previousPrice = previousLog?.price || item.retail_price
 
-        // Insert price history
-        await supabase.from('price_history').insert({
+        // Log the successful check
+        await supabase.from('price_check_log').insert({
           item_id: item.id,
           user_id: item.user_id,
           price: result.price,
           checked_at: new Date().toISOString(),
-          source: result.method === 'browserless' ? 'browserless_scrape' : 'automated_scrape'
+          source: result.method === 'browserless' ? 'browserless_scrape' : 'automated_scrape',
+          retailer: retailerKey,
+          success: true
         })
 
         // Check for price drop
@@ -584,6 +687,19 @@ serve(async (req) => {
         failureCount++
         retailerStats[retailerKey].failure++
         console.log(`❌ FAILURE: ${result.error} (${result.errorCategory})`)
+
+        // Log the failed check
+        await supabase.from('price_check_log').insert({
+          item_id: item.id,
+          user_id: item.user_id,
+          checked_at: new Date().toISOString(),
+          source: 'automated_scrape',
+          retailer: retailerKey,
+          success: false,
+          error_message: result.error,
+          error_category: result.errorCategory,
+          http_status_code: result.statusCode
+        })
 
         const newFailureCount = (item.price_check_failures || 0) + 1
 
