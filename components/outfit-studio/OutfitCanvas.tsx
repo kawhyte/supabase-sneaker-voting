@@ -1,18 +1,16 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import Image from 'next/image'
-import { X, RotateCcw } from 'lucide-react'
+import { useCallback, useRef } from 'react'
+import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 import { OutfitItem } from '@/components/types/outfit'
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
-  normalizePosition,
-  denormalizePosition,
   sortByZIndex,
 } from '@/lib/outfit-layout-engine'
+import { useDragManager } from '@/hooks/useDragManager'
+import { CanvasItem } from './CanvasItem'
 
 interface OutfitCanvasProps {
   items: OutfitItem[]
@@ -25,7 +23,16 @@ interface OutfitCanvasProps {
 
 /**
  * OutfitCanvas - Phone mockup with draggable items
- * Visual representation of outfit on iPhone screen mockup (375×667px)
+ *
+ * Performance Optimizations:
+ * - Uses useDragManager hook for performant drag (no state updates during drag)
+ * - Uses memoized CanvasItem components (only changed items re-render)
+ * - Minimal parent state updates (only track dragging item ID for visual feedback)
+ *
+ * Success Criteria:
+ * - Drag lag <30ms (60fps maintained)
+ * - Only dragged item re-renders (not all items)
+ * - No frame drops during drag
  */
 export function OutfitCanvas({
   items,
@@ -36,45 +43,23 @@ export function OutfitCanvas({
   readOnly = false,
 }: OutfitCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null)
-  const [draggingItemId, setDraggingItemId] = useState<string | null>(null)
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 
-  const handleMouseDown = (e: React.MouseEvent, itemId: string) => {
-    if (readOnly) return
+  // Memoize the drag end handler
+  const handleDragEnd = useCallback(
+    (itemId: string, x: number, y: number) => {
+      onUpdateItemPosition(itemId, x, y)
+    },
+    [onUpdateItemPosition]
+  )
 
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const rect = canvas.getBoundingClientRect()
-    const item = items.find(i => i.id === itemId)
-    if (!item) return
-
-    const itemX = item.position_x * CANVAS_WIDTH
-    const itemY = item.position_y * CANVAS_HEIGHT
-    const mouseX = e.clientX - rect.left
-    const mouseY = e.clientY - rect.top
-
-    setDraggingItemId(itemId)
-    setDragOffset({
-      x: mouseX - itemX,
-      y: mouseY - itemY,
-    })
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!draggingItemId || !canvasRef.current) return
-
-    const rect = canvasRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left - dragOffset.x
-    const y = e.clientY - rect.top - dragOffset.y
-
-    const { x: normalizedX, y: normalizedY } = normalizePosition(x, y)
-    onUpdateItemPosition(draggingItemId, normalizedX, normalizedY)
-  }
-
-  const handleMouseUp = () => {
-    setDraggingItemId(null)
-  }
+  // Use optimized drag manager hook
+  const { isDraggingItemId, onMouseDown } = useDragManager({
+    containerRef: canvasRef,
+    items,
+    canvasWidth: CANVAS_WIDTH,
+    canvasHeight: CANVAS_HEIGHT,
+    onDragEnd: handleDragEnd,
+  })
 
   // Sort items by z-index for proper rendering
   const sortedItems = sortByZIndex(items)
@@ -84,9 +69,6 @@ export function OutfitCanvas({
       {/* Canvas Container - Responsive */}
       <div
         ref={canvasRef}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
         className="relative mx-auto select-none max-w-full"
         style={{
           width: `${CANVAS_WIDTH}px`,
@@ -97,7 +79,7 @@ export function OutfitCanvas({
           border: '6px solid #000',
           borderRadius: '30px',
           overflow: 'hidden',
-          cursor: draggingItemId ? 'grabbing' : 'grab',
+          cursor: isDraggingItemId ? 'grabbing' : 'grab',
         }}
       >
         {/* iPhone notch (visual only) */}
@@ -111,13 +93,13 @@ export function OutfitCanvas({
           }}
         />
 
-        {/* Outfit Items */}
+        {/* Outfit Items - Memoized for performance */}
         {sortedItems.map(item => (
-          <OutfitCanvasItem
+          <CanvasItem
             key={item.id}
             item={item}
-            isDragging={draggingItemId === item.id}
-            onMouseDown={e => handleMouseDown(e, item.id)}
+            isDragging={isDraggingItemId === item.id}
+            onMouseDown={e => onMouseDown(item.id, e)}
             onRemove={() => onRemoveItem(item.id)}
             readOnly={readOnly}
           />
@@ -150,93 +132,3 @@ export function OutfitCanvas({
   )
 }
 
-interface OutfitCanvasItemProps {
-  item: OutfitItem
-  isDragging: boolean
-  onMouseDown: (e: React.MouseEvent) => void
-  onRemove: () => void
-  readOnly?: boolean
-}
-
-/**
- * OutfitCanvasItem - Individual draggable item on the canvas
- */
-function OutfitCanvasItem({
-  item,
-  isDragging,
-  onMouseDown,
-  onRemove,
-  readOnly = false,
-}: OutfitCanvasItemProps) {
-  const pixelX = item.position_x * CANVAS_WIDTH
-  const pixelY = item.position_y * CANVAS_HEIGHT
-  const pixelWidth = item.display_width * CANVAS_WIDTH
-  const pixelHeight = item.display_height * CANVAS_HEIGHT
-
-  // Use cropped image if available, otherwise use original
-  const imageUrl = item.cropped_image_url || item.item?.image_url || item.item?.item_photos?.[0]?.image_url
-
-  // Debug logging
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`OutfitCanvasItem ${item.item?.brand} ${item.item?.model}:`, {
-      cropped_image_url: item.cropped_image_url,
-      image_url: item.item?.image_url,
-      item_photos_count: item.item?.item_photos?.length || 0,
-      first_photo_url: item.item?.item_photos?.[0]?.image_url,
-      final_imageUrl: imageUrl,
-    })
-  }
-
-  return (
-    <div
-      className={`absolute group cursor-grab active:cursor-grabbing transition-all ${
-        isDragging ? 'scale-110 shadow-xl' : 'hover:shadow-lg'
-      }`}
-      style={{
-        left: `${pixelX}px`,
-        top: `${pixelY}px`,
-        width: `${pixelWidth}px`,
-        height: `${pixelHeight}px`,
-        zIndex: item.z_index,
-        transform: isDragging ? 'scale(1.1)' : 'scale(1)',
-        cursor: isDragging ? 'grabbing' : 'grab',
-      }}
-      onMouseDown={onMouseDown}
-      title="Drag to move, hover for options"
-    >
-      {/* Image */}
-      {imageUrl ? (
-        <Image
-          src={imageUrl}
-          alt={`${item.item?.brand} ${item.item?.model}`}
-          fill
-          className="object-contain rounded-md shadow-md"
-          sizes={`${pixelWidth}px`}
-          loading="lazy"
-          onError={() => console.error(`Failed to load image: ${imageUrl}`)}
-        />
-      ) : (
-        <div className="absolute inset-0 bg-slate-200 rounded-md flex items-center justify-center text-xs text-slate-600">
-          No image
-        </div>
-      )}
-
-      {/* Delete Button (hover only) */}
-      {!readOnly && (
-        <div className="dense absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              onRemove()
-            }}
-            className="bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md hover:shadow-lg hover:scale-110 transition-all"
-            aria-label="Remove item"
-            title="Click to remove from outfit"
-          >
-            <X className="h-3 w-3" />
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}

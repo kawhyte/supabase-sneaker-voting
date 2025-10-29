@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useTransition } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
+import { perfMonitor } from '@/lib/performance-monitor'
 
 interface CropArea {
   x: number // 0-1 normalized
@@ -21,20 +22,39 @@ interface ManualCropToolProps {
 
 /**
  * ManualCropTool - Rectangle-based manual crop for outfit item photos
- * Users drag a selection box to isolate the item from background
- * Stores normalized crop coordinates (0-1 range)
+ *
+ * Performance Optimization:
+ * - Uses React 18's useTransition() for automatic priority batching
+ * - Local state for immediate visual feedback during drag
+ * - Deferred parent state update (non-blocking)
+ * - No manual debouncing needed
+ *
+ * Success Criteria:
+ * - Crop tool feels responsive (no lag during drag)
+ * - Visual preview updates immediately
+ * - Final crop saved correctly
+ * - Parent component doesn't block UI during update
  */
 export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }: ManualCropToolProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const cropMeasurementRef = useRef<number | null>(null)
+
   const [cropArea, setCropArea] = useState<CropArea>({
     x: 0.1,
     y: 0.1,
     width: 0.8,
     height: 0.8,
   })
+
+  // Local preview state for immediate visual feedback (urgent updates)
+  const [previewCropArea, setPreviewCropArea] = useState<CropArea>(cropArea)
+
   const [isDragging, setIsDragging] = useState(false)
   const [dragHandle, setDragHandle] = useState<'move' | 'nw' | 'ne' | 'sw' | 'se' | null>(null)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+
+  // useTransition for automatic priority batching of parent updates
+  const [isPending, startTransition] = useTransition()
 
   const getContainerDimensions = () => {
     if (!containerRef.current) return { width: 400, height: 400 }
@@ -48,6 +68,7 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
     setIsDragging(true)
     setDragHandle(handle)
     setDragStart({ x: e.clientX, y: e.clientY })
+    cropMeasurementRef.current = perfMonitor.start('crop-tool-drag')
     e.preventDefault()
   }
 
@@ -58,20 +79,20 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
     const deltaX = (e.clientX - dragStart.x) / width
     const deltaY = (e.clientY - dragStart.y) / height
 
-    const newCropArea = { ...cropArea }
+    const newCropArea = { ...previewCropArea }
 
     if (dragHandle === 'move') {
       // Move entire crop area
-      const newX = Math.max(0, Math.min(1 - cropArea.width, cropArea.x + deltaX))
-      const newY = Math.max(0, Math.min(1 - cropArea.height, cropArea.y + deltaY))
+      const newX = Math.max(0, Math.min(1 - previewCropArea.width, previewCropArea.x + deltaX))
+      const newY = Math.max(0, Math.min(1 - previewCropArea.height, previewCropArea.y + deltaY))
       newCropArea.x = newX
       newCropArea.y = newY
     } else if (dragHandle === 'nw') {
       // Resize from top-left
-      const newX = Math.max(0, cropArea.x + deltaX)
-      const newY = Math.max(0, cropArea.y + deltaY)
-      const newWidth = Math.max(0.1, cropArea.width - deltaX)
-      const newHeight = Math.max(0.1, cropArea.height - deltaY)
+      const newX = Math.max(0, previewCropArea.x + deltaX)
+      const newY = Math.max(0, previewCropArea.y + deltaY)
+      const newWidth = Math.max(0.1, previewCropArea.width - deltaX)
+      const newHeight = Math.max(0.1, previewCropArea.height - deltaY)
 
       if (newX + newWidth <= 1 && newY + newHeight <= 1) {
         newCropArea.x = newX
@@ -81,16 +102,16 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
       }
     } else if (dragHandle === 'se') {
       // Resize from bottom-right
-      const newWidth = Math.max(0.1, Math.min(1 - cropArea.x, cropArea.width + deltaX))
-      const newHeight = Math.max(0.1, Math.min(1 - cropArea.y, cropArea.height + deltaY))
+      const newWidth = Math.max(0.1, Math.min(1 - previewCropArea.x, previewCropArea.width + deltaX))
+      const newHeight = Math.max(0.1, Math.min(1 - previewCropArea.y, previewCropArea.height + deltaY))
 
       newCropArea.width = newWidth
       newCropArea.height = newHeight
     } else if (dragHandle === 'ne') {
       // Resize from top-right
-      const newY = Math.max(0, cropArea.y + deltaY)
-      const newWidth = Math.max(0.1, Math.min(1 - cropArea.x, cropArea.width + deltaX))
-      const newHeight = Math.max(0.1, cropArea.height - deltaY)
+      const newY = Math.max(0, previewCropArea.y + deltaY)
+      const newWidth = Math.max(0.1, Math.min(1 - previewCropArea.x, previewCropArea.width + deltaX))
+      const newHeight = Math.max(0.1, previewCropArea.height - deltaY)
 
       if (newY + newHeight <= 1) {
         newCropArea.y = newY
@@ -99,9 +120,9 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
       }
     } else if (dragHandle === 'sw') {
       // Resize from bottom-left
-      const newX = Math.max(0, cropArea.x + deltaX)
-      const newWidth = Math.max(0.1, cropArea.width - deltaX)
-      const newHeight = Math.max(0.1, Math.min(1 - cropArea.y, cropArea.height + deltaY))
+      const newX = Math.max(0, previewCropArea.x + deltaX)
+      const newWidth = Math.max(0.1, previewCropArea.width - deltaX)
+      const newHeight = Math.max(0.1, Math.min(1 - previewCropArea.y, previewCropArea.height + deltaY))
 
       if (newX + newWidth <= 1) {
         newCropArea.x = newX
@@ -110,11 +131,26 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
       }
     }
 
-    setCropArea(newCropArea)
+    // Update preview immediately (urgent, high priority)
+    setPreviewCropArea(newCropArea)
+
+    // Schedule parent state update with useTransition (non-blocking, low priority)
+    startTransition(() => {
+      setCropArea(newCropArea)
+    })
+
     setDragStart({ x: e.clientX, y: e.clientY })
   }
 
   const handleMouseUp = () => {
+    if (cropMeasurementRef.current !== null) {
+      const dragDuration = perfMonitor.end('crop-tool-drag', cropMeasurementRef.current)
+      if (process.env.NODE_ENV === 'development') {
+        console.debug(`[Crop] Duration: ${dragDuration.toFixed(2)}ms`)
+      }
+      cropMeasurementRef.current = null
+    }
+
     setIsDragging(false)
     setDragHandle(null)
   }
@@ -146,20 +182,20 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
           sizes="400px"
         />
 
-        {/* Dark Overlay for non-selected areas */}
+        {/* Dark Overlay for non-selected areas - uses preview for immediate visual feedback */}
         <div
           className="absolute bg-black/40 pointer-events-none"
           style={{
             top: 0,
             left: 0,
             right: 0,
-            height: `${cropArea.y * 100}%`,
+            height: `${previewCropArea.y * 100}%`,
           }}
         />
         <div
           className="absolute bg-black/40 pointer-events-none"
           style={{
-            top: `${(cropArea.y + cropArea.height) * 100}%`,
+            top: `${(previewCropArea.y + previewCropArea.height) * 100}%`,
             left: 0,
             right: 0,
             bottom: 0,
@@ -168,31 +204,31 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
         <div
           className="absolute bg-black/40 pointer-events-none"
           style={{
-            top: `${cropArea.y * 100}%`,
+            top: `${previewCropArea.y * 100}%`,
             left: 0,
-            width: `${cropArea.x * 100}%`,
-            height: `${cropArea.height * 100}%`,
+            width: `${previewCropArea.x * 100}%`,
+            height: `${previewCropArea.height * 100}%`,
           }}
         />
         <div
           className="absolute bg-black/40 pointer-events-none"
           style={{
-            top: `${cropArea.y * 100}%`,
+            top: `${previewCropArea.y * 100}%`,
             right: 0,
-            width: `${(1 - cropArea.x - cropArea.width) * 100}%`,
-            height: `${cropArea.height * 100}%`,
+            width: `${(1 - previewCropArea.x - previewCropArea.width) * 100}%`,
+            height: `${previewCropArea.height * 100}%`,
           }}
         />
 
-        {/* Crop Selection Box */}
+        {/* Crop Selection Box - uses preview for immediate feedback */}
         <div
           className="absolute border-2 border-white cursor-move transition-shadow hover:shadow-lg"
           onMouseDown={e => handleMouseDown(e, 'move')}
           style={{
-            left: `${cropArea.x * 100}%`,
-            top: `${cropArea.y * 100}%`,
-            width: `${cropArea.width * 100}%`,
-            height: `${cropArea.height * 100}%`,
+            left: `${previewCropArea.x * 100}%`,
+            top: `${previewCropArea.y * 100}%`,
+            width: `${previewCropArea.width * 100}%`,
+            height: `${previewCropArea.height * 100}%`,
             boxShadow: isDragging ? '0 0 0 1px rgba(255,255,255,0.5)' : 'none',
           }}
         >
@@ -220,7 +256,7 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
         </div>
       </div>
 
-      {/* Preview */}
+      {/* Preview - uses preview state for immediate feedback */}
       <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
         <p className="text-xs text-slate-600 mb-2">Preview</p>
         <div className="relative bg-white rounded border border-slate-300" style={{ aspectRatio: '1', width: '100%', maxWidth: '150px' }}>
@@ -230,10 +266,10 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
             fill
             className="object-cover rounded"
             style={{
-              objectPosition: `${cropArea.x * 100}% ${cropArea.y * 100}%`,
-              width: `${100 / cropArea.width}%`,
-              height: `${100 / cropArea.height}%`,
-              transform: `translate(-${(cropArea.x / cropArea.width) * 100}%, -${(cropArea.y / cropArea.height) * 100}%)`,
+              objectPosition: `${previewCropArea.x * 100}% ${previewCropArea.y * 100}%`,
+              width: `${100 / previewCropArea.width}%`,
+              height: `${100 / previewCropArea.height}%`,
+              transform: `translate(-${(previewCropArea.x / previewCropArea.width) * 100}%, -${(previewCropArea.y / previewCropArea.height) * 100}%)`,
             }}
             sizes="150px"
           />
@@ -246,10 +282,11 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
           Cancel
         </Button>
         <Button
-          onClick={() => onCropComplete(cropArea)}
+          onClick={() => onCropComplete(previewCropArea)}
           size="sm"
+          disabled={isPending}
         >
-          Apply Crop
+          {isPending ? 'Applying...' : 'Apply Crop'}
         </Button>
       </div>
     </div>
