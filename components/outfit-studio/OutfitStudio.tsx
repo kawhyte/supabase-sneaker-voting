@@ -294,8 +294,8 @@ export function OutfitStudio({
 
       {/* Main Outfit Studio Modal */}
       <Dialog open={isOpen && !showQuizModal} onOpenChange={onClose}>
-        <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto p-8 sm:p-12 ">
+          <DialogHeader className='mb-8'>
             <DialogTitle>Create Outfit</DialogTitle>
             <DialogDescription>
               Add items from your wardrobe and arrange them on the canvas
@@ -458,7 +458,7 @@ export function OutfitStudio({
 
           {/* Footer */}
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={onClose} disabled={isSaving}>
+            <Button className='mx-6' variant="outline" onClick={onClose} disabled={isSaving}>
               Cancel
             </Button>
             <Button

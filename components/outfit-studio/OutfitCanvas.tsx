@@ -124,7 +124,7 @@ export function OutfitCanvas({
 
       {/* Empty State */}
       {items.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute  inset-0 flex items-center justify-center pointer-events-none">
           <p className="text-slate-400 text-sm text-center">Add items to create outfit</p>
         </div>
       )}

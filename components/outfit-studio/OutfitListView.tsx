@@ -242,7 +242,7 @@ export function OutfitListView({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-y-auto p-8 sm:p-12">
         <DialogHeader>
           <DialogTitle>My Outfits</DialogTitle>
           <DialogDescription>

@@ -174,6 +174,8 @@ import {
 	type UrlValidationResult,
 } from "@/lib/retailer-url-validator";
 import { SupportedRetailersDialog } from "@/components/supported-retailers-dialog";
+import { useFormMode } from "@/lib/form-mode-context";
+import { useSmartDefaults } from "@/hooks/useSmartDefaults";
 
 const itemSchema = z
 	.object({
@@ -367,12 +369,33 @@ export function AddItemForm({
 	const watchedBrandId = watch("brandId");
 	const { brands } = useBrands();
 
+	// Form mode context (Quick vs Advanced)
+	const { mode: formMode, setMode: setFormMode } = useFormMode();
+
+	// Smart defaults from user preferences and recent items
+	const smartDefaults = useSmartDefaults();
+
 	// Validation card visibility hook for smart display
 	const { shouldShowCard, isSticky, isMobile } = useValidationVisibility({
 		formRef,
 		isDirty,
 		attemptedSubmit,
 	});
+
+	// Apply smart defaults on initial load (create mode only)
+	useEffect(() => {
+		if (mode === "create" && !smartDefaults.isLoading && !isDirty) {
+			reset({
+				triedOn: false,
+				wears: 0,
+				category: smartDefaults.lastCategory,
+				brandId: smartDefaults.lastBrandId,
+				brand: smartDefaults.lastBrand || "",
+				color: smartDefaults.lastColor || "",
+				sizeTried: smartDefaults.lastSize || "",
+			});
+		}
+	}, [smartDefaults, mode, isDirty, reset]);
 
 	useEffect(() => {
 		if (mode === "edit" && initialData) {
@@ -820,6 +843,39 @@ export function AddItemForm({
 								onDismiss={() => setAttemptedSubmit(false)}
 							/>
 
+							{/* Form Mode Toggle - Only in Create Mode */}
+							{mode === "create" && (
+								<div className='flex items-center gap-3 p-4 rounded-lg bg-blaze-50 border border-sun-300'>
+									<Lightbulb className='h-5 w-5 text-sun-400 flex-shrink-0' />
+									<div className='flex-1'>
+										<p className='text-sm font-medium text-slate-900'>
+											{formMode === "quick" ? "⚡ Quick Mode" : "🔧 Advanced Mode"}
+										</p>
+										<p className='text-xs text-slate-600'>
+											{formMode === "quick"
+												? "Add essentials in 15-30 seconds"
+												: "Full details including colors, notes, and more"}
+										</p>
+									</div>
+									<Button
+										type='button'
+										variant={formMode === "quick" ? "default" : "outline"}
+										size='sm'
+										onClick={() => setFormMode("quick")}
+										className='text-xs'>
+										Quick
+									</Button>
+									<Button
+										type='button'
+										variant={formMode === "advanced" ? "default" : "outline"}
+										size='sm'
+										onClick={() => setFormMode("advanced")}
+										className='text-xs'>
+										Advanced
+									</Button>
+								</div>
+							)}
+
 							{/* Product Details Section */}
 							<div className='space-y-6'>
 								<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
@@ -1176,15 +1232,16 @@ export function AddItemForm({
 								</div>
 							</div>
 
-							{/* Additional Details & Try-On Details Accordion */}
-							<Accordion
-								type='single'
-								collapsible
-								className='w-full'
-								value={openAccordionItem}
-								onValueChange={setOpenAccordionItem}
-							>
-								<AccordionItem value='item-1'>
+							{/* Additional Details & Try-On Details Accordion - Advanced Mode Only */}
+							{formMode === "advanced" && (
+								<Accordion
+									type='single'
+									collapsible
+									className='w-full'
+									value={openAccordionItem}
+									onValueChange={setOpenAccordionItem}
+								>
+									<AccordionItem value='item-1'>
 									<AccordionTrigger>
 										<h3 className='font-semibold font-heading text-base text-slate-900 leading-5 mt-8'>
 											{watchedTriedOn ? (
@@ -1325,6 +1382,7 @@ export function AddItemForm({
 									</AccordionContent>
 								</AccordionItem>
 							</Accordion>
+							)}
 
 							<div className='flex items-center justify-end gap-3 mt-6'>
 								<Button

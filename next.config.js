@@ -3,6 +3,13 @@ const nextConfig = {
   // Enable React Strict Mode for better dev experience
   reactStrictMode: true,
 
+  // Strip console logs in production (keep error & warn for debugging)
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn']
+    } : false
+  },
+
   images: {
     remotePatterns: [
       {

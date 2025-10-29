@@ -94,11 +94,6 @@ export default async function AddProductPage() {
     console.error('Auth error:', error);
   }
 
-  // For now, skip auth redirect to test the form
-  // if (!user) {
-  //   return redirect('/login')
-  // }
-
   return (
     <div className="min-h-screen bg-background">
       {/* Container with responsive padding + max-width constraint */}

@@ -65,6 +65,7 @@
 
 import { useRouter } from 'next/navigation'
 import { AddItemForm } from '@/components/add-item-form'
+import { FormModeProvider } from '@/lib/form-mode-context'
 
 export default function AddNewItemPage() {
   const router = useRouter()
@@ -78,14 +79,16 @@ export default function AddNewItemPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Container with responsive padding + max-width constraint */}
-      <div className="container mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8 py-12">
-        {/* Form Card - Elevated above background */}
-        <div className="bg-card rounded-lg shadow-md p-6 sm:p-8">
-          <AddItemForm onItemAdded={handleItemAdded} mode="create" />
+    <FormModeProvider>
+      <div className="min-h-screen bg-background">
+        {/* Container with responsive padding + max-width constraint */}
+        <div className="container mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8 py-12">
+          {/* Form Card - Elevated above background */}
+          <div className="bg-card rounded-lg shadow-md p-6 sm:p-8">
+            <AddItemForm onItemAdded={handleItemAdded} mode="create" />
+          </div>
         </div>
       </div>
-    </div>
+    </FormModeProvider>
   )
 }
