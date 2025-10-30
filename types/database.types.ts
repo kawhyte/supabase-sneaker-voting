@@ -282,6 +282,60 @@ export type Database = {
           },
         ]
       }
+      outfit_migration_archive: {
+        Row: {
+          display_height: number | null
+          display_width: number | null
+          id: string
+          item_brand: string | null
+          item_category: string | null
+          item_id: string
+          item_model: string | null
+          migrated_at: string
+          migrated_by_user_id: string | null
+          outfit_id: string
+          outfit_name: string | null
+          position_x: number | null
+          position_y: number | null
+          removal_reason: string
+          z_index: number | null
+        }
+        Insert: {
+          display_height?: number | null
+          display_width?: number | null
+          id?: string
+          item_brand?: string | null
+          item_category?: string | null
+          item_id: string
+          item_model?: string | null
+          migrated_at?: string
+          migrated_by_user_id?: string | null
+          outfit_id: string
+          outfit_name?: string | null
+          position_x?: number | null
+          position_y?: number | null
+          removal_reason: string
+          z_index?: number | null
+        }
+        Update: {
+          display_height?: number | null
+          display_width?: number | null
+          id?: string
+          item_brand?: string | null
+          item_category?: string | null
+          item_id?: string
+          item_model?: string | null
+          migrated_at?: string
+          migrated_by_user_id?: string | null
+          outfit_id?: string
+          outfit_name?: string | null
+          position_x?: number | null
+          position_y?: number | null
+          removal_reason?: string
+          z_index?: number | null
+        }
+        Relationships: []
+      }
       outfits: {
         Row: {
           background_color: string | null
