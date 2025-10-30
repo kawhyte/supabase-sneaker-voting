@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
   DialogContent,
@@ -32,7 +33,10 @@ import {
   autoArrangeOutfit,
 } from '@/lib/outfit-layout-engine'
 import { createClient } from '@/utils/supabase/client'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, Check, Loader2 } from 'lucide-react'
+import { useOutfitQuotas } from '@/hooks/useOutfitQuotas'
+import { getQuotaMessage } from '@/lib/quota-validation'
+import { cn } from '@/lib/utils'
 
 const OUTFIT_OCCASIONS: OutfitOccasion[] = [
   'casual',
@@ -54,6 +58,10 @@ interface OutfitStudioProps {
   onOutfitCreated?: (outfit: Outfit | OutfitWithItems) => void
   // When adding wishlist item
   newWishlistItem?: SizingJournalEntry | null
+  // ✅ NEW: Edit mode props
+  mode?: 'create' | 'edit'
+  editingOutfitId?: string
+  editingOutfit?: OutfitWithItems
 }
 
 /**
@@ -72,11 +80,15 @@ export function OutfitStudio({
   outfitsCreated = 0,
   onOutfitCreated,
   newWishlistItem,
+  mode = 'create',
+  editingOutfitId,
+  editingOutfit,
 }: OutfitStudioProps) {
   // Form State
   const [outfitName, setOutfitName] = useState('Untitled Outfit')
   const [occasion, setOccasion] = useState<OutfitOccasion>('casual')
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF')
+  const [description, setDescription] = useState<string>('')
 
   // Outfit Items
   const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([])
@@ -95,8 +107,26 @@ export function OutfitStudio({
     closeCelebration,
   } = useMilestoneCelebration()
 
+  // Quota management
+  const { quotaStatus, canAdd: canAddItem, getCategoryCount } = useOutfitQuotas(outfitItems)
+
   // Initialize Supabase client for quiz callbacks
   const supabase = createClient()
+
+  // ✅ Pre-populate form when editing
+  useEffect(() => {
+    if (mode === 'edit' && editingOutfit) {
+      setOutfitName(editingOutfit.name || 'Untitled Outfit')
+      setOccasion(editingOutfit.occasion || 'casual')
+      setBackgroundColor(editingOutfit.background_color || '#FFFFFF')
+      setDescription(editingOutfit.description || '')
+
+      // Pre-populate outfit items
+      if (editingOutfit.outfit_items && editingOutfit.outfit_items.length > 0) {
+        setOutfitItems(editingOutfit.outfit_items)
+      }
+    }
+  }, [mode, editingOutfit])
 
   // 🎯 STEP 3.5c: Quiz modal callbacks for OutfitStudio
   const handleQuizProceed = async () => {
@@ -156,6 +186,19 @@ export function OutfitStudio({
 
   // Handle adding item from wardrobe
   const handleAddItem = (item: SizingJournalEntry) => {
+    // Check if item already in outfit
+    if (outfitItems.find(oi => oi.item_id === item.id)) {
+      toast.error('Item already in outfit')
+      return
+    }
+
+    // ✅ Check quota before adding
+    const { canAdd: canAddItemCheck, reason } = canAddItem(item)
+    if (!canAddItemCheck) {
+      toast.error(reason || 'Cannot add item (quota exceeded)')
+      return
+    }
+
     const itemCountInCategory = itemsByCategory[item.category || 'other'] || 0
     const position = calculateAutoPosition(item, itemCountInCategory)
     const size = calculateSuggestedSize(item)
@@ -247,8 +290,9 @@ export function OutfitStudio({
 
   // Handle save outfit
   const handleSaveOutfit = async () => {
+    // Validation
     if (outfitItems.length === 0) {
-      toast.error('Add at least one item to create an outfit')
+      toast.error('Add at least one item to your outfit')
       return
     }
 
@@ -258,70 +302,72 @@ export function OutfitStudio({
     }
 
     setIsSaving(true)
+
     try {
-      const response = await fetch('/api/outfits', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: outfitName.trim(),
-          description: '',
-          occasion,
-          background_color: backgroundColor,
-          outfit_items: outfitItems.map(item => ({
-            item_id: item.item_id,
-            position_x: item.position_x,
-            position_y: item.position_y,
-            z_index: item.z_index,
-            display_width: item.display_width,
-            display_height: item.display_height,
-            crop_x: item.crop_x,
-            crop_y: item.crop_y,
-            crop_width: item.crop_width,
-            crop_height: item.crop_height,
-            cropped_image_url: item.cropped_image_url,
-          })),
-        }),
-      })
+      const outfitData = {
+        name: outfitName.trim(),
+        description: description.trim() || null,
+        occasion: occasion || null,
+        background_color: backgroundColor,
+        outfit_items: outfitItems.map((item, index) => ({
+          item_id: item.item_id,
+          position_x: item.position_x,
+          position_y: item.position_y,
+          z_index: item.z_index,
+          crop_x: item.crop_x,
+          crop_y: item.crop_y,
+          crop_width: item.crop_width,
+          crop_height: item.crop_height,
+          cropped_image_url: item.cropped_image_url,
+          display_width: item.display_width,
+          display_height: item.display_height,
+          item_order: index,
+        })),
+      }
+
+      let response
+
+      if (mode === 'edit' && editingOutfitId) {
+        // ✅ EDIT MODE: PUT request
+        response = await fetch(`/api/outfits/${editingOutfitId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(outfitData),
+        })
+      } else {
+        // ✅ CREATE MODE: POST request
+        response = await fetch('/api/outfits', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(outfitData),
+        })
+      }
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to save outfit')
+        throw new Error('Failed to save outfit')
       }
 
-      const data = await response.json()
-      toast.success('Outfit created successfully!')
+      const savedOutfit = await response.json()
 
-      // Call callback if provided - pass outfit with items
-      if (onOutfitCreated && data.outfit) {
-        const outfitWithItems = {
-          ...data.outfit,
-          outfit_items: data.outfit_items || [],
-        }
-        onOutfitCreated(outfitWithItems)
+      // Show success message
+      if (mode === 'edit') {
+        toast.success('Outfit updated successfully!')
+      } else {
+        toast.success('Outfit created successfully!')
+        // Trigger milestone celebration (only for create)
+        celebrate('outfit_created')
       }
 
-      // Check for outfit creation milestones
-      const newOutfitCount = (outfitsCreated || 0) + 1
+      // Callback to parent
+      onOutfitCreated?.(savedOutfit)
 
-      // Reset form
-      setOutfitName('Untitled Outfit')
-      setOccasion('casual')
-      setBackgroundColor('#FFFFFF')
-      setOutfitItems([])
-
-      // Trigger celebration before closing
-      console.log('🎉 Triggering outfit_created celebration')
-      celebrate('outfit_created')
-
-      // Close studio after a short delay to let celebration show
+      // Close modal after brief delay
       setTimeout(() => {
-        console.log('🎉 Closing outfit studio')
         onClose()
       }, 100)
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to save outfit'
-      toast.error(message)
-      console.error('Outfit save error:', error)
+      console.error('Error saving outfit:', error)
+      toast.error(mode === 'edit' ? 'Failed to update outfit' : 'Failed to create outfit')
     } finally {
       setIsSaving(false)
     }
@@ -429,6 +475,30 @@ export function OutfitStudio({
                     <span className="text-xs text-slate-600 mt-2">{backgroundColor}</span>
                   </div>
                 </div>
+
+                {/* Description Field */}
+                <div>
+                  <Label htmlFor="description" className="text-sm">
+                    Description <span className="text-muted-foreground text-xs">(optional)</span>
+                  </Label>
+                  <Textarea
+                    id="description"
+                    placeholder="e.g., Wore to Sarah's wedding, perfect for summer brunch..."
+                    value={description}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value.length <= 500) {
+                        setDescription(value)
+                      }
+                    }}
+                    maxLength={500}
+                    rows={3}
+                    className="resize-none mt-1"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {description.length}/500 characters
+                  </p>
+                </div>
               </div>
 
               {/* Items in Outfit */}
@@ -454,6 +524,41 @@ export function OutfitStudio({
                       </button>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Quota Status Badges */}
+              <div className="space-y-2 border-t border-border pt-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Outfit Quotas
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {Object.entries(quotaStatus.quotas)
+                    .filter(([_, validation]) => validation.max !== null) // Only show restricted categories
+                    .map(([category, validation]) => {
+                      const isAtLimit = validation.isAtLimit && validation.current > 0
+
+                      return (
+                        <div
+                          key={category}
+                          className={cn(
+                            'rounded-md border px-3 py-2 text-xs',
+                            isAtLimit
+                              ? 'border-sun-400 bg-sun-100'
+                              : 'border-border bg-background'
+                          )}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">
+                              {getQuotaMessage(category, validation.current, validation.max)}
+                            </span>
+                            {isAtLimit && (
+                              <Check className="h-3 w-3 text-sun-600 flex-shrink-0" />
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
                 </div>
               </div>
 
@@ -513,9 +618,18 @@ export function OutfitStudio({
             <Button
               onClick={handleSaveOutfit}
               disabled={isSaving || outfitItems.length === 0}
-              className="flex items-center gap-2"
+              className="w-full"
             >
-              {isSaving ? 'Saving...' : 'Save Outfit'}
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {mode === 'edit' ? 'Saving Changes...' : 'Creating Outfit...'}
+                </>
+              ) : (
+                <>
+                  {mode === 'edit' ? 'Save Changes' : 'Create Outfit'}
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

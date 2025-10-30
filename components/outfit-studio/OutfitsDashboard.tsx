@@ -311,6 +311,7 @@ export function OutfitsDashboard() {
             setSelectedOutfitId(null)
           }}
           outfits={outfits}
+          userWardrobe={userWardrobe}
           initialSelectedOutfitId={selectedOutfitId}
           onDelete={handleOutfitDeleted}
         />

@@ -375,3 +375,191 @@ export const SEASON_CONFIG: Record<OutfitSeason, {
     months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   },
 }
+
+// ============================================================================
+// CATEGORY QUOTA TYPES
+// ============================================================================
+
+/**
+ * Defines quota rules for outfit item categories
+ * - Shoes, Tops, Bottoms, Outerwear: Maximum 1 each
+ * - Accessories, Bags, Hats, Jewelry, Watches, Socks: Unlimited
+ */
+export interface CategoryQuota {
+  category: string          // Category name (e.g., "shoes", "tops")
+  max: number | null        // Maximum allowed (null = unlimited)
+  label: string             // Display label (e.g., "Shoes")
+  icon?: string             // Optional icon name (for UI)
+}
+
+/**
+ * Quota validation result for a specific category
+ */
+export interface QuotaValidation {
+  category: string
+  current: number           // Current count in outfit
+  max: number | null        // Maximum allowed
+  isAtLimit: boolean        // true if current >= max
+  canAdd: boolean           // true if can add more items
+  message?: string          // Optional user-facing message
+}
+
+/**
+ * Complete quota status for an outfit
+ */
+export interface OutfitQuotaStatus {
+  quotas: Record<string, QuotaValidation>  // Keyed by category
+  violations: QuotaValidation[]            // Categories exceeding limits
+  isValid: boolean                         // true if no violations
+}
+
+/**
+ * Quota rules for each category
+ *
+ * Restricted (max 1):
+ * - Shoes (sneakers, shoes)
+ * - Tops (tops, sweaters, shirts)
+ * - Bottoms (bottoms, pants, shorts, skirts)
+ * - Outerwear (outerwear, jackets, coats)
+ *
+ * Unlimited:
+ * - Accessories (accessories, bags, hats, jewelry, watches, socks)
+ */
+export const QUOTA_RULES: Record<string, CategoryQuota> = {
+  // SHOES (max 1)
+  'sneakers': {
+    category: 'sneakers',
+    max: 1,
+    label: 'Shoes',
+    icon: 'Footprints',
+  },
+  'shoes': {
+    category: 'shoes',
+    max: 1,
+    label: 'Shoes',
+    icon: 'Footprints',
+  },
+
+  // TOPS (max 1)
+  'tops': {
+    category: 'tops',
+    max: 1,
+    label: 'Tops',
+    icon: 'Shirt',
+  },
+  'sweaters': {
+    category: 'sweaters',
+    max: 1,
+    label: 'Tops',
+    icon: 'Shirt',
+  },
+  'shirts': {
+    category: 'shirts',
+    max: 1,
+    label: 'Tops',
+    icon: 'Shirt',
+  },
+
+  // BOTTOMS (max 1)
+  'bottoms': {
+    category: 'bottoms',
+    max: 1,
+    label: 'Bottoms',
+    icon: 'PantsIcon',
+  },
+  'pants': {
+    category: 'pants',
+    max: 1,
+    label: 'Bottoms',
+    icon: 'PantsIcon',
+  },
+  'shorts': {
+    category: 'shorts',
+    max: 1,
+    label: 'Bottoms',
+    icon: 'PantsIcon',
+  },
+  'skirts': {
+    category: 'skirts',
+    max: 1,
+    label: 'Bottoms',
+    icon: 'PantsIcon',
+  },
+
+  // OUTERWEAR (max 1)
+  'outerwear': {
+    category: 'outerwear',
+    max: 1,
+    label: 'Outerwear',
+    icon: 'Coat',
+  },
+  'jackets': {
+    category: 'jackets',
+    max: 1,
+    label: 'Outerwear',
+    icon: 'Coat',
+  },
+  'coats': {
+    category: 'coats',
+    max: 1,
+    label: 'Outerwear',
+    icon: 'Coat',
+  },
+
+  // ACCESSORIES (unlimited)
+  'accessories': {
+    category: 'accessories',
+    max: null,
+    label: 'Accessories',
+    icon: 'Watch',
+  },
+  'bags': {
+    category: 'bags',
+    max: null,
+    label: 'Accessories',
+    icon: 'ShoppingBag',
+  },
+  'hats': {
+    category: 'hats',
+    max: null,
+    label: 'Accessories',
+    icon: 'HardHat',
+  },
+  'jewelry': {
+    category: 'jewelry',
+    max: null,
+    label: 'Accessories',
+    icon: 'Gem',
+  },
+  'watches': {
+    category: 'watches',
+    max: null,
+    label: 'Accessories',
+    icon: 'Watch',
+  },
+  'socks': {
+    category: 'socks',
+    max: null,
+    label: 'Accessories',
+    icon: 'Shirt',
+  },
+
+  // FALLBACK (unlimited)
+  'other': {
+    category: 'other',
+    max: null,
+    label: 'Other',
+    icon: 'Box',
+  },
+}
+
+/**
+ * Helper: Get quota for a category (with fallback to unlimited)
+ */
+export function getQuotaForCategory(category: string): CategoryQuota {
+  return QUOTA_RULES[category.toLowerCase()] || {
+    category: category,
+    max: null,
+    label: category,
+  }
+}

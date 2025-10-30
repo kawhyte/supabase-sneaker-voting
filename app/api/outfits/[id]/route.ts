@@ -313,7 +313,7 @@ export async function PUT(
 
     // Parse request body
     const body = await request.json()
-    const { times_worn, last_worn, date_worn, occasion, name } = body
+    const { times_worn, last_worn, date_worn, occasion, name, description, outfit_items, background_color } = body
 
     // Verify outfit belongs to user
     const outfit = await outfitReadBreaker.execute(async () => {
@@ -365,6 +365,8 @@ export async function PUT(
       date_worn?: string | null
       occasion?: string
       name?: string
+      description?: string | null
+      background_color?: string
     }
 
     const updateData: OutfitUpdateData = {}
@@ -373,11 +375,50 @@ export async function PUT(
     if (date_worn !== undefined) updateData.date_worn = date_worn
     if (occasion !== undefined) updateData.occasion = occasion
     if (name !== undefined) updateData.name = name
+    if (description !== undefined) updateData.description = description
+    if (background_color !== undefined) updateData.background_color = background_color
 
     // Update outfit with retry
     const updatedOutfit = await outfitWriteBreaker.execute(async () => {
       return await retryUtils.retry(
         async () => {
+          // If outfit_items are provided, delete existing items and create new ones
+          if (outfit_items && Array.isArray(outfit_items)) {
+            // Delete existing outfit items
+            const { error: deleteError } = await supabase
+              .from('outfit_items')
+              .delete()
+              .eq('outfit_id', outfitId)
+
+            if (deleteError) throw deleteError
+
+            // Create new outfit items
+            const itemsToInsert = outfit_items.map((item: any) => ({
+              outfit_id: outfitId,
+              item_id: item.item_id || item.item?.id,
+              position_x: item.position_x,
+              position_y: item.position_y,
+              z_index: item.z_index || 0,
+              display_width: item.display_width,
+              display_height: item.display_height,
+              crop_x: item.crop_x || null,
+              crop_y: item.crop_y || null,
+              crop_width: item.crop_width || null,
+              crop_height: item.crop_height || null,
+              cropped_image_url: item.cropped_image_url || null,
+              item_order: item.item_order || 0,
+            }))
+
+            if (itemsToInsert.length > 0) {
+              const { error: insertError } = await supabase
+                .from('outfit_items')
+                .insert(itemsToInsert)
+
+              if (insertError) throw insertError
+            }
+          }
+
+          // Update outfit metadata
           const { data, error } = await supabase
             .from('outfits')
             .update(updateData)

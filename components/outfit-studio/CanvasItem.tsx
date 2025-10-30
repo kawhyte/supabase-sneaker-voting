@@ -42,14 +42,36 @@ const CanvasItem = memo(
     const pixelWidth = item.display_width * CANVAS_WIDTH
     const pixelHeight = item.display_height * CANVAS_HEIGHT
 
-    // Use cropped image if available, otherwise use original
-    const imageUrl = useMemo(
-      () =>
-        item.cropped_image_url ||
-        item.item?.image_url ||
-        item.item?.item_photos?.[0]?.image_url,
-      [item.cropped_image_url, item.item?.image_url, item.item?.item_photos]
-    )
+    // Memoize image selection with priority: cropped > main > legacy > first photo
+    const imageUrl = useMemo(() => {
+      // Priority 1: Cropped version (if item has been manually cropped for this outfit)
+      if (item.cropped_image_url) {
+        return item.cropped_image_url
+      }
+
+      // Priority 2: Main image (is_main_image flag)
+      const mainPhoto = item.item?.item_photos?.find(photo => photo.is_main_image)
+      if (mainPhoto) {
+        return mainPhoto.image_url
+      }
+
+      // Priority 3: Legacy single image (for items created before multi-photo support)
+      if (item.item?.image_url) {
+        return item.item.image_url
+      }
+
+      // Priority 4: First photo (fallback if no main image designated)
+      if (item.item?.item_photos?.[0]) {
+        return item.item.item_photos[0].image_url
+      }
+
+      // Fallback: null (will show placeholder)
+      return null
+    }, [
+      item.cropped_image_url,
+      item.item?.image_url,
+      item.item?.item_photos,
+    ])
 
     // Memoize style object
     const itemStyle = useMemo(

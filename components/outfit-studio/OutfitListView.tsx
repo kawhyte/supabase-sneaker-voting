@@ -14,12 +14,15 @@ import {
 } from '@/components/ui/dialog'
 import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitCanvas } from './OutfitCanvas'
+import { OutfitStudio } from './OutfitStudio'
 import { Trash2, Edit2, Share2, Check } from 'lucide-react'
+import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 
 interface OutfitListViewProps {
   isOpen: boolean
   onClose: () => void
   outfits: OutfitWithItems[]
+  userWardrobe: SizingJournalEntry[]
   onDelete?: (outfitId: string) => void
   onUpdate?: (outfit: Outfit) => void
   initialSelectedOutfitId?: string | null
@@ -29,6 +32,7 @@ export function OutfitListView({
   isOpen,
   onClose,
   outfits,
+  userWardrobe,
   onDelete,
   onUpdate,
   initialSelectedOutfitId,
@@ -38,6 +42,8 @@ export function OutfitListView({
   const [isMarkingWorn, setIsMarkingWorn] = useState(false)
   const [outfitsList, setOutfitsList] = useState(outfits)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [editingOutfit, setEditingOutfit] = useState<OutfitWithItems | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   // Update outfitsList when props change
   useEffect(() => {
@@ -282,6 +288,17 @@ export function OutfitListView({
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={() => {
+                    setEditingOutfit(selectedOutfit)
+                    setIsEditModalOpen(true)
+                  }}
+                >
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => setSelectedOutfitId(null)}
                 >
                   Back
@@ -486,6 +503,42 @@ export function OutfitListView({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Outfit Modal */}
+      {isEditModalOpen && editingOutfit && (
+        <OutfitStudio
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setEditingOutfit(null)
+          }}
+          userWardrobe={userWardrobe}
+          mode="edit"
+          editingOutfitId={editingOutfit.id}
+          editingOutfit={editingOutfit}
+          onOutfitCreated={(updatedOutfit) => {
+            // Update the outfit in the list
+            const updatedOutfits = outfitsList.map(o =>
+              o.id === editingOutfit.id ? updatedOutfit as OutfitWithItems : o
+            )
+            setOutfitsList(updatedOutfits)
+
+            // Refresh the selected outfit
+            if ('outfit_items' in updatedOutfit) {
+              setSelectedOutfitId(updatedOutfit.id)
+            }
+
+            // Close edit modal
+            setIsEditModalOpen(false)
+            setEditingOutfit(null)
+
+            // Call parent callback if provided
+            onUpdate?.(updatedOutfit as Outfit)
+
+            toast.success('Outfit updated successfully!')
+          }}
+        />
+      )}
     </Dialog>
   )
 }
