@@ -21,6 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from '@/components/ui/tooltip'
 import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
 import { Outfit, OutfitWithItems, OutfitItem, OutfitOccasion, CropArea } from '@/components/types/outfit'
 import { OutfitCanvas } from './OutfitCanvas'
@@ -527,7 +533,8 @@ export function OutfitStudio({
       )}
 
       {/* Main Outfit Studio Modal */}
-      <Dialog open={isOpen && !showQuizModal} onOpenChange={onClose}>
+      <TooltipProvider>
+        <Dialog open={isOpen && !showQuizModal} onOpenChange={onClose}>
         <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto p-8 sm:p-12 ">
           <DialogHeader className='mb-8'>
             <DialogTitle>Create Outfit</DialogTitle>
@@ -657,45 +664,57 @@ export function OutfitStudio({
                       </div>
                       <button
                         onClick={() => handleRemoveItem(item.id)}
+                        aria-label={`Remove ${item.item?.brand} ${item.item?.model} from outfit`}
                         className="text-red-500 hover:text-red-700 flex-shrink-0"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-4 w-4" aria-hidden="true" />
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Quota Status Badges */}
+              {/* Quota Status Badges (with tooltips) */}
               <div className="space-y-2 border-t border-border pt-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   Outfit Quotas
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {Object.entries(quotaStatus.quotas)
-                    .filter(([_, validation]) => validation.max !== null) // Only show restricted categories
+                    .filter(([_, validation]) => validation.max !== null)
                     .map(([category, validation]) => {
                       const isAtLimit = validation.isAtLimit && validation.current > 0
 
+                      const tooltipMessage = validation.canAdd
+                        ? `Can add ${validation.max! - validation.current} more ${validation.category}`
+                        : `Already have ${validation.category} in outfit (${validation.current}/${validation.max})`
+
                       return (
-                        <div
-                          key={category}
-                          className={cn(
-                            'rounded-md border px-3 py-2 text-xs',
-                            isAtLimit
-                              ? 'border-sun-400 bg-sun-100'
-                              : 'border-border bg-background'
-                          )}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">
-                              {getQuotaMessage(category, validation.current, validation.max)}
-                            </span>
-                            {isAtLimit && (
-                              <Check className="h-3 w-3 text-sun-600 flex-shrink-0" />
-                            )}
-                          </div>
-                        </div>
+                        <Tooltip key={category}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className={cn(
+                                'rounded-md border px-3 py-2 text-xs cursor-help transition-colors',
+                                isAtLimit
+                                  ? 'border-sun-400 bg-sun-100'
+                                  : 'border-border bg-background hover:bg-muted'
+                              )}
+                              aria-label={tooltipMessage}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">
+                                  {getQuotaMessage(category, validation.current, validation.max)}
+                                </span>
+                                {isAtLimit && (
+                                  <Check className="h-3 w-3 text-sun-600 flex-shrink-0" aria-hidden="true" />
+                                )}
+                              </div>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{tooltipMessage}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       )
                     })}
                 </div>
@@ -703,7 +722,7 @@ export function OutfitStudio({
 
               {/* Add Item Dropdown */}
               <div className="space-y-2">
-                <Label className="text-sm">Add Item</Label>
+                <Label className="text-sm" htmlFor="add-item-select">Add Item</Label>
                 {userWardrobe.length === 0 && (
                   <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
                     ⚠️ No items in wardrobe. Add items to your collection first.
@@ -715,36 +734,60 @@ export function OutfitStudio({
                     onValueChange={(itemId) => {
                       const item = userWardrobe.find(i => i.id === itemId)
                       if (item) {
-                        console.log('Selected item:', item.brand, item.model)
                         handleAddItem(item)
                       }
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="add-item-select" aria-label="Select item to add to outfit" aria-describedby="quota-help-text">
                       <SelectValue placeholder="Select item to add..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {(() => {
-                        const availableItems = userWardrobe.filter(item => !outfitItems.find(oi => oi.item_id === item.id))
-                        console.log('Available items for dropdown:', availableItems.length, availableItems)
+                      {userWardrobe.length === 0 ? (
+                        <div className="p-4 text-sm text-muted-foreground text-center">
+                          No items in wardrobe
+                        </div>
+                      ) : (
+                        userWardrobe.map(item => {
+                          // Check if already in outfit
+                          const alreadyInOutfit = outfitItems.find(oi => oi.item_id === item.id)
 
-                        if (availableItems.length === 0) {
+                          // Check quota status
+                          const { canAdd: canAddCheck, reason } = canAddItem(item)
+                          const isDisabled = !!alreadyInOutfit || !canAddCheck
+
                           return (
-                            <div className="p-2 text-xs text-slate-600">
-                              All items already added to outfit
-                            </div>
+                            <SelectItem
+                              key={item.id}
+                              value={item.id}
+                              disabled={isDisabled}
+                              className={cn(
+                                isDisabled && 'opacity-50 cursor-not-allowed line-through'
+                              )}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span>
+                                  {item.brand} {item.model} - {item.color}
+                                </span>
+                                {isDisabled && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {alreadyInOutfit
+                                      ? '(already added)'
+                                      : reason
+                                      ? `(${reason})`
+                                      : '(quota reached)'}
+                                  </span>
+                                )}
+                              </div>
+                            </SelectItem>
                           )
-                        }
-
-                        return availableItems.map(item => (
-                          <SelectItem key={item.id} value={item.id}>
-                            {item.brand} {item.model} - {item.color}
-                          </SelectItem>
-                        ))
-                      })()}
+                        })
+                      )}
                     </SelectContent>
                   </Select>
                 )}
+                <p id="quota-help-text" className="text-xs text-muted-foreground">
+                  You can add 1 shoe, 1 top, 1 bottom, 1 outerwear, and unlimited accessories.
+                </p>
               </div>
             </div>
           </div>
@@ -757,11 +800,15 @@ export function OutfitStudio({
             <Button
               onClick={handleSaveOutfit}
               disabled={isSaving || outfitItems.length === 0}
+              aria-busy={isSaving}
+              aria-label={isSaving
+                ? mode === 'edit' ? 'Saving changes...' : 'Creating outfit...'
+                : mode === 'edit' ? 'Save changes to outfit' : 'Create new outfit'}
               className="w-full"
             >
               {isSaving ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                   {mode === 'edit' ? 'Saving Changes...' : 'Creating Outfit...'}
                 </>
               ) : (
@@ -773,6 +820,7 @@ export function OutfitStudio({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </TooltipProvider>
 
       {/* Replace Confirmation Dialog */}
       {itemToReplace && (
