@@ -45,7 +45,15 @@ export async function GET(request: NextRequest) {
     // Exclude snoozed notifications (application-side filtering since NOW() can't be in WHERE)
     const { data: allNotifications, error } = await query
 
-    if (error) throw error
+    if (error) {
+      console.error('Query error:', error)
+      throw error
+    }
+
+    console.log(`Fetched ${allNotifications?.length || 0} notifications for user ${user.id}`)
+    if (allNotifications && allNotifications.length > 0) {
+      console.log('First notification:', allNotifications[0])
+    }
 
     // Filter snoozed notifications
     const now = new Date()
