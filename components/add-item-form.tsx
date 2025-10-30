@@ -1205,8 +1205,8 @@ export function AddItemForm({
 								</div>
 							</div>
 
-							{/* Price Tracking Section - Only for Wishlisted Items */}
-							{(mode === 'create' || initialData?.status === 'wishlisted') && (
+							{/* Price Tracking Section - Wishlisted Items or Edit Mode */}
+							{(mode === 'create' || initialData?.status === 'wishlisted' || mode === 'edit') && (
 								<div className='space-y-6 mt-12'>
 									<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
 										<TrendingDown className='relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0' />
@@ -1497,7 +1497,7 @@ export function AddItemForm({
 								<Button
 									type='submit'
 									disabled={
-										isLoading || isSavingPhotos || (!isValid && isDirty) || photos.length === 0
+										isLoading || isSavingPhotos || (!isValid && isDirty) || (mode === "create" && photos.length === 0)
 									}>
 									{(isLoading || isSavingPhotos) && (
 										<Loader2 className='h-4 w-4 mr-2 animate-spin' />
