@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          achievement_key: string
+          category: string | null
+          created_at: string | null
+          description: string
+          icon_emoji: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          points: number | null
+          unlock_criteria: Json
+        }
+        Insert: {
+          achievement_key: string
+          category?: string | null
+          created_at?: string | null
+          description: string
+          icon_emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          points?: number | null
+          unlock_criteria: Json
+        }
+        Update: {
+          achievement_key?: string
+          category?: string | null
+          created_at?: string | null
+          description?: string
+          icon_emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          points?: number | null
+          unlock_criteria?: Json
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           brand_logo: string | null
@@ -209,6 +248,144 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_preferences: {
+        Row: {
+          achievements_enabled: boolean | null
+          bundle_threshold: number | null
+          created_at: string | null
+          enable_bundling: boolean | null
+          enable_email: boolean | null
+          enable_in_app: boolean | null
+          enable_push: boolean | null
+          id: string
+          max_daily_notifications: number | null
+          outfit_suggestions_enabled: boolean | null
+          preferences_version: number | null
+          price_alerts_enabled: boolean | null
+          quiet_hours_enabled: boolean | null
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          seasonal_tips_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+          user_timezone: string | null
+          wear_reminders_enabled: boolean | null
+        }
+        Insert: {
+          achievements_enabled?: boolean | null
+          bundle_threshold?: number | null
+          created_at?: string | null
+          enable_bundling?: boolean | null
+          enable_email?: boolean | null
+          enable_in_app?: boolean | null
+          enable_push?: boolean | null
+          id?: string
+          max_daily_notifications?: number | null
+          outfit_suggestions_enabled?: boolean | null
+          preferences_version?: number | null
+          price_alerts_enabled?: boolean | null
+          quiet_hours_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          seasonal_tips_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          user_timezone?: string | null
+          wear_reminders_enabled?: boolean | null
+        }
+        Update: {
+          achievements_enabled?: boolean | null
+          bundle_threshold?: number | null
+          created_at?: string | null
+          enable_bundling?: boolean | null
+          enable_email?: boolean | null
+          enable_in_app?: boolean | null
+          enable_push?: boolean | null
+          id?: string
+          max_daily_notifications?: number | null
+          outfit_suggestions_enabled?: boolean | null
+          preferences_version?: number | null
+          price_alerts_enabled?: boolean | null
+          quiet_hours_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          seasonal_tips_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          user_timezone?: string | null
+          wear_reminders_enabled?: boolean | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_label: string | null
+          action_url: string | null
+          bundled_count: number | null
+          bundled_items: Json | null
+          created_at: string | null
+          expiry_at: string | null
+          group_key: string | null
+          id: string
+          is_bundled: boolean | null
+          is_read: boolean | null
+          link_url: string | null
+          message: string
+          metadata: Json | null
+          notification_type: string
+          read_at: string | null
+          severity: string | null
+          snoozed_until: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          action_label?: string | null
+          action_url?: string | null
+          bundled_count?: number | null
+          bundled_items?: Json | null
+          created_at?: string | null
+          expiry_at?: string | null
+          group_key?: string | null
+          id?: string
+          is_bundled?: boolean | null
+          is_read?: boolean | null
+          link_url?: string | null
+          message: string
+          metadata?: Json | null
+          notification_type: string
+          read_at?: string | null
+          severity?: string | null
+          snoozed_until?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          action_label?: string | null
+          action_url?: string | null
+          bundled_count?: number | null
+          bundled_items?: Json | null
+          created_at?: string | null
+          expiry_at?: string | null
+          group_key?: string | null
+          id?: string
+          is_bundled?: boolean | null
+          is_read?: boolean | null
+          link_url?: string | null
+          message?: string
+          metadata?: Json | null
+          notification_type?: string
+          read_at?: string | null
+          severity?: string | null
+          snoozed_until?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       outfit_items: {
         Row: {
@@ -647,6 +824,57 @@ export type Database = {
         }
         Relationships: []
       }
+      seasonal_content: {
+        Row: {
+          created_at: string | null
+          end_date: string
+          icon_emoji: string | null
+          id: string
+          is_active: boolean | null
+          message: string
+          priority: number | null
+          season: string
+          start_date: string
+          suggested_categories: Json | null
+          suggested_colors: Json | null
+          suggested_tips: Json | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_date: string
+          icon_emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          message: string
+          priority?: number | null
+          season: string
+          start_date: string
+          suggested_categories?: Json | null
+          suggested_colors?: Json | null
+          suggested_tips?: Json | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_date?: string
+          icon_emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          message?: string
+          priority?: number | null
+          season?: string
+          start_date?: string
+          suggested_categories?: Json | null
+          suggested_colors?: Json | null
+          suggested_tips?: Json | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       size_preferences: {
         Row: {
           brand: string
@@ -674,6 +902,116 @@ export type Database = {
           notes?: string | null
           preferred_size?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_dismissed_seasonal_alerts: {
+        Row: {
+          dismissed_at: string | null
+          id: string
+          season: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          dismissed_at?: string | null
+          id?: string
+          season: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          dismissed_at?: string | null
+          id?: string
+          season?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          achievements_unlocked: number | null
+          average_cost_per_wear: number | null
+          created_at: string | null
+          last_notification_at: string | null
+          most_worn_count: number | null
+          most_worn_item_id: string | null
+          owned_items: number | null
+          total_achievements: number | null
+          total_items: number | null
+          total_outfits: number | null
+          total_savings_from_alerts: number | null
+          total_spent: number | null
+          unread_notification_count: number | null
+          updated_at: string | null
+          user_id: string
+          wishlisted_items: number | null
+        }
+        Insert: {
+          achievements_unlocked?: number | null
+          average_cost_per_wear?: number | null
+          created_at?: string | null
+          last_notification_at?: string | null
+          most_worn_count?: number | null
+          most_worn_item_id?: string | null
+          owned_items?: number | null
+          total_achievements?: number | null
+          total_items?: number | null
+          total_outfits?: number | null
+          total_savings_from_alerts?: number | null
+          total_spent?: number | null
+          unread_notification_count?: number | null
+          updated_at?: string | null
+          user_id: string
+          wishlisted_items?: number | null
+        }
+        Update: {
+          achievements_unlocked?: number | null
+          average_cost_per_wear?: number | null
+          created_at?: string | null
+          last_notification_at?: string | null
+          most_worn_count?: number | null
+          most_worn_item_id?: string | null
+          owned_items?: number | null
+          total_achievements?: number | null
+          total_items?: number | null
+          total_outfits?: number | null
+          total_savings_from_alerts?: number | null
+          total_spent?: number | null
+          unread_notification_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+          wishlisted_items?: number | null
         }
         Relationships: []
       }
