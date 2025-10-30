@@ -36,7 +36,10 @@ import { createClient } from '@/utils/supabase/client'
 import { Plus, X, Check, Loader2 } from 'lucide-react'
 import { useOutfitQuotas } from '@/hooks/useOutfitQuotas'
 import { getQuotaMessage } from '@/lib/quota-validation'
+import { getQuotaForCategory } from '@/components/types/outfit'
 import { cn } from '@/lib/utils'
+import { useUndo } from '@/contexts/UndoContext'
+import { ConfirmReplaceDialog } from './ConfirmReplaceDialog'
 
 const OUTFIT_OCCASIONS: OutfitOccasion[] = [
   'casual',
@@ -98,6 +101,12 @@ export function OutfitStudio({
   const [croppingItemId, setCroppingItemId] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [showQuiz, setShowQuiz] = useState(false)
+  const [replaceDialogOpen, setReplaceDialogOpen] = useState(false)
+  const [itemToReplace, setItemToReplace] = useState<{
+    old: SizingJournalEntry
+    new: SizingJournalEntry
+    category: string
+  } | null>(null)
 
   // Milestone celebrations
   const {
@@ -109,6 +118,9 @@ export function OutfitStudio({
 
   // Quota management
   const { quotaStatus, canAdd: canAddItem, getCategoryCount } = useOutfitQuotas(outfitItems)
+
+  // Undo management
+  const { pushAction, undo, canUndo, clearStack } = useUndo()
 
   // Initialize Supabase client for quiz callbacks
   const supabase = createClient()
@@ -127,6 +139,13 @@ export function OutfitStudio({
       }
     }
   }, [mode, editingOutfit])
+
+  // Clear undo stack when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      clearStack()
+    }
+  }, [isOpen, clearStack])
 
   // 🎯 STEP 3.5c: Quiz modal callbacks for OutfitStudio
   const handleQuizProceed = async () => {
@@ -192,22 +211,53 @@ export function OutfitStudio({
       return
     }
 
-    // ✅ Check quota before adding
+    // Check quota
     const { canAdd: canAddItemCheck, reason } = canAddItem(item)
+
     if (!canAddItemCheck) {
-      toast.error(reason || 'Cannot add item (quota exceeded)')
+      // Check if we can auto-replace
+      const category = item.category || 'other'
+      const quota = getQuotaForCategory(category)
+
+      if (quota.max === 1) {
+        // Find existing item in this category
+        const existingItem = outfitItems.find(
+          oi => oi.item?.category?.toLowerCase() === category.toLowerCase()
+        )
+
+        if (existingItem && existingItem.item) {
+          // Show replace confirmation
+          setItemToReplace({
+            old: existingItem.item,
+            new: item,
+            category: quota.label,
+          })
+          setReplaceDialogOpen(true)
+          return
+        }
+      }
+
+      // Can't auto-replace (unlimited category or no existing item)
+      toast.error(reason || 'Cannot add item')
       return
     }
 
-    const itemCountInCategory = itemsByCategory[item.category || 'other'] || 0
-    const position = calculateAutoPosition(item, itemCountInCategory)
+    // Add item normally
+    addItemToOutfit(item)
+  }
+
+  const addItemToOutfit = (item: SizingJournalEntry) => {
+    const category = item.category || 'other'
+    const categoryCount = getCategoryCount(category)
+
+    const position = calculateAutoPosition(item, categoryCount)
     const size = calculateSuggestedSize(item)
 
     const newOutfitItem: OutfitItem = {
-      id: `temp-${Date.now()}`, // Temporary ID, will be replaced on save
-      outfit_id: '', // Will be set on save
+      id: `temp-${Date.now()}`,
+      outfit_id: '',
       item_id: item.id,
-      position_x: position.x / 375, // Normalize to 0-1
+      position_x: position.x / 375,
       position_y: position.y / 667,
       z_index: position.layer,
       display_width: size.width,
@@ -223,9 +273,98 @@ export function OutfitStudio({
       item: item,
     }
 
-    setOutfitItems([...outfitItems, newOutfitItem])
+    const previousState = [...outfitItems]
+    const newState = [...outfitItems, newOutfitItem]
+
+    setOutfitItems(newState)
     setSelectedItemToAdd(null)
+
+    // Push to undo stack
+    pushAction({
+      type: 'ADD_ITEM',
+      timestamp: Date.now(),
+      data: {
+        previous: previousState,
+        current: newState,
+      },
+    })
+
     toast.success(`Added ${item.brand} ${item.model}`)
+  }
+
+  const handleConfirmReplace = () => {
+    if (!itemToReplace) return
+
+    const category = itemToReplace.new.category || 'other'
+
+    // Find and remove old item
+    const previousState = [...outfitItems]
+    const itemsWithoutOld = outfitItems.filter(
+      oi => oi.item?.id !== itemToReplace.old.id
+    )
+
+    // Add new item
+    const categoryCount = getCategoryCount(category)
+    const position = calculateAutoPosition(itemToReplace.new, categoryCount)
+    const size = calculateSuggestedSize(itemToReplace.new)
+
+    const newOutfitItem: OutfitItem = {
+      id: `temp-${Date.now()}`,
+      outfit_id: '',
+      item_id: itemToReplace.new.id,
+      position_x: position.x / 375,
+      position_y: position.y / 667,
+      z_index: position.layer,
+      display_width: size.width,
+      display_height: size.height,
+      item_order: itemsWithoutOld.length,
+      crop_x: null,
+      crop_y: null,
+      crop_width: null,
+      crop_height: null,
+      cropped_image_url: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      item: itemToReplace.new,
+    }
+
+    const newState = [...itemsWithoutOld, newOutfitItem]
+
+    setOutfitItems(newState)
+    setSelectedItemToAdd(null)
+
+    // Push to undo stack
+    pushAction({
+      type: 'REPLACE_ITEM',
+      timestamp: Date.now(),
+      data: {
+        previous: previousState,
+        current: newState,
+      },
+    })
+
+    // Show undo toast (5 seconds)
+    toast.success(
+      `Replaced ${itemToReplace.old.brand} with ${itemToReplace.new.brand}`,
+      {
+        duration: 5000,
+        action: {
+          label: 'Undo',
+          onClick: handleUndo,
+        },
+      }
+    )
+
+    setReplaceDialogOpen(false)
+    setItemToReplace(null)
+  }
+
+  const handleUndo = () => {
+    const previousState = undo()
+    if (previousState) {
+      setOutfitItems(previousState)
+      toast.info('Action undone')
+    }
   }
 
   // Handle removing item from outfit
@@ -634,6 +773,21 @@ export function OutfitStudio({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Replace Confirmation Dialog */}
+      {itemToReplace && (
+        <ConfirmReplaceDialog
+          isOpen={replaceDialogOpen}
+          onClose={() => {
+            setReplaceDialogOpen(false)
+            setItemToReplace(null)
+          }}
+          onConfirm={handleConfirmReplace}
+          oldItem={itemToReplace.old}
+          newItem={itemToReplace.new}
+          category={itemToReplace.category}
+        />
+      )}
 
       {/* Quiz Modal (if showing) */}
       {showQuizModal && (
