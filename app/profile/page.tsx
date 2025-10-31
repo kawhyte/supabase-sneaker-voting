@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from '@/components/profile-form'
 import { PurchasePreventionSettings } from '@/components/purchase-prevention-settings'
+import { NotificationPreferences } from '@/components/notification-preferences'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -36,37 +37,52 @@ export default async function ProfilePage() {
       .single()
 
     return (
-      <div className="max-w-[820px] mx-auto">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Profile Settings</h1>
-          <p className="text-base text-muted-foreground">Manage your profile information and preferences</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
+          <p className="text-muted-foreground">
+            Manage your account preferences, notifications, and purchase prevention settings
+          </p>
         </div>
-        <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
+
+        {/* Settings Sections */}
+        <div className="space-y-6 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
+          {/* Profile Information */}
           <ProfileForm
             profile={createdProfile || { id: user.id, display_name: user.email?.split('@')[0] || 'User', avatar_url: null }}
             user={user}
           />
+
+          {/* Smart Purchase Prevention */}
+          <PurchasePreventionSettings />
+
+          {/* Notification Preferences */}
+          <NotificationPreferences />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-[820px] mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500">
-        <h1 className="text-4xl font-bold text-foreground mb-2">Profile Settings</h1>
-        <p className="text-base text-muted-foreground">Manage your profile information and preferences</p>
+      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
+        <p className="text-muted-foreground">
+          Manage your account preferences, notifications, and purchase prevention settings
+        </p>
       </div>
 
-      {/* Profile Form */}
-      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700 border border-accent-background rounded-2xl p-8">
+      {/* Settings Sections */}
+      <div className="space-y-6 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
+        {/* Profile Information */}
         <ProfileForm profile={profile} user={user} />
-      </div>
 
-      {/* Purchase Prevention Settings */}
-      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
+        {/* Smart Purchase Prevention */}
         <PurchasePreventionSettings />
+
+        {/* Notification Preferences */}
+        <NotificationPreferences />
       </div>
     </div>
   )

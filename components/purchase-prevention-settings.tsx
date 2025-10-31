@@ -191,7 +191,7 @@ export function PurchasePreventionSettings() {
 
         {/* Duplication Warnings Setting */}
         <div className="space-y-4">
-          <div className="flex items-start justify-between">
+          <div className=" dense flex items-start justify-between">
             <div className="space-y-2 flex-1">
               <Label className="text-sm font-semibold flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
@@ -205,7 +205,7 @@ export function PurchasePreventionSettings() {
               checked={settings.enable_duplication_warnings}
               onCheckedChange={handleDuplicationToggle}
               disabled={isSaving}
-              className="ml-2"
+              className="dense ml-2"
             />
           </div>
 

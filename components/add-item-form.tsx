@@ -987,7 +987,7 @@ export function AddItemForm({
 
 							{/* Product Details Section */}
 							<div className='space-y-6'>
-								<div className='flex items-center gap-2 pb-2 border-b border-stone-300'>
+								<div className=' dense flex items-center gap-2 pb-2 border-b border-stone-300'>
     {/* Add relative and top-[1px] to nudge the icon down */}
     <Package className='relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0' />
     <h3 className='font-semibold font-heading text-base text-slate-900 leading-5'>Product Details</h3>
