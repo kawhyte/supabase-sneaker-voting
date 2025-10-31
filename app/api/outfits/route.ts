@@ -6,6 +6,8 @@ import { dbErrorHandler } from '@/lib/db-error-handler'
 import { retryUtils } from '@/lib/retry-utils'
 import { getCircuitBreaker } from '@/lib/circuit-breaker'
 import { ApiEndpointType, getApiClientConfig } from '@/lib/api-client-config'
+import { checkAchievements } from '@/lib/achievement-checker'
+import { updateWardrobeStats } from '@/lib/update-wardrobe-stats'
 
 const logger = new Logger()
 
@@ -154,6 +156,20 @@ export async function POST(request: NextRequest) {
       outfitId: outfit.id,
       itemCount: createdItems?.length || 0,
     })
+
+    // Check achievements and update stats asynchronously
+    try {
+      await updateWardrobeStats(user.id)
+      await checkAchievements(user.id)
+    } catch (statsError) {
+      logger.warn('Error updating stats or checking achievements', {
+        component: 'OutfitsAPI',
+        requestId,
+        userId: user.id,
+        error: statsError instanceof Error ? statsError.message : String(statsError),
+      })
+      // Don't fail the request if this fails
+    }
 
     // Return created outfit with items
     return NextResponse.json({
