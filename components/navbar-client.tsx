@@ -97,10 +97,23 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Plus } from "lucide-react";
+import { Menu, X, Plus, Bell, LogOut, Settings } from "lucide-react";
 import { PawPrint } from 'lucide-react';
+import { createClient } from "@/utils/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NotificationCenter } from "@/components/notification-center/NotificationCenter";
+import { WardrobeStatsWidget } from "@/components/navbar/WardrobeStatsWidget";
+import { AchievementsPreview } from "@/components/navbar/AchievementsPreview";
 interface NavLink {
 	href: string;
 	label: string;
@@ -115,8 +128,58 @@ interface NavbarClientProps {
 export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps) {
 	const pathname = usePathname();
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const [unreadCount, setUnreadCount] = useState(0);
+	const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
+	const [user, setUser] = useState<any>(null);
+	const supabase = createClient();
 
 	const isActive = (path: string) => pathname === path;
+
+	// Fetch user and unread count
+	useEffect(() => {
+		if (!isAuthenticated) return;
+
+		async function fetchData() {
+			const { data: { user: authUser } } = await supabase.auth.getUser();
+			if (!authUser) return;
+
+			setUser(authUser);
+
+			// Get unread count from user_stats
+			const { data: stats } = await supabase
+				.from('user_stats')
+				.select('unread_notification_count')
+				.eq('user_id', authUser.id)
+				.single();
+
+			setUnreadCount(stats?.unread_notification_count || 0);
+		}
+
+		fetchData();
+
+		// Real-time subscription for unread count
+		if (user?.id) {
+			const channel = supabase
+				.channel('user-stats-changes')
+				.on(
+					'postgres_changes',
+					{
+						event: 'UPDATE',
+						schema: 'public',
+						table: 'user_stats',
+						filter: `user_id=eq.${user.id}`
+					},
+					(payload) => {
+						setUnreadCount(payload.new.unread_notification_count || 0);
+					}
+				)
+				.subscribe();
+
+			return () => {
+				supabase.removeChannel(channel);
+			};
+		}
+	}, [isAuthenticated, supabase, user?.id]);
 
 	const publicNavLinks: NavLink[] = [
 		{ href: '/', label: 'Home' },
@@ -173,10 +236,96 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 						))}
 					</div>
 
-					{/* Desktop Auth Button - Outside Pill */}
-					<div className='hidden lg:block motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:-translate-y-0.5 flex-shrink-0'>
-						{authButton}
-					</div>
+					{/* Desktop Notification Bell + User Menu */}
+					{isAuthenticated && user && (
+						<div className='hidden lg:flex items-center gap-3 flex-shrink-0'>
+							{/* Bell Icon */}
+							<button
+								onClick={() => setIsNotificationCenterOpen(true)}
+								className="dense relative p-2 rounded-full hover:bg-muted motion-safe:transition-colors"
+								aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
+							>
+								<Bell className="h-5 w-5 text-foreground" />
+								{unreadCount > 0 && (
+									<span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-xs font-bold motion-safe:animate-pulse">
+										{unreadCount > 99 ? '99+' : unreadCount}
+									</span>
+								)}
+							</button>
+
+							{/* User Menu */}
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<button className="dense p-0 rounded-full hover:opacity-80 motion-safe:transition-opacity">
+										<Avatar className="h-8 w-8">
+											<AvatarImage src={user?.user_metadata?.avatar_url} />
+											<AvatarFallback className="bg-sun-400 text-slate-900 font-semibold">
+												{user?.email?.[0].toUpperCase() || 'U'}
+											</AvatarFallback>
+										</Avatar>
+									</button>
+								</DropdownMenuTrigger>
+
+								<DropdownMenuContent align="end" className="w-72">
+									{/* User Info */}
+									<DropdownMenuLabel>
+										<div className="flex items-center gap-3">
+											<Avatar className="h-12 w-12">
+												<AvatarImage src={user?.user_metadata?.avatar_url} />
+												<AvatarFallback className="bg-sun-400 text-slate-900 text-lg font-semibold">
+													{user?.email?.[0].toUpperCase() || 'U'}
+												</AvatarFallback>
+											</Avatar>
+											<div>
+												<p className="font-semibold text-sm">{user?.user_metadata?.display_name || 'User'}</p>
+												<p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+											</div>
+										</div>
+									</DropdownMenuLabel>
+
+									<DropdownMenuSeparator />
+
+									{/* Wardrobe Stats */}
+									<WardrobeStatsWidget userId={user?.id} />
+
+									<DropdownMenuSeparator />
+
+									{/* Achievements */}
+									<AchievementsPreview userId={user?.id} />
+
+									<DropdownMenuSeparator />
+
+									{/* Settings */}
+									<DropdownMenuItem asChild>
+										<Link href="/profile" className="cursor-pointer flex items-center">
+											<Settings className="h-4 w-4 mr-2" />
+											Settings
+										</Link>
+									</DropdownMenuItem>
+
+									{/* Log Out */}
+									<DropdownMenuItem asChild>
+										<button
+											onClick={() => {
+												window.location.href = '/';
+											}}
+											className="text-red-600 w-full cursor-pointer text-left"
+										>
+											<LogOut className="h-4 w-4 mr-2 inline" />
+											Log Out
+										</button>
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+					)}
+
+					{/* Desktop Auth Button - Outside Pill (if not authenticated) */}
+					{!isAuthenticated && (
+						<div className='hidden lg:block motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:-translate-y-0.5 flex-shrink-0'>
+							{authButton}
+						</div>
+					)}
 
 					{/* Mobile Menu Button - h-5 w-5 = 20px (accessible touch target) */}
 					<div className='dense lg:hidden rounded-full bg-muted p-2'>
