@@ -1,7 +1,6 @@
 // components/avatar/AvatarOption.tsx
 import { cn } from '@/lib/utils'
 import { Check } from 'lucide-react'
-import Image from 'next/image'
 
 interface AvatarOptionProps {
   id: string
@@ -29,12 +28,10 @@ export function AvatarOption({ id, name, isSelected, onClick }: AvatarOptionProp
     >
       {/* Avatar Image */}
       <div className="relative h-24 w-24 rounded-full overflow-hidden ring-2 ring-border">
-        <Image
+        <img
           src={`/avatars/${id}.webp`}
           alt={name}
-          fill
-          className="object-cover"
-          sizes="96px"
+          className="w-full h-full object-cover"
         />
       </div>
 
