@@ -114,6 +114,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationCenter } from "@/components/notification-center/NotificationCenter";
 import { WardrobeStatsWidget } from "@/components/navbar/WardrobeStatsWidget";
 import { AchievementsPreview } from "@/components/navbar/AchievementsPreview";
+import { AvatarDisplay } from "@/components/avatar/AvatarDisplay";
 interface NavLink {
 	href: string;
 	label: string;
@@ -131,6 +132,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 	const [unreadCount, setUnreadCount] = useState(0);
 	const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
 	const [user, setUser] = useState<any>(null);
+	const [userProfile, setUserProfile] = useState<any>(null);
 	const supabase = createClient();
 
 	const isActive = (path: string) => pathname === path;
@@ -180,6 +182,44 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 			};
 		}
 	}, [isAuthenticated, supabase, user?.id]);
+
+	// Fetch user profile with avatar data
+	useEffect(() => {
+		if (!isAuthenticated || !user?.id) return;
+
+		async function fetchProfile() {
+			const { data: profile } = await supabase
+				.from('profiles')
+				.select('id, display_name, avatar_url, avatar_type, preset_avatar_id, avatar_updated_at')
+				.eq('id', user.id)
+				.single();
+
+			setUserProfile(profile);
+		}
+
+		fetchProfile();
+
+		// Refetch when avatar updates
+		const channel = supabase
+			.channel('profile-changes')
+			.on(
+				'postgres_changes',
+				{
+					event: 'UPDATE',
+					schema: 'public',
+					table: 'profiles',
+					filter: `id=eq.${user.id}`
+				},
+				(payload) => {
+					setUserProfile(payload.new);
+				}
+			)
+			.subscribe();
+
+		return () => {
+			supabase.removeChannel(channel);
+		};
+	}, [isAuthenticated, user?.id, supabase]);
 
 	const publicNavLinks: NavLink[] = [
 		{ href: '/', label: 'Home' },
@@ -257,12 +297,23 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<button className="dense p-0 rounded-full hover:opacity-80 motion-safe:transition-opacity">
-										<Avatar className="h-8 w-8">
-											<AvatarImage src={user?.user_metadata?.avatar_url} />
-											<AvatarFallback className="bg-sun-400 text-slate-900 font-semibold">
-												{user?.email?.[0].toUpperCase() || 'U'}
-											</AvatarFallback>
-										</Avatar>
+										{userProfile ? (
+											<AvatarDisplay
+												avatarType={userProfile?.avatar_type}
+												avatarUrl={userProfile?.avatar_url}
+												presetAvatarId={userProfile?.preset_avatar_id}
+												displayName={userProfile?.display_name}
+												email={user?.email}
+												size="sm"
+											/>
+										) : (
+											<Avatar className="h-8 w-8">
+												<AvatarImage src={user?.user_metadata?.avatar_url} />
+												<AvatarFallback className="bg-sun-400 text-slate-900 font-semibold">
+													{user?.email?.[0].toUpperCase() || 'U'}
+												</AvatarFallback>
+											</Avatar>
+										)}
 									</button>
 								</DropdownMenuTrigger>
 
@@ -270,14 +321,25 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 									{/* User Info */}
 									<DropdownMenuLabel>
 										<div className="flex items-center gap-3">
-											<Avatar className="h-12 w-12">
-												<AvatarImage src={user?.user_metadata?.avatar_url} />
-												<AvatarFallback className="bg-sun-400 text-slate-900 text-lg font-semibold">
-													{user?.email?.[0].toUpperCase() || 'U'}
-												</AvatarFallback>
-											</Avatar>
+											{userProfile ? (
+												<AvatarDisplay
+													avatarType={userProfile?.avatar_type}
+													avatarUrl={userProfile?.avatar_url}
+													presetAvatarId={userProfile?.preset_avatar_id}
+													displayName={userProfile?.display_name}
+													email={user?.email}
+													size="md"
+												/>
+											) : (
+												<Avatar className="h-12 w-12">
+													<AvatarImage src={user?.user_metadata?.avatar_url} />
+													<AvatarFallback className="bg-sun-400 text-slate-900 text-lg font-semibold">
+														{user?.email?.[0].toUpperCase() || 'U'}
+													</AvatarFallback>
+												</Avatar>
+											)}
 											<div>
-												<p className="font-semibold text-sm">{user?.user_metadata?.display_name || 'User'}</p>
+												<p className="font-semibold text-sm">{userProfile?.display_name || user?.user_metadata?.display_name || 'User'}</p>
 												<p className="text-xs text-muted-foreground truncate">{user?.email}</p>
 											</div>
 										</div>

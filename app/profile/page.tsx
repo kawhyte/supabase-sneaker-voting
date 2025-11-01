@@ -23,7 +23,7 @@ export default async function ProfilePage() {
   // Fetch the user's profile
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, display_name, avatar_url, avatar_type, preset_avatar_id, avatar_updated_at, updated_at')
     .eq('id', user.id)
     .single()
 
@@ -32,7 +32,7 @@ export default async function ProfilePage() {
     // Fetch again after creating
     const { data: createdProfile } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, display_name, avatar_url, avatar_type, preset_avatar_id, avatar_updated_at, updated_at')
       .eq('id', user.id)
       .single()
 
@@ -49,7 +49,7 @@ export default async function ProfilePage() {
         <div className="space-y-6 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
           {/* Profile Information */}
           <ProfileForm
-            profile={createdProfile || { id: user.id, display_name: user.email?.split('@')[0] || 'User', avatar_url: null }}
+            profile={createdProfile || { id: user.id, display_name: user.email?.split('@')[0] || 'User', avatar_url: null, avatar_type: 'custom', preset_avatar_id: null, avatar_updated_at: undefined, updated_at: undefined }}
             user={user}
           />
 
