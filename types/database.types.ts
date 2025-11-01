@@ -766,27 +766,36 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_type: Database["public"]["Enums"]["avatar_type"] | null
+          avatar_updated_at: string | null
           avatar_url: string | null
           display_name: string | null
           enable_duplication_warnings: boolean | null
           id: string
           preferred_cooling_off_days: number | null
+          preset_avatar_id: string | null
           updated_at: string | null
         }
         Insert: {
+          avatar_type?: Database["public"]["Enums"]["avatar_type"] | null
+          avatar_updated_at?: string | null
           avatar_url?: string | null
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
           id: string
           preferred_cooling_off_days?: number | null
+          preset_avatar_id?: string | null
           updated_at?: string | null
         }
         Update: {
+          avatar_type?: Database["public"]["Enums"]["avatar_type"] | null
+          avatar_updated_at?: string | null
           avatar_url?: string | null
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
           id?: string
           preferred_cooling_off_days?: number | null
+          preset_avatar_id?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1041,6 +1050,7 @@ export type Database = {
       }
     }
     Enums: {
+      avatar_type: "custom" | "preset"
       item_status: "owned" | "wishlisted" | "journaled"
     }
     CompositeTypes: {
@@ -1169,6 +1179,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      avatar_type: ["custom", "preset"],
       item_status: ["owned", "wishlisted", "journaled"],
     },
   },
