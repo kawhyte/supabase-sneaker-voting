@@ -34,10 +34,27 @@ export function AchievementsPreview({ userId }: { userId?: string }) {
           .eq('user_id', userId)
           .single();
 
-        if (error) throw error;
-        setStats(data);
+        if (error) {
+          // Handle "not found" error - user_stats row doesn't exist yet
+          if (error.code === 'PGRST116') {
+            console.warn('user_stats row not found for user:', userId);
+            // Set default stats
+            setStats({ achievements_unlocked: 0, total_achievements: 8 });
+          } else {
+            throw error;
+          }
+        } else {
+          setStats(data);
+        }
       } catch (error) {
-        console.error('Error fetching achievement stats:', error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : typeof error === 'object' && error !== null && 'message' in error
+          ? (error as any).message
+          : String(error);
+        console.error('Error fetching achievement stats:', errorMessage, error);
+        // Set safe default to prevent blank display
+        setStats({ achievements_unlocked: 0, total_achievements: 8 });
       } finally {
         setIsLoading(false);
       }

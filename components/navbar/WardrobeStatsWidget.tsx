@@ -31,10 +31,27 @@ export function WardrobeStatsWidget({ userId }: { userId?: string }) {
           .eq('user_id', userId)
           .single();
 
-        if (error) throw error;
-        setStats(data);
+        if (error) {
+          // Handle "not found" error - user_stats row doesn't exist yet
+          if (error.code === 'PGRST116') {
+            console.warn('user_stats row not found for user:', userId);
+            // Set default stats
+            setStats({ total_items: 0, average_cost_per_wear: null });
+          } else {
+            throw error;
+          }
+        } else {
+          setStats(data);
+        }
       } catch (error) {
-        console.error('Error fetching wardrobe stats:', error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : typeof error === 'object' && error !== null && 'message' in error
+          ? (error as any).message
+          : String(error);
+        console.error('Error fetching wardrobe stats:', errorMessage, error);
+        // Set safe default to prevent blank display
+        setStats({ total_items: 0, average_cost_per_wear: null });
       } finally {
         setIsLoading(false);
       }
