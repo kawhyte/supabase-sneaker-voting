@@ -1,4 +1,7 @@
 // components/avatar/AvatarDisplay.tsx
+'use client'
+
+import { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 
@@ -21,6 +24,7 @@ export function AvatarDisplay({
   size = 'md',
   className
 }: AvatarDisplayProps) {
+  const [isLoading, setIsLoading] = useState(true)
   // Size mapping (follows 8px grid)
   const sizeClasses = {
     sm: 'h-8 w-8',      // 32px - navbar
@@ -49,10 +53,15 @@ export function AvatarDisplay({
 
   return (
     <Avatar className={cn(sizeClasses[size], className)}>
+      {isLoading && imageSrc && (
+        <div className="absolute inset-0 rounded-full bg-muted animate-pulse" />
+      )}
       <AvatarImage
         src={imageSrc}
         alt={displayName || 'User avatar'}
         loading="lazy"
+        onLoad={() => setIsLoading(false)}
+        onError={() => setIsLoading(false)}
       />
       <AvatarFallback className="bg-sun-400 text-slate-900 font-semibold">
         {getInitials()}

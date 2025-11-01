@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { User } from '@supabase/supabase-js'
 import { Loader2 } from 'lucide-react'
 import { AvatarEditor } from '@/components/avatar/AvatarEditor'
+import { AvatarErrorBoundary } from '@/components/avatar/AvatarErrorBoundary'
 
 interface Profile {
   id: string
@@ -93,7 +94,9 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
       <CardContent className="pt-8">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Avatar Editor Section */}
-          <AvatarEditor profile={profile} user={user} />
+          <AvatarErrorBoundary>
+            <AvatarEditor profile={profile} user={user} />
+          </AvatarErrorBoundary>
 
           {/* Form Fields Section */}
           <div className="space-y-6">
