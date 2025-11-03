@@ -49,7 +49,7 @@ export function ItemFooterBadges({
 						size='sm'
 						aria-label='View cost per wear statistics'>
 						<TrendingDown className='h-4 w-4' />
-						<span>View Cost Per Wear</span>
+						<span>Cost Per Wear</span>
 					</Button>
 				)}
 
