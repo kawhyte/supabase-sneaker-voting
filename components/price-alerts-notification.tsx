@@ -95,6 +95,11 @@ interface PriceAlertsNotificationProps {
 }
 
 export function PriceAlertsNotification({ onDismiss }: PriceAlertsNotificationProps) {
+  console.warn(
+    '⚠️ PriceAlertsNotification is deprecated. Price alerts now appear in the unified notification center. ' +
+    'This component is no longer displayed on the dashboard.'
+  )
+
   const [alerts, setAlerts] = useState<PriceAlert[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const supabase = createClient()

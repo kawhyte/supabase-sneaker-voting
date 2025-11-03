@@ -17,7 +17,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Button } from '@/components/ui/button'
 import { NotificationCard } from './NotificationCard'
 import { NotificationEmpty } from './NotificationEmpty'
-import { Bell, CheckCheck } from 'lucide-react'
+import { Bell, CheckCheck, Tag, Heart } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Notification {
@@ -108,6 +108,68 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
     }
   }
 
+  // Dismiss all price alerts
+  const handleDismissAllPriceAlerts = async () => {
+    try {
+      const priceAlertIds = notifications
+        .filter((n) => n.notification_type === 'price_alert' && !n.is_read)
+        .map((n) => n.id)
+
+      if (priceAlertIds.length === 0) {
+        toast.info('No unread price alerts to dismiss')
+        return
+      }
+
+      const response = await fetch('/api/notifications/dismiss-by-type', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          notification_type: 'price_alert',
+          ids: priceAlertIds
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to dismiss price alerts')
+
+      toast.success(`Dismissed ${priceAlertIds.length} price alerts`)
+      fetchNotifications()
+    } catch (error) {
+      console.error('Error dismissing price alerts:', error)
+      toast.error('Failed to dismiss price alerts')
+    }
+  }
+
+  // Dismiss all wear reminders
+  const handleDismissAllWearReminders = async () => {
+    try {
+      const wearReminderIds = notifications
+        .filter((n) => n.notification_type === 'wear_reminder' && !n.is_read)
+        .map((n) => n.id)
+
+      if (wearReminderIds.length === 0) {
+        toast.info('No unread wear reminders to dismiss')
+        return
+      }
+
+      const response = await fetch('/api/notifications/dismiss-by-type', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          notification_type: 'wear_reminder',
+          ids: wearReminderIds
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to dismiss wear reminders')
+
+      toast.success(`Dismissed ${wearReminderIds.length} wear reminders`)
+      fetchNotifications()
+    } catch (error) {
+      console.error('Error dismissing wear reminders:', error)
+      toast.error('Failed to dismiss wear reminders')
+    }
+  }
+
   // Group notifications by date
   const groupedNotifications = groupByDate(notifications)
   const unreadCount = notifications.filter(n => !n.is_read).length
@@ -120,30 +182,58 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
       >
         {/* Header */}
         <SheetHeader className="p-6 pb-4 border-b border-border">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-foreground" />
-              <SheetTitle className="text-lg font-semibold">
-                Notifications
-              </SheetTitle>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-foreground" />
+                <SheetTitle className="text-lg font-semibold">
+                  Notifications
+                </SheetTitle>
+                {unreadCount > 0 && (
+                  <span className="dense flex items-center justify-center min-w-[20px] h-5 px-2 rounded-full bg-sun-400 text-slate-900 text-xs font-semibold">
+                    {unreadCount}
+                  </span>
+                )}
+              </div>
+
               {unreadCount > 0 && (
-                <span className="dense flex items-center justify-center min-w-[20px] h-5 px-2 rounded-full bg-sun-400 text-slate-900 text-xs font-semibold">
-                  {unreadCount}
-                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleMarkAllRead}
+                  className="dense h-8 px-3 text-xs"
+                >
+                  <CheckCheck className="h-3 w-3 mr-1" />
+                  Mark all read
+                </Button>
               )}
             </div>
 
-            {unreadCount > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleMarkAllRead}
-                className="dense h-8 px-3 text-xs"
-              >
-                <CheckCheck className="h-3 w-3 mr-1" />
-                Mark all read
-              </Button>
-            )}
+            {/* Bulk Action Buttons */}
+            <div className="flex flex-col gap-2">
+              {notifications.filter((n) => n.notification_type === 'price_alert' && !n.is_read).length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDismissAllPriceAlerts}
+                  className="dense text-xs h-8"
+                >
+                  <Tag className="h-3 w-3 mr-2" />
+                  Dismiss All Price Alerts
+                </Button>
+              )}
+              {notifications.filter((n) => n.notification_type === 'wear_reminder' && !n.is_read).length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDismissAllWearReminders}
+                  className="dense text-xs h-8"
+                >
+                  <Heart className="h-3 w-3 mr-2" />
+                  Dismiss All Wear Reminders
+                </Button>
+              )}
+            </div>
           </div>
         </SheetHeader>
 

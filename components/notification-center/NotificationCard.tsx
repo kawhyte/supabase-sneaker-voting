@@ -23,11 +23,14 @@ import {
   X,
   Clock,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Heart,
+  Palette
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 interface NotificationCardProps {
   notification: any
@@ -38,6 +41,7 @@ export function NotificationCard({ notification, onUpdate }: NotificationCardPro
   const [isExpanded, setIsExpanded] = useState(false)
   const [isSwiping, setIsSwiping] = useState(false)
   const [swipeOffset, setSwipeOffset] = useState(0)
+  const router = useRouter()
 
   // Swipe to dismiss handlers
   const handlers = useSwipeable({
@@ -218,6 +222,75 @@ export function NotificationCard({ notification, onUpdate }: NotificationCardPro
                     </motion.div>
                   )}
                 </AnimatePresence>
+              </div>
+            )}
+
+            {/* Seasonal Tips Section */}
+            {notification.notification_type === 'seasonal_tip' && notification.metadata && (
+              <div className="mt-3 space-y-3">
+                {/* Tips Section */}
+                {notification.metadata.tips && Array.isArray(notification.metadata.tips) && notification.metadata.tips.length > 0 && (
+                  <div className="rounded-lg bg-sun-50 p-3">
+                    <p className="mb-2 font-semibold text-xs text-slate-700 uppercase tracking-wide">
+                      What to do this season:
+                    </p>
+                    <ul className="space-y-1.5">
+                      {notification.metadata.tips.map((tip: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2 text-sm text-slate-700">
+                          <span className="text-sun-600 flex-shrink-0">•</span>
+                          <span>{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Categories Section */}
+                {notification.metadata.suggested_categories && Array.isArray(notification.metadata.suggested_categories) && notification.metadata.suggested_categories.length > 0 && (
+                  <div>
+                    <p className="mb-2 font-semibold text-xs text-slate-700 uppercase tracking-wide">
+                      Focus on these categories:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {notification.metadata.suggested_categories.map((category: string, index: number) => (
+                        <span
+                          key={index}
+                          className="rounded-full bg-sun-200 px-3 py-1 text-xs font-semibold text-sun-900"
+                        >
+                          {category}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => {
+                      router.push('/dashboard?tab=outfits&action=create')
+                      handleMarkAsRead()
+                    }}
+                    className="flex-1 text-xs h-8"
+                  >
+                    <Sparkles className="mr-2 h-3 w-3" />
+                    Create Outfit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      router.push('/dashboard?tab=owned')
+                      handleMarkAsRead()
+                    }}
+                    className="flex-1 text-xs h-8"
+                  >
+                    <Palette className="mr-2 h-3 w-3" />
+                    Organize
+                  </Button>
+                </div>
               </div>
             )}
 

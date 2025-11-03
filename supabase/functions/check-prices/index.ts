@@ -653,23 +653,39 @@ serve(async (req) => {
 
           console.log(`🎉 DROP: $${previousPrice} → $${result.price} (-${dropPercentage.toFixed(1)}%)`)
 
-          const { data: alert } = await supabase
-            .from('price_alerts')
+          // Create notification instead of price_alerts table
+          const notificationTitle =
+            severity === 'high'
+              ? 'Big Price Drop! 🎉'
+              : severity === 'medium'
+              ? 'Price Drop Alert 💰'
+              : 'Small Price Drop 👀'
+
+          const { data: notification } = await supabase
+            .from('notifications')
             .insert({
-              item_id: item.id,
               user_id: item.user_id,
-              previous_price: previousPrice,
-              current_price: result.price,
-              percentage_off: Math.round(dropPercentage),
-              severity,
+              notification_type: 'price_alert',
+              title: notificationTitle,
               message: `${item.brand} ${item.model} dropped to $${result.price} (${Math.round(dropPercentage)}% off)`,
+              severity,
+              link_url: `/dashboard?tab=wishlist&item=${item.id}`,
+              action_label: 'View Item',
               is_read: false,
+              is_bundled: false,
+              bundled_count: 0,
+              metadata: {
+                item_id: item.id,
+                current_price: result.price,
+                previous_price: previousPrice,
+                percentage_off: Math.round(dropPercentage)
+              },
               created_at: new Date().toISOString()
             })
             .select()
             .single()
 
-          if (alert) alerts.push(alert)
+          if (notification) alerts.push(notification)
         }
 
         // Reset failure count and update last check
