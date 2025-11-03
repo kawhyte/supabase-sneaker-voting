@@ -253,6 +253,12 @@ export type Database = {
         Row: {
           achievements_enabled: boolean | null
           bundle_threshold: number | null
+          cooling_off_ready_email: boolean | null
+          cooling_off_ready_in_app: boolean | null
+          cooling_off_ready_push: boolean | null
+          cost_per_wear_milestones_email: boolean | null
+          cost_per_wear_milestones_in_app: boolean | null
+          cost_per_wear_milestones_push: boolean | null
           created_at: string | null
           enable_bundling: boolean | null
           enable_email: boolean | null
@@ -267,6 +273,9 @@ export type Database = {
           quiet_hours_end: string | null
           quiet_hours_start: string | null
           seasonal_tips_enabled: boolean | null
+          shopping_reminders_email: boolean | null
+          shopping_reminders_in_app: boolean | null
+          shopping_reminders_push: boolean | null
           updated_at: string | null
           user_id: string
           user_timezone: string | null
@@ -275,6 +284,12 @@ export type Database = {
         Insert: {
           achievements_enabled?: boolean | null
           bundle_threshold?: number | null
+          cooling_off_ready_email?: boolean | null
+          cooling_off_ready_in_app?: boolean | null
+          cooling_off_ready_push?: boolean | null
+          cost_per_wear_milestones_email?: boolean | null
+          cost_per_wear_milestones_in_app?: boolean | null
+          cost_per_wear_milestones_push?: boolean | null
           created_at?: string | null
           enable_bundling?: boolean | null
           enable_email?: boolean | null
@@ -289,6 +304,9 @@ export type Database = {
           quiet_hours_end?: string | null
           quiet_hours_start?: string | null
           seasonal_tips_enabled?: boolean | null
+          shopping_reminders_email?: boolean | null
+          shopping_reminders_in_app?: boolean | null
+          shopping_reminders_push?: boolean | null
           updated_at?: string | null
           user_id: string
           user_timezone?: string | null
@@ -297,6 +315,12 @@ export type Database = {
         Update: {
           achievements_enabled?: boolean | null
           bundle_threshold?: number | null
+          cooling_off_ready_email?: boolean | null
+          cooling_off_ready_in_app?: boolean | null
+          cooling_off_ready_push?: boolean | null
+          cost_per_wear_milestones_email?: boolean | null
+          cost_per_wear_milestones_in_app?: boolean | null
+          cost_per_wear_milestones_push?: boolean | null
           created_at?: string | null
           enable_bundling?: boolean | null
           enable_email?: boolean | null
@@ -311,6 +335,9 @@ export type Database = {
           quiet_hours_end?: string | null
           quiet_hours_start?: string | null
           seasonal_tips_enabled?: boolean | null
+          shopping_reminders_email?: boolean | null
+          shopping_reminders_in_app?: boolean | null
+          shopping_reminders_push?: boolean | null
           updated_at?: string | null
           user_id?: string
           user_timezone?: string | null
@@ -322,14 +349,17 @@ export type Database = {
         Row: {
           action_label: string | null
           action_url: string | null
+          bundle_group_key: string | null
           bundled_count: number | null
           bundled_items: Json | null
+          bundled_notification_type: string | null
           created_at: string | null
           expiry_at: string | null
           group_key: string | null
           id: string
           is_bundled: boolean | null
           is_read: boolean | null
+          legacy_price_alert_id: string | null
           link_url: string | null
           message: string
           metadata: Json | null
@@ -344,14 +374,17 @@ export type Database = {
         Insert: {
           action_label?: string | null
           action_url?: string | null
+          bundle_group_key?: string | null
           bundled_count?: number | null
           bundled_items?: Json | null
+          bundled_notification_type?: string | null
           created_at?: string | null
           expiry_at?: string | null
           group_key?: string | null
           id?: string
           is_bundled?: boolean | null
           is_read?: boolean | null
+          legacy_price_alert_id?: string | null
           link_url?: string | null
           message: string
           metadata?: Json | null
@@ -366,14 +399,17 @@ export type Database = {
         Update: {
           action_label?: string | null
           action_url?: string | null
+          bundle_group_key?: string | null
           bundled_count?: number | null
           bundled_items?: Json | null
+          bundled_notification_type?: string | null
           created_at?: string | null
           expiry_at?: string | null
           group_key?: string | null
           id?: string
           is_bundled?: boolean | null
           is_read?: boolean | null
+          legacy_price_alert_id?: string | null
           link_url?: string | null
           message?: string
           metadata?: Json | null
@@ -385,7 +421,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_legacy_price_alert_id_fkey"
+            columns: ["legacy_price_alert_id"]
+            isOneToOne: false
+            referencedRelation: "price_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       outfit_items: {
         Row: {
@@ -771,9 +815,11 @@ export type Database = {
           avatar_url: string | null
           display_name: string | null
           enable_duplication_warnings: boolean | null
+          enable_quiz_gate: boolean | null
           id: string
           preferred_cooling_off_days: number | null
           preset_avatar_id: string | null
+          quiz_gate_outfit_threshold: number | null
           updated_at: string | null
         }
         Insert: {
@@ -782,9 +828,11 @@ export type Database = {
           avatar_url?: string | null
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
+          enable_quiz_gate?: boolean | null
           id: string
           preferred_cooling_off_days?: number | null
           preset_avatar_id?: string | null
+          quiz_gate_outfit_threshold?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -793,9 +841,11 @@ export type Database = {
           avatar_url?: string | null
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
+          enable_quiz_gate?: boolean | null
           id?: string
           preferred_cooling_off_days?: number | null
           preset_avatar_id?: string | null
+          quiz_gate_outfit_threshold?: number | null
           updated_at?: string | null
         }
         Relationships: []

@@ -13,11 +13,10 @@ import {
 } from '@/components/ui/dialog'
 import { AlertCircle, Heart } from 'lucide-react'
 
-const REQUIRED_OUTFITS = 3
-
 interface CanYouStyleThisQuizProps {
   outfitsCreated: number
   isOpen: boolean
+  requiredOutfits?: number  // New prop to support configurable threshold
   itemBrand?: string
   itemModel?: string
   itemPrice?: number
@@ -39,6 +38,7 @@ interface CanYouStyleThisQuizProps {
 export function CanYouStyleThisQuiz({
   outfitsCreated,
   isOpen,
+  requiredOutfits = 3,  // Default to 3 if not provided
   itemBrand,
   itemModel,
   itemPrice,
@@ -48,8 +48,8 @@ export function CanYouStyleThisQuiz({
 }: CanYouStyleThisQuizProps) {
   const [showSkipConfirm, setShowSkipConfirm] = useState(false)
 
-  const progress = (outfitsCreated / REQUIRED_OUTFITS) * 100
-  const isComplete = outfitsCreated >= REQUIRED_OUTFITS
+  const progress = (outfitsCreated / requiredOutfits) * 100
+  const isComplete = outfitsCreated >= requiredOutfits
   const itemName = itemModel ? `${itemBrand} ${itemModel}` : 'this item'
 
   return (
@@ -72,7 +72,7 @@ export function CanYouStyleThisQuiz({
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Progress</span>
               <span className="text-sm text-slate-600">
-                {outfitsCreated}/{REQUIRED_OUTFITS} outfits
+                {outfitsCreated}/{requiredOutfits} outfits
               </span>
             </div>
             <Progress value={progress} className="h-2" />

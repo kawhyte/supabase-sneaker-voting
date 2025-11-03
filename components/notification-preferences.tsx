@@ -21,7 +21,7 @@ import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Bell, Clock, Package, Tag, Sparkles, Trophy, AlertCircle } from 'lucide-react'
+import { Bell, Clock, Package, Tag, Sparkles, Trophy, AlertCircle, ShoppingBag, Unlock, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface NotificationPrefs {
@@ -32,6 +32,15 @@ interface NotificationPrefs {
   wear_reminders_enabled: boolean
   seasonal_tips_enabled: boolean
   achievements_enabled: boolean
+  shopping_reminders_in_app: boolean
+  shopping_reminders_push: boolean
+  shopping_reminders_email: boolean
+  cooling_off_ready_in_app: boolean
+  cooling_off_ready_push: boolean
+  cooling_off_ready_email: boolean
+  cost_per_wear_milestones_in_app: boolean
+  cost_per_wear_milestones_push: boolean
+  cost_per_wear_milestones_email: boolean
   quiet_hours_enabled: boolean
   quiet_hours_start: string
   quiet_hours_end: string
@@ -290,6 +299,69 @@ export function NotificationPreferences() {
                 checked={prefs.achievements_enabled}
                 onCheckedChange={(checked) =>
                   savePreferences({ achievements_enabled: checked })
+                }
+                className="dense"
+              />
+            </div>
+
+            {/* Shopping Reminders */}
+            <div className="  dense flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <Label htmlFor="shopping-reminders">Shopping Reminders</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Gentle reminders to use what you have
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="shopping-reminders"
+                checked={prefs.shopping_reminders_in_app}
+                onCheckedChange={(checked) =>
+                  savePreferences({ shopping_reminders_in_app: checked })
+                }
+                className="dense"
+              />
+            </div>
+
+            {/* Cooling-Off Ready */}
+            <div className="  dense flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Unlock className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <Label htmlFor="cooling-off">Cooling-Off Period Complete</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Notify when wishlist items are ready to purchase
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="cooling-off"
+                checked={prefs.cooling_off_ready_in_app}
+                onCheckedChange={(checked) =>
+                  savePreferences({ cooling_off_ready_in_app: checked })
+                }
+                className="dense"
+              />
+            </div>
+
+            {/* Cost-Per-Wear Milestones */}
+            <div className="  dense flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <Label htmlFor="cpw-milestones">Cost-Per-Wear Milestones</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Celebrate when items reach cost-per-wear goals
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="cpw-milestones"
+                checked={prefs.cost_per_wear_milestones_in_app}
+                onCheckedChange={(checked) =>
+                  savePreferences({ cost_per_wear_milestones_in_app: checked })
                 }
                 className="dense"
               />

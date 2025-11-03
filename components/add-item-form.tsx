@@ -328,6 +328,9 @@ export function AddItemForm({
 	const [showQuizModal, setShowQuizModal] = useState(false);
 	const [outfitCount, setOutfitCount] = useState(0);
 	const [pendingWishlistItem, setPendingWishlistItem] = useState<any>(null);
+	// Purchase prevention settings
+	const [enableQuizGate, setEnableQuizGate] = useState(true);
+	const [quizGateThreshold, setQuizGateThreshold] = useState(3);
 	const formRef = useRef<HTMLFormElement>(null);
 	const supabase = createClient();
 
@@ -499,6 +502,38 @@ export function AddItemForm({
 		}
 	}, [mode]);
 
+	// Load purchase prevention settings (quiz gate)
+	useEffect(() => {
+		const loadPurchasePreventionSettings = async () => {
+			try {
+				const { data: { user } } = await supabase.auth.getUser();
+				if (!user) return;
+
+				const { data: profile, error } = await supabase
+					.from('profiles')
+					.select('enable_quiz_gate, quiz_gate_outfit_threshold')
+					.eq('id', user.id)
+					.single();
+
+				if (error) {
+					console.error('[AddItemForm] Failed to load settings:', error);
+					return;
+				}
+
+				if (profile) {
+					setEnableQuizGate(profile.enable_quiz_gate ?? true);
+					setQuizGateThreshold(profile.quiz_gate_outfit_threshold ?? 3);
+				}
+			} catch (error) {
+				console.error('[AddItemForm] Failed to load purchase prevention settings:', error);
+			}
+		};
+
+		if (mode === 'create') {
+			loadPurchasePreventionSettings();
+		}
+	}, [mode, supabase]);
+
 	const handleUrlScrape = async (url: string) => {
 		if (!url.trim()) return;
 		setIsScrapingUrl(true);
@@ -667,7 +702,7 @@ export function AddItemForm({
 
 			// 🎯 STEP 3.5: Quiz modal gate for new wishlist items
 			// If creating new item as wishlist AND user has < 3 outfits: show quiz modal
-			if (mode === "create" && experienceData.status === "wishlisted" && outfitCount < 3) {
+			if (enableQuizGate && mode === "create" && experienceData.status === "wishlisted" && outfitCount < quizGateThreshold) {
 				// Store the pending item data and photos, show quiz
 				setPendingWishlistItem({
 					...experienceData,
@@ -1531,6 +1566,7 @@ export function AddItemForm({
 				<CanYouStyleThisQuiz
 					isOpen={showQuizModal}
 					outfitsCreated={outfitCount}
+					requiredOutfits={quizGateThreshold}
 					itemBrand={pendingWishlistItem.brand}
 					itemModel={pendingWishlistItem.model}
 					itemPrice={pendingWishlistItem.retail_price || undefined}

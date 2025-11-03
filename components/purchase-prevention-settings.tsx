@@ -1,9 +1,10 @@
 /**
  * Purchase Prevention Settings
  *
- * Phase 3 Smart Purchase Prevention UI
- * - Cooling-off period configuration (7, 14, 30 days)
+ * Complete Smart Purchase Prevention UI with all three features:
+ * - Quiz Gate: "Can You Style This?" modal configuration
  * - Duplication detection toggle
+ * - Cooling-off period configuration (7, 14, 30 days)
  */
 
 'use client';
@@ -14,6 +15,7 @@ import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import {
   Select,
   SelectContent,
@@ -21,10 +23,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AlertCircle, Clock, AlertTriangle } from 'lucide-react';
+import { AlertCircle, Clock, AlertTriangle, Sparkles } from 'lucide-react';
 import { getCoolingOffLabel, COOLING_OFF_OPTIONS, type CoolingOffDays } from '@/lib/cooling-off-period';
 
 interface PurchasePreventionSettings {
+  enable_quiz_gate: boolean;
+  quiz_gate_outfit_threshold: number;
   enable_duplication_warnings: boolean;
   preferred_cooling_off_days: number;
 }
@@ -32,6 +36,8 @@ interface PurchasePreventionSettings {
 export function PurchasePreventionSettings() {
   const supabase = createClient();
   const [settings, setSettings] = useState<PurchasePreventionSettings>({
+    enable_quiz_gate: true,
+    quiz_gate_outfit_threshold: 3,
     enable_duplication_warnings: false,
     preferred_cooling_off_days: 7,
   });
@@ -47,7 +53,7 @@ export function PurchasePreventionSettings() {
 
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('enable_duplication_warnings, preferred_cooling_off_days')
+          .select('enable_quiz_gate, quiz_gate_outfit_threshold, enable_duplication_warnings, preferred_cooling_off_days')
           .eq('id', user.id)
           .single();
 
@@ -55,6 +61,8 @@ export function PurchasePreventionSettings() {
 
         if (profile) {
           setSettings({
+            enable_quiz_gate: profile.enable_quiz_gate ?? true,
+            quiz_gate_outfit_threshold: profile.quiz_gate_outfit_threshold ?? 3,
             enable_duplication_warnings: profile.enable_duplication_warnings ?? false,
             preferred_cooling_off_days: profile.preferred_cooling_off_days ?? 7,
           });
@@ -84,6 +92,8 @@ export function PurchasePreventionSettings() {
       const { error } = await supabase
         .from('profiles')
         .update({
+          enable_quiz_gate: settings.enable_quiz_gate,
+          quiz_gate_outfit_threshold: settings.quiz_gate_outfit_threshold,
           enable_duplication_warnings: settings.enable_duplication_warnings,
           preferred_cooling_off_days: settings.preferred_cooling_off_days,
         })
@@ -117,6 +127,22 @@ export function PurchasePreventionSettings() {
     }));
   };
 
+  // Handle quiz gate toggle
+  const handleQuizGateToggle = (checked: boolean) => {
+    setSettings((prev) => ({
+      ...prev,
+      enable_quiz_gate: checked,
+    }));
+  };
+
+  // Handle quiz gate threshold change
+  const handleQuizGateThresholdChange = (value: number[]) => {
+    setSettings((prev) => ({
+      ...prev,
+      quiz_gate_outfit_threshold: value[0],
+    }));
+  };
+
   if (isLoading) {
     return (
       <Card className="border border-stone-200">
@@ -146,11 +172,81 @@ export function PurchasePreventionSettings() {
           Smart Purchase Prevention
         </CardTitle>
         <CardDescription>
-          Configure cooling-off periods and duplicate item warnings to help you make intentional purchases
+          Control impulse buying with Quiz Gate, duplication warnings, and cooling-off periods
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-8">
+        {/* Quiz Gate Setting */}
+        <div className="space-y-4 pb-6 border-b border-stone-200">
+          <div className="space-y-2">
+            <Label className="text-sm font-semibold flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              "Can You Style This?" Quiz Gate
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Require users to prove they can style an outfit before adding items to their wishlist
+            </p>
+          </div>
+
+          {/* Quiz Gate Toggle */}
+          <div className="dense flex items-start justify-between">
+            <div className="flex-1">
+              <p className="text-sm font-medium">Enable Quiz Gate</p>
+              <p className="text-xs text-muted-foreground">
+                Block wishlist additions until user creates required outfits
+              </p>
+            </div>
+            <Switch
+              checked={settings.enable_quiz_gate}
+              onCheckedChange={handleQuizGateToggle}
+              disabled={isSaving}
+              className="dense ml-2"
+            />
+          </div>
+
+          {/* Quiz Gate Threshold Slider */}
+          {settings.enable_quiz_gate && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
+              <div>
+                <Label htmlFor="quiz-threshold" className="text-sm font-medium">
+                  Required Outfits: {settings.quiz_gate_outfit_threshold}
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Users must create this many outfits before they can add items to their wishlist
+                </p>
+              </div>
+
+              <Slider
+                id="quiz-threshold"
+                min={2}
+                max={10}
+                step={1}
+                value={[settings.quiz_gate_outfit_threshold]}
+                onValueChange={handleQuizGateThresholdChange}
+                disabled={isSaving}
+                className="mt-3"
+              />
+
+              <div className="flex items-start gap-2 mt-3 p-2 bg-blue-100 rounded text-xs text-blue-700">
+                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                <p>
+                  Setting this to <strong>{settings.quiz_gate_outfit_threshold} outfits</strong> means users won't see the quiz modal until they've created at least {settings.quiz_gate_outfit_threshold} outfits.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!settings.enable_quiz_gate && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex gap-2">
+              <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-700">
+                Quiz Gate is disabled. Users can add items to their wishlist without the "Can You Style This?" check.
+              </p>
+            </div>
+          )}
+        </div>
+
         {/* Cooling-Off Period Setting */}
         <div className="space-y-4 pb-6 border-b border-stone-200">
           <div className="space-y-2">

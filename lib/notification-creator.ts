@@ -13,6 +13,9 @@ export type NotificationType =
   | 'seasonal_tip'
   | 'achievement_unlock'
   | 'outfit_suggestion'
+  | 'shopping_reminder'
+  | 'cooling_off_ready'
+  | 'cost_per_wear_milestone'
 
 export type NotificationSeverity = 'low' | 'medium' | 'high'
 
@@ -211,12 +214,16 @@ async function createOrUpdateBundle(
  * Helper: Check if notification type is enabled in user preferences
  */
 function getNotificationTypeEnabled(type: NotificationType, prefs: any): boolean {
-  const typeMap: Record<NotificationType, keyof typeof prefs> = {
+  // Map notification types to their preference column names
+  const typeMap: Record<NotificationType, string> = {
     price_alert: 'price_alerts_enabled',
     wear_reminder: 'wear_reminders_enabled',
     seasonal_tip: 'seasonal_tips_enabled',
     achievement_unlock: 'achievements_enabled',
-    outfit_suggestion: 'outfit_suggestions_enabled'
+    outfit_suggestion: 'outfit_suggestions_enabled',
+    shopping_reminder: 'shopping_reminders_in_app',
+    cooling_off_ready: 'cooling_off_ready_in_app',
+    cost_per_wear_milestone: 'cost_per_wear_milestones_in_app'
   }
 
   const prefKey = typeMap[type]
