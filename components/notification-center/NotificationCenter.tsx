@@ -11,13 +11,14 @@
 
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { NotificationCard } from './NotificationCard'
 import { NotificationEmpty } from './NotificationEmpty'
-import { Bell, CheckCheck, Tag, Heart } from 'lucide-react'
+import { Bell, CheckCheck, Tag, Heart, Search, Filter, ChevronDown } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 
 interface Notification {
@@ -45,6 +46,13 @@ interface NotificationCenterProps {
 export function NotificationCenter({ isOpen, onClose, userId }: NotificationCenterProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterType, setFilterType] = useState<string | null>(null)
+  const [showFilters, setShowFilters] = useState(false)
+  const [showShortcuts, setShowShortcuts] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [undoQueue, setUndoQueue] = useState<Array<{ id: string; notification: Notification; timestamp: number }>>([])
+  const notificationRefs = useRef<(HTMLDivElement | null)[]>([])
   const supabase = createClient()
 
   // Fetch notifications
@@ -170,8 +178,182 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
     }
   }
 
+  // Dismiss with undo
+  const dismissWithUndo = (notification: Notification) => {
+    const timestamp = Date.now()
+
+    // Add to undo queue
+    setUndoQueue((prev) => [...prev, { id: notification.id, notification, timestamp }])
+
+    // Optimistically hide notification
+    setNotifications((prev) => prev.filter((n) => n.id !== notification.id))
+
+    // Show undo toast
+    const toastId = toast.success('Notification dismissed', {
+      duration: 5000,
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          handleUndo(notification.id)
+          toast.dismiss(toastId)
+        },
+      },
+    })
+
+    // After 5 seconds, permanently delete
+    const timeout = setTimeout(async () => {
+      // Check if undo was called
+      const stillInQueue = undoQueue.find((item) => item.id === notification.id)
+      if (!stillInQueue) return
+
+      // Mark as read (permanent delete)
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', notification.id)
+
+      if (error) {
+        console.error('Error dismissing notification:', error)
+      }
+
+      // Remove from undo queue
+      setUndoQueue((prev) => prev.filter((item) => item.id !== notification.id))
+    }, 5000)
+
+    return () => clearTimeout(timeout)
+  }
+
+  // Handle undo
+  const handleUndo = (notificationId: string) => {
+    // Find notification in undo queue
+    const queueItem = undoQueue.find((item) => item.id === notificationId)
+    if (!queueItem) return
+
+    // Restore notification
+    setNotifications((prev) => {
+      // Check if already restored
+      if (prev.find((n) => n.id === notificationId)) return prev
+
+      // Add back in correct position (by date)
+      const restored = [...prev, queueItem.notification].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+      return restored
+    })
+
+    // Remove from undo queue
+    setUndoQueue((prev) => prev.filter((item) => item.id !== notificationId))
+
+    toast.success('Notification restored')
+  }
+
+  // Clean up expired undo items
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now()
+      setUndoQueue((prev) => prev.filter((item) => now - item.timestamp < 5000))
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Filter notifications
+  const filteredNotifications = useMemo(() => {
+    let filtered = notifications
+
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (n) =>
+          n.title.toLowerCase().includes(query) ||
+          n.message.toLowerCase().includes(query) ||
+          n.notification_type.toLowerCase().includes(query)
+      )
+    }
+
+    // Type filter
+    if (filterType) {
+      filtered = filtered.filter((n) => n.notification_type === filterType)
+    }
+
+    return filtered
+  }, [notifications, searchQuery, filterType])
+
+  // Keyboard handler
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!isOpen) return
+
+      switch (e.key) {
+        case 'j': // Next notification (Notion-style)
+        case 'ArrowDown':
+          e.preventDefault()
+          setSelectedIndex((prev) => Math.min(prev + 1, filteredNotifications.length - 1))
+          break
+
+        case 'k': // Previous notification (Notion-style)
+        case 'ArrowUp':
+          e.preventDefault()
+          setSelectedIndex((prev) => Math.max(prev - 1, 0))
+          break
+
+        case 'Enter':
+          e.preventDefault()
+          // Open selected notification
+          if (filteredNotifications[selectedIndex]?.link_url) {
+            window.location.href = filteredNotifications[selectedIndex].link_url!
+          }
+          break
+
+        case 'x': // Dismiss selected notification
+          e.preventDefault()
+          if (filteredNotifications[selectedIndex]) {
+            dismissWithUndo(filteredNotifications[selectedIndex])
+          }
+          break
+
+        case 'a': // Mark all as read
+          if (e.metaKey || e.ctrlKey) {
+            e.preventDefault()
+            handleMarkAllRead()
+          }
+          break
+
+        case 'Escape':
+          e.preventDefault()
+          onClose()
+          break
+
+        case '/': // Focus search
+          e.preventDefault()
+          document.querySelector<HTMLInputElement>('input[placeholder="Search notifications..."]')?.focus()
+          break
+      }
+    },
+    [isOpen, filteredNotifications, selectedIndex, onClose]
+  )
+
+  // Register keyboard listener
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, handleKeyDown])
+
+  // Scroll selected notification into view
+  useEffect(() => {
+    if (notificationRefs.current[selectedIndex]) {
+      notificationRefs.current[selectedIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      })
+    }
+  }, [selectedIndex])
+
   // Sort notifications by priority, then group by date
-  const sortedNotifications = sortByPriority(notifications)
+  const sortedNotifications = sortByPriority(filteredNotifications)
   const groupedNotifications = groupByDate(sortedNotifications)
   const unreadCount = notifications.filter(n => !n.is_read).length
 
@@ -210,8 +392,80 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
               )}
             </div>
 
+            {/* Search and Filter */}
+            <div className="border-b border-border">
+              <div className="flex items-center gap-2 pb-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search notifications..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-lg border border-stone-200 py-2 pl-10 pr-3 text-sm focus:border-sun-400 focus:outline-none focus:ring-2 focus:ring-sun-400/20"
+                    aria-label="Search notifications"
+                    role="searchbox"
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`dense ${showFilters ? 'bg-sun-50 border-sun-400' : ''}`}
+                  aria-label="Toggle filters"
+                >
+                  <Filter className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Filter Dropdown */}
+              {showFilters && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-3 pb-3"
+                >
+                  <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                    Filter by Type
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setFilterType(null)}
+                      className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                        filterType === null
+                          ? 'bg-sun-400 text-white'
+                          : 'bg-stone-100 text-slate-700 hover:bg-stone-200'
+                      }`}
+                    >
+                      All
+                    </button>
+                    {[
+                      { type: 'price_alert', label: 'Price Alerts' },
+                      { type: 'wear_reminder', label: 'Wear Reminders' },
+                      { type: 'seasonal_tip', label: 'Seasonal Tips' },
+                      { type: 'cooling_off_ready', label: 'Cooling-Off' },
+                      { type: 'cost_per_wear_milestone', label: 'Milestones' },
+                    ].map(({ type, label }) => (
+                      <button
+                        key={type}
+                        onClick={() => setFilterType(type)}
+                        className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                          filterType === type
+                            ? 'bg-sun-400 text-white'
+                            : 'bg-stone-100 text-slate-700 hover:bg-stone-200'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
             {/* Bulk Action Buttons */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 pt-3">
               {notifications.filter((n) => n.notification_type === 'price_alert' && !n.is_read).length > 0 && (
                 <Button
                   variant="outline"
@@ -239,34 +493,99 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
         </SheetHeader>
 
         {/* Notification List */}
-        <div className="flex-1 px-6 overflow-y-auto">
+        <div className="flex-1 px-6 overflow-y-auto flex flex-col">
           {isLoading ? (
             <LoadingSkeleton />
-          ) : notifications.length === 0 ? (
+          ) : filteredNotifications.length === 0 ? (
             <NotificationEmpty />
           ) : (
-            <div className="space-y-6 py-4">
-              {Object.entries(groupedNotifications).map(([date, items]) => (
-                <div key={date}>
-                  <h3 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
-                    {date}
-                  </h3>
-                  <div className="space-y-3">
-                    {items.map((notification) => (
-                      <NotificationCard
-                        key={notification.id}
-                        notification={notification}
-                        onUpdate={fetchNotifications}
-                      />
-                    ))}
-                  </div>
+            <>
+              {/* Show filtered results count */}
+              {(searchQuery || filterType) && (
+                <div className="py-2 text-xs text-slate-600">
+                  Showing {filteredNotifications.length} of {notifications.length} notifications
                 </div>
-              ))}
-            </div>
+              )}
+
+              <div className="space-y-6 py-4 flex-1">
+                {Object.entries(groupedNotifications).map(([date, items]) => (
+                  <div key={date}>
+                    <h3 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
+                      {date}
+                    </h3>
+                    <div className="space-y-3">
+                      {items.map((notification, index) => (
+                        <div
+                          key={notification.id}
+                          ref={(el) => {
+                            if (el) notificationRefs.current[index] = el
+                          }}
+                        >
+                          <NotificationCard
+                            notification={notification}
+                            onUpdate={fetchNotifications}
+                            index={index}
+                            isSelected={index === selectedIndex}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
+
+          {/* Keyboard Shortcuts Legend */}
+          <div className="border-t border-stone-200 bg-stone-50 p-3 mt-auto">
+            <button
+              onClick={() => setShowShortcuts(!showShortcuts)}
+              className="flex w-full items-center justify-between text-xs text-slate-600 hover:text-slate-900"
+            >
+              <span className="font-semibold">Keyboard Shortcuts</span>
+              <ChevronDown
+                className={`h-3 w-3 transition-transform ${showShortcuts ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {showShortcuts && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-2 space-y-1"
+              >
+                <ShortcutItem keys={['j', '↓']} description="Next notification" />
+                <ShortcutItem keys={['k', '↑']} description="Previous notification" />
+                <ShortcutItem keys={['Enter']} description="Open notification" />
+                <ShortcutItem keys={['x']} description="Dismiss notification" />
+                <ShortcutItem keys={['⌘A', 'Ctrl+A']} description="Mark all as read" />
+                <ShortcutItem keys={['/']} description="Search notifications" />
+                <ShortcutItem keys={['Esc']} description="Close panel" />
+              </motion.div>
+            )}
+          </div>
         </div>
       </SheetContent>
     </Sheet>
+  )
+}
+
+// Helper component for keyboard shortcuts
+function ShortcutItem({ keys, description }: { keys: string[]; description: string }) {
+  return (
+    <div className="flex items-center justify-between text-xs">
+      <span className="text-slate-600">{description}</span>
+      <div className="flex gap-1">
+        {keys.map((key, i) => (
+          <kbd
+            key={i}
+            className="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-mono text-xs font-semibold text-slate-700"
+          >
+            {key}
+          </kbd>
+        ))}
+      </div>
+    </div>
   )
 }
 
