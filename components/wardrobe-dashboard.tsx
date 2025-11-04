@@ -24,8 +24,6 @@ import {
   WishlistEmptyState,
   ArchiveEmptyState,
 } from './empty-state-illustrations'
-import { WearRemindersContainer } from './wear-reminder-notifications'
-import { SeasonalSuggestionsCard } from './seasonal-suggestions'
 
 interface SizingJournalDashboardProps {
   onAddNew?: () => void
@@ -477,38 +475,6 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
       />
 
       <SizingJournalStats journalEntries={journalEntries} />
-
-      {/* Seasonal Suggestions - Show only for owned items */}
-      {status.includes('owned') && journalEntries.length > 0 && (
-        <div className="mb-8">
-          <SeasonalSuggestionsCard
-            onViewOutfits={() => {
-              // Scroll to outfits or navigate
-              window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
-            onOrganizeWardrobe={() => {
-              // Trigger filter or view change
-              window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
-          />
-        </div>
-      )}
-
-      {/* Wear Reminders - Show only for owned items */}
-      {status.includes('owned') && journalEntries.length > 0 && (
-        <div className="mb-8">
-          <WearRemindersContainer
-            items={journalEntries}
-            onWear={(itemId) => {
-              // Update last_worn_date for the item
-              const item = journalEntries.find(e => e.id === itemId)
-              if (item) {
-                handleIncrementWear(item)
-              }
-            }}
-          />
-        </div>
-      )}
 
       <DashboardGrid
         entries={filteredAndSortedEntries}
