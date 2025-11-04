@@ -3,10 +3,12 @@
  *
  * Displays cooling-off period progress for wishlist items
  * Shows countdown and lock status
+ * Triggers notification when cooling-off period completes
  */
 
 'use client';
 
+import { useEffect } from 'react';
 import { Clock, Lock } from 'lucide-react';
 import {
   canPurchaseNow,
@@ -20,13 +22,59 @@ interface CoolingOffBadgeProps {
   createdAt: string;
   canPurchaseAfter: string | null;
   coolingOffDays?: number;
+  item?: {
+    id: string;
+    brand: string;
+    model: string;
+    color: string;
+    target_price?: number;
+    image_url?: string;
+  };
+  userId?: string;
 }
 
 export function CoolingOffBadge({
   createdAt,
   canPurchaseAfter,
   coolingOffDays = 7,
+  item,
+  userId,
 }: CoolingOffBadgeProps) {
+  // Trigger notification when cooling-off period completes
+  useEffect(() => {
+    if (!canPurchaseAfter || !item || !userId) return;
+
+    const canBuyNow = canPurchaseNow(canPurchaseAfter);
+    if (canBuyNow) {
+      const completedAt = new Date(canPurchaseAfter).getTime();
+      const now = Date.now();
+      const hourInMs = 60 * 60 * 1000;
+
+      // If completed within the last hour, trigger notification
+      if (now - completedAt < hourInMs) {
+        const triggerNotification = async () => {
+          try {
+            const { triggerCoolingOffNotification } = await import(
+              '@/lib/notification-server-actions'
+            );
+
+            await triggerCoolingOffNotification(userId, {
+              id: item.id,
+              brand: item.brand,
+              model: item.model,
+              color: item.color,
+              target_price: item.target_price,
+              image_url: item.image_url,
+            });
+          } catch (error) {
+            console.error('Error creating cooling-off notification:', error);
+          }
+        };
+
+        triggerNotification();
+      }
+    }
+  }, [canPurchaseAfter, item, userId]);
   // Don't show if no cooling-off period
   if (!canPurchaseAfter) {
     return null;

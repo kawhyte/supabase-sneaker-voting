@@ -280,3 +280,234 @@ async function getTodayNotificationCount(userId: string): Promise<number> {
 
   return count || 0
 }
+
+/**
+ * PHASE 4: Create a "Ready to Buy" notification when cooling-off period ends
+ * User preference: cooling_off_ready_in_app (default: false)
+ */
+export async function createCoolingOffReadyNotification(
+  userId: string,
+  item: {
+    id: string
+    brand: string
+    model: string
+    color: string
+    target_price?: number
+    image_url?: string
+  }
+): Promise<{ success: boolean; notificationId?: string; error?: string }> {
+  const supabase = await createClient()
+
+  try {
+    // Check user preferences (default OFF)
+    const { data: prefs, error: prefsError } = await supabase
+      .from('notification_preferences')
+      .select('cooling_off_ready_in_app')
+      .eq('user_id', userId)
+      .single()
+
+    if (prefsError || !prefs?.cooling_off_ready_in_app) {
+      return {
+        success: false,
+        error: 'User has disabled cooling-off notifications',
+      }
+    }
+
+    // Check if notification already sent for this item
+    const { data: existing } = await supabase
+      .from('notifications')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('notification_type', 'cooling_off_ready')
+      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+      .maybeSingle()
+
+    if (existing) {
+      return {
+        success: false,
+        error: 'Notification already sent for this item recently',
+      }
+    }
+
+    // Create notification
+    const result = await createNotification({
+      userId,
+      type: 'cooling_off_ready',
+      title: 'Ready to Purchase! 🔓',
+      message: `Your cooling-off period for ${item.brand} ${item.model} is complete.${
+        item.target_price ? ` Target: $${item.target_price}` : ''
+      }`,
+      severity: 'medium',
+      linkUrl: `/dashboard?tab=wishlist&item=${item.id}`,
+      actionLabel: 'View Item',
+      metadata: {
+        item_id: item.id,
+        brand: item.brand,
+        model: item.model,
+        color: item.color,
+        target_price: item.target_price,
+        image_url: item.image_url,
+      },
+    })
+
+    return {
+      success: true,
+      notificationId: result?.id,
+    }
+  } catch (error) {
+    console.error('Error creating cooling-off notification:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * PHASE 4: Create a cost-per-wear milestone achievement notification
+ * Triggered when item reaches its target cost-per-wear goal
+ */
+export async function createCostPerWearMilestone(
+  userId: string,
+  item: {
+    id: string
+    brand: string
+    model: string
+    color: string
+    wears: number
+    purchase_price: number
+    cost_per_wear: number
+    target_cost_per_wear: number
+    image_url?: string
+  }
+): Promise<{ success: boolean; notificationId?: string; error?: string }> {
+  const supabase = await createClient()
+
+  try {
+    // Check user preferences
+    const { data: prefs, error: prefsError } = await supabase
+      .from('notification_preferences')
+      .select('cost_per_wear_milestones_in_app')
+      .eq('user_id', userId)
+      .single()
+
+    if (prefsError || !prefs?.cost_per_wear_milestones_in_app) {
+      return {
+        success: false,
+        error: 'User has disabled cost-per-wear notifications',
+      }
+    }
+
+    // Check if we already sent notification for this milestone
+    const { data: existing } = await supabase
+      .from('notifications')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('notification_type', 'cost_per_wear_milestone')
+      .eq('metadata->>item_id', item.id)
+      .maybeSingle()
+
+    if (existing) {
+      return {
+        success: false,
+        error: 'Milestone notification already sent for this item',
+      }
+    }
+
+    // Create celebration notification
+    const result = await createNotification({
+      userId,
+      type: 'cost_per_wear_milestone',
+      title: 'Cost-Per-Wear Goal Achieved! 🎉',
+      message: `Your ${item.brand} ${item.model} is earning its keep! Now at $${item.cost_per_wear.toFixed(
+        2
+      )}/wear (${item.wears} wears).`,
+      severity: 'low',
+      linkUrl: `/dashboard?tab=owned&item=${item.id}`,
+      actionLabel: 'View Progress',
+      metadata: {
+        item_id: item.id,
+        brand: item.brand,
+        model: item.model,
+        color: item.color,
+        wears: item.wears,
+        purchase_price: item.purchase_price,
+        cost_per_wear: item.cost_per_wear,
+        target_cost_per_wear: item.target_cost_per_wear,
+        milestone_type: 'target_achieved',
+        image_url: item.image_url,
+      },
+    })
+
+    return {
+      success: true,
+      notificationId: result?.id,
+    }
+  } catch (error) {
+    console.error('Error creating cost-per-wear milestone:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * PHASE 4: Create follow-up notification after user dismisses duplication warning
+ * Gentle reminder to avoid impulse purchases
+ */
+export async function createDuplicationFollowUp(
+  userId: string,
+  dismissedWarning: {
+    item_name: string
+    similar_items: Array<{ brand: string; model: string }>
+    severity: 'high' | 'medium' | 'low'
+  }
+): Promise<{ success: boolean; notificationId?: string; error?: string }> {
+  const supabase = await createClient()
+
+  try {
+    // Only create for high severity dismissals
+    if (dismissedWarning.severity !== 'high') {
+      return { success: false, error: 'Only high severity warnings trigger follow-ups' }
+    }
+
+    // Check user preferences
+    const { data: prefs, error: prefsError } = await supabase
+      .from('notification_preferences')
+      .select('outfit_suggestions_in_app')
+      .eq('user_id', userId)
+      .single()
+
+    if (prefsError || !prefs?.outfit_suggestions_in_app) {
+      return { success: false, error: 'User has disabled suggestions' }
+    }
+
+    // Create notification (will be snoozed if needed)
+    const result = await createNotification({
+      userId,
+      type: 'outfit_suggestion',
+      title: 'Can You Style This? 🤔',
+      message: `You already own ${dismissedWarning.similar_items.length} similar items. Try styling them in new ways before adding more!`,
+      severity: 'low',
+      linkUrl: '/dashboard?tab=outfits&action=create',
+      actionLabel: 'Create Outfit',
+      metadata: {
+        trigger: 'duplication_warning_dismissed',
+        item_name: dismissedWarning.item_name,
+        similar_items: dismissedWarning.similar_items,
+      },
+    })
+
+    return {
+      success: true,
+      notificationId: result?.id,
+    }
+  } catch (error) {
+    console.error('Error creating duplication follow-up:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}

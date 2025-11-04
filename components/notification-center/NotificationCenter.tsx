@@ -170,8 +170,9 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
     }
   }
 
-  // Group notifications by date
-  const groupedNotifications = groupByDate(notifications)
+  // Sort notifications by priority, then group by date
+  const sortedNotifications = sortByPriority(notifications)
+  const groupedNotifications = groupByDate(sortedNotifications)
   const unreadCount = notifications.filter(n => !n.is_read).length
 
   return (
@@ -267,6 +268,52 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
       </SheetContent>
     </Sheet>
   )
+}
+
+/**
+ * PRIORITY QUEUE: Sort notifications by type priority
+ *
+ * Priority order (highest to lowest):
+ * 1. price_alert (1) - Time-sensitive deals
+ * 2. cooling_off_ready (2) - Purchase windows
+ * 3. cost_per_wear_milestone, achievement_unlock (3) - Celebrations
+ * 4. wear_reminder (4) - Action reminders
+ * 5. seasonal_tip (5) - Guidance
+ * 6. outfit_suggestion (6) - Suggestions
+ *
+ * Within same priority: unread first, then newest first
+ */
+function sortByPriority(notifications: Notification[]): Notification[] {
+  const getPriority = (notificationType: string): number => {
+    const priorityMap: Record<string, number> = {
+      'price_alert': 1,
+      'cooling_off_ready': 2,
+      'cost_per_wear_milestone': 3,
+      'achievement_unlock': 3,
+      'wear_reminder': 4,
+      'seasonal_tip': 5,
+      'outfit_suggestion': 6,
+      'shopping_reminder': 5,
+    }
+    return priorityMap[notificationType] || 6 // Default to lowest priority
+  }
+
+  return [...notifications].sort((a, b) => {
+    // 1. Sort by read status (unread first)
+    if (a.is_read !== b.is_read) {
+      return a.is_read ? 1 : -1
+    }
+
+    // 2. Sort by priority (lower number = higher priority)
+    const aPriority = getPriority(a.notification_type)
+    const bPriority = getPriority(b.notification_type)
+    if (aPriority !== bPriority) {
+      return aPriority - bPriority
+    }
+
+    // 3. Sort by date (newest first)
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  })
 }
 
 // Helper: Group notifications by date

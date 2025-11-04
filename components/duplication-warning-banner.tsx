@@ -3,6 +3,7 @@
  *
  * Shows inline warning when adding an item similar to ones already owned
  * Helps users avoid buying duplicates
+ * Creates follow-up notification when high-severity warnings are dismissed
  */
 
 'use client';
@@ -15,11 +16,15 @@ import { Card, CardContent } from '@/components/ui/card';
 interface DuplicationWarningBannerProps {
   warning: DuplicationWarning;
   onDismiss?: () => void;
+  userId?: string;
+  newItemName?: string;
 }
 
 export function DuplicationWarningBanner({
   warning,
   onDismiss,
+  userId,
+  newItemName,
 }: DuplicationWarningBannerProps) {
   const severityColors = {
     low: {
@@ -46,6 +51,28 @@ export function DuplicationWarningBanner({
   };
 
   const colors = severityColors[warning.severity];
+
+  const handleDismiss = async () => {
+    // If high severity, create follow-up notification
+    if (warning.severity === 'high' && userId && newItemName) {
+      try {
+        const { triggerDuplicationFollowUp } = await import('@/lib/notification-server-actions');
+
+        await triggerDuplicationFollowUp(userId, {
+          item_name: newItemName,
+          similar_items: warning.similarItems.map((item) => ({
+            brand: item.brand,
+            model: item.model,
+          })),
+          severity: 'high',
+        });
+      } catch (error) {
+        console.error('Error creating duplication follow-up notification:', error);
+      }
+    }
+
+    onDismiss?.();
+  };
 
   return (
     <Card className={`${colors.bg} border-2 ${colors.border} ${colors.text}`}>
@@ -85,7 +112,7 @@ export function DuplicationWarningBanner({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onDismiss}
+                  onClick={handleDismiss}
                   className="h-6 w-6 p-0 flex-shrink-0 hover:bg-current hover:bg-opacity-20"
                   aria-label="Dismiss warning"
                 >
