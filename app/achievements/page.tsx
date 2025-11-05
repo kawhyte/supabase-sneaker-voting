@@ -6,6 +6,7 @@ import { HeroSection } from '@/components/achievements/HeroSection'
 import { CoreStatsGrid } from '@/components/achievements/CoreStatsGrid'
 import { TopWornList } from '@/components/achievements/TopWornList'
 import { LeastWornList } from '@/components/achievements/LeastWornList'
+import { FinancialInsights } from '@/components/achievements/FinancialInsights'
 import {
   getWardrobeStats,
   getTopWornItems,
@@ -23,6 +24,7 @@ export default function AchievementsPage() {
   const [leastWorn, setLeastWorn] = useState<LeastWornItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const supabase = createClient()
 
@@ -40,6 +42,8 @@ export default function AchievementsPage() {
           setError('Please log in to view your achievements')
           return
         }
+
+        setUserId(user.id)
 
         // Track page view
         analytics.track(AnalyticsEvent.DASHBOARD_VIEWED, {
@@ -89,10 +93,12 @@ export default function AchievementsPage() {
       <TopWornList items={topWorn} />
       <LeastWornList items={leastWorn} />
 
-      {/* Phase 2-4 placeholders */}
+      {userId && <FinancialInsights userId={userId} />}
+
+      {/* Phase 3-4 placeholders */}
       <div className="bg-muted border border-border rounded-lg p-12 text-center">
         <p className="text-muted-foreground">
-          More insights coming soon: Financial analytics, Achievement gallery, and Fun facts!
+          More insights coming soon: Achievement gallery and Fun facts!
         </p>
       </div>
     </main>
