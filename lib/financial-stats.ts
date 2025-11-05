@@ -37,7 +37,7 @@ export async function getCategorySpending(
   const timeRange = getTimeRange(period)
 
   let query = supabase
-    .from('sneakers')
+    .from('items')
     .select('category, purchase_price, retail_price')
     .eq('user_id', userId)
     .eq('status', 'owned')
@@ -103,7 +103,7 @@ export async function getSpendingTrends(
   if (!timeRange) {
     // For 'all', get monthly aggregates
     const { data, error } = await supabase
-      .from('sneakers')
+      .from('items')
       .select('purchase_date, purchase_price, retail_price')
       .eq('user_id', userId)
       .eq('status', 'owned')
@@ -116,7 +116,7 @@ export async function getSpendingTrends(
   }
 
   const { data, error } = await supabase
-    .from('sneakers')
+    .from('items')
     .select('purchase_date, purchase_price, retail_price')
     .eq('user_id', userId)
     .eq('status', 'owned')
@@ -139,7 +139,7 @@ export async function getWardrobeSizeOverTime(
 
   // Get all items with created_at dates
   const { data, error } = await supabase
-    .from('sneakers')
+    .from('items')
     .select('created_at, is_archived')
     .eq('user_id', userId)
     .order('created_at', { ascending: true })
@@ -171,7 +171,7 @@ export async function getTotalSaved(userId: string): Promise<number> {
 
   // Get all items where sale_price < retail_price
   const { data, error } = await supabase
-    .from('sneakers')
+    .from('items')
     .select('retail_price, sale_price, purchase_price')
     .eq('user_id', userId)
     .eq('status', 'owned')

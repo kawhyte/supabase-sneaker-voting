@@ -1019,6 +1019,7 @@ export type Database = {
       }
       user_stats: {
         Row: {
+          achievements_preferences: Json | null
           achievements_unlocked: number | null
           average_cost_per_wear: number | null
           created_at: string | null
@@ -1037,6 +1038,7 @@ export type Database = {
           wishlisted_items: number | null
         }
         Insert: {
+          achievements_preferences?: Json | null
           achievements_unlocked?: number | null
           average_cost_per_wear?: number | null
           created_at?: string | null
@@ -1055,6 +1057,7 @@ export type Database = {
           wishlisted_items?: number | null
         }
         Update: {
+          achievements_preferences?: Json | null
           achievements_unlocked?: number | null
           average_cost_per_wear?: number | null
           created_at?: string | null

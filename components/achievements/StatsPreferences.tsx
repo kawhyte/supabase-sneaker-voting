@@ -117,7 +117,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
           Customize
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:w-[400px]">
+      <SheetContent className="w-full sm:w-[400px] p-6">
         <SheetHeader>
           <SheetTitle>Stats Preferences</SheetTitle>
           <SheetDescription>
@@ -130,7 +130,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
           <div>
             <h3 className="font-semibold mb-3 text-sm text-muted-foreground">Financial Insights</h3>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="dense flex items-center justify-between">
                 <Label htmlFor="total-spent" className="flex-1">
                   Show Total Spent
                 </Label>
@@ -141,7 +141,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
                   disabled={isSaving}
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="dense flex items-center justify-between">
                 <Label htmlFor="category-spending" className="flex-1">
                   Show Category Breakdown
                 </Label>
@@ -152,7 +152,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
                   disabled={isSaving}
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className=" dense flex items-center justify-between">
                 <Label htmlFor="spending-trends" className="flex-1">
                   Show Spending Trends
                 </Label>
@@ -163,7 +163,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
                   disabled={isSaving}
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="dense flex items-center justify-between">
                 <Label htmlFor="total-saved" className="flex-1">
                   Show Total Saved
                 </Label>
@@ -181,7 +181,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
           <div>
             <h3 className="font-semibold mb-3 text-sm text-muted-foreground">Collection Insights</h3>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="dense flex items-center justify-between">
                 <Label htmlFor="wardrobe-size" className="flex-1">
                   Show Wardrobe Growth
                 </Label>
@@ -192,7 +192,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
                   disabled={isSaving}
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="dense flex items-center justify-between">
                 <Label htmlFor="least-worn" className="flex-1">
                   Show Least Worn Items
                 </Label>
@@ -212,7 +212,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
               Comparative Insights
             </h3>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="dense flex items-center justify-between">
                 <Label htmlFor="comparative-stats" className="flex-1">
                   Show vs Average User
                 </Label>

@@ -43,7 +43,9 @@ export function FinancialInsights({ userId }: FinancialInsightsProps) {
         setWardrobeSizeData(wardrobeSize)
         setTotalSaved(saved)
       } catch (error) {
-        console.error('Error loading financial insights:', error)
+        const errorMessage =
+          error instanceof Error ? error.message : JSON.stringify(error)
+        console.error('Error loading financial insights:', errorMessage)
       } finally {
         setIsLoading(false)
       }
