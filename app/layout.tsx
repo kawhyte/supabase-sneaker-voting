@@ -133,7 +133,7 @@ export default function RootLayout({
             {/* Footer uses card color for subtle differentiation */}
             <footer className="border-t bg-card text-card-foreground py-8 px-8">
               <p className="text-sm text-muted-foreground">
-                © 2025 Your Company. Built with love and Tailwind v4.
+                © 2025 PurrView.
               </p>
             </footer>
 

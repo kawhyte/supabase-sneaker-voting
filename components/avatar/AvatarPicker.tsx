@@ -23,6 +23,7 @@ const CAT_AVATARS: Avatar[] = [
   { id: 'cat-4', name: 'Cool Cat' },
   { id: 'cat-5', name: 'Curious Cat' },
   { id: 'cat-6', name: 'Wise Cat' },
+  
 ]
 
 interface AvatarPickerProps {
@@ -118,7 +119,7 @@ export function AvatarPicker({ isOpen, onClose, currentAvatarId, onSelect }: Ava
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="max-w-2xl"
+        className="max-w-2xl p-6"
         onKeyDown={handleKeyDown}
       >
         <DialogHeader>
