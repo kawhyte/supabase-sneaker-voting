@@ -1,0 +1,92 @@
+'use client'
+
+import { motion } from 'framer-motion'
+import { LeastWornItem } from '@/lib/achievements-stats'
+import { CATEGORY_CONFIGS } from '@/components/types/item-category'
+import Link from 'next/link'
+import Image from 'next/image'
+import { AlertCircle } from 'lucide-react'
+
+interface LeastWornListProps {
+  items: LeastWornItem[]
+}
+
+export function LeastWornList({ items }: LeastWornListProps) {
+  if (items.length === 0) {
+    return null // Don't show section if no data
+  }
+
+  return (
+    <section className="mb-12" aria-labelledby="least-worn-title">
+      <div className="flex items-center gap-3 mb-6">
+        <AlertCircle className="h-6 w-6 text-amber-600" />
+        <h2 id="least-worn-title" className="text-2xl font-bold text-foreground">
+          Items Needing Love 💛
+        </h2>
+      </div>
+
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
+        <p className="text-sm text-amber-900">
+          These items haven't been worn much. Create an outfit with them or consider if they still spark joy!
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        {items.map((item, index) => (
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1, duration: 0.3 }}
+          >
+            <Link
+              href="/dashboard?tab=owned"
+              className="block bg-card border-2 border-amber-300 rounded-lg overflow-hidden hover:shadow-lg hover:border-amber-500 transition-all"
+            >
+              {/* Image */}
+              {item.image_url ? (
+                <div className="relative aspect-square bg-muted">
+                  <Image
+                    src={item.image_url}
+                    alt={`${item.brand} ${item.model}`}
+                    fill
+                    className="object-cover opacity-75"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 20vw"
+                  />
+                </div>
+              ) : (
+                <div className="aspect-square bg-muted flex items-center justify-center opacity-75">
+                  {(() => {
+                    const CategoryIcon = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS]?.icon
+                    return CategoryIcon ? <CategoryIcon className="h-16 w-16" /> : <span className="text-4xl">👕</span>
+                  })()}
+                </div>
+              )}
+
+              {/* Details */}
+              <div className="p-4">
+                <div className="font-semibold text-sm text-foreground mb-1 line-clamp-1">
+                  {item.brand}
+                </div>
+                <div className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                  {item.model}
+                </div>
+
+                {/* Wear Info */}
+                <div className="text-xs text-amber-700 font-medium">
+                  {item.wears === 0 ? (
+                    'Never worn'
+                  ) : item.daysSinceLastWorn !== null ? (
+                    `${item.daysSinceLastWorn} days ago`
+                  ) : (
+                    `${item.wears} wears`
+                  )}
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  )
+}
