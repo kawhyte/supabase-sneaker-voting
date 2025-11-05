@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { AchievementBadge } from './AchievementBadge'
 import { AchievementModal } from './AchievementModal'
 import { ACHIEVEMENT_DEFINITIONS } from '@/lib/achievement-definitions'
 import { createClient } from '@/utils/supabase/client'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import analytics, { AnalyticsEvent } from '@/lib/analytics'
 
 interface AchievementsGalleryProps {
   userId: string
@@ -16,11 +17,81 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set())
   const [selectedAchievement, setSelectedAchievement] = useState<string | null>(null)
   const [progress, setProgress] = useState<Map<string, number>>(new Map())
+  const [focusedIndex, setFocusedIndex] = useState(0)
+  const badgeRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   useEffect(() => {
     loadUnlockedAchievements()
     calculateProgress()
   }, [userId])
+
+  const filtered = ACHIEVEMENT_DEFINITIONS.filter((achievement) => {
+    const isUnlocked = unlockedIds.has(achievement.id)
+    if (filter === 'unlocked') return isUnlocked
+    if (filter === 'locked') return !isUnlocked
+    return true
+  })
+
+  // Keyboard navigation handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const gridCols = window.innerWidth >= 1280 ? 5 : window.innerWidth >= 1024 ? 4 : 3
+
+      switch (e.key) {
+        case 'ArrowRight':
+          e.preventDefault()
+          setFocusedIndex((prev) => Math.min(prev + 1, filtered.length - 1))
+          // Track keyboard navigation
+          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+            feature: 'achievement_keyboard_nav_right',
+            userId,
+          })
+          break
+        case 'ArrowLeft':
+          e.preventDefault()
+          setFocusedIndex((prev) => Math.max(prev - 1, 0))
+          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+            feature: 'achievement_keyboard_nav_left',
+            userId,
+          })
+          break
+        case 'ArrowDown':
+          e.preventDefault()
+          setFocusedIndex((prev) => Math.min(prev + gridCols, filtered.length - 1))
+          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+            feature: 'achievement_keyboard_nav_down',
+            userId,
+          })
+          break
+        case 'ArrowUp':
+          e.preventDefault()
+          setFocusedIndex((prev) => Math.max(prev - gridCols, 0))
+          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+            feature: 'achievement_keyboard_nav_up',
+            userId,
+          })
+          break
+        case 'Enter':
+        case ' ':
+          e.preventDefault()
+          badgeRefs.current[focusedIndex]?.click()
+          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+            feature: 'achievement_keyboard_activated',
+            achievementId: filtered[focusedIndex]?.id,
+            userId,
+          })
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [focusedIndex, filtered.length, userId])
+
+  // Focus management
+  useEffect(() => {
+    badgeRefs.current[focusedIndex]?.focus()
+  }, [focusedIndex])
 
   async function loadUnlockedAchievements() {
     const supabase = createClient()
@@ -42,13 +113,6 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
     setProgress(progressMap)
   }
 
-  const filtered = ACHIEVEMENT_DEFINITIONS.filter((achievement) => {
-    const isUnlocked = unlockedIds.has(achievement.id)
-    if (filter === 'unlocked') return isUnlocked
-    if (filter === 'locked') return !isUnlocked
-    return true
-  })
-
   return (
     <section className="mb-12" aria-labelledby="achievements-gallery-title">
       <div className="flex items-center justify-between mb-6">
@@ -67,18 +131,35 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {filtered.map((achievement) => (
-          <AchievementBadge
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" role="region" aria-label="Achievement badges">
+        {filtered.map((achievement, index) => (
+          <button
+            ref={(el) => (badgeRefs.current[index] = el)}
             key={achievement.id}
-            id={achievement.id}
-            name={achievement.name}
-            icon={achievement.icon}
-            tier={achievement.tier}
-            isUnlocked={unlockedIds.has(achievement.id)}
-            progress={progress.get(achievement.id)}
-            onClick={() => setSelectedAchievement(achievement.id)}
-          />
+            tabIndex={index === focusedIndex ? 0 : -1}
+            aria-label={`${achievement.name}. ${
+              unlockedIds.has(achievement.id) ? 'Unlocked' : 'Locked'
+            }. ${achievement.description || 'No description'}`}
+            onClick={() => {
+              setSelectedAchievement(achievement.id)
+              analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+                feature: 'achievement_details_viewed',
+                achievementId: achievement.id,
+                userId,
+              })
+            }}
+            className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
+          >
+            <AchievementBadge
+              id={achievement.id}
+              name={achievement.name}
+              icon={achievement.icon}
+              tier={achievement.tier}
+              isUnlocked={unlockedIds.has(achievement.id)}
+              progress={progress.get(achievement.id)}
+              onClick={() => setSelectedAchievement(achievement.id)}
+            />
+          </button>
         ))}
       </div>
 

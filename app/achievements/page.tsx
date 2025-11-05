@@ -1,14 +1,23 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import './achievements.css'
 import { HeroSection } from '@/components/achievements/HeroSection'
 import { CoreStatsGrid } from '@/components/achievements/CoreStatsGrid'
 import { TopWornList } from '@/components/achievements/TopWornList'
 import { LeastWornList } from '@/components/achievements/LeastWornList'
-import { FinancialInsights } from '@/components/achievements/FinancialInsights'
-import { AchievementsGallery } from '@/components/achievements/AchievementsGallery'
-import { FunFactsSection } from '@/components/achievements/FunFactsSection'
+import { AchievementsErrorBoundary } from '@/components/achievements/AchievementsErrorBoundary'
+import { StatsPreferences, type StatsPreferencesType } from '@/components/achievements/StatsPreferences'
+import {
+  HeroSkeleton,
+  CoreStatsSkeleton,
+  TopWornListSkeleton,
+  LeastWornListSkeleton,
+  FinancialInsightsSkeleton,
+  GallerySkeleton,
+  FactsSkeleton,
+} from '@/components/achievements/Skeletons'
 import {
   getWardrobeStats,
   getTopWornItems,
@@ -17,16 +26,33 @@ import {
   type TopWornItem,
   type LeastWornItem,
 } from '@/lib/achievements-stats'
-import { Skeleton } from '@/components/ui/skeleton'
 import analytics, { AnalyticsEvent } from '@/lib/analytics'
 
-export default function AchievementsPage() {
+// Lazy load heavy components
+const FinancialInsights = lazy(() =>
+  import('@/components/achievements/FinancialInsights').then((mod) => ({
+    default: mod.FinancialInsights,
+  }))
+)
+const AchievementsGallery = lazy(() =>
+  import('@/components/achievements/AchievementsGallery').then((mod) => ({
+    default: mod.AchievementsGallery,
+  }))
+)
+const FunFactsSection = lazy(() =>
+  import('@/components/achievements/FunFactsSection').then((mod) => ({
+    default: mod.FunFactsSection,
+  }))
+)
+
+function AchievementsPageContent() {
   const [stats, setStats] = useState<WardrobeStats | null>(null)
   const [topWorn, setTopWorn] = useState<TopWornItem[]>([])
   const [leastWorn, setLeastWorn] = useState<LeastWornItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [preferences, setPreferences] = useState<StatsPreferencesType | null>(null)
 
   const supabase = createClient()
 
@@ -48,10 +74,15 @@ export default function AchievementsPage() {
         setUserId(user.id)
 
         // Track page view
-        analytics.track(AnalyticsEvent.DASHBOARD_VIEWED, {
-          userId: user.id,
-          page: 'achievements',
-        })
+        try {
+          analytics.track(AnalyticsEvent.DASHBOARD_VIEWED, {
+            userId: user.id,
+            page: 'achievements',
+            timestamp: Date.now(),
+          })
+        } catch (e) {
+          console.error('Failed to track page view:', e)
+        }
 
         // Fetch all stats in parallel
         const [statsData, topWornData, leastWornData] = await Promise.all([
@@ -85,62 +116,92 @@ export default function AchievementsPage() {
   }
 
   if (isLoading || !stats) {
-    return <LoadingSkeleton />
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <HeroSkeleton />
+        <CoreStatsSkeleton />
+        <TopWornListSkeleton />
+        <LeastWornListSkeleton />
+        <FinancialInsightsSkeleton />
+        <GallerySkeleton />
+        <FactsSkeleton />
+      </div>
+    )
+  }
+
+  const trackInteraction = (feature: string) => {
+    try {
+      if (userId) {
+        analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+          feature: `achievements_${feature}`,
+          userId,
+        })
+      }
+    } catch (e) {
+      console.error('Failed to track interaction:', e)
+    }
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <HeroSection stats={stats} />
-      <CoreStatsGrid stats={stats} />
-      <TopWornList items={topWorn} />
-      <LeastWornList items={leastWorn} />
-
-      {userId && <FinancialInsights userId={userId} />}
-
-      {userId && <AchievementsGallery userId={userId} />}
-
-      {userId && <FunFactsSection userId={userId} />}
-
-      {/* Phase 5 placeholder */}
-      <div className="bg-muted border border-border rounded-lg p-12 text-center">
-        <p className="text-muted-foreground">
-          More insights coming soon: Polish and optimization!
-        </p>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 achievements-main">
+      {/* Header with Preferences */}
+      <div className="achievements-header flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+        <h1 className="hero-title text-3xl sm:text-4xl font-bold text-foreground">
+          Your Achievements 🏆
+        </h1>
+        {userId && (
+          <div onClick={() => trackInteraction('stats_preferences')}>
+            <StatsPreferences userId={userId} onPreferencesChange={setPreferences} />
+          </div>
+        )}
       </div>
+
+      <HeroSection stats={stats} />
+
+      <div className="core-stats-grid">
+        <CoreStatsGrid stats={stats} />
+      </div>
+
+      <div className="worn-items-grid">
+        <TopWornList items={topWorn} />
+      </div>
+
+      {/* Conditionally render based on preferences */}
+      {preferences?.show_least_worn !== false && (
+        <div className="worn-items-grid">
+          <LeastWornList items={leastWorn} />
+        </div>
+      )}
+
+      {userId && (
+        <Suspense fallback={<FinancialInsightsSkeleton />}>
+          <div className="charts-grid">
+            <FinancialInsights userId={userId} />
+          </div>
+        </Suspense>
+      )}
+
+      {userId && (
+        <Suspense fallback={<GallerySkeleton />}>
+          <div className="achievement-gallery">
+            <AchievementsGallery userId={userId} />
+          </div>
+        </Suspense>
+      )}
+
+      {userId && (
+        <Suspense fallback={<FactsSkeleton />}>
+          <FunFactsSection userId={userId} />
+        </Suspense>
+      )}
     </main>
   )
 }
 
-function LoadingSkeleton() {
+export default function AchievementsPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Hero Skeleton */}
-      <div className="text-center mb-8">
-        <Skeleton className="h-12 w-96 mx-auto mb-3" />
-        <Skeleton className="h-6 w-64 mx-auto" />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        {[...Array(3)].map((_, i) => (
-          <Skeleton key={i} className="h-40 rounded-lg" />
-        ))}
-      </div>
-
-      {/* Core Stats Skeleton */}
-      <Skeleton className="h-8 w-48 mb-6" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        {[...Array(4)].map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-lg" />
-        ))}
-      </div>
-
-      {/* Top Worn Skeleton */}
-      <Skeleton className="h-8 w-48 mb-6" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-64 rounded-lg" />
-        ))}
-      </div>
-    </div>
+    <AchievementsErrorBoundary>
+      <AchievementsPageContent />
+    </AchievementsErrorBoundary>
   )
 }

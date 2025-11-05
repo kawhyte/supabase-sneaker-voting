@@ -1,0 +1,164 @@
+/* Achievements Page Mobile & Responsive Optimizations */
+
+/* Mobile Optimization (< 640px) */
+@media (max-width: 640px) {
+  /* Hero title reduction */
+  main > h1,
+  .hero-title {
+    font-size: 2rem; /* 32px instead of 48px */
+    line-height: 1.2;
+  }
+
+  /* Single column for core stats */
+  .core-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Optimize chart heights for mobile */
+  .chart-container {
+    height: 240px; /* Shorter on mobile */
+  }
+
+  /* Compact fun facts on mobile */
+  .fun-fact-card {
+    padding: 1rem; /* 16px instead of 24px */
+  }
+
+  /* Achievement gallery - reduce grid columns */
+  .achievement-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Reduce spacing for smaller screens */
+  main {
+    padding: 1rem 0.5rem; /* Reduced from 3rem */
+  }
+
+  /* Top/Least worn items - 2 column on mobile */
+  .worn-items-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Header spacing on mobile */
+  .achievements-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Preferences button on mobile */
+  .stats-preferences-button {
+    width: 100%;
+  }
+}
+
+/* Tablet Optimization (640px - 1024px) */
+@media (max-width: 1024px) {
+  /* Hero title adjustment */
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  /* Achievement gallery - 3-4 columns */
+  .achievement-gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  /* Chart optimization */
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Desktop (1024px - 1920px) */
+@media (min-width: 1024px) {
+  /* Achievement gallery - full 5 columns */
+  .achievement-gallery {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Ultra-wide (> 1920px) */
+@media (min-width: 1920px) {
+  /* Center content on ultra-wide screens */
+  main {
+    max-width: 1920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Touch Target Optimization */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger buttons on touch devices */
+  .stats-preferences-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Achievement badges - larger touch area */
+  .achievement-badge {
+    min-height: 80px;
+  }
+
+  /* Remove hover effects on touch */
+  button:hover {
+    background-color: inherit;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark Mode Optimization */
+@media (prefers-color-scheme: dark) {
+  /* Ensure good contrast in dark mode */
+  .achievements-error-box {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+}
+
+/* Print Optimization */
+@media print {
+  /* Hide interactive elements when printing */
+  .stats-preferences-button,
+  .achievement-gallery,
+  .charts-grid {
+    display: none;
+  }
+
+  /* Optimize for print */
+  main {
+    max-width: 100%;
+    padding: 0;
+  }
+}
+
+/* Keyboard Navigation Indicators */
+button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeleton {
+  animation: shimmer 2s infinite;
+}
