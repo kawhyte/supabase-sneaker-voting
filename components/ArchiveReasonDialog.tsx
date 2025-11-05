@@ -14,7 +14,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Archive, ShoppingBag, Heart, Footprints, Package } from 'lucide-react'
-import { ArchiveReason } from './types/sizing-journal-entry'
+import { ArchiveReason } from './types/WardrobeItem'
 
 interface ArchiveReasonDialogProps {
 	open: boolean

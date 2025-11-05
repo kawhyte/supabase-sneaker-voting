@@ -258,7 +258,7 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // House of Heat (sneaker news/marketplace)
+  // House of Heat (shoe retailer/marketplace)
   {
     domain: 'houseofheat.co',
     name: 'House of Heat',

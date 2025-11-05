@@ -23,7 +23,7 @@
  * @see ItemDisplayLogic for the returned object structure
  */
 
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry';
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 
 export interface ItemDisplayLogic {
 	isOwned: boolean;
@@ -49,7 +49,7 @@ export interface ItemDisplayLogic {
  * const { isOwned, isOnSale } = useItemDisplayLogic(item);
  * // Use flags in conditional rendering: {isOwned && <WearCounter />}
  */
-export function useItemDisplayLogic(item: SizingJournalEntry): ItemDisplayLogic {
+export function useItemDisplayLogic(item: WardrobeItem): ItemDisplayLogic {
 	const isOwned = item.status === 'owned';
 	const isWishlist = item.status === 'wishlisted';
 	const isOnSale = !!(

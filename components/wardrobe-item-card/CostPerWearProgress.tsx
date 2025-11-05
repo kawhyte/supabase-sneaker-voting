@@ -13,7 +13,7 @@
 
 "use client";
 
-import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { calculateWorthItMetrics } from "@/lib/wardrobe-item-utils";
 import {
 	Tooltip,
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 
 interface CostPerWearProgressProps {
-	item: SizingJournalEntry;
+	item: WardrobeItem;
 }
 
 export function CostPerWearProgress({ item }: CostPerWearProgressProps) {

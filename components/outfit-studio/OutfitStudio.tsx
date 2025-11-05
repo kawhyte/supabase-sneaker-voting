@@ -27,12 +27,12 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from '@/components/ui/tooltip'
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Outfit, OutfitWithItems, OutfitItem, OutfitOccasion, CropArea } from '@/components/types/outfit'
 import { OutfitCanvas } from './OutfitCanvas'
 import { ManualCropTool } from './ManualCropTool'
 import { CanYouStyleThisQuiz } from './CanYouStyleThisQuiz'
-import { MilestoneCelebrationModal, useMilestoneCelebration } from '@/components/milestone-celebration'
+import { MilestoneCelebrationModal, useMilestoneCelebration } from '@/components/MilestoneCelebration'
 import {
   calculateAutoPosition,
   calculateSuggestedSize,
@@ -62,11 +62,11 @@ const OUTFIT_OCCASIONS: OutfitOccasion[] = [
 interface OutfitStudioProps {
   isOpen: boolean
   onClose: () => void
-  userWardrobe: SizingJournalEntry[]
+  userWardrobe: WardrobeItem[]
   outfitsCreated?: number
   onOutfitCreated?: (outfit: Outfit | OutfitWithItems) => void
   // When adding wishlist item
-  newWishlistItem?: SizingJournalEntry | null
+  newWishlistItem?: WardrobeItem | null
   // ✅ NEW: Edit mode props
   mode?: 'create' | 'edit'
   editingOutfitId?: string
@@ -103,14 +103,14 @@ export function OutfitStudio({
   const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([])
 
   // UI State
-  const [selectedItemToAdd, setSelectedItemToAdd] = useState<SizingJournalEntry | null>(newWishlistItem || null)
+  const [selectedItemToAdd, setSelectedItemToAdd] = useState<WardrobeItem | null>(newWishlistItem || null)
   const [croppingItemId, setCroppingItemId] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [showQuiz, setShowQuiz] = useState(false)
   const [replaceDialogOpen, setReplaceDialogOpen] = useState(false)
   const [itemToReplace, setItemToReplace] = useState<{
-    old: SizingJournalEntry
-    new: SizingJournalEntry
+    old: WardrobeItem
+    new: WardrobeItem
     category: string
   } | null>(null)
 
@@ -210,7 +210,7 @@ export function OutfitStudio({
   )
 
   // Handle adding item from wardrobe
-  const handleAddItem = (item: SizingJournalEntry) => {
+  const handleAddItem = (item: WardrobeItem) => {
     // Check if item already in outfit
     if (outfitItems.find(oi => oi.item_id === item.id)) {
       toast.error('Item already in outfit')
@@ -252,7 +252,7 @@ export function OutfitStudio({
     addItemToOutfit(item)
   }
 
-  const addItemToOutfit = (item: SizingJournalEntry) => {
+  const addItemToOutfit = (item: WardrobeItem) => {
     const category = item.category || 'other'
     const categoryCount = getCategoryCount(category)
 
@@ -394,7 +394,7 @@ export function OutfitStudio({
   const handleResetAutoArrange = () => {
     if (outfitItems.length === 0) return
 
-    const items = outfitItems.map(oi => oi.item).filter(Boolean) as SizingJournalEntry[]
+    const items = outfitItems.map(oi => oi.item).filter(Boolean) as WardrobeItem[]
     const arranged = autoArrangeOutfit(items)
 
     setOutfitItems(

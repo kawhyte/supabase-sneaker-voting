@@ -139,7 +139,7 @@ export function ValidationStatusCard({
 				label: 'Item Name',
 				status: isMissing(watchedValues.model) ? 'pending' : 'complete',
 				required: true,
-				hint: 'Sneaker model, shoe name, or item description',
+				hint: 'Item model, brand name, or product description',
 			},
 			{
 				id: 'retailPrice',

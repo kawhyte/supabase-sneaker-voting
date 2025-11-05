@@ -15,7 +15,7 @@ export interface BrandData {
 
 export type ArchiveReason = 'sold' | 'donated' | 'worn_out' | 'other'
 
-export interface SizingJournalEntry {
+export interface WardrobeItem {
   id: string
   created_at: string
   user_id: string

@@ -2,7 +2,7 @@ import { Poppins } from 'next/font/google';
 import "./globals.css";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from '@/components/Navbar';
 import { ViewDensityProvider } from "@/lib/view-density-context";
 import { FormModeProvider } from "@/lib/form-mode-context";
 import { UndoProvider } from "@/contexts/UndoContext";

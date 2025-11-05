@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { SizingJournalDashboard } from '@/components/wardrobe-dashboard'
+import { WardrobeDashboard } from '@/components/WardrobeDashboard'
 import { Archive } from 'lucide-react'
 
 export default function ArchivePage() {
@@ -24,7 +24,7 @@ export default function ArchivePage() {
           </p>
         </div>
 
-        <SizingJournalDashboard
+        <WardrobeDashboard
           status={['owned', 'wishlisted']}
           isArchivePage={true}
         />

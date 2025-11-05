@@ -8,24 +8,24 @@
 
 import { motion } from "framer-motion";
 import { useDensity, getDensityGridClasses } from "@/lib/view-density-context";
-import { SizingJournalEntry } from "./types/sizing-journal-entry";
-import { WardrobeCard } from "./wardrobe-card";
+import { WardrobeItem } from './types/WardrobeItem';
+import { WardrobeCard } from "./WardrobeCard";
 import { ReactNode } from "react";
 
 interface DashboardGridProps {
-	entries: SizingJournalEntry[];
-	onEdit: (entry: SizingJournalEntry) => void;
-	onDelete: (entry: SizingJournalEntry) => void;
-	onIncrementWear?: (entry: SizingJournalEntry) => void;
-	onDecrementWear?: (entry: SizingJournalEntry) => void;
-	onMoveToWatchlist?: (entry: SizingJournalEntry) => void;
-	onArchive?: (entry: SizingJournalEntry) => void;
-	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
-	onCreateOutfit?: (entry: SizingJournalEntry) => void;
+	entries: WardrobeItem[];
+	onEdit: (entry: WardrobeItem) => void;
+	onDelete: (entry: WardrobeItem) => void;
+	onIncrementWear?: (entry: WardrobeItem) => void;
+	onDecrementWear?: (entry: WardrobeItem) => void;
+	onMoveToWatchlist?: (entry: WardrobeItem) => void;
+	onArchive?: (entry: WardrobeItem) => void;
+	onMarkAsPurchased?: (entry: WardrobeItem) => void;
+	onCreateOutfit?: (entry: WardrobeItem) => void;
 	emptyState?: ReactNode;
 	viewMode?: "journal" | "collection" | "archive" | "wishlist";
 	isArchivePage?: boolean;
-	userWardrobe?: SizingJournalEntry[];
+	userWardrobe?: WardrobeItem[];
 }
 
 export function DashboardGrid({

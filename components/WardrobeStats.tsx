@@ -1,13 +1,13 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { SizingJournalEntry } from './types/sizing-journal-entry'
+import { WardrobeItem } from './types/WardrobeItem'
 
-interface SizingJournalStatsProps {
-  journalEntries: SizingJournalEntry[]
+interface WardrobeStatsProps {
+  journalEntries: WardrobeItem[]
 }
 
-export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) {
+export function WardrobeStats({ journalEntries }: WardrobeStatsProps) {
   const totalEntries = journalEntries.length
   const recommended = journalEntries.filter(
     entry => entry.would_recommend && entry.has_been_tried

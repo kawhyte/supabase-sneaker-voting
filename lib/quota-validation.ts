@@ -13,7 +13,7 @@ import type {
   OutfitQuotaStatus,
 } from '@/components/types/outfit'
 import { QUOTA_RULES, getQuotaForCategory } from '@/components/types/outfit'
-import type { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import type { WardrobeItem } from '@/components/types/WardrobeItem'
 
 /**
  * Get current count of items in a specific category
@@ -37,7 +37,7 @@ export function getCategoryCount(
  */
 export function canAddItem(
   outfitItems: OutfitItem[],
-  itemToAdd: SizingJournalEntry
+  itemToAdd: WardrobeItem
 ): { canAdd: boolean; reason?: string } {
   const category = itemToAdd.category?.toLowerCase() || 'other'
   const quota = getQuotaForCategory(category)

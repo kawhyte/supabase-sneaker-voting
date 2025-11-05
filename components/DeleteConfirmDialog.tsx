@@ -2,10 +2,10 @@
 
 import { Button } from '@/components/ui/button'
 import { Trash2, Loader2 } from 'lucide-react'
-import { SizingJournalEntry } from './types/sizing-journal-entry'
+import { WardrobeItem } from './types/WardrobeItem'
 
 interface DeleteConfirmDialogProps {
-  experience: SizingJournalEntry | null
+  experience: WardrobeItem | null
   isOpen: boolean
   isDeleting: boolean
   onConfirm: () => void

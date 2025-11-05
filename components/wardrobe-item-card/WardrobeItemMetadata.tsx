@@ -13,15 +13,15 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { getComfortLabel } from "@/lib/wardrobe-item-utils";
 
 interface ItemSizeComfortWearsProps {
-	item: SizingJournalEntry;
+	item: WardrobeItem;
 	viewMode: 'journal' | 'collection' | 'archive' | 'wishlist';
 	canTrackWears: boolean;
-	onIncrementWear?: (item: SizingJournalEntry) => void;
-	onDecrementWear?: (item: SizingJournalEntry) => void;
+	onIncrementWear?: (item: WardrobeItem) => void;
+	onDecrementWear?: (item: WardrobeItem) => void;
 }
 
 export function ItemSizeComfortWears({

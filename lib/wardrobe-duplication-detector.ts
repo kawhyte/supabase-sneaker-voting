@@ -9,12 +9,12 @@
  * Won't flag "black hoodie + black jeans" as duplicates.
  */
 
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry';
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 
 export interface DuplicationWarning {
   severity: 'low' | 'medium' | 'high';
   message: string;
-  similarItems: SizingJournalEntry[];
+  similarItems: WardrobeItem[];
   recommendation: string;
 }
 
@@ -92,8 +92,8 @@ function isSimilarColor(color1: string, color2: string): boolean {
  * @returns DuplicationWarning or null if no duplicates detected
  */
 export function detectDuplicates(
-  newItem: Partial<SizingJournalEntry>,
-  existingWardrobe: SizingJournalEntry[]
+  newItem: Partial<WardrobeItem>,
+  existingWardrobe: WardrobeItem[]
 ): DuplicationWarning | null {
   if (!newItem.category || !newItem.color) {
     return null;
@@ -141,9 +141,9 @@ export function detectDuplicates(
  * Useful for showing recommendations
  */
 export function getSimilarItems(
-  item: Partial<SizingJournalEntry>,
-  wardrobe: SizingJournalEntry[]
-): SizingJournalEntry[] {
+  item: Partial<WardrobeItem>,
+  wardrobe: WardrobeItem[]
+): WardrobeItem[] {
   if (!item.category || !item.color) {
     return [];
   }
@@ -162,7 +162,7 @@ export function getSimilarItems(
  */
 export function getAvailableColorVariants(
   category: string,
-  wardrobe: SizingJournalEntry[]
+  wardrobe: WardrobeItem[]
 ): string[] {
   const colorSet = new Set(
     wardrobe

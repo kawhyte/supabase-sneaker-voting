@@ -51,7 +51,7 @@
 
 'use client'
 
-import { AddItemForm } from './add-item-form'
+import { AddItemForm } from './AddItemForm'
 
 export function AddProductClient() {
   const handleProductAdded = () => {

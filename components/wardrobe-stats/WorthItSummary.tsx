@@ -12,14 +12,14 @@
 
 "use client";
 
-import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { calculateWorthItMetrics } from "@/lib/wardrobe-item-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, TrendingDown, AlertCircle, Zap } from "lucide-react";
 
 interface WorthItSummaryProps {
-	items: SizingJournalEntry[];
+	items: WardrobeItem[];
 }
 
 export function WorthItSummary({ items }: WorthItSummaryProps) {

@@ -9,14 +9,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import type { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import type { WardrobeItem } from '@/components/types/WardrobeItem'
 
 interface ConfirmReplaceDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void
-  oldItem: SizingJournalEntry
-  newItem: SizingJournalEntry
+  oldItem: WardrobeItem
+  newItem: WardrobeItem
   category: string
 }
 

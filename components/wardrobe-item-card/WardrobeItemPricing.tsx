@@ -10,11 +10,11 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
-import { StalePriceWarning } from "./stale-price-warning";
+import { WardrobeItem } from '@/components/types/WardrobeItem';
+import { StalePriceWarning } from "./StalePriceWarning";
 
 interface ItemPricingDisplayProps {
-	item: SizingJournalEntry;
+	item: WardrobeItem;
 	isOwned: boolean;
 	isOnSale: boolean;
 }

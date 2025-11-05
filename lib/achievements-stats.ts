@@ -6,7 +6,7 @@
  */
 
 import { createClient } from '@/utils/supabase/client'
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import { WardrobeItem } from '@/components/types/WardrobeItem'
 
 export interface WardrobeStats {
   totalItems: number

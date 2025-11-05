@@ -25,7 +25,7 @@ import { Label } from '@/components/ui/label'
 import { CATEGORY_CONFIGS, type ItemCategory } from '@/components/types/item-category'
 import { useBrands } from '@/hooks/useBrands'
 
-interface SizingJournalFiltersV2Props {
+interface WardrobeFiltersProps {
 	searchTerm: string
 	onSearchChange: (value: string) => void
 	selectedBrands?: Set<string>
@@ -45,7 +45,7 @@ interface FilterState {
 	sortBy: string
 }
 
-export function SizingJournalFiltersV2({
+export function WardrobeFilters({
 	searchTerm,
 	onSearchChange,
 	selectedBrands = new Set(),
@@ -54,7 +54,7 @@ export function SizingJournalFiltersV2({
 	onSortChange,
 	selectedCategories,
 	onCategoriesChange,
-}: SizingJournalFiltersV2Props) {
+}: WardrobeFiltersProps) {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const [selectedBrandsList, setSelectedBrandsList] = useState<string[]>(
 		Array.from(selectedBrands)

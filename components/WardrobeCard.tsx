@@ -9,29 +9,29 @@
 
 "use client";
 
-import { SizingJournalEntry } from "./types/sizing-journal-entry";
-import { WardrobeItemCard } from "./wardrobe-item-card/wardrobe-item-card";
+import { WardrobeItem } from './types/WardrobeItem';
+import { WardrobeItemCard } from "./wardrobe-item-card/WardrobeItemCard";
 
 /**
  * @deprecated - Props interface kept for backwards compatibility
  * Use WardrobeItemCard with grouped `actions` prop instead
  */
-export interface SizingJournalEntryCardProps {
-	entry: SizingJournalEntry;
-	onEdit: (entry: SizingJournalEntry) => void;
-	onDelete: (entry: SizingJournalEntry) => void;
+export interface WardrobeItemCardProps {
+	entry: WardrobeItem;
+	onEdit: (entry: WardrobeItem) => void;
+	onDelete: (entry: WardrobeItem) => void;
 	viewMode?: 'journal' | 'collection' | 'archive' | 'wishlist';
-	onIncrementWear?: (entry: SizingJournalEntry) => void;
-	onDecrementWear?: (entry: SizingJournalEntry) => void;
-	onMoveToWatchlist?: (entry: SizingJournalEntry) => void;
-	onArchive?: (entry: SizingJournalEntry) => void;
-	onRestore?: (entry: SizingJournalEntry) => void;
-	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
-	onUnarchive?: (entry: SizingJournalEntry) => void;
-	onCreateOutfit?: (entry: SizingJournalEntry) => void;
+	onIncrementWear?: (entry: WardrobeItem) => void;
+	onDecrementWear?: (entry: WardrobeItem) => void;
+	onMoveToWatchlist?: (entry: WardrobeItem) => void;
+	onArchive?: (entry: WardrobeItem) => void;
+	onRestore?: (entry: WardrobeItem) => void;
+	onMarkAsPurchased?: (entry: WardrobeItem) => void;
+	onUnarchive?: (entry: WardrobeItem) => void;
+	onCreateOutfit?: (entry: WardrobeItem) => void;
 	isArchivePage?: boolean;
 	purchaseDate?: string | null;
-	userWardrobe?: SizingJournalEntry[];
+	userWardrobe?: WardrobeItem[];
 }
 
 /**
@@ -42,7 +42,7 @@ export interface SizingJournalEntryCardProps {
  *
  * @example
  * // OLD (deprecated)
- * <SizingJournalEntryCard
+ * <WardrobeItemCard
  *   entry={item}
  *   onEdit={handleEdit}
  *   onDelete={handleDelete}
@@ -75,7 +75,7 @@ export function WardrobeCard({
 	isArchivePage = false,
 	purchaseDate,
 	userWardrobe = [],
-}: SizingJournalEntryCardProps) {
+}: WardrobeItemCardProps) {
 	return (
 		<WardrobeItemCard
 			item={entry}
@@ -99,4 +99,4 @@ export function WardrobeCard({
 }
 
 // Export WardrobeItemCard directly for new implementations
-export { WardrobeItemCard } from "./wardrobe-item-card/wardrobe-item-card";
+export { WardrobeItemCard } from "./wardrobe-item-card/WardrobeItemCard";

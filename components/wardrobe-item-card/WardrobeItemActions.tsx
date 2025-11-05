@@ -24,17 +24,17 @@ import {
 	ShoppingBag,
 	Archive,
 } from "lucide-react";
-import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 
 interface ItemCardActionsProps {
-	item: SizingJournalEntry;
+	item: WardrobeItem;
 	isArchivePage: boolean;
-	onEdit: (item: SizingJournalEntry) => void;
-	onDelete: (item: SizingJournalEntry) => void;
-	onUnarchive?: (item: SizingJournalEntry) => void;
-	onMarkAsPurchased?: (item: SizingJournalEntry) => void;
-	onMoveToWatchlist?: (item: SizingJournalEntry) => void;
-	onArchive?: (item: SizingJournalEntry) => void;
+	onEdit: (item: WardrobeItem) => void;
+	onDelete: (item: WardrobeItem) => void;
+	onUnarchive?: (item: WardrobeItem) => void;
+	onMarkAsPurchased?: (item: WardrobeItem) => void;
+	onMoveToWatchlist?: (item: WardrobeItem) => void;
+	onArchive?: (item: WardrobeItem) => void;
 }
 
 export function ItemCardActions({

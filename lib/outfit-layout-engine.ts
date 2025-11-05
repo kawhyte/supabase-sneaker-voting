@@ -1,4 +1,4 @@
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { ItemPosition, CategoryLayerConfig } from '@/components/types/outfit'
 
 /**
@@ -58,7 +58,7 @@ const CATEGORY_LAYER_MAP: Record<string, CategoryLayerConfig> = {
  * @returns Position object with x, y, layer, width, height
  */
 export function calculateAutoPosition(
-  item: SizingJournalEntry,
+  item: WardrobeItem,
   itemCountInCategory: number = 0
 ): ItemPosition {
   const category = item.category || 'other'
@@ -111,7 +111,7 @@ export function denormalizePosition(normalizedX: number, normalizedY: number): {
  * Calculate suggested size for item based on category
  * Some categories benefit from larger display (shoes, bags) while others smaller (accessories)
  */
-export function calculateSuggestedSize(item: SizingJournalEntry): { width: number; height: number } {
+export function calculateSuggestedSize(item: WardrobeItem): { width: number; height: number } {
   const category = item.category || 'other'
 
   const sizeMap: Record<string, { width: number; height: number }> = {
@@ -203,7 +203,7 @@ export function sortByZIndex<T extends { z_index: number }>(items: T[]): T[] {
  * Called when user clicks "Reset to auto-arrange" button
  */
 export function autoArrangeOutfit(
-  items: SizingJournalEntry[]
+  items: WardrobeItem[]
 ): Array<{
   item_id: string
   position_x: number
@@ -220,7 +220,7 @@ export function autoArrangeOutfit(
       acc[cat].push(item)
       return acc
     },
-    {} as Record<string, SizingJournalEntry[]>
+    {} as Record<string, WardrobeItem[]>
   )
 
   const result: Array<{

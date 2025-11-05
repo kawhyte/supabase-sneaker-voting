@@ -23,16 +23,16 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { getComfortLabel, calculateCostPerWear } from "@/lib/wardrobe-item-utils";
-import { CostPerWearProgress } from "./cost-per-wear-progress";
+import { CostPerWearProgress } from "./CostPerWearProgress";
 
 interface WearStatsDrawerProps {
-	item: SizingJournalEntry;
+	item: WardrobeItem;
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	onIncrementWear?: (item: SizingJournalEntry) => void;
-	onDecrementWear?: (item: SizingJournalEntry) => void;
+	onIncrementWear?: (item: WardrobeItem) => void;
+	onDecrementWear?: (item: WardrobeItem) => void;
 }
 
 export function WearStatsDrawer({

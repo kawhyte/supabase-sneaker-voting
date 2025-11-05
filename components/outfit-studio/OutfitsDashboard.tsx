@@ -4,15 +4,15 @@ import { useState, useEffect, lazy, Suspense } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ErrorBoundary } from '@/components/error-boundary'
-import { OutfitStudioErrorBoundary } from '@/components/outfit-studio-error-boundary'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { OutfitStudioErrorBoundary } from '@/components/OutfitStudioErrorBoundary'
 import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitListView } from './OutfitListView'
 import { OutfitStudio } from './OutfitStudio'
 import { OutfitCardPreview } from './OutfitCardPreview'
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
-import { OutfitsEmptyState } from '@/components/empty-state-illustrations'
-import { CatLoadingSpinner } from '@/components/cat-loading-animation'
+import { WardrobeItem } from '@/components/types/WardrobeItem'
+import { OutfitsEmptyState } from '@/components/EmptyStateIllustrations'
+import { CatLoadingSpinner } from '@/components/CatLoadingAnimation'
 import { Sparkles, Plus, Calendar } from 'lucide-react'
 
 // Lazy load heavy outfit components (only loaded when tabs are active)
@@ -29,7 +29,7 @@ type DashboardTab = 'gallery' | 'calendar'
 
 export function OutfitsDashboard() {
   const [outfits, setOutfits] = useState<OutfitWithItems[]>([])
-  const [userWardrobe, setUserWardrobe] = useState<SizingJournalEntry[]>([])
+  const [userWardrobe, setUserWardrobe] = useState<WardrobeItem[]>([])
   const [isListViewOpen, setIsListViewOpen] = useState(false)
   const [isStudioOpen, setIsStudioOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)

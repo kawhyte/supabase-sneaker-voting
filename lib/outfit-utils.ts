@@ -18,7 +18,7 @@ import {
   OutfitStats,
   OutfitOccasion,
 } from '@/components/types/outfit';
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry';
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 
 const supabase = createClient();
 
@@ -461,11 +461,11 @@ export async function getOutfitStats(): Promise<OutfitStats | null> {
  * Simple algorithm: random combinations with category balance
  */
 export async function suggestOutfitCombination(
-  userWardrobe: SizingJournalEntry[]
-): Promise<SizingJournalEntry[]> {
+  userWardrobe: WardrobeItem[]
+): Promise<WardrobeItem[]> {
   try {
     // Group items by category
-    const byCategory: Record<string, SizingJournalEntry[]> = {};
+    const byCategory: Record<string, WardrobeItem[]> = {};
 
     userWardrobe.forEach((item) => {
       if (!byCategory[item.category]) {
@@ -475,7 +475,7 @@ export async function suggestOutfitCombination(
     });
 
     // Select random items from each category
-    const suggested: SizingJournalEntry[] = [];
+    const suggested: WardrobeItem[] = [];
 
     Object.values(byCategory).forEach((items) => {
       if (items.length > 0) {
@@ -496,7 +496,7 @@ export async function suggestOutfitCombination(
  * Positions items vertically based on category
  */
 export function calculateAutoPositions(
-  items: SizingJournalEntry[]
+  items: WardrobeItem[]
 ): Array<{
   item_id: string;
   position_x: number;

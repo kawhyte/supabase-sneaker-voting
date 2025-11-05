@@ -10,8 +10,8 @@
 "use client";
 
 import { Image as ImageIcon } from "lucide-react";
-import { PhotoCarousel } from "@/components/photo-carousel";
-import { ItemPhoto } from "@/components/types/sizing-journal-entry";
+import { PhotoCarousel } from '@/components/PhotoCarousel';
+import { ItemPhoto } from '@/components/types/WardrobeItem';
 import { getImageAltText } from "@/lib/wardrobe-item-utils";
 import { ViewDensity } from "@/lib/view-density-context";
 

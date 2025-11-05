@@ -1,5 +1,5 @@
-import AuthButton from "@/components/auth-button";
-import { NavbarClient } from "@/components/navbar-client";
+import AuthButton from '@/components/AuthButton';
+import { NavbarClient } from '@/components/NavbarClient';
 import { createClient } from "@/utils/supabase/server";
 
 export async function Navbar() {

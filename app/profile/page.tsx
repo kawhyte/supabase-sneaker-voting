@@ -1,8 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { ProfileForm } from '@/components/profile-form'
-import { PurchasePreventionSettings } from '@/components/purchase-prevention-settings'
-import { NotificationPreferences } from '@/components/notification-preferences'
+import { ProfileForm } from '@/components/ProfileForm'
+import { PurchasePreventionSettings } from '@/components/PurchasePreventionSettings'
+import { NotificationPreferences } from '@/components/NotificationPreferences'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {

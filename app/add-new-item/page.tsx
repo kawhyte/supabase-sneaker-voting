@@ -64,7 +64,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { AddItemForm } from '@/components/add-item-form'
+import { AddItemForm } from '@/components/AddItemForm'
 
 export default function AddNewItemPage() {
   const router = useRouter()

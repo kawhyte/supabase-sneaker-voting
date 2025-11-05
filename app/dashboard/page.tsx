@@ -4,8 +4,8 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ViewDensityToggle } from '@/components/view-density-toggle'
-import { SizingJournalDashboard } from '@/components/wardrobe-dashboard'
+import { ViewDensityToggle } from '@/components/ViewDensityToggle'
+import { WardrobeDashboard } from '@/components/WardrobeDashboard'
 import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
 import { Package, Heart, Archive, Sparkles } from 'lucide-react'
 
@@ -141,7 +141,7 @@ function DashboardContent() {
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.3 }}
               >
-                <SizingJournalDashboard status={['owned']} />
+                <WardrobeDashboard status={['owned']} />
               </motion.div>
             </TabsContent>
 
@@ -152,7 +152,7 @@ function DashboardContent() {
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.3 }}
               >
-                <SizingJournalDashboard status={['wishlisted']} />
+                <WardrobeDashboard status={['wishlisted']} />
               </motion.div>
             </TabsContent>
 
@@ -174,7 +174,7 @@ function DashboardContent() {
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.3 }}
               >
-                <SizingJournalDashboard
+                <WardrobeDashboard
                   status={['owned', 'wishlisted']}
                   isArchivePage={true}
                 />

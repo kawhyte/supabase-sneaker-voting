@@ -7,19 +7,19 @@
 "use client";
 
 import { useDensity, getDensityGridClasses } from "@/lib/view-density-context";
-import { SizingJournalEntry } from "./types/sizing-journal-entry";
-import { WardrobeCard } from "./wardrobe-card";
+import { WardrobeItem } from './types/WardrobeItem';
+import { WardrobeCard } from "./WardrobeCard";
 import { ReactNode } from "react";
 
 interface CollectionGridProps {
-	items: SizingJournalEntry[];
+	items: WardrobeItem[];
 	role: string;
 	ariaLabel: string;
-	onEdit: (entry: SizingJournalEntry) => void;
-	onDelete: (entry: SizingJournalEntry) => void;
-	onArchive?: (entry: SizingJournalEntry) => void;
-	onUnarchive?: (entry: SizingJournalEntry) => void;
-	onMarkAsPurchased?: (entry: SizingJournalEntry) => void;
+	onEdit: (entry: WardrobeItem) => void;
+	onDelete: (entry: WardrobeItem) => void;
+	onArchive?: (entry: WardrobeItem) => void;
+	onUnarchive?: (entry: WardrobeItem) => void;
+	onMarkAsPurchased?: (entry: WardrobeItem) => void;
 	isArchivePage?: boolean;
 	emptyState?: ReactNode;
 	viewMode?: "journal" | "collection" | "archive" | "wishlist";

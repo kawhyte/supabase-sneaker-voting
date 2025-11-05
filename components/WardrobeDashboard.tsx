@@ -6,35 +6,35 @@ import { Button } from '@/components/ui/button'
 import { Search, Heart, Package, Archive } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
-import { DashboardGrid } from './dashboard-grid'
-import { EditItemModal } from './edit-item-modal'
-import { SizingJournalFiltersV2 } from './wardrobe-filters'
-import { SizingJournalStats } from './sizing-journal-stats'
-import { SizingJournalSkeleton } from './sizing-journal-skeleton'
-import { DeleteConfirmDialog } from './delete-confirm-dialog'
-import { PurchasedConfirmationModal } from './purchased-confirmation-modal'
-import { ArchiveReasonDialog } from './archive-reason-dialog'
+import { DashboardGrid } from './DashboardGrid'
+import { EditItemModal } from './EditItemModal'
+import { WardrobeFilters } from './WardrobeFilters'
+import { WardrobeStats } from './WardrobeStats'
+import { WardrobeSkeleton } from './WardrobeSkeleton'
+import { DeleteConfirmDialog } from './DeleteConfirmDialog'
+import { PurchasedConfirmationModal } from './PurchasedConfirmationModal'
+import { ArchiveReasonDialog } from './ArchiveReasonDialog'
 import { OutfitStudio } from './outfit-studio/OutfitStudio'
-import { SizingJournalEntry } from './types/sizing-journal-entry'
-import { filterJournalEntries, sortJournalEntries } from '@/lib/sizing-journal-utils'
+import { WardrobeItem } from './types/WardrobeItem'
+import { filterJournalEntries, sortJournalEntries } from '@/lib/wardrobe-item-utils'
 import { type ItemCategory } from '@/components/types/item-category'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
 import {
   WardrobeEmptyState,
   WishlistEmptyState,
   ArchiveEmptyState,
-} from './empty-state-illustrations'
+} from './EmptyStateIllustrations'
 
-interface SizingJournalDashboardProps {
+interface WardrobeDashboardProps {
   onAddNew?: () => void
   status: ('owned' | 'wishlisted' | 'archive')[]
   isArchivePage?: boolean
 }
 
-export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isArchivePage = false }: SizingJournalDashboardProps) {
+export function WardrobeDashboard({ onAddNew, status = ['wishlisted'], isArchivePage = false }: WardrobeDashboardProps) {
 
   // State - Data
-  const [journalEntries, setJournalEntries] = useState<SizingJournalEntry[]>([])
+  const [journalEntries, setJournalEntries] = useState<WardrobeItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   // State - Filters
@@ -44,12 +44,12 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
   const [selectedCategories, setSelectedCategories] = useState<ItemCategory[]>([])
 
   // State - Modals
-  const [editingEntry, setEditingEntry] = useState<SizingJournalEntry | null>(null)
+  const [editingEntry, setEditingEntry] = useState<WardrobeItem | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [deletingEntry, setDeletingEntry] = useState<SizingJournalEntry | null>(null)
+  const [deletingEntry, setDeletingEntry] = useState<WardrobeItem | null>(null)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [selectedItemForAction, setSelectedItemForAction] = useState<SizingJournalEntry | null>(null)
+  const [selectedItemForAction, setSelectedItemForAction] = useState<WardrobeItem | null>(null)
   const [isPurchasedModalOpen, setIsPurchasedModalOpen] = useState(false)
   const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false)
   const [isOutfitStudioOpen, setIsOutfitStudioOpen] = useState(false)
@@ -97,7 +97,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     }
   }
   // ... (handleEditEntry, handleDeleteEntry, handleToggleCollection, etc. are unchanged)
-    const handleEditEntry = (entry: SizingJournalEntry) => {
+    const handleEditEntry = (entry: WardrobeItem) => {
     setEditingEntry(entry)
     setIsEditModalOpen(true)
   }
@@ -111,7 +111,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     loadJournalEntries()
   }
 
-  const handleDeleteEntry = (entry: SizingJournalEntry) => {
+  const handleDeleteEntry = (entry: WardrobeItem) => {
     setDeletingEntry(entry)
     setIsDeleteConfirmOpen(true)
   }
@@ -185,7 +185,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     setDeletingEntry(null)
   }
 
-  const handleToggleCollection = async (entry: SizingJournalEntry) => {
+  const handleToggleCollection = async (entry: WardrobeItem) => {
     const newStatus = entry.status === 'owned' ? 'wishlisted' : 'owned'
 
     if (newStatus === 'owned' && entry.category === 'shoes' && !entry.purchase_price && !entry.retail_price) {
@@ -236,12 +236,12 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
   }
 
   // New Action Handlers
-  const handleOpenPurchasedModal = (item: SizingJournalEntry) => {
+  const handleOpenPurchasedModal = (item: WardrobeItem) => {
     setSelectedItemForAction(item)
     setIsPurchasedModalOpen(true)
   }
 
-  const handleOpenArchiveDialog = (item: SizingJournalEntry) => {
+  const handleOpenArchiveDialog = (item: WardrobeItem) => {
     setSelectedItemForAction(item)
     setIsArchiveDialogOpen(true)
   }
@@ -282,7 +282,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     }
   }
 
-  const handleIncrementWear = async (entry: SizingJournalEntry) => {
+  const handleIncrementWear = async (entry: WardrobeItem) => {
     const newWearCount = (entry.wears || 0) + 1
     const now = new Date().toISOString()
 
@@ -309,7 +309,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     }
   }
 
-  const handleDecrementWear = async (entry: SizingJournalEntry) => {
+  const handleDecrementWear = async (entry: WardrobeItem) => {
     const currentWears = entry.wears || 0
     if (currentWears === 0) return // Prevent negative values
 
@@ -342,7 +342,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     }
   }
 
-  const moveItemToWishlist = async (item: SizingJournalEntry) => {
+  const moveItemToWishlist = async (item: WardrobeItem) => {
     try {
       const { error } = await supabase
         .from('items')
@@ -399,7 +399,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     }
   }
 
-  const unarchiveItem = async (item: SizingJournalEntry) => {
+  const unarchiveItem = async (item: WardrobeItem) => {
     try {
       const { error } = await supabase
         .from('items')
@@ -454,7 +454,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         aria-label="Loading items"
       >
         <DashboardHeader status={displayStatus} />
-        <SizingJournalSkeleton />
+        <WardrobeSkeleton />
       </div>
     )
   }
@@ -463,7 +463,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
     <div className="max-w-[1920px] mx-auto px-xl py-xl">
       <DashboardHeader status={displayStatus} />
 
-      <SizingJournalFiltersV2
+      <WardrobeFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         selectedBrands={selectedBrands}
@@ -474,7 +474,7 @@ export function SizingJournalDashboard({ onAddNew, status = ['wishlisted'], isAr
         onCategoriesChange={setSelectedCategories}
       />
 
-      <SizingJournalStats journalEntries={journalEntries} />
+      <WardrobeStats journalEntries={journalEntries} />
 
       <DashboardGrid
         entries={filteredAndSortedEntries}

@@ -9,19 +9,19 @@
 "use client";
 
 import { useState } from "react";
-import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
-import { WearStatsDrawer } from "./wear-stats-drawer";
+import { WardrobeItem } from '@/components/types/WardrobeItem';
+import { WearStatsDrawer } from "./WearStatsDrawer";
 import { Button } from "@/components/ui/button";
 import { TrendingDown, Sparkles } from "lucide-react";
 
 interface ItemFooterBadgesProps {
-	item: SizingJournalEntry;
+	item: WardrobeItem;
 	viewMode: 'journal' | 'collection' | 'archive' | 'wishlist';
 	canTrackWears?: boolean;
-	onIncrementWear?: (item: SizingJournalEntry) => void;
-	onDecrementWear?: (item: SizingJournalEntry) => void;
-	onCreateOutfit?: (item: SizingJournalEntry) => void;
-	userWardrobe?: SizingJournalEntry[];
+	onIncrementWear?: (item: WardrobeItem) => void;
+	onDecrementWear?: (item: WardrobeItem) => void;
+	onCreateOutfit?: (item: WardrobeItem) => void;
+	userWardrobe?: WardrobeItem[];
 }
 
 export function ItemFooterBadges({

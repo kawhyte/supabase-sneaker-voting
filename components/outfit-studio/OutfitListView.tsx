@@ -16,13 +16,13 @@ import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitCanvas } from './OutfitCanvas'
 import { OutfitStudio } from './OutfitStudio'
 import { Trash2, Edit2, Share2, Check } from 'lucide-react'
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import { WardrobeItem } from '@/components/types/WardrobeItem'
 
 interface OutfitListViewProps {
   isOpen: boolean
   onClose: () => void
   outfits: OutfitWithItems[]
-  userWardrobe: SizingJournalEntry[]
+  userWardrobe: WardrobeItem[]
   onDelete?: (outfitId: string) => void
   onUpdate?: (outfit: Outfit) => void
   initialSelectedOutfitId?: string | null

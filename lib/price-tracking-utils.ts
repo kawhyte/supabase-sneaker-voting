@@ -5,7 +5,7 @@
  * Integrates with automated weekly price checking via Edge Functions.
  */
 
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry';
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 
 export interface PriceHistoryEntry {
   id?: string;
@@ -66,7 +66,7 @@ export function getDaysSincePriceCheck(lastPriceCheckAt: string | null | undefin
  * @returns PriceDropAlert or null if no significant drop
  */
 export function detectPriceDrop(
-  item: SizingJournalEntry,
+  item: WardrobeItem,
   currentPrice: number,
   previousPrice?: number
 ): PriceDropAlert | null {
@@ -111,7 +111,7 @@ export function detectPriceDrop(
  * @returns true if item has dropped to or below target price
  */
 export function isTargetPriceReached(
-  item: SizingJournalEntry,
+  item: WardrobeItem,
   currentPrice: number
 ): boolean {
   if (!item.target_price) {
@@ -127,7 +127,7 @@ export function isTargetPriceReached(
  * @param currentPrice - Current price (optional)
  * @returns Object with lowest price, savings, and percentage
  */
-export function getPriceSavingsInfo(item: SizingJournalEntry, currentPrice?: number) {
+export function getPriceSavingsInfo(item: WardrobeItem, currentPrice?: number) {
   const retailPrice = item.retail_price || item.purchase_price || 0;
   const lowestPrice = item.lowest_price_seen || currentPrice || retailPrice;
   const displayPrice = currentPrice || item.sale_price || retailPrice;
@@ -149,7 +149,7 @@ export function getPriceSavingsInfo(item: SizingJournalEntry, currentPrice?: num
  * @param item - The wishlist item
  * @returns Human-readable status message
  */
-export function formatPriceTrackingStatus(item: SizingJournalEntry): string {
+export function formatPriceTrackingStatus(item: WardrobeItem): string {
   if (!item.auto_price_tracking_enabled) {
     return 'Price tracking disabled';
   }
@@ -193,7 +193,7 @@ export function shouldDisablePriceTracking(priceCheckFailures: number | null): b
  * @param item - The wishlist item
  * @returns The best (lowest) price available
  */
-export function getBestPrice(item: SizingJournalEntry): number {
+export function getBestPrice(item: WardrobeItem): number {
   const prices = [item.lowest_price_seen, item.sale_price, item.retail_price].filter(
     (p): p is number => p !== null && p !== undefined && p > 0
   );
@@ -207,7 +207,7 @@ export function getBestPrice(item: SizingJournalEntry): number {
  * @param item - The wishlist item with price and wear data
  * @returns Score 0-100 (higher = better value)
  */
-export function calculateValueScore(item: SizingJournalEntry & { wears?: number }): number {
+export function calculateValueScore(item: WardrobeItem & { wears?: number }): number {
   const basePrice = item.retail_price || 100;
   const currentPrice = item.sale_price || basePrice;
   const discount = Math.min(100, ((basePrice - currentPrice) / basePrice) * 100);

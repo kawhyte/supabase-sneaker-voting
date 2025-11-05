@@ -1,4 +1,4 @@
-import { SizingJournalEntry } from './sizing-journal-entry'
+import { WardrobeItem } from './WardrobeItem'
 
 /**
  * Outfit - User-created outfit composition
@@ -67,14 +67,14 @@ export interface OutfitItem {
   updated_at: string
 
   // Relations
-  item?: SizingJournalEntry
+  item?: WardrobeItem
 }
 
 /**
  * OutfitWithItems - Full outfit with resolved item data
  */
 export interface OutfitWithItems extends Outfit {
-  outfit_items: (OutfitItem & { item: SizingJournalEntry })[]
+  outfit_items: (OutfitItem & { item: WardrobeItem })[]
 }
 
 /**
@@ -261,7 +261,7 @@ export interface OutfitDragData {
   item_id?: string
   outfit_item_id?: string
   outfit_id?: string
-  item?: SizingJournalEntry
+  item?: WardrobeItem
   source: 'sidebar' | 'canvas'
 }
 

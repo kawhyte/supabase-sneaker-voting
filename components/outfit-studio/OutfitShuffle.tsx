@@ -21,17 +21,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Outfit, OutfitOccasion, OutfitSeason, OCCASION_CONFIG, SEASON_CONFIG } from '@/components/types/outfit'
 import { toast } from 'sonner'
 
 interface OutfitShuffleProps {
-  wardrobe: SizingJournalEntry[]
-  onSaveOutfit: (items: SizingJournalEntry[], occasion: OutfitOccasion) => Promise<Outfit | null>
+  wardrobe: WardrobeItem[]
+  onSaveOutfit: (items: WardrobeItem[], occasion: OutfitOccasion) => Promise<Outfit | null>
 }
 
 interface SuggestedOutfit {
-  items: SizingJournalEntry[]
+  items: WardrobeItem[]
   occasion: OutfitOccasion
   colorPalette: string[]
 }
@@ -57,11 +57,11 @@ export function OutfitShuffle({
       acc[category].push(item)
       return acc
     },
-    {} as Record<string, SizingJournalEntry[]>
+    {} as Record<string, WardrobeItem[]>
   )
 
   // Get seasonal items based on selected season
-  const getSeasonalItems = (): SizingJournalEntry[] => {
+  const getSeasonalItems = (): WardrobeItem[] => {
     if (season === 'all_year') return wardrobe
 
     const seasonMonth = SEASON_CONFIG[season]
@@ -88,11 +88,11 @@ export function OutfitShuffle({
         acc[category].push(item)
         return acc
       },
-      {} as Record<string, SizingJournalEntry[]>
+      {} as Record<string, WardrobeItem[]>
     )
 
     // Select random item from each category
-    const selectedItems: SizingJournalEntry[] = []
+    const selectedItems: WardrobeItem[] = []
     Object.values(byCategory).forEach((items) => {
       if (items.length > 0) {
         const randomIndex = Math.floor(Math.random() * items.length)
@@ -304,7 +304,7 @@ export function OutfitShuffle({
 }
 
 interface OutfitShuffleItemProps {
-  item: SizingJournalEntry
+  item: WardrobeItem
 }
 
 /**

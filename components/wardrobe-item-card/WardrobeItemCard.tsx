@@ -6,7 +6,7 @@
  *
  * Memoized for performance optimization in large grids.
  *
- * Former name: SizingJournalEntryCard (renamed for clarity)
+ * Former name: WardrobeItemCard (renamed for clarity)
  * Lines: ~120 (vs 719 in original)
  */
 
@@ -15,20 +15,20 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Archive } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { SizingJournalEntry } from "@/components/types/sizing-journal-entry";
+import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { prepareItemPhotos, isItemOnSale, formatDate } from "@/lib/wardrobe-item-utils";
 import { useItemDisplayLogic } from "@/hooks/useItemDisplayLogic";
 import { useItemPermissions } from "@/hooks/useItemPermissions";
 import { useDensity } from "@/lib/view-density-context";
 import { memo } from "react";
-import { ItemCardActions } from "./wardrobe-item-actions";
-import { ItemCardImage } from "./wardrobe-item-image";
-import { ItemPricingDisplay } from "./wardrobe-item-pricing";
-import { ItemSizeComfortWears } from "./wardrobe-item-metadata";
-import { ItemStoreAndDate } from "./wardrobe-item-purchase-info";
-import { ItemFooterBadges } from "./wardrobe-item-footer";
-import { CostPerWearProgress } from "./cost-per-wear-progress";
-import { CoolingOffBadge } from "./cooling-off-badge";
+import { ItemCardActions } from "./WardrobeItemActions";
+import { ItemCardImage } from "./WardrobeItemImage";
+import { ItemPricingDisplay } from "./WardrobeItemPricing";
+import { ItemSizeComfortWears } from "./WardrobeItemMetadata";
+import { ItemStoreAndDate } from "./WardrobeItemPurchaseInfo";
+import { ItemFooterBadges } from "./WardrobeItemFooter";
+import { CostPerWearProgress } from "./CostPerWearProgress";
+import { CoolingOffBadge } from "./CoolingOffBadge";
 
 /**
  * Props for WardrobeItemCard component
@@ -44,22 +44,22 @@ import { CoolingOffBadge } from "./cooling-off-badge";
  * @property isArchivePage - Whether displaying on archive page (affects actions/display)
  */
 interface WardrobeItemCardProps {
-	item: SizingJournalEntry;
+	item: WardrobeItem;
 	viewMode?: 'journal' | 'collection' | 'archive' | 'wishlist';
 	actions: {
-		onEdit: (item: SizingJournalEntry) => void;
-		onDelete: (item: SizingJournalEntry) => void;
-		onIncrementWear?: (item: SizingJournalEntry) => void;
-		onDecrementWear?: (item: SizingJournalEntry) => void;
-		onMoveToWatchlist?: (item: SizingJournalEntry) => void;
-		onArchive?: (item: SizingJournalEntry) => void;
-		onUnarchive?: (item: SizingJournalEntry) => void;
-		onMarkAsPurchased?: (item: SizingJournalEntry) => void;
-		onCreateOutfit?: (item: SizingJournalEntry) => void;
+		onEdit: (item: WardrobeItem) => void;
+		onDelete: (item: WardrobeItem) => void;
+		onIncrementWear?: (item: WardrobeItem) => void;
+		onDecrementWear?: (item: WardrobeItem) => void;
+		onMoveToWatchlist?: (item: WardrobeItem) => void;
+		onArchive?: (item: WardrobeItem) => void;
+		onUnarchive?: (item: WardrobeItem) => void;
+		onMarkAsPurchased?: (item: WardrobeItem) => void;
+		onCreateOutfit?: (item: WardrobeItem) => void;
 	};
 	isArchivePage?: boolean;
 	purchaseDate?: string | null;
-	userWardrobe?: SizingJournalEntry[];
+	userWardrobe?: WardrobeItem[];
 }
 
 function WardrobeItemCardComponent({

@@ -147,15 +147,15 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
-import { MultiPhotoUpload } from "@/components/multi-photo-upload";
-import { ImageConfirmationModal } from "@/components/image-confirmation-modal";
-import { BrandCombobox } from "@/components/brand-combobox";
-import { ValidationStatusCard } from "@/components/item-validation-status-card";
+import { MultiPhotoUpload } from '@/components/MultiPhotoUpload';
+import { ImageConfirmationModal } from '@/components/ImageConfirmationModal';
+import { BrandCombobox } from '@/components/BrandCombobox';
+import { ValidationStatusCard } from '@/components/ItemValidationStatusCard';
 import { useValidationVisibility } from "@/hooks/useValidationVisibility";
 import { useBrands } from "@/hooks/useBrands";
-import { SizeCombobox } from "@/components/size-combobox";
-import { ClothingSizeCombobox } from "@/components/clothing-size-combobox";
-import { ComfortRating } from "@/components/comfort-rating";
+import { SizeCombobox } from '@/components/SizeCombobox';
+import { ClothingSizeCombobox } from '@/components/ClothingSizeCombobox';
+import { ComfortRating } from '@/components/ComfortRating';
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	CATEGORY_CONFIGS,
@@ -173,7 +173,7 @@ import {
 	isSupportedRetailer,
 	type UrlValidationResult,
 } from "@/lib/retailer-url-validator";
-import { SupportedRetailersDialog } from "@/components/supported-retailers-dialog";
+import { SupportedRetailersDialog } from '@/components/SupportedRetailersDialog';
 import { useFormMode } from "@/lib/form-mode-context";
 import { useSmartDefaults } from "@/hooks/useSmartDefaults";
 import { CanYouStyleThisQuiz } from "@/components/outfit-studio/CanYouStyleThisQuiz";

@@ -8,7 +8,8 @@
  * - Data normalization (photos)
  */
 
-import { SizingJournalEntry, ItemPhoto } from '@/components/types/sizing-journal-entry';
+import { WardrobeItem, ItemPhoto } from '@/components/types/WardrobeItem';
+import type { ItemCategory } from '@/components/types/item-category';
 
 /**
  * Get comfort rating label and color
@@ -150,7 +151,7 @@ export function getTargetCostPerWear(
  * Calculate comprehensive worth it metrics
  * Determines if item has been worn enough to justify purchase price
  *
- * @param item - SizingJournalEntry with price and wear data
+ * @param item - WardrobeItem with price and wear data
  * @returns Metrics for display and decision making
  */
 export interface WorthItMetrics {
@@ -164,7 +165,7 @@ export interface WorthItMetrics {
 	milestoneEmoji: string | null;
 }
 
-export function calculateWorthItMetrics(item: SizingJournalEntry): WorthItMetrics {
+export function calculateWorthItMetrics(item: WardrobeItem): WorthItMetrics {
 	// Determine which price to use
 	const purchasePrice = item.purchase_price;
 	const retailPrice = item.retail_price;
@@ -231,7 +232,7 @@ export function calculateWorthItMetrics(item: SizingJournalEntry): WorthItMetric
  * @param item - Wardrobe item entry
  * @returns Array of photos with normalized structure
  */
-export function prepareItemPhotos(item: SizingJournalEntry): ItemPhoto[] {
+export function prepareItemPhotos(item: WardrobeItem): ItemPhoto[] {
 	// First priority: item_photos array
 	if (item.item_photos && item.item_photos.length > 0) {
 		return item.item_photos;
@@ -258,7 +259,7 @@ export function prepareItemPhotos(item: SizingJournalEntry): ItemPhoto[] {
  * @param item - Wardrobe item
  * @returns true if sale_price < retail_price
  */
-export function isItemOnSale(item: SizingJournalEntry): boolean {
+export function isItemOnSale(item: WardrobeItem): boolean {
 	return !!(item.sale_price && item.retail_price && item.sale_price < item.retail_price);
 }
 
@@ -272,4 +273,73 @@ export function isItemOnSale(item: SizingJournalEntry): boolean {
 export function getImageAltText(brand: string, model: string, color?: string): string {
 	const baseText = `${brand} ${model}`;
 	return color && color !== "Standard" ? `${baseText} in ${color}` : baseText;
+}
+
+/**
+ * --- Merged from sizing-journal-utils.ts ---
+ */
+
+/**
+ * Safely checks if a string value matches the search term.
+ * Handles null/undefined values by treating them as empty strings.
+ * This ensures the filter doesn't crash when searching for entries with missing fields.
+ *
+ * @param value - The string value to search in (can be null/undefined)
+ * @param searchTerm - The search term to match
+ * @returns true if the value matches the search term, false otherwise
+ *
+ * @example
+ * safeStringMatch('Jordan', 'jordan') // true
+ * safeStringMatch(null, 'test') // true (null treated as empty string)
+ * safeStringMatch('Nike Air', 'Air') // true
+ */
+function safeStringMatch(value: string | null | undefined, searchTerm: string): boolean {
+	return (value ?? '').toLowerCase().includes(searchTerm.toLowerCase())
+}
+
+export function filterJournalEntries(
+	entries: WardrobeItem[],
+	searchTerm: string,
+	selectedUsers: Set<string>,
+	selectedBrands: Set<string>,
+	selectedCategories: ItemCategory[] = []
+): WardrobeItem[] {
+	return entries.filter(entry => {
+		const matchesSearch = searchTerm === '' ||
+			safeStringMatch(entry.brand, searchTerm) ||
+			safeStringMatch(entry.model, searchTerm) ||
+			safeStringMatch(entry.color, searchTerm)
+
+		// Note: User filtering is now handled at the database level via RLS and queries
+		// The selectedUsers parameter is kept for backward compatibility but no longer used
+		const matchesBrand = selectedBrands.size === 0 || selectedBrands.has(entry.brand)
+		const matchesCategory = selectedCategories.length === 0 ||
+			selectedCategories.includes(entry.category as ItemCategory)
+
+		return matchesSearch && matchesBrand && matchesCategory
+	})
+}
+
+export function sortJournalEntries(
+	entries: WardrobeItem[],
+	sortBy: string
+): WardrobeItem[] {
+	return [...entries].sort((a, b) => {
+		switch (sortBy) {
+			case 'date-desc':
+				return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+			case 'date-asc':
+				return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+			case 'comfort-rating':
+				return (a.comfort_rating || 0) - (b.comfort_rating || 0)
+			case 'brand':
+				return a.brand.localeCompare(b.brand)
+			default:
+				return 0
+		}
+	})
+}
+
+export function getUniqueBrands(entries: WardrobeItem[]): string[] {
+	return Array.from(new Set(entries.map(entry => entry.brand))).sort()
 }

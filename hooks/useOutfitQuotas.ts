@@ -10,7 +10,7 @@ import type {
   OutfitItem,
   OutfitQuotaStatus,
 } from '@/components/types/outfit'
-import type { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
+import type { WardrobeItem } from '@/components/types/WardrobeItem'
 import {
   getOutfitQuotaStatus,
   canAddItem,
@@ -19,7 +19,7 @@ import {
 
 interface UseOutfitQuotasResult {
   quotaStatus: OutfitQuotaStatus
-  canAdd: (item: SizingJournalEntry) => { canAdd: boolean; reason?: string }
+  canAdd: (item: WardrobeItem) => { canAdd: boolean; reason?: string }
   getCategoryCount: (category: string) => number
   hasViolations: boolean
 }
@@ -35,7 +35,7 @@ export function useOutfitQuotas(
 
   // Memoize canAdd function
   const canAddMemoized = useMemo(
-    () => (item: SizingJournalEntry) => canAddItem(outfitItems, item),
+    () => (item: WardrobeItem) => canAddItem(outfitItems, item),
     [outfitItems]
   )
 

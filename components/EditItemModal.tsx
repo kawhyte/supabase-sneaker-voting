@@ -81,7 +81,7 @@
 'use client'
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { AddItemForm } from '@/components/add-item-form'
+import { AddItemForm } from '@/components/AddItemForm'
 
 interface EditItemModalProps {
   experience: any
