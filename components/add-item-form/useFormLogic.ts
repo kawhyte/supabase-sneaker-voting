@@ -14,6 +14,7 @@ import {
 	type ItemCategory,
 } from '@/components/types/item-category'
 import { PhotoItem } from '@/components/types/photo-item'
+import { ItemStatus } from '@/types/ItemStatus'
 
 /**
  * Form validation schema.
@@ -270,9 +271,7 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 				auto_price_tracking_enabled: data.auto_price_tracking_enabled || false,
 				notes: data.notes && data.notes.trim() ? data.notes : '',
 				wears: data.wears || 0,
-				status: (mode === 'add' || mode === 'create' ? 'wishlisted' : initialData?.status) as
-					| 'wishlisted'
-					| 'owned',
+				status: (mode === 'add' || mode === 'create' ? ItemStatus.WISHLISTED : initialData?.status) as ItemStatus,
 				has_been_tried: data.triedOn,
 			}
 

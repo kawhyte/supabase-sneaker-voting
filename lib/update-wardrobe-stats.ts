@@ -6,6 +6,7 @@
  */
 
 import { createClient } from '@/utils/supabase/server'
+import { ItemStatus } from '@/types/ItemStatus'
 
 export async function updateWardrobeStats(userId: string) {
   const supabase = await createClient()
@@ -17,8 +18,8 @@ export async function updateWardrobeStats(userId: string) {
       .select('status, purchase_price, wears')
       .eq('user_id', userId)
 
-    const ownedItems = allItems?.filter((i: any) => i.status === 'owned') || []
-    const wishlistedItems = allItems?.filter((i: any) => i.status === 'wishlisted') || []
+    const ownedItems = allItems?.filter((i: any) => i.status === ItemStatus.OWNED) || []
+    const wishlistedItems = allItems?.filter((i: any) => i.status === ItemStatus.WISHLISTED) || []
 
     // Calculate total spent
     const totalSpent = ownedItems.reduce(

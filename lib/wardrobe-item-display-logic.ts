@@ -1,4 +1,5 @@
 import type { ItemCategory } from '@/components/types/item-category'
+import { ItemStatus } from '@/types/ItemStatus'
 
 /**
  * Wardrobe item display logic
@@ -8,7 +9,7 @@ import type { ItemCategory } from '@/components/types/item-category'
  */
 
 interface WardrobeItem {
-	status: 'owned' | 'wishlisted'
+	status: ItemStatus
 	category: ItemCategory
 	wears?: number
 	purchase_price?: number
@@ -34,7 +35,7 @@ export function shouldShowWearCounter(item: WardrobeItem): boolean {
 	]
 
 	return (
-		item.status === 'owned' &&
+		item.status === ItemStatus.OWNED &&
 		wearableCategories.includes(item.category)
 	)
 }
@@ -51,7 +52,7 @@ export function shouldShowCostPerWear(item: WardrobeItem): boolean {
 	const hasPrice = !!(item.purchase_price || item.retail_price)
 	const hasWears = (item.wears || 0) > 0
 
-	return item.status === 'owned' && hasPrice && hasWears
+	return item.status === ItemStatus.OWNED && hasPrice && hasWears
 }
 
 /**
@@ -60,7 +61,7 @@ export function shouldShowCostPerWear(item: WardrobeItem): boolean {
  * Only for wishlisted items that are within the cooling-off period.
  */
 export function shouldShowCoolingOff(item: WardrobeItem): boolean {
-	if (item.status !== 'wishlisted') return false
+	if (item.status !== ItemStatus.WISHLISTED) return false
 
 	// Check if created_at is within last 7 days
 	if (!item.created_at) return false
@@ -80,7 +81,7 @@ export function shouldShowCoolingOff(item: WardrobeItem): boolean {
  * Only for wishlisted items with a product URL configured.
  */
 export function shouldShowPriceMonitoring(item: WardrobeItem): boolean {
-	return item.status === 'wishlisted' && !!item.product_url
+	return item.status === ItemStatus.WISHLISTED && !!item.product_url
 }
 
 /**
@@ -106,7 +107,7 @@ export function getItemDisplayFlags(item: WardrobeItem) {
  */
 export function canAddToOutfit(item: WardrobeItem): boolean {
 	return (
-		item.status === 'owned' &&
+		item.status === ItemStatus.OWNED &&
 		(item.item_photos?.length || 0) > 0
 	)
 }

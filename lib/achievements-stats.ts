@@ -6,7 +6,6 @@
  */
 
 import { createClient } from '@/utils/supabase/client'
-import { WardrobeItem } from '@/components/types/WardrobeItem'
 
 export interface WardrobeStats {
   totalItems: number
@@ -176,7 +175,7 @@ export async function getWardrobeStats(userId: string): Promise<WardrobeStats> {
  * Get target cost-per-wear based on price
  * (Copied from wardrobe-item-utils.ts)
  */
-function getTargetCostPerWear(price: number, category: string): number {
+function getTargetCostPerWear(price: number, _category: string): number {
   if (price < 50) return 2 // Budget items: $2/wear
   if (price < 150) return 5 // Mid-range: $5/wear
   return 10 // Premium: $10/wear

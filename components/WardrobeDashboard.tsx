@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Search, Heart, Package, Archive } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
 import { DashboardGrid } from './DashboardGrid'
@@ -24,14 +23,15 @@ import {
   WishlistEmptyState,
   ArchiveEmptyState,
 } from './EmptyStateIllustrations'
+import { ItemStatus } from '@/types/ItemStatus'
 
 interface WardrobeDashboardProps {
   onAddNew?: () => void
-  status: ('owned' | 'wishlisted' | 'archive')[]
+  status: ItemStatus[]
   isArchivePage?: boolean
 }
 
-export function WardrobeDashboard({ onAddNew, status = ['wishlisted'], isArchivePage = false }: WardrobeDashboardProps) {
+export function WardrobeDashboard({ onAddNew, status = [ItemStatus.WISHLISTED], isArchivePage = false }: WardrobeDashboardProps) {
 
   // State - Data
   const [journalEntries, setJournalEntries] = useState<WardrobeItem[]>([])
@@ -186,9 +186,9 @@ export function WardrobeDashboard({ onAddNew, status = ['wishlisted'], isArchive
   }
 
   const handleToggleCollection = async (entry: WardrobeItem) => {
-    const newStatus = entry.status === 'owned' ? 'wishlisted' : 'owned'
+    const newStatus = entry.status === ItemStatus.OWNED ? ItemStatus.WISHLISTED : ItemStatus.OWNED
 
-    if (newStatus === 'owned' && entry.category === 'shoes' && !entry.purchase_price && !entry.retail_price) {
+    if (newStatus === ItemStatus.OWNED && entry.category === 'shoes' && !entry.purchase_price && !entry.retail_price) {
       toast.error('Please set a price before adding to collection', {
         description: 'A price is required to track cost per wear',
         action: {
@@ -219,7 +219,7 @@ export function WardrobeDashboard({ onAddNew, status = ['wishlisted'], isArchive
       }
 
       toast.success(
-        newStatus === 'owned' ? 'Added to collection' : 'Removed from collection',
+        newStatus === ItemStatus.OWNED ? 'Added to collection' : 'Removed from collection',
         {
           description: `${entry.brand} ${entry.model}`,
           duration: 3000,
@@ -254,7 +254,7 @@ export function WardrobeDashboard({ onAddNew, status = ['wishlisted'], isArchive
       const { error } = await supabase
         .from('items')
         .update({
-          status: 'owned',
+          status: ItemStatus.OWNED,
           purchase_price: purchasePrice,
           purchase_date: purchaseDate.toISOString().split('T')[0]
         })
@@ -346,7 +346,7 @@ export function WardrobeDashboard({ onAddNew, status = ['wishlisted'], isArchive
     try {
       const { error } = await supabase
         .from('items')
-        .update({ status: 'wishlisted' })
+        .update({ status: ItemStatus.WISHLISTED })
         .eq('id', item.id)
 
       if (error) {
@@ -433,13 +433,13 @@ export function WardrobeDashboard({ onAddNew, status = ['wishlisted'], isArchive
     sortBy
   )
 
-  const displayStatus = status.includes('wishlisted') ? 'wishlisted' : status[0]
+  const displayStatus = status.includes(ItemStatus.WISHLISTED) ? ItemStatus.WISHLISTED : status[0]
 
   // Map status to viewMode for cards
   const getViewMode = (): 'collection' | 'archive' | 'wishlist' => {
     if (isArchivePage) return 'archive'
-    if (status.includes('owned')) return 'collection'
-    if (status.includes('wishlisted')) return 'wishlist'
+    if (status.includes(ItemStatus.OWNED)) return 'collection'
+    if (status.includes(ItemStatus.WISHLISTED)) return 'wishlist'
     return 'wishlist'
   }
 
@@ -488,7 +488,7 @@ export function WardrobeDashboard({ onAddNew, status = ['wishlisted'], isArchive
         onMarkAsPurchased={handleOpenPurchasedModal}
         onArchive={handleOpenArchiveDialog}
         onCreateOutfit={() => setIsOutfitStudioOpen(true)}
-        userWardrobe={journalEntries.filter(e => e.status === 'owned')}
+        userWardrobe={journalEntries.filter(e => e.status === ItemStatus.OWNED)}
         emptyState={
           <EmptyState
             hasEntries={journalEntries.length > 0}
@@ -540,30 +540,26 @@ export function WardrobeDashboard({ onAddNew, status = ['wishlisted'], isArchive
       <OutfitStudio
         isOpen={isOutfitStudioOpen}
         onClose={() => setIsOutfitStudioOpen(false)}
-        userWardrobe={journalEntries.filter(e => e.status === 'owned')}
+        userWardrobe={journalEntries.filter(e => e.status === ItemStatus.OWNED)}
       />
     </div>
   )
 }
 
 // Sub-components
-function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'archive' }) {
-  const titles = {
-    owned: {
+function DashboardHeader({ status }: { status: ItemStatus }) {
+  const titles: Record<ItemStatus, { title: string; description: string }> = {
+    [ItemStatus.OWNED]: {
       title: 'Owned Items',
       description: 'Items you own and have purchased'
     },
-    wishlisted: {
+    [ItemStatus.WISHLISTED]: {
       title: 'Want to Buy',
       description: 'Track items you\'re interested in and monitor price changes'
-    },
-    archive: {
-      title: 'Archived Items',
-      description: 'Items you\'ve archived and no longer need to track'
     }
   }
 
-  const { title, description } = titles[status as keyof typeof titles]
+  const { title, description } = titles[status] || titles[ItemStatus.WISHLISTED]
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-xl">
@@ -577,7 +573,7 @@ function DashboardHeader({ status }: { status: 'owned' | 'wishlisted' | 'archive
 
 interface EmptyStateProps {
   hasEntries: boolean
-  displayStatus: 'owned' | 'wishlisted' | 'archive'
+  displayStatus: ItemStatus
   isArchivePage: boolean
   onAddNew?: () => void
 }
@@ -611,7 +607,7 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
     )
   }
 
-  if (displayStatus === 'wishlisted') {
+  if (displayStatus === ItemStatus.WISHLISTED) {
     return (
       <div className="col-span-full flex justify-center py-12">
         <WishlistEmptyState />
@@ -619,7 +615,7 @@ function EmptyState({ hasEntries, displayStatus, isArchivePage, onAddNew }: Empt
     )
   }
 
-  if (displayStatus === 'owned') {
+  if (displayStatus === ItemStatus.OWNED) {
     return (
       <div className="col-span-full flex justify-center py-12">
         <WardrobeEmptyState />

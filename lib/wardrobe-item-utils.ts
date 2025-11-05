@@ -10,6 +10,7 @@
 
 import { WardrobeItem, ItemPhoto } from '@/components/types/WardrobeItem';
 import type { ItemCategory } from '@/components/types/item-category';
+import { ItemStatus } from '@/types/ItemStatus';
 
 /**
  * Get comfort rating label and color
@@ -172,7 +173,7 @@ export function calculateWorthItMetrics(item: WardrobeItem): WorthItMetrics {
 	const price = purchasePrice ?? retailPrice;
 
 	// Not applicable if no price or not owned
-	if (!price || price <= 0 || item.status !== 'owned') {
+	if (!price || price <= 0 || item.status !== ItemStatus.OWNED) {
 		return {
 			isWorthIt: false,
 			currentCPW: null,

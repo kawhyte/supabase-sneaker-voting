@@ -36,10 +36,9 @@ import { MilestoneCelebrationModal, useMilestoneCelebration } from '@/components
 import {
   calculateAutoPosition,
   calculateSuggestedSize,
-  autoArrangeOutfit,
 } from '@/lib/outfit-layout-engine'
 import { createClient } from '@/utils/supabase/client'
-import { Plus, X, Check, Loader2 } from 'lucide-react'
+import { X, Check, Loader2 } from 'lucide-react'
 import { useOutfitQuotas } from '@/hooks/useOutfitQuotas'
 import { getQuotaMessage } from '@/lib/quota-validation'
 import { getQuotaForCategory } from '@/components/types/Outfit'
@@ -394,22 +393,24 @@ export function OutfitStudio({
   const handleResetAutoArrange = () => {
     if (outfitItems.length === 0) return
 
-    const items = outfitItems.map(oi => oi.item).filter(Boolean) as WardrobeItem[]
-    const arranged = autoArrangeOutfit(items)
+    // Reset positions for each item
+    const resetItems = outfitItems.map(item => {
+      const category = item.item?.category || 'other'
+      const categoryCount = getCategoryCount(category)
+      const position = calculateAutoPosition(item.item!, categoryCount)
+      const size = calculateSuggestedSize(item.item!)
 
-    setOutfitItems(
-      outfitItems.map(item => {
-        const arranged = autoArrangeOutfit([item.item!])[0]
-        return {
-          ...item,
-          position_x: arranged.position_x,
-          position_y: arranged.position_y,
-          z_index: arranged.z_index,
-          display_width: arranged.display_width,
-          display_height: arranged.display_height,
-        }
-      })
-    )
+      return {
+        ...item,
+        position_x: position.x / 375,
+        position_y: position.y / 667,
+        z_index: position.layer,
+        display_width: size.width,
+        display_height: size.height,
+      }
+    })
+
+    setOutfitItems(resetItems)
 
     toast.success('Reset to auto-arrange')
   }

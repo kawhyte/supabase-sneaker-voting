@@ -8,6 +8,7 @@ import { ViewDensityToggle } from '@/components/ViewDensityToggle'
 import { WardrobeDashboard } from '@/components/WardrobeDashboard'
 import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
 import { Package, Heart, Archive, Sparkles } from 'lucide-react'
+import { ItemStatus } from '@/types/ItemStatus'
 
 /*
   ✅ DASHBOARD DESIGN SYSTEM v2.0 IMPLEMENTATION
@@ -141,7 +142,7 @@ function DashboardContent() {
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.3 }}
               >
-                <WardrobeDashboard status={['owned']} />
+                <WardrobeDashboard status={[ItemStatus.OWNED]} />
               </motion.div>
             </TabsContent>
 
@@ -152,7 +153,7 @@ function DashboardContent() {
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.3 }}
               >
-                <WardrobeDashboard status={['wishlisted']} />
+                <WardrobeDashboard status={[ItemStatus.WISHLISTED]} />
               </motion.div>
             </TabsContent>
 
@@ -175,7 +176,7 @@ function DashboardContent() {
                 transition={{ duration: 0.3 }}
               >
                 <WardrobeDashboard
-                  status={['owned', 'wishlisted']}
+                  status={[ItemStatus.OWNED, ItemStatus.WISHLISTED]}
                   isArchivePage={true}
                 />
               </motion.div>

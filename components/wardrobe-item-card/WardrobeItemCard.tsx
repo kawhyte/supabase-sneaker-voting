@@ -78,7 +78,6 @@ function WardrobeItemCardComponent({
 
 	// Compute display values
 	const hasBeenTriedOn = item.has_been_tried;
-	const onSale = isItemOnSale(item);
 	const purchasedDate = item.purchase_date || purchaseDate;
 
 	// Show metadata based on density

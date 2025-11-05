@@ -25,6 +25,7 @@ import {
 	Archive,
 } from "lucide-react";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
+import { ItemStatus } from '@/types/ItemStatus';
 
 interface ItemCardActionsProps {
 	item: WardrobeItem;
@@ -47,8 +48,8 @@ export function ItemCardActions({
 	onMoveToWatchlist,
 	onArchive,
 }: ItemCardActionsProps) {
-	const isWishlisted = item.status === 'wishlisted';
-	const isOwned = item.status === 'owned';
+	const isWishlisted = item.status === ItemStatus.WISHLISTED;
+	const isOwned = item.status === ItemStatus.OWNED;
 
 	return (
 		<div className='absolute right-3 top-3 z-40 flex items-center gap-1'>

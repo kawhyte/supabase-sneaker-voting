@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { WardrobeDashboard } from '@/components/WardrobeDashboard'
 import { Archive } from 'lucide-react'
+import { ItemStatus } from '@/types/ItemStatus'
 
 export default function ArchivePage() {
   return (
@@ -25,7 +26,7 @@ export default function ArchivePage() {
         </div>
 
         <WardrobeDashboard
-          status={['owned', 'wishlisted']}
+          status={[ItemStatus.OWNED, ItemStatus.WISHLISTED]}
           isArchivePage={true}
         />
       </motion.div>

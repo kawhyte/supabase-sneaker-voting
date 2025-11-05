@@ -28,7 +28,6 @@ interface NotesSectionProps {
 export function NotesSection({ form }: NotesSectionProps) {
 	const {
 		register,
-		watch,
 		formState: { errors },
 	} = form
 

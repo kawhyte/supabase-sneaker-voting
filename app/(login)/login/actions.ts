@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { redirect, RedirectType } from 'next/navigation'
+import { redirect } from 'next/navigation'
 
 /**
  * Check if an error is a Next.js redirect error.

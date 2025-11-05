@@ -1,4 +1,6 @@
-import type { ItemCategory, SizeType } from "./item-category";
+import type { ItemCategory } from "./item-category"
+import type { ItemStatus } from "@/types/ItemStatus"
+import type { SizeType } from "@/types/SizeType"
 
 export interface ItemPhoto {
   id: string
@@ -48,7 +50,7 @@ export interface WardrobeItem {
   brands?: BrandData | null
 
   // Current schema fields
-  status: 'owned' | 'wishlisted'
+  status: ItemStatus
   has_been_tried: boolean
 
   // Phase 3: Smart Purchase Prevention

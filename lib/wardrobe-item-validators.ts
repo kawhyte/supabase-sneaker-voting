@@ -5,12 +5,14 @@
  * These are testable and reusable across components.
  */
 
+import { ItemStatus } from '@/types/ItemStatus';
+
 interface WardrobeItem {
 	purchase_price?: number
 	retail_price?: number
 	wears?: number
 	is_archived?: boolean
-	status?: 'owned' | 'wishlisted'
+	status?: ItemStatus
 	item_photos?: any[]
 }
 
@@ -52,7 +54,7 @@ export function canUnarchiveItem(item: WardrobeItem): boolean {
  */
 export function canAddToOutfit(item: WardrobeItem): boolean {
 	return (
-		item.status === 'owned' &&
+		item.status === ItemStatus.OWNED &&
 		(item.item_photos?.length || 0) > 0
 	)
 }

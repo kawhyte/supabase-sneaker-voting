@@ -24,6 +24,7 @@
  */
 
 import { WardrobeItem } from '@/components/types/WardrobeItem';
+import { ItemStatus } from '@/types/ItemStatus';
 
 export interface ItemDisplayLogic {
 	isOwned: boolean;
@@ -50,8 +51,8 @@ export interface ItemDisplayLogic {
  * // Use flags in conditional rendering: {isOwned && <WearCounter />}
  */
 export function useItemDisplayLogic(item: WardrobeItem): ItemDisplayLogic {
-	const isOwned = item.status === 'owned';
-	const isWishlist = item.status === 'wishlisted';
+	const isOwned = item.status === ItemStatus.OWNED;
+	const isWishlist = item.status === ItemStatus.WISHLISTED;
 	const isOnSale = !!(
 		item.sale_price &&
 		item.retail_price &&

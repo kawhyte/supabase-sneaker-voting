@@ -8,11 +8,6 @@
 
 "use client";
 
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { getComfortLabel } from "@/lib/wardrobe-item-utils";
 
@@ -27,9 +22,6 @@ interface ItemSizeComfortWearsProps {
 export function ItemSizeComfortWears({
 	item,
 	viewMode,
-	canTrackWears,
-	onIncrementWear,
-	onDecrementWear,
 }: ItemSizeComfortWearsProps) {
 	const comfortInfo = item.comfort_rating ? getComfortLabel(item.comfort_rating) : null;
 

@@ -5,6 +5,7 @@
  */
 
 import { createClient } from '@/utils/supabase/client'
+import { ItemStatus } from '@/types/ItemStatus'
 
 export interface CategorySpending {
   category: string
@@ -40,7 +41,7 @@ export async function getCategorySpending(
     .from('items')
     .select('category, purchase_price, retail_price')
     .eq('user_id', userId)
-    .eq('status', 'owned')
+    .eq('status', ItemStatus.OWNED)
     .eq('is_archived', false)
 
   if (timeRange) {
@@ -106,7 +107,7 @@ export async function getSpendingTrends(
       .from('items')
       .select('purchase_date, purchase_price, retail_price')
       .eq('user_id', userId)
-      .eq('status', 'owned')
+      .eq('status', ItemStatus.OWNED)
       .not('purchase_date', 'is', null)
       .order('purchase_date', { ascending: true })
 
@@ -119,7 +120,7 @@ export async function getSpendingTrends(
     .from('items')
     .select('purchase_date, purchase_price, retail_price')
     .eq('user_id', userId)
-    .eq('status', 'owned')
+    .eq('status', ItemStatus.OWNED)
     .gte('purchase_date', timeRange.start.toISOString())
     .lte('purchase_date', timeRange.end.toISOString())
     .order('purchase_date', { ascending: true })
@@ -174,7 +175,7 @@ export async function getTotalSaved(userId: string): Promise<number> {
     .from('items')
     .select('retail_price, sale_price, purchase_price')
     .eq('user_id', userId)
-    .eq('status', 'owned')
+    .eq('status', ItemStatus.OWNED)
 
   if (error) throw error
 
