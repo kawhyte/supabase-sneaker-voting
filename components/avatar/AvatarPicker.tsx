@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/button'
 import { AvatarOption } from './AvatarOption'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { AvatarAnalytics } from '@/lib/avatar-analytics'
+// Analytics removed - not configured yet
+// TODO: Re-add when Google Analytics 4 is set up
+// import { AvatarAnalytics } from '@/lib/avatar-analytics'
 
 interface Avatar {
   id: string
@@ -36,11 +38,11 @@ export function AvatarPicker({ isOpen, onClose, currentAvatarId, onSelect }: Ava
   const [announcement, setAnnouncement] = useState('')
 
   // Track when picker opens
-  useEffect(() => {
-    if (isOpen) {
-      AvatarAnalytics.pickerOpened()
-    }
-  }, [isOpen])
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     AvatarAnalytics.pickerOpened()
+  //   }
+  // }, [isOpen])
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -93,11 +95,11 @@ export function AvatarPicker({ isOpen, onClose, currentAvatarId, onSelect }: Ava
       setAnnouncement(`${selectedAvatar?.name || 'Avatar'} saved successfully`)
 
       // Track successful selection
-      AvatarAnalytics.avatarSelected(
-        selectedId,
-        selectedAvatar?.name || 'Unknown',
-        currentAvatarId ? 'preset' : null
-      )
+      // AvatarAnalytics.avatarSelected(
+      //   selectedId,
+      //   selectedAvatar?.name || 'Unknown',
+      //   currentAvatarId ? 'preset' : null
+      // )
 
       toast.success('Avatar updated successfully!')
       onClose()
@@ -105,7 +107,7 @@ export function AvatarPicker({ isOpen, onClose, currentAvatarId, onSelect }: Ava
       console.error('Error updating avatar:', error)
 
       // Track failure
-      AvatarAnalytics.avatarSaveFailed(error instanceof Error ? error.message : 'Unknown error')
+      // AvatarAnalytics.avatarSaveFailed(error instanceof Error ? error.message : 'Unknown error')
 
       toast.error('Failed to update avatar')
     } finally {

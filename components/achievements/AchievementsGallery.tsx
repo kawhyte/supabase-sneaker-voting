@@ -6,7 +6,9 @@ import { AchievementModal } from './AchievementModal'
 import { ACHIEVEMENT_DEFINITIONS } from '@/lib/achievement-definitions'
 import { createClient } from '@/utils/supabase/client'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import analytics, { AnalyticsEvent } from '@/lib/analytics'
+// Analytics removed - not configured yet
+// TODO: Re-add when Google Analytics 4 is set up
+// import analytics, { AnalyticsEvent } from '@/lib/analytics'
 
 interface AchievementsGalleryProps {
   userId: string
@@ -42,44 +44,44 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
           e.preventDefault()
           setFocusedIndex((prev) => Math.min(prev + 1, filtered.length - 1))
           // Track keyboard navigation
-          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
-            feature: 'achievement_keyboard_nav_right',
-            userId,
-          })
+          // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+          //   feature: 'achievement_keyboard_nav_right',
+          //   userId,
+          // })
           break
         case 'ArrowLeft':
           e.preventDefault()
           setFocusedIndex((prev) => Math.max(prev - 1, 0))
-          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
-            feature: 'achievement_keyboard_nav_left',
-            userId,
-          })
+          // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+          //   feature: 'achievement_keyboard_nav_left',
+          //   userId,
+          // })
           break
         case 'ArrowDown':
           e.preventDefault()
           setFocusedIndex((prev) => Math.min(prev + gridCols, filtered.length - 1))
-          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
-            feature: 'achievement_keyboard_nav_down',
-            userId,
-          })
+          // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+          //   feature: 'achievement_keyboard_nav_down',
+          //   userId,
+          // })
           break
         case 'ArrowUp':
           e.preventDefault()
           setFocusedIndex((prev) => Math.max(prev - gridCols, 0))
-          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
-            feature: 'achievement_keyboard_nav_up',
-            userId,
-          })
+          // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+          //   feature: 'achievement_keyboard_nav_up',
+          //   userId,
+          // })
           break
         case 'Enter':
         case ' ':
           e.preventDefault()
           badgeRefs.current[focusedIndex]?.click()
-          analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
-            feature: 'achievement_keyboard_activated',
-            achievementId: filtered[focusedIndex]?.id,
-            userId,
-          })
+          // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+          //   feature: 'achievement_keyboard_activated',
+          //   achievementId: filtered[focusedIndex]?.id,
+          //   userId,
+          // })
           break
       }
     }
@@ -142,11 +144,11 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
             }. ${achievement.description || 'No description'}`}
             onClick={() => {
               setSelectedAchievement(achievement.id)
-              analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
-                feature: 'achievement_details_viewed',
-                achievementId: achievement.id,
-                userId,
-              })
+              // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+              //   feature: 'achievement_details_viewed',
+              //   achievementId: achievement.id,
+              //   userId,
+              // })
             }}
             className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
           >

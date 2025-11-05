@@ -1,10 +1,23 @@
 /**
- * useItemPermissions - Determine what operations are allowed for an item
+ * useItemPermissions - Determine what operations are allowed for an item based on category
  *
- * Based on item category, determines:
- * - Can track wear count
- * - Can mark as purchased
- * - Can add to collection
+ * This hook encapsulates category-specific business rules for item operations.
+ * Different item categories (shoes, tops, accessories, etc.) have different capabilities:
+ * - Shoes and clothing: can track wear count, require size
+ * - Accessories: limited wear tracking, no size requirement
+ * - Jewelry: no wear tracking, size usually not applicable
+ *
+ * @example
+ * const perms = useItemPermissions('sneakers');
+ * if (perms.canTrackWearCount) {
+ *   // Show wear counter UI
+ * }
+ *
+ * @param category - The item category to check permissions for
+ * @returns ItemPermissions object with flags for each operation
+ *
+ * @see ItemCategory for available categories
+ * @see ItemPermissions for the returned object structure
  */
 
 import { ItemCategory, getCategoryConfig } from '@/components/types/item-category';
@@ -20,8 +33,13 @@ export interface ItemPermissions {
 
 /**
  * Determine item permissions based on category
- * @param category - Item category
- * @returns Object with permission flags
+ *
+ * Looks up the category configuration and translates it to permission flags.
+ * If the category is not found, returns safe defaults (all operations allowed).
+ *
+ * @param category - Item category (e.g., 'sneakers', 'tops', 'accessories')
+ * @returns ItemPermissions object with boolean flags for each operation type
+ * @throws No - returns safe defaults if category config not found
  */
 export function useItemPermissions(category: ItemCategory): ItemPermissions {
 	const config = getCategoryConfig(category);

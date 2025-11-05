@@ -3,7 +3,9 @@
 import { Component, ReactNode } from 'react'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import analytics from '@/lib/analytics'
+// Analytics removed - not configured yet
+// TODO: Re-add when Google Analytics 4 is set up
+// import analytics from '@/lib/analytics'
 
 interface Props {
   children: ReactNode
@@ -28,14 +30,14 @@ export class AchievementsErrorBoundary extends Component<Props, State> {
     console.error('Achievements error:', error, errorInfo)
 
     // Track error in analytics
-    try {
-      analytics.trackError(error, {
-        page: 'achievements',
-        componentStack: errorInfo.componentStack,
-      })
-    } catch (e) {
-      console.error('Failed to track error:', e)
-    }
+    // try {
+    //   analytics.trackError(error, {
+    //     page: 'achievements',
+    //     componentStack: errorInfo.componentStack,
+    //   })
+    // } catch (e) {
+    //   console.error('Failed to track error:', e)
+    // }
   }
 
   handleReset = () => {

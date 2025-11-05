@@ -2,7 +2,9 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { OutfitItem } from '@/components/types/outfit'
-import { perfMonitor } from '@/lib/performance-monitor'
+// Performance monitoring removed - not configured yet
+// TODO: Re-add when performance monitoring is set up
+// import { perfMonitor } from '@/lib/performance-monitor'
 
 export interface UseDragManagerOptions {
   containerRef: React.RefObject<HTMLElement>
@@ -87,7 +89,7 @@ export function useDragManager({
       setIsDraggingItemId(itemId)
 
       // Start performance measurement
-      perfMonitor.start('canvas-drag')
+      // perfMonitor.start('canvas-drag')
     },
     [items, canvasWidth, canvasHeight]
   )
@@ -130,7 +132,7 @@ export function useDragManager({
       if (!itemId) return
 
       // End performance measurement
-      const dragDuration = perfMonitor.end('canvas-drag')
+      // const dragDuration = perfMonitor.end('canvas-drag')
 
       // Call parent callback with final position (only once!)
       const { x, y } = dragPositionRef.current
@@ -141,9 +143,9 @@ export function useDragManager({
       itemElementRef.current = null
       setIsDraggingItemId(null)
 
-      if (process.env.NODE_ENV === 'development') {
-        console.debug(`[Drag] Item: ${itemId}, Duration: ${dragDuration.toFixed(2)}ms`)
-      }
+      // if (process.env.NODE_ENV === 'development') {
+      //   console.debug(`[Drag] Item: ${itemId}, Duration: ${dragDuration.toFixed(2)}ms`)
+      // }
     }
 
     // Attach listeners to document (not container)

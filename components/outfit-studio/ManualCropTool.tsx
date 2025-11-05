@@ -4,7 +4,9 @@ import { useState, useRef, useTransition } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
-import { perfMonitor } from '@/lib/performance-monitor'
+// Performance monitoring removed - not configured yet
+// TODO: Re-add when performance monitoring is set up
+// import { perfMonitor } from '@/lib/performance-monitor'
 
 interface CropArea {
   x: number // 0-1 normalized
@@ -68,7 +70,7 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
     setIsDragging(true)
     setDragHandle(handle)
     setDragStart({ x: e.clientX, y: e.clientY })
-    cropMeasurementRef.current = perfMonitor.start('crop-tool-drag')
+    // cropMeasurementRef.current = perfMonitor.start('crop-tool-drag')
     e.preventDefault()
   }
 
@@ -144,10 +146,10 @@ export function ManualCropTool({ imageUrl, onCropComplete, onCancel, itemName }:
 
   const handleMouseUp = () => {
     if (cropMeasurementRef.current !== null) {
-      const dragDuration = perfMonitor.end('crop-tool-drag', cropMeasurementRef.current)
-      if (process.env.NODE_ENV === 'development') {
-        console.debug(`[Crop] Duration: ${dragDuration.toFixed(2)}ms`)
-      }
+      // const dragDuration = perfMonitor.end('crop-tool-drag', cropMeasurementRef.current)
+      // if (process.env.NODE_ENV === 'development') {
+      //   console.debug(`[Crop] Duration: ${dragDuration.toFixed(2)}ms`)
+      // }
       cropMeasurementRef.current = null
     }
 

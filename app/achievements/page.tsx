@@ -26,7 +26,9 @@ import {
   type TopWornItem,
   type LeastWornItem,
 } from '@/lib/achievements-stats'
-import analytics, { AnalyticsEvent } from '@/lib/analytics'
+// Analytics removed - not configured yet
+// TODO: Re-add when Google Analytics 4 is set up
+// import analytics, { AnalyticsEvent } from '@/lib/analytics'
 
 // Lazy load heavy components
 const FinancialInsights = lazy(() =>
@@ -73,16 +75,16 @@ function AchievementsPageContent() {
 
         setUserId(user.id)
 
-        // Track page view
-        try {
-          analytics.track(AnalyticsEvent.DASHBOARD_VIEWED, {
-            userId: user.id,
-            page: 'achievements',
-            timestamp: Date.now(),
-          })
-        } catch (e) {
-          console.error('Failed to track page view:', e)
-        }
+        // Analytics removed - not configured yet
+        // try {
+        //   analytics.track(AnalyticsEvent.DASHBOARD_VIEWED, {
+        //     userId: user.id,
+        //     page: 'achievements',
+        //     timestamp: Date.now(),
+        //   })
+        // } catch (e) {
+        //   console.error('Failed to track page view:', e)
+        // }
 
         // Fetch all stats in parallel
         const [statsData, topWornData, leastWornData] = await Promise.all([
@@ -130,16 +132,17 @@ function AchievementsPageContent() {
   }
 
   const trackInteraction = (feature: string) => {
-    try {
-      if (userId) {
-        analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
-          feature: `achievements_${feature}`,
-          userId,
-        })
-      }
-    } catch (e) {
-      console.error('Failed to track interaction:', e)
-    }
+    // Analytics removed - not configured yet
+    // try {
+    //   if (userId) {
+    //     analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
+    //       feature: `achievements_${feature}`,
+    //       userId,
+    //     })
+    //   }
+    // } catch (e) {
+    //   console.error('Failed to track interaction:', e)
+    // }
   }
 
   return (

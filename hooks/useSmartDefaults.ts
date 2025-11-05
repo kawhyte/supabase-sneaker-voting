@@ -17,24 +17,37 @@ interface SmartDefaults {
 /**
  * useSmartDefaults - Load smart defaults from user profile and recent items
  *
- * Implements hybrid smart defaults strategy:
- * 1. Check profiles table for user preferences (cooling_off_days, duplication warnings)
- * 2. Check recent items for patterns (last brand, category, color, size)
- * 3. Return merged defaults for form initialization
+ * Implements hybrid smart defaults strategy for better UX in forms:
+ * 1. Query profiles table for user preferences (cooling_off_days, duplication warnings)
+ * 2. Query recent items for usage patterns (last brand, category, color, size)
+ * 3. Merge results with sensible fallbacks and return for form initialization
  *
- * Usage:
- * ```tsx
- * const defaults = useSmartDefaults()
+ * This hook reduces form friction by pre-populating fields based on user history.
+ * For example, if the user's last added item was a Nike shoe in red size 10,
+ * the next form will default to Nike, shoe category, red, size 10.
  *
- * useForm({
- *   defaultValues: {
- *     brand: defaults.lastBrand || '',
- *     category: defaults.lastCategory || 'shoes',
- *     color: defaults.lastColor || '',
- *     ...
- *   }
- * })
- * ```
+ * Performance: Runs once on mount (empty dependency array), loads user's first
+ * owned non-archived item from recent-first order (indexed query).
+ *
+ * Error Handling: Silently handles missing profile (PGRST116 = not found) or
+ * recent items. Returns isLoading=false and provides fallback values.
+ *
+ * @returns SmartDefaults object with user preferences, recent patterns, and loading state
+ *
+ * @example
+ * const defaults = useSmartDefaults();
+ *
+ * if (defaults.isLoading) return <Spinner />;
+ *
+ * return (
+ *   <form>
+ *     <BrandInput defaultValue={defaults.lastBrand} />
+ *     <CategorySelect defaultValue={defaults.lastCategory} />
+ *     <ColorInput defaultValue={defaults.lastColor} />
+ *   </form>
+ * );
+ *
+ * @see SmartDefaults for the returned object structure
  */
 export function useSmartDefaults(): SmartDefaults {
   const [defaults, setDefaults] = useState<SmartDefaults>({
