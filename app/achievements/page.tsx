@@ -7,6 +7,7 @@ import { CoreStatsGrid } from '@/components/achievements/CoreStatsGrid'
 import { TopWornList } from '@/components/achievements/TopWornList'
 import { LeastWornList } from '@/components/achievements/LeastWornList'
 import { FinancialInsights } from '@/components/achievements/FinancialInsights'
+import { AchievementsGallery } from '@/components/achievements/AchievementsGallery'
 import {
   getWardrobeStats,
   getTopWornItems,
@@ -95,10 +96,12 @@ export default function AchievementsPage() {
 
       {userId && <FinancialInsights userId={userId} />}
 
-      {/* Phase 3-4 placeholders */}
+      {userId && <AchievementsGallery userId={userId} />}
+
+      {/* Phase 4 placeholder */}
       <div className="bg-muted border border-border rounded-lg p-12 text-center">
         <p className="text-muted-foreground">
-          More insights coming soon: Achievement gallery and Fun facts!
+          More insights coming soon: Fun facts!
         </p>
       </div>
     </main>
