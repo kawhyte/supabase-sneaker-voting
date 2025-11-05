@@ -20,17 +20,17 @@ export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) 
     {
       value: totalEntries,
       label: 'Total Entries',
-      color: 'var(--color-primary-500)'
+      colorClass: 'text-sun-400'
     },
     {
       value: recommended,
       label: 'Recommended',
-      color: 'var(--color-accent-blue-500)'
+      colorClass: 'text-blue-500'
     },
     {
       value: spotted,
       label: 'Spotted',
-      color: 'var(--color-accent-purple-500)'
+      colorClass: 'text-purple-500'
     }
   ]
 
@@ -40,8 +40,7 @@ export function SizingJournalStats({ journalEntries }: SizingJournalStatsProps) 
         <Card key={index} className="hover-lift">
           <CardContent className="p-md text-center">
             <div
-              className="text-3xl font-bold mb-xxs"
-              style={{ color: stat.color }}
+              className={`text-3xl font-bold mb-xxs ${stat.colorClass}`}
             >
               {stat.value}
             </div>
