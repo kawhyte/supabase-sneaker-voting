@@ -5,46 +5,66 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export function SizingJournalSkeleton() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-md sm:gap-lg lg:gap-lg">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       {[...Array(6)].map((_, i) => (
-        <Card key={i} className="overflow-hidden flex flex-col rounded-xl w-full border border-stone-200 shadow-sm">
-          {/* Image Skeleton - aspect-[4/3] to match actual cards */}
-          <div className="relative w-full aspect-[4/3] bg-stone-100 animate-pulse" />
+        <Card
+          key={i}
+          className="overflow-hidden flex flex-col rounded-xl w-full min-h-[420px] border border-stone-200 shadow-sm"
+        >
+          {/* Actions Menu Placeholder */}
+          <div className="absolute top-2 right-2 z-40 h-8 w-8" />
 
-          {/* Content Section - matches actual card padding and structure */}
-          <CardContent className="flex-1 p-md flex flex-col gap-xs">
-            {/* Brand */}
-            <Skeleton className="h-3 w-1/4" />
+          {/* Image Section - matches aspect ratio of photo carousel */}
+          <div className="relative w-full bg-stone-100 animate-pulse" style={{ aspectRatio: '3/4' }} />
 
-            {/* Title - 2 lines */}
-            <div className="mt-xs">
-              <Skeleton className="h-5 w-full mb-2" />
-              <Skeleton className="h-5 w-3/4" />
+          {/* Content Section */}
+          <CardContent className="flex-1 p-4 flex flex-col gap-3">
+            {/* Brand with Logo */}
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-6 w-6 rounded flex-shrink-0" />
+              <Skeleton className="h-3 w-20" />
             </div>
 
-            {/* Metadata Grid - Size, Fit, Comfort */}
-            <div className="grid grid-cols-3 gap-xs mt-md">
-              <div className="flex flex-col gap-2">
-                <Skeleton className="h-3 w-12" />
-                <Skeleton className="h-6 w-full rounded-lg" />
+            {/* Title (Model + Color) */}
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+
+            {/* Metadata Section */}
+            <div className="flex flex-col gap-2.5 mt-3">
+              {/* Date */}
+              <Skeleton className="h-4 w-3/4" />
+
+              {/* Pricing */}
+              <Skeleton className="h-4 w-1/2" />
+
+              {/* Size, Comfort, Wears */}
+              <div className="flex gap-3">
+                <Skeleton className="h-5 w-16 rounded" />
+                <Skeleton className="h-5 w-16 rounded" />
+                <Skeleton className="h-5 w-16 rounded" />
               </div>
-              <div className="flex flex-col gap-2">
-                <Skeleton className="h-3 w-8" />
-                <Skeleton className="h-6 w-full rounded-lg" />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Skeleton className="h-3 w-16" />
-                <Skeleton className="h-6 w-full rounded-lg" />
-              </div>
+
+              {/* Store and Last Worn */}
+              <Skeleton className="h-4 w-2/3" />
             </div>
 
             {/* Notes Section */}
-            <Skeleton className="h-16 w-full mt-md rounded-lg" />
+            <div className="mt-3 p-2.5 bg-stone-50 rounded-lg">
+              <Skeleton className="h-12 w-full" />
+            </div>
 
-            {/* Footer Badges */}
-            <div className="flex gap-xs mt-auto pt-md border-t border-slate-100">
-              <Skeleton className="h-6 w-20 rounded-md" />
-              <Skeleton className="h-6 w-24 rounded-md" />
+            {/* Status Badges */}
+            <div className="flex gap-2 mt-3">
+              <Skeleton className="h-5 w-20 rounded-md" />
+              <Skeleton className="h-5 w-24 rounded-md" />
+            </div>
+
+            {/* Footer */}
+            <div className="flex gap-2 mt-auto pt-4 border-t border-stone-200">
+              <Skeleton className="h-8 w-24 rounded-md" />
+              <Skeleton className="h-8 w-28 rounded-md" />
             </div>
           </CardContent>
         </Card>
