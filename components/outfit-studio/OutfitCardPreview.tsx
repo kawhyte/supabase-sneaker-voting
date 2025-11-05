@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { OutfitWithItems } from '@/components/types/outfit'
-import { OutfitCardCanvas } from './OutfitCardCanvas'
+import React from "react";
+import { OutfitWithItems } from "@/components/types/Outfit";
+import { OutfitCardCanvas } from "./OutfitCardCanvas";
 
 interface OutfitCardPreviewProps {
-  outfit: OutfitWithItems
-  className?: string
-  priority?: boolean
+	outfit: OutfitWithItems;
+	className?: string;
+	priority?: boolean;
 }
 
 /**
@@ -15,10 +15,10 @@ interface OutfitCardPreviewProps {
  * Renders items with Nike/JD Sports positioning
  */
 export function OutfitCardPreview({
-  outfit,
-  className = '',
-  priority = false
+	outfit,
+	className = "",
+	priority = false,
 }: OutfitCardPreviewProps) {
-  // Render canvas directly - simple and reliable
-  return <OutfitCardCanvas outfit={outfit} className={className} />
+	// Render canvas directly - simple and reliable
+	return <OutfitCardCanvas outfit={outfit} className={className} />;
 }

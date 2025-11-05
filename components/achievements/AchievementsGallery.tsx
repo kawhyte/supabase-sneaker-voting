@@ -135,13 +135,17 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
       {/* Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" role="region" aria-label="Achievement badges">
         {filtered.map((achievement, index) => (
-          <button
+          <AchievementBadge
             ref={(el) => (badgeRefs.current[index] = el)}
             key={achievement.id}
+            id={achievement.id}
+            name={achievement.name}
+            icon={achievement.icon}
+            tier={achievement.tier}
+            isUnlocked={unlockedIds.has(achievement.id)}
+            progress={progress.get(achievement.id)}
             tabIndex={index === focusedIndex ? 0 : -1}
-            aria-label={`${achievement.name}. ${
-              unlockedIds.has(achievement.id) ? 'Unlocked' : 'Locked'
-            }. ${achievement.description || 'No description'}`}
+            description={achievement.description}
             onClick={() => {
               setSelectedAchievement(achievement.id)
               // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
@@ -150,18 +154,7 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
               //   userId,
               // })
             }}
-            className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
-          >
-            <AchievementBadge
-              id={achievement.id}
-              name={achievement.name}
-              icon={achievement.icon}
-              tier={achievement.tier}
-              isUnlocked={unlockedIds.has(achievement.id)}
-              progress={progress.get(achievement.id)}
-              onClick={() => setSelectedAchievement(achievement.id)}
-            />
-          </button>
+          />
         ))}
       </div>
 

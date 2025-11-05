@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Calendar, Check, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Outfit, OutfitWithItems } from '@/components/types/outfit'
+import { Outfit, OutfitWithItems } from '@/components/types/Outfit'
 import { toast } from 'sonner'
 
 interface OutfitCalendarProps {
