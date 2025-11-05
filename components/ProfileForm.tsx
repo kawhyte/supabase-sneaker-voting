@@ -86,7 +86,7 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
   }
 
   return (
-    <Card className="   border-stone-200  hover:shadow-md motion-safe:transition-shadow motion-safe:duration-300">
+    <Card className=" ">
       {/* <CardHeader className="pb-6 border-b border-stone-200/50">
         <CardTitle className="text-2xl font-bold text-foreground">Profile Information</CardTitle>
         <CardDescription className="text-base text-muted-foreground">Update your personal details and profile picture</CardDescription>
@@ -142,7 +142,7 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-6 border-t border-stone-200/50">
+          <div className="flex justify-end py-6  border-t border-stone-200/50">
             <Button
               type="submit"
               disabled={isLoading}
