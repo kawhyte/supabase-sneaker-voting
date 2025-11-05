@@ -4,9 +4,7 @@ import { productCache } from '@/lib/product-cache'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('API route called')
     const { url, forceRefresh = false } = await request.json()
-    console.log('Received URL:', url)
 
     if (!url || typeof url !== 'string') {
       return NextResponse.json(
@@ -18,7 +16,6 @@ export async function POST(request: NextRequest) {
     // Check cache first (unless force refresh is requested)
     if (!forceRefresh && productCache.has(url)) {
       const cachedData = productCache.get(url)
-      console.log('Returning cached data')
       return NextResponse.json({
         ...cachedData,
         fromCache: true
@@ -27,15 +24,11 @@ export async function POST(request: NextRequest) {
 
     // Create Supabase client
     const supabase = await createClient()
-    console.log('Created Supabase client')
 
     // Call the Edge Function
-    console.log('Calling Edge Function...')
     const { data, error } = await supabase.functions.invoke('parse-product', {
       body: { url }
     })
-
-    console.log('Edge Function response:', { data, error })
 
     if (error) {
       console.error('Supabase function error:', error)
@@ -46,7 +39,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (data?.error) {
-      console.log('Data error:', data.error)
       return NextResponse.json(
         { error: data.error },
         { status: 400 }
@@ -56,14 +48,12 @@ export async function POST(request: NextRequest) {
     if (data?.success) {
       // Cache the successful result
       productCache.set(url, data)
-      console.log('Cached successful result')
 
       return NextResponse.json({
         ...data,
         fromCache: false
       })
     } else {
-      console.log('No success flag in data:', data)
       return NextResponse.json(
         { error: 'Failed to parse product data' },
         { status: 422 }

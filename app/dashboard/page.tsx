@@ -1,14 +1,12 @@
 'use client'
 
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ViewDensityToggle } from '@/components/view-density-toggle'
 import { SizingJournalDashboard } from '@/components/wardrobe-dashboard'
 import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
-import { SizingJournalEntry } from '@/components/types/sizing-journal-entry'
-import { createClient } from '@/utils/supabase/client'
 import { Package, Heart, Archive, Sparkles } from 'lucide-react'
 
 /*
