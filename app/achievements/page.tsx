@@ -8,6 +8,7 @@ import { TopWornList } from '@/components/achievements/TopWornList'
 import { LeastWornList } from '@/components/achievements/LeastWornList'
 import { FinancialInsights } from '@/components/achievements/FinancialInsights'
 import { AchievementsGallery } from '@/components/achievements/AchievementsGallery'
+import { FunFactsSection } from '@/components/achievements/FunFactsSection'
 import {
   getWardrobeStats,
   getTopWornItems,
@@ -98,10 +99,12 @@ export default function AchievementsPage() {
 
       {userId && <AchievementsGallery userId={userId} />}
 
-      {/* Phase 4 placeholder */}
+      {userId && <FunFactsSection userId={userId} />}
+
+      {/* Phase 5 placeholder */}
       <div className="bg-muted border border-border rounded-lg p-12 text-center">
         <p className="text-muted-foreground">
-          More insights coming soon: Fun facts!
+          More insights coming soon: Polish and optimization!
         </p>
       </div>
     </main>
