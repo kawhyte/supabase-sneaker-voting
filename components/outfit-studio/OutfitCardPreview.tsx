@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { OutfitWithItems } from "@/components/types/Outfit";
+import { OutfitWithItems } from "@/components/types/outfit";
 import { OutfitCardCanvas } from "./OutfitCardCanvas";
 
 interface OutfitCardPreviewProps {

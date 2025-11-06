@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Outfit, OutfitWithItems } from '@/components/types/Outfit'
+import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitCanvas } from './OutfitCanvas'
 import { OutfitStudio } from './OutfitStudio'
 import { Trash2, Edit2, Share2, Check } from 'lucide-react'

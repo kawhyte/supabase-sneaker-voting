@@ -11,8 +11,8 @@ import type {
 	CategoryQuota,
 	QuotaValidation,
 	OutfitQuotaStatus,
-} from "@/components/types/Outfit";
-import { QUOTA_RULES, getQuotaForCategory } from "@/components/types/Outfit";
+} from "@/components/types/outfit";
+import { QUOTA_RULES, getQuotaForCategory } from "@/components/types/outfit";
 import type { WardrobeItem } from "@/components/types/WardrobeItem";
 
 /**

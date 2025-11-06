@@ -5,7 +5,7 @@
  * 400×480px canvas with standardized positioning
  */
 
-import { OutfitItem, OutfitWithItems } from "@/components/types/Outfit";
+import { OutfitItem, OutfitWithItems } from "@/components/types/outfit";
 
 // Canvas dimensions
 export const CARD_CANVAS_WIDTH = 400;

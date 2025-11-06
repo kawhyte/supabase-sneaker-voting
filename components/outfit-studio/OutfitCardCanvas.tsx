@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import Image from "next/image";
-import { OutfitWithItems } from "@/components/types/Outfit";
+import { OutfitWithItems } from "@/components/types/outfit";
 import {
 	prepareOutfitForCard,
 	CARD_CANVAS_WIDTH,

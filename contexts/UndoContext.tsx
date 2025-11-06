@@ -7,7 +7,7 @@ import {
 	useCallback,
 	useEffect,
 } from "react";
-import type { OutfitItem } from "@/components/types/Outfit";
+import type { OutfitItem } from "@/components/types/outfit";
 
 // ============================================================================
 // TYPES

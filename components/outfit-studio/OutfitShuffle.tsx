@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
-import { Outfit, OutfitOccasion, OutfitSeason, OCCASION_CONFIG, SEASON_CONFIG } from '@/components/types/Outfit'
+import { Outfit, OutfitOccasion, OutfitSeason, OCCASION_CONFIG, SEASON_CONFIG } from '@/components/types/outfit'
 import { toast } from 'sonner'
 
 interface OutfitShuffleProps {

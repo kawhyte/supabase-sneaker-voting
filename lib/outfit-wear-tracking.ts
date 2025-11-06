@@ -4,7 +4,7 @@
  * Handles wear tracking, notifications, and wearing streak analytics
  */
 
-import { Outfit, OutfitOccasion } from "@/components/types/Outfit";
+import { Outfit, OutfitOccasion } from "@/components/types/outfit";
 
 /**
  * Wearing streak - consecutive days an outfit has been worn

@@ -3,7 +3,7 @@
 import { memo, useMemo } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
-import { OutfitItem } from "@/components/types/Outfit";
+import { OutfitItem } from "@/components/types/outfit";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/outfit-layout-engine";
 
 interface CanvasItemProps {

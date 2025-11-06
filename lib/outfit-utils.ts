@@ -17,7 +17,7 @@ import {
   OutfitFilter,
   OutfitStats,
   OutfitOccasion,
-} from '@/components/types/Outfit';
+} from '@/components/types/outfit';
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 
 const supabase = createClient();

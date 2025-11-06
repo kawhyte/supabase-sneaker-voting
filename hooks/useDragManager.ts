@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { OutfitItem } from "@/components/types/Outfit";
+import { OutfitItem } from "@/components/types/outfit";
 // Performance monitoring removed - not configured yet
 // TODO: Re-add when performance monitoring is set up
 // import { perfMonitor } from '@/lib/performance-monitor'

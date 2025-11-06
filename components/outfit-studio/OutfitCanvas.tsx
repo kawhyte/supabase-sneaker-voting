@@ -3,7 +3,7 @@
 import { useCallback, useRef } from "react";
 import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { OutfitItem } from "@/components/types/Outfit";
+import { OutfitItem } from "@/components/types/outfit";
 import {
 	CANVAS_WIDTH,
 	CANVAS_HEIGHT,

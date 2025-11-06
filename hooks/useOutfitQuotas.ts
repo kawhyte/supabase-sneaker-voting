@@ -6,7 +6,7 @@
  */
 
 import { useMemo } from "react";
-import type { OutfitItem, OutfitQuotaStatus } from "@/components/types/Outfit";
+import type { OutfitItem, OutfitQuotaStatus } from "@/components/types/outfit";
 import type { WardrobeItem } from "@/components/types/WardrobeItem";
 import {
 	getOutfitQuotaStatus,
