@@ -5,7 +5,7 @@
  * No external services required beyond what's already in use
  */
 
-import { OutfitWithItems } from "@/components/types/Outfit";
+import { OutfitWithItems } from "@/components/types/outfit";
 import {
 	prepareOutfitForCard,
 	CARD_CANVAS_WIDTH,

@@ -1,5 +1,5 @@
 import { WardrobeItem } from "@/components/types/WardrobeItem";
-import { ItemPosition, CategoryLayerConfig } from "@/components/types/Outfit";
+import { ItemPosition, CategoryLayerConfig } from "@/components/types/outfit";
 
 /**
  * Outfit Layout Engine
