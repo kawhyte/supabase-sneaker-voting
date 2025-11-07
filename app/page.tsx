@@ -35,12 +35,16 @@ function LottieAnimationWrapper() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4, duration: 0.6 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.6,
+        delay: 0.4,
+        ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
+      }}
       className="w-full flex justify-center"
     >
-      <div className="w-full max-w-[500px] aspect-square">
+      <div className="w-full max-w-[90%] sm:max-w-[70%] md:max-w-[500px] aspect-square">
         <Lottie
           loop
           play
@@ -76,16 +80,28 @@ export default function HomePage() {
       <div className="relative z-10 w-full px-4 py-12 md:py-0">
         <div className="max-w-7xl mx-auto text-center space-y-4 md:space-y-4">
           {/* Subtitle with fade-in */}
-          <p className="text-sm md:text-lg font-medium text-slate-900"
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.1,
+              ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
+            }}
+            className="text-sm md:text-lg font-medium text-slate-900"
           >
-          A watchlist for your wardrobe
-          </p>
+            A watchlist for your wardrobe
+          </motion.p>
 
           {/* Main Headline with staggered text animation */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
+            transition={{
+              duration: 0.6,
+              delay: 0.2,
+              ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
+            }}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-slate-900 leading-tight"
           >
             <div className="flex flex-row items-center justify-center gap-2 sm:gap-3">
@@ -103,7 +119,11 @@ export default function HomePage() {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
+            transition={{
+              duration: 0.6,
+              delay: 0.3,
+              ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
+            }}
             className="text-lg sm:text-xl md:text-2xl text-slate-600 max-w-7xl mx-auto leading-relaxed font-light"
           >
             Curate your wardrobe with feline precision. Keep a watchful eye on your wishlist and pounce on the purrfect price when it drops.
@@ -118,7 +138,11 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
+            transition={{
+              duration: 0.6,
+              delay: 0.5,
+              ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
+            }}
             className="pt-4 md:pt-4"
           >
             <Link href="/login" prefetch={true}>
@@ -141,16 +165,16 @@ export default function HomePage() {
           {/* Scroll Hint (subtle) */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 0.7 }}
             transition={{ delay: 1, duration: 0.5 }}
             className="pt-12 md:pt-16"
           >
             <motion.div
               animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
               className="flex justify-center"
             >
-              <div className="text-slate-400 text-xs tracking-widest uppercase">
+              <div className="text-slate-600 text-xs tracking-widest uppercase font-medium">
                 Scroll to explore
               </div>
             </motion.div>
