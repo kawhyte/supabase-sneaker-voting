@@ -7,6 +7,7 @@ export interface ItemPhoto {
   image_url: string
   image_order: number
   is_main_image: boolean
+  cloudinary_id?: string
 }
 
 export interface BrandData {

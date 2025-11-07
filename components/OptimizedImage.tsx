@@ -1,7 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import {
+  buildCloudinaryUrl,
+  buildBlurPlaceholder,
+  isCloudinaryUrl,
+  extractPublicIdFromUrl
+} from '@/lib/cloudinary-url-builder'
 
 export interface OptimizedImageProps {
   src: string
@@ -42,36 +47,31 @@ export function OptimizedImage({
   priority = false,
   useBlurPlaceholder = true,
 }: OptimizedImageProps) {
-  const [loaded, setLoaded] = useState(false)
-  const [error, setError] = useState(false)
-  const [blurSrc, setBlurSrc] = useState<string | null>(null)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
-  // Generate Cloudinary blur placeholder URL if using Cloudinary
-  useEffect(() => {
-    if (useBlurPlaceholder && src?.includes('res.cloudinary.com')) {
-      // Extract public_id from Cloudinary URL
-      // Format: https://res.cloudinary.com/{cloud_name}/image/upload/{public_id}
-      const urlParts = src.split('/upload/')
-      if (urlParts.length === 2) {
-        const publicId = urlParts[1].split('?')[0] // Remove query params
-        const cloud_name = src.split('/')[3] // Extract cloud name
+  // Generate optimized URL if Cloudinary
+  const optimizedSrc = isCloudinaryUrl(src)
+    ? buildCloudinaryUrl(extractPublicIdFromUrl(src), {
+        width: width || 'auto',
+        quality: 'auto:good',
+        format: 'auto',
+      })
+    : src
 
-        // Create blur transformation URL
-        // Apply blur + quality reduction + format for instant load
-        const blurUrl = `https://res.cloudinary.com/${cloud_name}/image/upload/w_100,h_100,q_20,f_auto,e_blur:300/${publicId}`
-        setBlurSrc(blurUrl)
-      }
-    }
-  }, [src, useBlurPlaceholder])
+  // Generate blur placeholder if Cloudinary
+  const blurSrc = isCloudinaryUrl(src) && useBlurPlaceholder
+    ? buildBlurPlaceholder(extractPublicIdFromUrl(src))
+    : undefined
 
   // Reset states when src changes
   useEffect(() => {
-    setLoaded(false)
-    setError(false)
+    setImageLoaded(false)
+    setImageError(false)
   }, [src])
 
   // Error fallback
-  if (error) {
+  if (imageError) {
     return (
       <div
         className="flex items-center justify-center bg-slate-200 text-slate-500 text-xs p-2 rounded"
@@ -85,60 +85,40 @@ export function OptimizedImage({
   return (
     <div className="relative overflow-hidden rounded" style={style}>
       {/* Blur placeholder (Cloudinary optimized) */}
-      {!loaded && blurSrc ? (
+      {!imageLoaded && blurSrc ? (
         <img
           src={blurSrc}
           alt=""
+          aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover blur-sm"
           decoding="async"
           draggable={false}
           style={{ opacity: 0.8 }}
         />
-      ) : !loaded ? (
+      ) : !imageLoaded ? (
         // Fallback: animate pulse if no blur available
         <div className="absolute inset-0 bg-slate-200 animate-pulse rounded" />
       ) : null}
 
       {/* Main image with fade-in */}
-      {width && height ? (
-        // Next.js Image (with dimensions) - optimized path
-        <Image
-          src={src}
-          alt={alt}
-          width={width}
-          height={height}
-          priority={priority}
-          style={{
-            opacity: loaded ? 1 : 0,
-            transition: 'opacity 0.3s ease-in-out',
-          }}
-          className={className}
-          loading={priority ? 'eager' : 'lazy'}
-          onLoad={() => setLoaded(true)}
-          onError={() => setError(true)}
-          draggable={false}
-        />
-      ) : (
-        // Native img (no dimensions) - fallback for dynamic sizes
-        <img
-          src={src}
-          alt={alt}
-          style={{
-            opacity: loaded ? 1 : 0,
-            transition: 'opacity 0.3s ease-in-out',
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            ...style,
-          }}
-          className={className}
-          loading="lazy"
-          decoding="async"
-          onLoad={() => setLoaded(true)}
-          onError={() => setError(true)}
-          draggable={false}
-        />
-      )}
+      <img
+        src={imageError ? '/images/placeholder.jpg' : optimizedSrc}
+        alt={alt}
+        style={{
+          opacity: imageLoaded ? 1 : 0,
+          transition: 'opacity 0.3s ease-in-out',
+          width: width ? `${width}px` : '100%',
+          height: height ? `${height}px` : '100%',
+          objectFit: 'cover',
+          ...style,
+        }}
+        className={className}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        onLoad={() => setImageLoaded(true)}
+        onError={() => setImageError(true)}
+        draggable={false}
+      />
     </div>
   )
 }

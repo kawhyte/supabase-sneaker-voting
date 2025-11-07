@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { getStandardizedImageUrl } from '@/lib/image-standardization'
+import { buildCloudinaryUrlWithSize, extractPublicIdFromUrl } from '@/lib/cloudinary-url-builder'
 
 interface Photo {
   id: string
@@ -101,7 +101,10 @@ export function PhotoCarousel({
 
   if (sortedPhotos.length === 1) {
     const photo = sortedPhotos[0]
-    const displayUrl = category ? getStandardizedImageUrl(photo.image_url, category) : photo.image_url
+    const displayUrl = buildCloudinaryUrlWithSize(
+      extractPublicIdFromUrl(photo.image_url),
+      'carousel'
+    )
     return (
       <Card className={`dense ${className}`}>
         <CardContent className="p-0 relative">
@@ -120,6 +123,11 @@ export function PhotoCarousel({
               alt="Item photo"
               className="w-full h-full object-contain rounded-lg"
               style={{ aspectRatio: autoHeight ? 'auto' : '1 / 1' }}
+              loading='lazy'
+              decoding='async'
+              onError={(e) => {
+                e.currentTarget.src = '/images/placeholder.jpg';
+              }}
             />
 
             {onPhotoClick && (
@@ -147,7 +155,10 @@ export function PhotoCarousel({
         <div className="overflow-hidden h-full" ref={emblaRef}>
             <div className="flex h-full">
               {sortedPhotos.map((photo, index) => {
-                const displayUrl = category ? getStandardizedImageUrl(photo.image_url, category) : photo.image_url
+                const displayUrl = buildCloudinaryUrlWithSize(
+                  extractPublicIdFromUrl(photo.image_url),
+                  'carousel'
+                )
                 return (
                 <div
                   key={photo.id}
@@ -161,6 +172,11 @@ export function PhotoCarousel({
                       src={displayUrl}
                       alt={`Item photo ${index + 1}`}
                       className="w-full h-full object-contain"
+                      loading='lazy'
+                      decoding='async'
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/placeholder.jpg';
+                      }}
                     />
 
                     {onPhotoClick && (
@@ -216,7 +232,10 @@ export function PhotoCarousel({
       {showIndicators && sortedPhotos.length > 1 && false && (
         <div className="flex justify-center space-x-2 mt-4">
           {sortedPhotos.map((photo, index) => {
-            const displayUrl = category ? getStandardizedImageUrl(photo.image_url, category) : photo.image_url
+            const displayUrl = buildCloudinaryUrlWithSize(
+              extractPublicIdFromUrl(photo.image_url),
+              'thumbnail'
+            )
             return (
             <button
               key={photo.id}
@@ -233,6 +252,8 @@ export function PhotoCarousel({
                 src={displayUrl}
                 alt={`Thumbnail ${index + 1}`}
                 className="w-12 h-12 object-cover"
+                loading='lazy'
+                decoding='async'
               />
               {photo.is_main_image && (
                 <div className="absolute top-0 right-0 w-2 h-2 bg-blue-600 rounded-full"></div>

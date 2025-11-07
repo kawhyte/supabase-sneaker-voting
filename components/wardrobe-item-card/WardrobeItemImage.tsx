@@ -14,6 +14,7 @@ import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { ItemPhoto } from '@/components/types/WardrobeItem';
 import { getImageAltText } from "@/lib/wardrobe-item-utils";
 import { ViewDensity } from "@/lib/view-density-context";
+import { buildCloudinaryUrlWithSize, extractPublicIdFromUrl } from '@/lib/cloudinary-url-builder';
 
 interface ItemCardImageProps {
 	photos: ItemPhoto[];
@@ -56,10 +57,17 @@ export function ItemCardImage({
 			<div className={`relative w-full ${aspectClass} bg-gradient-to-b from-white via-white to-stone-50/30 flex items-center justify-center p-2 sm:p-4 lg:p-5 transition-all duration-200 card-image-container group`}>
 				{photos.length === 1 ? (
 					<img
-						src={photos[0].image_url}
+						src={buildCloudinaryUrlWithSize(
+							extractPublicIdFromUrl(photos[0].image_url),
+							'card'
+						)}
 						alt={altText}
 						className='w-full h-full object-contain object-center transition-transform duration-300 group-hover:scale-105'
 						loading='lazy'
+						decoding='async'
+						onError={(e) => {
+							e.currentTarget.src = '/images/placeholder.jpg';
+						}}
 					/>
 				) : (
 					<div className='w-full h-full transition-transform duration-300 group-hover:scale-105'>
