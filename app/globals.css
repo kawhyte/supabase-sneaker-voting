@@ -234,20 +234,20 @@
 
   /* --- BRAND COLORS --- */
 
-  /* Sun (Vibrant Yellow - Primary Brand)
+  /* Sun (Warm Beige/Gold - Primary Brand)
      Purpose: CTAs, focus states, brand identity moments
-     Inspiration: Mailchimp energy
+     Inspiration: SaveToStow minimal aesthetic - softer, sophisticated
      Use: bg-sun-400 for buttons, ring-sun-400 for focus */
-  --color-sun-50: oklch(0.97 0.08 90);        /* Light BG */
-  --color-sun-100: oklch(0.94 0.12 90);       /* Soft */
-  --color-sun-200: oklch(0.90 0.16 90);       /* Medium */
-  --color-sun-300: oklch(0.86 0.20 90);       /* Strong */
-  --color-sun-400: oklch(0.82 0.22 90);       /* Main Brand ⭐ (#FFC700) */
-  --color-sun-500: oklch(0.76 0.21 90);       /* Hover state */
-  --color-sun-600: oklch(0.68 0.18 90);       /* Active/text WCAG AAA */
-  --color-sun-700: oklch(0.58 0.16 90);       /* Deep */
-  --color-sun-800: oklch(0.48 0.14 90);       /* Dark */
-  --color-sun-900: oklch(0.38 0.12 90);       /* Darkest */
+  --color-sun-50: #FBF9F6;        /* Lightest cream */
+  --color-sun-100: #F9F5F0;       /* Very light */
+  --color-sun-200: #F4E8D8;       /* Light cream/beige */
+  --color-sun-300: #E8DCC8;       /* Soft warm tone */
+  --color-sun-400: #D4A574;       /* Main Brand ⭐ Warm beige/gold */
+  --color-sun-500: #C89660;       /* Hover state */
+  --color-sun-600: #B89060;       /* Active/text - Darker warm gold */
+  --color-sun-700: #A68550;       /* Deep */
+  --color-sun-800: #947A40;       /* Dark */
+  --color-sun-900: #826F30;       /* Darkest */
 
   /* Terracotta (Warm Orange-Red - Secondary Accent)
      Purpose: Secondary CTAs, warm accents, complementary badges
@@ -325,7 +325,7 @@
      ============================================ */
 
   /* Page Layout */
-  --color-background: var(--color-stone-50);       /* Neutral warm background - sneakers pop */
+  --color-background: var(--color-stone-200);      /* Warmer background for cohesive palette */
   --color-foreground: var(--color-slate-900);      /* Dark text */
 
   /* Cards & Elevated Surfaces */
