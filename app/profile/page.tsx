@@ -117,7 +117,6 @@ function SettingsContent() {
             >
               <User className="h-4 w-4 mr-2" />
               Profile
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-sun-400 opacity-0 data-[state=active]:opacity-100 motion-safe:transition-all motion-safe:duration-300" />
             </TabsTrigger>
 
             <TabsTrigger
@@ -127,7 +126,6 @@ function SettingsContent() {
             >
               <ShieldCheck className="h-4 w-4 mr-2" />
               Purchase Prevention
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-sun-400 opacity-0 data-[state=active]:opacity-100 motion-safe:transition-all motion-safe:duration-300" />
             </TabsTrigger>
 
             <TabsTrigger
@@ -137,7 +135,6 @@ function SettingsContent() {
             >
               <Bell className="h-4 w-4 mr-2" />
               Notifications
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-sun-400 opacity-0 data-[state=active]:opacity-100 motion-safe:transition-all motion-safe:duration-300" />
             </TabsTrigger>
           </TabsList>
 

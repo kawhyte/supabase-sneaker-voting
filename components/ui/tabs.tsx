@@ -36,17 +36,13 @@ const TabsTrigger = React.forwardRef<
       // Default (pill) variant
       "inline-flex rounded-2xl items-center justify-center whitespace-nowrap px-sm py-xs text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:scale-105 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-stone-100 data-[state=active]:bg-sun-200 data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-sm",
       // Underline variant overrides
-      variant === 'underline' && "relative px-0 py-3 pb-4 rounded-none bg-transparent text-base text-slate-600 font-medium hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-none",
+      variant === 'underline' && "relative px-0 py-3 pb-4 rounded-none bg-transparent text-base text-slate-600 font-medium hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-none after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-sun-400 after:opacity-0 data-[state=active]:after:opacity-100 after:transition-all after:duration-300",
       className
     )}
     data-variant={variant}
     {...props}
   >
     {children}
-    {/* Underline indicator - only shows for underline variant */}
-    {variant === 'underline' && (
-      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-sun-400 opacity-0 data-[state=active]:opacity-100 motion-safe:transition-all motion-safe:duration-300" />
-    )}
   </TabsPrimitive.Trigger>
 ))
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName

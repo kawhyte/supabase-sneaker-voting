@@ -712,7 +712,6 @@
 
 nav {
   @apply max-w-[1920px] mx-auto;
-  background-color: var(--color-stone-50);  /* White background for clean separation from blaze-50 background */
   margin-block: var(--spacing-6);  /* 24px - Component-level spacing for major structural element */
 }
 

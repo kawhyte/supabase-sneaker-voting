@@ -111,21 +111,40 @@ function DashboardContent() {
           <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-16">
             {/* Tabs */}
             <div className="flex-1">
-              <TabsList className="grid w-full grid-cols-4 justify-center gap-x-4">
-                <TabsTrigger value="owned" className="flex items-center gap-2">
-                  <Package className="h-4 w-4" />
+              <TabsList
+                data-variant="underline"
+                className="w-full justify-start border-b border-stone-200 bg-transparent p-0 gap-8 mb-8"
+              >
+                <TabsTrigger
+                  value="owned"
+                  data-variant="underline"
+                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+                >
+                  <Package className="h-4 w-4 mr-2" />
                   Owned
                 </TabsTrigger>
-                <TabsTrigger value="wishlist" className="flex items-center gap-2">
-                  <Heart className="h-4 w-4" />
+                <TabsTrigger
+                  value="wishlist"
+                  data-variant="underline"
+                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+                >
+                  <Heart className="h-4 w-4 mr-2" />
                   Want to Buy
                 </TabsTrigger>
-                <TabsTrigger value="outfits" className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
+                <TabsTrigger
+                  value="outfits"
+                  data-variant="underline"
+                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
                   Outfits
                 </TabsTrigger>
-                <TabsTrigger value="archive" className="flex items-center gap-2">
-                  <Archive className="h-4 w-4" />
+                <TabsTrigger
+                  value="archive"
+                  data-variant="underline"
+                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+                >
+                  <Archive className="h-4 w-4 mr-2" />
                   Archived Items
                 </TabsTrigger>
               </TabsList>
