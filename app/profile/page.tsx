@@ -1,89 +1,194 @@
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useEffect, useState, Suspense } from 'react'
+import { createClient } from '@/utils/supabase/client'
+import { motion } from 'framer-motion'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { useTabNavigation, useTabKeyboardShortcuts } from '@/hooks/useTabNavigation'
+import { User, ShieldCheck, Bell } from 'lucide-react'
 import { ProfileForm } from '@/components/ProfileForm'
 import { PurchasePreventionSettings } from '@/components/PurchasePreventionSettings'
 import { NotificationPreferences } from '@/components/NotificationPreferences'
-import { Metadata } from 'next'
+import type { User as AuthUser } from '@supabase/supabase-js'
 
-export const metadata: Metadata = {
-  title: 'Profile Settings',
-  description: 'Manage your profile information and preferences',
+interface ProfileData {
+  id: string
+  display_name: string | null
+  avatar_url: string | null
+  avatar_type: 'custom' | 'preset' | null
+  preset_avatar_id: string | null
+  avatar_updated_at?: string
+  updated_at?: string
 }
 
-export default async function ProfilePage() {
-  const supabase = await createClient()
+function SettingsContent() {
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [profile, setProfile] = useState<ProfileData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Get the current user
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  // Tab navigation with hash routing
+  const { activeTab, setActiveTab } = useTabNavigation('profile')
 
-  if (userError || !user) {
-    redirect('/login')
-  }
+  // Keyboard shortcuts (Cmd/Ctrl + 1/2/3)
+  useTabKeyboardShortcuts(
+    ['profile', 'purchase-prevention', 'notifications'],
+    setActiveTab
+  )
 
-  // Fetch the user's profile
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('id, display_name, avatar_url, avatar_type, preset_avatar_id, avatar_updated_at, updated_at')
-    .eq('id', user.id)
-    .single()
+  // Fetch user and profile data
+  useEffect(() => {
+    async function fetchData() {
+      const supabase = createClient()
 
-  // If profile doesn't exist, create a default one
-  if (profileError || !profile) {
-    // Fetch again after creating
-    const { data: createdProfile } = await supabase
-      .from('profiles')
-      .select('id, display_name, avatar_url, avatar_type, preset_avatar_id, avatar_updated_at, updated_at')
-      .eq('id', user.id)
-      .single()
+      // Get user
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      if (!currentUser) {
+        // Redirect to login via client-side navigation
+        window.location.href = '/login'
+        return
+      }
+      setUser(currentUser)
 
+      // Get profile
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, display_name, avatar_url, avatar_type, preset_avatar_id, avatar_updated_at, updated_at')
+        .eq('id', currentUser.id)
+        .single()
+
+      if (profileData) {
+        setProfile(profileData)
+      } else {
+        // Create default profile if doesn't exist
+        setProfile({
+          id: currentUser.id,
+          display_name: currentUser.email?.split('@')[0] || 'User',
+          avatar_url: null,
+          avatar_type: 'custom',
+          preset_avatar_id: null
+        })
+      }
+
+      setIsLoading(false)
+    }
+
+    fetchData()
+  }, [])
+
+  if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account preferences, notifications, and purchase prevention settings
-          </p>
-        </div>
-
-        {/* Settings Sections */}
-        <div className="space-y-6 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
-          {/* Profile Information */}
-          <ProfileForm
-            profile={createdProfile || { id: user.id, display_name: user.email?.split('@')[0] || 'User', avatar_url: null, avatar_type: 'custom', preset_avatar_id: null, avatar_updated_at: undefined, updated_at: undefined }}
-            user={user}
-          />
-
-          {/* Smart Purchase Prevention */}
-          <PurchasePreventionSettings />
-
-          {/* Notification Preferences */}
-          <NotificationPreferences />
-        </div>
+      <div className="w-full py-8 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     )
   }
 
+  if (!user || !profile) {
+    return null
+  }
+
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account preferences, notifications, and purchase prevention settings
-        </p>
-      </div>
+    <div className="w-full min-h-screen">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+      >
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
+          <p className="text-muted-foreground">
+            Manage your account settings and preferences
+          </p>
+        </div>
 
-      {/* Settings Sections */}
-      <div className="space-y-6 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700">
-        {/* Profile Information */}
-        <ProfileForm profile={profile} user={user} />
+        {/* ⭐ TABBED NAVIGATION */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {/* Tab List */}
+          <TabsList
+            data-variant="underline"
+            className="w-full justify-start border-b border-stone-200 bg-transparent p-0 gap-8 mb-8"
+          >
+            <TabsTrigger
+              value="profile"
+              data-variant="underline"
+              className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+            >
+              <User className="h-4 w-4 mr-2" />
+              Profile
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-sun-400 opacity-0 data-[state=active]:opacity-100 motion-safe:transition-all motion-safe:duration-300" />
+            </TabsTrigger>
 
-        {/* Smart Purchase Prevention */}
-        <PurchasePreventionSettings />
+            <TabsTrigger
+              value="purchase-prevention"
+              data-variant="underline"
+              className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+            >
+              <ShieldCheck className="h-4 w-4 mr-2" />
+              Purchase Prevention
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-sun-400 opacity-0 data-[state=active]:opacity-100 motion-safe:transition-all motion-safe:duration-300" />
+            </TabsTrigger>
 
-        {/* Notification Preferences */}
-        <NotificationPreferences />
-      </div>
+            <TabsTrigger
+              value="notifications"
+              data-variant="underline"
+              className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              Notifications
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-sun-400 opacity-0 data-[state=active]:opacity-100 motion-safe:transition-all motion-safe:duration-300" />
+            </TabsTrigger>
+          </TabsList>
+
+          {/* ⭐ TAB CONTENT */}
+
+          {/* Profile Tab */}
+          <TabsContent
+            value="profile"
+            className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300"
+          >
+            <ProfileForm profile={profile} user={user} />
+          </TabsContent>
+
+          {/* Purchase Prevention Tab */}
+          <TabsContent
+            value="purchase-prevention"
+            className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300"
+          >
+            <PurchasePreventionSettings />
+          </TabsContent>
+
+          {/* Notifications Tab */}
+          <TabsContent
+            value="notifications"
+            className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300"
+          >
+            <NotificationPreferences />
+          </TabsContent>
+        </Tabs>
+
+        {/* Keyboard Shortcuts Help */}
+        <div className="mt-8 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-xs text-slate-600">
+            💡 <strong>Tip:</strong> Use <kbd className="px-1 py-0.5 bg-white border rounded text-xs">Cmd</kbd> + <kbd className="px-1 py-0.5 bg-white border rounded text-xs">1/2/3</kbd> to quickly switch between tabs
+          </p>
+        </div>
+      </motion.div>
     </div>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full py-8 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      }
+    >
+      <SettingsContent />
+    </Suspense>
   )
 }
