@@ -8,9 +8,10 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { User } from '@supabase/supabase-js'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Check } from 'lucide-react'
 import { AvatarEditor } from '@/components/avatar/AvatarEditor'
 import { AvatarErrorBoundary } from '@/components/avatar/AvatarErrorBoundary'
+import { useAutoSave } from '@/hooks/useAutoSave'
 
 interface Profile {
   id: string
@@ -29,8 +30,30 @@ interface ProfileFormProps {
 
 export function ProfileForm({ profile, user }: ProfileFormProps) {
   const [displayName, setDisplayName] = useState(profile.display_name || '')
-  const [isLoading, setIsLoading] = useState(false)
   const supabase = createClient()
+
+  // Auto-save display name changes
+  const { isSaving: isAutoSaving, hasUnsavedChanges } = useAutoSave({
+    data: { display_name: displayName },
+    onSave: async (data, signal) => {
+      if (!data.display_name.trim()) {
+        throw new Error('Display name cannot be empty')
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          display_name: data.display_name.trim(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+        .abortSignal(signal)
+
+      if (error) throw error
+    },
+    delay: 1000,
+    showToasts: true
+  })
 
   // Format the last sign in date
   const formatLastSignIn = (date: string | undefined) => {
@@ -49,42 +72,6 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
     return signInDate.toLocaleDateString('en-US', options)
   }
 
-
-  // Handle form submission
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-
-    if (!displayName.trim()) {
-      toast.error('Display name is required')
-      return
-    }
-
-    setIsLoading(true)
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          display_name: displayName.trim(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
-
-      if (error) {
-        console.error('Error updating profile:', error)
-        toast.error('Failed to update profile')
-        return
-      }
-
-      toast.success('Profile updated successfully')
-    } catch (error) {
-      console.error('Error:', error)
-      toast.error('An error occurred while updating profile')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   return (
     <Card className=" ">
       {/* <CardHeader className="pb-6 border-b border-stone-200/50">
@@ -92,7 +79,7 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
         <CardDescription className="text-base text-muted-foreground">Update your personal details and profile picture</CardDescription>
       </CardHeader> */}
       <CardContent className="pt-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form className="space-y-8">
           {/* Avatar Editor Section */}
           <AvatarErrorBoundary>
             <AvatarEditor profile={profile} user={user} />
@@ -102,9 +89,24 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
           <div className="space-y-6">
             {/* Display Name */}
             <div className="space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500">
-              <div>
-                <Label htmlFor="displayName" className="text-base font-semibold text-foreground">Display Name</Label>
-                <p className="text-xs text-muted-foreground mt-1">This is how others will see you</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="displayName" className="text-base font-semibold text-foreground">Display Name</Label>
+                  <p className="text-xs text-muted-foreground mt-1">This is how others will see you</p>
+                </div>
+                {/* Auto-save status indicator */}
+                {isAutoSaving && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span>Saving...</span>
+                  </div>
+                )}
+                {!isAutoSaving && !hasUnsavedChanges && displayName !== profile.display_name && (
+                  <div className="flex items-center gap-2 text-xs text-green-600">
+                    <Check className="h-3 w-3" />
+                    <span>Saved</span>
+                  </div>
+                )}
               </div>
               <Input
                 id="displayName"
@@ -141,23 +143,12 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end py-6  border-t border-stone-200/50">
-            <Button
-              type="submit"
-              disabled={isLoading}
-              size="lg"
-              className="motion-safe:transition-all motion-safe:duration-200 motion-safe:hover:shadow-lg motion-safe:hover:-translate-y-0.5"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                'Save Changes'
-              )}
-            </Button>
+          {/* Auto-save info */}
+          <div className="pt-6 border-t border-stone-200/50">
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <Check className="h-3 w-3" />
+              Changes are saved automatically
+            </p>
           </div>
         </form>
       </CardContent>

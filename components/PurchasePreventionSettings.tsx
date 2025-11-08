@@ -23,8 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AlertCircle, Clock, AlertTriangle, Sparkles } from 'lucide-react';
+import { AlertCircle, Clock, AlertTriangle, Sparkles, Check, Loader2 } from 'lucide-react';
 import { getCoolingOffLabel, COOLING_OFF_OPTIONS, type CoolingOffDays } from '@/lib/cooling-off-period';
+import { useAutoSave } from '@/hooks/useAutoSave';
 
 interface PurchasePreventionSettings {
   enable_quiz_gate: boolean;
@@ -42,7 +43,31 @@ export function PurchasePreventionSettings() {
     preferred_cooling_off_days: 7,
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Auto-save settings changes
+  const { isSaving: isAutoSaving, hasUnsavedChanges } = useAutoSave({
+    data: settings,
+    onSave: async (data, signal) => {
+      if (!userId) return;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          enable_quiz_gate: data.enable_quiz_gate,
+          quiz_gate_outfit_threshold: data.quiz_gate_outfit_threshold,
+          enable_duplication_warnings: data.enable_duplication_warnings,
+          preferred_cooling_off_days: data.preferred_cooling_off_days,
+        })
+        .eq('id', userId)
+        .abortSignal(signal);
+
+      if (error) throw error;
+    },
+    delay: 1000,
+    showToasts: true,
+    enabled: !isLoading && userId !== null
+  });
 
   // Load current settings
   useEffect(() => {
@@ -50,6 +75,8 @@ export function PurchasePreventionSettings() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
+
+        setUserId(user.id);
 
         const { data: profile, error } = await supabase
           .from('profiles')
@@ -77,38 +104,6 @@ export function PurchasePreventionSettings() {
 
     loadSettings();
   }, [supabase]);
-
-  // Save settings
-  const handleSaveSettings = async () => {
-    try {
-      setIsSaving(true);
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error('Not authenticated');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          enable_quiz_gate: settings.enable_quiz_gate,
-          quiz_gate_outfit_threshold: settings.quiz_gate_outfit_threshold,
-          enable_duplication_warnings: settings.enable_duplication_warnings,
-          preferred_cooling_off_days: settings.preferred_cooling_off_days,
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      toast.success('Purchase prevention settings saved');
-    } catch (error) {
-      console.error('Failed to save settings:', error);
-      toast.error('Failed to save settings');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   // Handle duplication warnings toggle
   const handleDuplicationToggle = (checked: boolean) => {
@@ -200,7 +195,7 @@ export function PurchasePreventionSettings() {
             <Switch
               checked={settings.enable_quiz_gate}
               onCheckedChange={handleQuizGateToggle}
-              disabled={isSaving}
+              disabled={isAutoSaving}
               className="dense ml-2"
             />
           </div>
@@ -224,7 +219,7 @@ export function PurchasePreventionSettings() {
                 step={1}
                 value={[settings.quiz_gate_outfit_threshold]}
                 onValueChange={handleQuizGateThresholdChange}
-                disabled={isSaving}
+                disabled={isAutoSaving}
                 className="mt-3"
               />
 
@@ -262,7 +257,7 @@ export function PurchasePreventionSettings() {
           <Select
             value={settings.preferred_cooling_off_days.toString()}
             onValueChange={handleCoolingOffChange}
-            disabled={isSaving}
+            disabled={isAutoSaving}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select cooling-off period" />
@@ -300,7 +295,7 @@ export function PurchasePreventionSettings() {
             <Switch
               checked={settings.enable_duplication_warnings}
               onCheckedChange={handleDuplicationToggle}
-              disabled={isSaving}
+              disabled={isAutoSaving}
               className="dense ml-2"
             />
           </div>
@@ -317,15 +312,20 @@ export function PurchasePreventionSettings() {
           )}
         </div>
 
-        {/* Save button */}
+        {/* Auto-save status */}
         <div className="pt-4 border-t border-stone-200">
-          <button
-            onClick={handleSaveSettings}
-            disabled={isSaving}
-            className="w-full px-4 py-2 bg-sun-400 hover:bg-sun-600 disabled:bg-stone-300 text-foreground font-medium rounded-lg transition-colors"
-          >
-            {isSaving ? 'Saving...' : 'Save Purchase Prevention Settings'}
-          </button>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <Check className="h-3 w-3" />
+              Changes are saved automatically
+            </p>
+            {isAutoSaving && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <span>Saving...</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Info section */}
