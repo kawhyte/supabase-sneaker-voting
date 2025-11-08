@@ -102,7 +102,7 @@ export function OptimizedImage({
 
       {/* Main image with fade-in */}
       <img
-        src={imageError ? '/images/placeholder.jpg' : optimizedSrc}
+        src={imageError ? '/images/placeholder.svg' : optimizedSrc}
         alt={alt}
         style={{
           opacity: imageLoaded ? 1 : 0,

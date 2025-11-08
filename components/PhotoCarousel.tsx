@@ -126,7 +126,7 @@ export function PhotoCarousel({
               loading='lazy'
               decoding='async'
               onError={(e) => {
-                e.currentTarget.src = '/images/placeholder.jpg';
+                e.currentTarget.src = '/images/placeholder.svg';
               }}
             />
 
@@ -175,7 +175,7 @@ export function PhotoCarousel({
                       loading='lazy'
                       decoding='async'
                       onError={(e) => {
-                        e.currentTarget.src = '/images/placeholder.jpg';
+                        e.currentTarget.src = '/images/placeholder.svg';
                       }}
                     />
 

@@ -66,7 +66,7 @@ export function ItemCardImage({
 						loading='lazy'
 						decoding='async'
 						onError={(e) => {
-							e.currentTarget.src = '/images/placeholder.jpg';
+							e.currentTarget.src = '/images/placeholder.svg';
 						}}
 					/>
 				) : (

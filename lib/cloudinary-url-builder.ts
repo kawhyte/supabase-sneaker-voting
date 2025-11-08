@@ -38,7 +38,6 @@ export interface CloudinaryTransformOptions {
   crop?: 'limit' | 'fill' | 'fit' | 'scale' | 'pad';
   gravity?: 'center' | 'face' | 'auto';
   dpr?: 'auto' | number;  // Device pixel ratio
-  fetchFormat?: 'auto';
 }
 
 /**
@@ -58,7 +57,7 @@ export function buildCloudinaryUrl(
 ): string {
   // Handle missing public_id
   if (!publicId || !CLOUDINARY_CLOUD_NAME) {
-    return '/images/placeholder.jpg'; // Fallback placeholder
+    return '/images/placeholder.svg'; // Fallback placeholder
   }
 
   // Strip version prefix if present (v1234567890/)
@@ -73,7 +72,6 @@ export function buildCloudinaryUrl(
     crop = 'limit',
     gravity,
     dpr = 'auto',
-    fetchFormat = 'auto',
   } = options;
 
   // Build transformation string
@@ -112,11 +110,6 @@ export function buildCloudinaryUrl(
   // Device pixel ratio (retina support)
   if (dpr) {
     transformations.push(`dpr_${dpr}`);
-  }
-
-  // Fetch format (for automatic format selection)
-  if (fetchFormat) {
-    transformations.push(`fetch_format_${fetchFormat}`);
   }
 
   // Construct final URL
@@ -161,7 +154,7 @@ export function buildCloudinaryUrlWithSize(
  */
 export function buildBlurPlaceholder(publicId: string | null | undefined): string {
   if (!publicId || !CLOUDINARY_CLOUD_NAME) {
-    return '/images/placeholder.jpg';
+    return '/images/placeholder.svg';
   }
 
   const cleanPublicId = publicId.replace(/^v\d+\//, '');
