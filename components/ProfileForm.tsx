@@ -73,7 +73,7 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
   }
 
   return (
-    <Card className=" ">
+    <Card className="bg-muted px-8 py-8 ">
       {/* <CardHeader className="pb-6 border-b border-stone-200/50">
         <CardTitle className="text-2xl font-bold text-foreground">Profile Information</CardTitle>
         <CardDescription className="text-base text-muted-foreground">Update your personal details and profile picture</CardDescription>
@@ -137,7 +137,7 @@ export function ProfileForm({ profile, user }: ProfileFormProps) {
             {/* Last Sign In */}
             <div className="space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-900">
               <Label className="text-base font-semibold text-foreground">Last Signed In</Label>
-              <div className="text-sm text-foreground bg-stone-50/50 border border-stone-200/50 px-4 py-3 rounded-lg">
+              <div className="text-sm text-muted-foreground/50 bg-muted/50 border border-stone-200/50 px-4 py-3 rounded-lg cursor-not-allowed ">
                 {formatLastSignIn(user.last_sign_in_at)}
               </div>
             </div>

@@ -562,9 +562,9 @@ function DashboardHeader({ status }: { status: ItemStatus }) {
   const { title, description } = titles[status] || titles[ItemStatus.WISHLISTED]
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-xl">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-4">
       <div>
-        <h1 className="text-3xl font-bold font-heading">{title}</h1>
+        <h1 className="text-3xl font-bold font-heading -mb-2">{title}</h1>
         <p className="text-slate-600">{description}</p>
       </div>
     </div>
