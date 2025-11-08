@@ -282,7 +282,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 							{/* Bell Icon */}
 							<button
 								onClick={() => setIsNotificationCenterOpen(true)}
-								className="dense relative p-2 rounded-full hover:bg-muted motion-safe:transition-colors"
+								className="dense relative flex items-center justify-center p-2 rounded-full bg-muted hover:bg-muted/60 motion-safe:transition-colors"
 								aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
 							>
 								<Bell className="h-5 w-5 text-foreground" />
