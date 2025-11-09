@@ -67,11 +67,18 @@ export function ChartsSkeleton() {
 
 export function FinancialInsightsSkeleton() {
   return (
-    <div className="mb-12">
-      <Skeleton className="h-8 w-48 mb-6" />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Skeleton className="h-96 rounded-lg" />
-        <Skeleton className="h-96 rounded-lg" />
+    <div className="mb-12 bg-card border border-border rounded-xl p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-6">
+        <Skeleton className="h-8 w-48" /> {/* Title */}
+        <Skeleton className="h-5 w-20" /> {/* "This Year" label */}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex flex-col">
+            <Skeleton className="h-6 w-40 mb-4" /> {/* Subtitle */}
+            <Skeleton className="h-64 rounded-lg" /> {/* Chart */}
+          </div>
+        ))}
       </div>
     </div>
   )
