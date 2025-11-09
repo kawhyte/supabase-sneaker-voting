@@ -182,86 +182,157 @@ function getTargetCostPerWear(price: number, _category: string): number {
 }
 
 /**
- * Get top 5 most worn items
+ * Get top worn items for user (most frequently worn)
+ * @param userId - User ID
+ * @param limit - Number of items to return (default: 3)
+ * @returns Array of top worn items, sorted by wear count descending
+ * @throws Returns empty array on error (graceful degradation)
  */
-export async function getTopWornItems(userId: string): Promise<TopWornItem[]> {
+export async function getTopWornItems(userId: string, limit: number = 3): Promise<TopWornItem[]> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
-    .from('items')
-    .select('id, brand, model, color, category, wears, last_worn_date, image_url, purchase_price, retail_price, item_photos(image_url, is_main_image)')
-    .eq('user_id', userId)
-    .eq('status', 'owned')
-    .eq('is_archived', false)
-    .order('wears', { ascending: false })
-    .limit(5)
+  try {
+    const { data, error } = await supabase
+      .from('items')
+      .select(`
+        id,
+        brand,
+        model,
+        color,
+        category,
+        wears,
+        last_worn_date,
+        purchase_price,
+        retail_price,
+        item_photos (
+          image_url,
+          is_main_image
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'owned')
+      .eq('is_archived', false)
+      .gte('wears', 1)  // Only items worn at least once
+      .order('wears', { ascending: false })
+      .limit(limit)
 
-  if (error) {
-    console.error('Error fetching top worn items:', error)
-    throw error
+    if (error) {
+      console.error('Error fetching top worn items:', error)
+      throw error
+    }
+
+    // Handle null/empty data gracefully
+    if (!data || data.length === 0) {
+      return []
+    }
+
+    // Map with fallback chains for missing fields
+    return data.map((item) => ({
+      id: item.id,
+      brand: item.brand || 'Unknown Brand',
+      model: item.model || item.brand || 'Unnamed Item',  // Fallback chain
+      color: item.color || '',
+      category: item.category || 'other',
+      wears: item.wears || 0,
+      lastWorn: item.last_worn_date || null,
+      image_url: getMainImage(item),
+      purchase_price: item.purchase_price || undefined,
+      retail_price: item.retail_price || undefined,
+    }))
+  } catch (error) {
+    console.error('Error in getTopWornItems:', error)
+    return []  // Graceful degradation: return empty array instead of throwing
   }
-
-  return (data || []).map((item) => ({
-    id: item.id,
-    brand: item.brand,
-    model: item.model,
-    color: item.color,
-    category: item.category,
-    wears: item.wears || 0,
-    lastWorn: item.last_worn_date,
-    image_url: getMainImage(item),
-    purchase_price: item.purchase_price,
-    retail_price: item.retail_price,
-  }))
 }
 
 /**
- * Get top 5 least worn items (excluding 0-wear items added in last 7 days)
+ * Get least worn items for user (items needing love)
+ * Excludes brand new items (added in last 7 days with 0 wears)
+ * @param userId - User ID
+ * @param limit - Number of items to return (default: 3)
+ * @returns Array of least worn items, sorted by wear count ascending
+ * @throws Returns empty array on error (graceful degradation)
  */
-export async function getLeastWornItems(userId: string): Promise<LeastWornItem[]> {
+export async function getLeastWornItems(userId: string, limit: number = 3): Promise<LeastWornItem[]> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
-    .from('items')
-    .select('id, brand, model, color, category, wears, last_worn_date, created_at, image_url, item_photos(image_url, is_main_image)')
-    .eq('user_id', userId)
-    .eq('status', 'owned')
-    .eq('is_archived', false)
-    .order('wears', { ascending: true })
-    .limit(20) // Get 20 and filter
+  try {
+    const { data, error } = await supabase
+      .from('items')
+      .select(`
+        id,
+        brand,
+        model,
+        color,
+        category,
+        wears,
+        last_worn_date,
+        created_at,
+        item_photos (
+          image_url,
+          is_main_image
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'owned')
+      .eq('is_archived', false)
+      .order('wears', { ascending: true })
+      .order('last_worn_date', { ascending: true, nullsFirst: true })  // Never worn items first
+      .limit(limit * 3)  // Fetch more to account for filtering
 
-  if (error) {
-    console.error('Error fetching least worn items:', error)
-    throw error
+    if (error) {
+      console.error('Error fetching least worn items:', error)
+      throw error
+    }
+
+    // Handle null/empty data gracefully
+    if (!data || data.length === 0) {
+      return []
+    }
+
+    // Filter out brand new items (added in last 7 days with 0 wears)
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
+    const filtered = data.filter((item) => {
+      if (item.wears === 0) {
+        const createdAt = new Date(item.created_at).getTime()
+        return createdAt < sevenDaysAgo  // Only include if older than 7 days
+      }
+      return true
+    })
+
+    // Map with fallback chains and calculate days since last worn
+    return filtered.slice(0, limit).map((item) => {
+      let daysSinceLastWorn: number | null = null
+
+      if (item.last_worn_date) {
+        const lastWornDate = new Date(item.last_worn_date)
+        const today = new Date()
+        const diffTime = Math.abs(today.getTime() - lastWornDate.getTime())
+        daysSinceLastWorn = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      } else if (item.created_at) {
+        // Never worn - calculate days since added
+        const createdDate = new Date(item.created_at)
+        const today = new Date()
+        const diffTime = Math.abs(today.getTime() - createdDate.getTime())
+        daysSinceLastWorn = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      }
+
+      return {
+        id: item.id,
+        brand: item.brand || 'Unknown Brand',
+        model: item.model || item.brand || 'Unnamed Item',  // Fallback chain
+        color: item.color || '',
+        category: item.category || 'other',
+        wears: item.wears || 0,
+        lastWorn: item.last_worn_date || null,
+        daysSinceLastWorn,
+        image_url: getMainImage(item),
+      }
+    })
+  } catch (error) {
+    console.error('Error in getLeastWornItems:', error)
+    return []  // Graceful degradation: return empty array instead of throwing
   }
-
-  // Filter out brand new items (added in last 7 days with 0 wears)
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
-  const filtered = (data || []).filter((item) => {
-    if (item.wears === 0) {
-      const createdAt = new Date(item.created_at).getTime()
-      return createdAt < sevenDaysAgo // Only include if older than 7 days
-    }
-    return true
-  })
-
-  return filtered.slice(0, 5).map((item) => {
-    const daysSinceLastWorn = item.last_worn_date
-      ? Math.floor((Date.now() - new Date(item.last_worn_date).getTime()) / (1000 * 60 * 60 * 24))
-      : null
-
-    return {
-      id: item.id,
-      brand: item.brand,
-      model: item.model,
-      color: item.color,
-      category: item.category,
-      wears: item.wears || 0,
-      lastWorn: item.last_worn_date,
-      daysSinceLastWorn,
-      image_url: getMainImage(item),
-    }
-  })
 }
 
 /**

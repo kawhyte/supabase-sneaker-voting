@@ -12,12 +12,21 @@ interface AchievementModalProps {
 }
 
 export function AchievementModal({ achievement, isUnlocked, onClose }: AchievementModalProps) {
+  const IconComponent = achievement.icon
+  const LockIcon = Lock
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">
-            <div className="text-6xl mb-4">{isUnlocked ? achievement.icon : '🔒'}</div>
+            <div className="mb-4 flex justify-center">
+              {isUnlocked ? (
+                <IconComponent className="w-16 h-16 text-primary" />
+              ) : (
+                <LockIcon className="w-16 h-16 text-muted-foreground" />
+              )}
+            </div>
             <div className="text-2xl font-bold">{achievement.name}</div>
           </DialogTitle>
         </DialogHeader>

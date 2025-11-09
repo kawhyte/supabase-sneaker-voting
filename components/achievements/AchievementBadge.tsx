@@ -1,11 +1,12 @@
 'use client'
 
 import { forwardRef } from 'react'
+import { LucideIcon } from 'lucide-react'
 
 interface AchievementBadgeProps {
   id: string
   name: string
-  icon: string
+  icon: LucideIcon
   tier: 'bronze' | 'silver' | 'gold' | 'platinum'
   isUnlocked: boolean
   progress?: number // 0-100
@@ -18,7 +19,7 @@ export const AchievementBadge = forwardRef<HTMLButtonElement, AchievementBadgePr
   (
     {
       name,
-      icon,
+      icon: IconComponent,
       isUnlocked,
       progress = 0,
       onClick,
@@ -44,13 +45,13 @@ export const AchievementBadge = forwardRef<HTMLButtonElement, AchievementBadgePr
       >
         {/* Icon */}
         <div className={`
-          flex items-center justify-center w-16 h-16 rounded-full text-4xl
+          flex items-center justify-center w-16 h-16 rounded-full
           ${isUnlocked
             ? 'bg-primary/30'
             : 'bg-gray-300 dark:bg-gray-700'
           }
         `}>
-          {icon}
+          <IconComponent className={`w-8 h-8 ${isUnlocked ? 'text-primary' : 'text-gray-600 dark:text-gray-500'}`} />
         </div>
 
         {/* Name */}

@@ -1,8 +1,10 @@
+import { LucideIcon, Package, Shirt, Sparkles, Palette, Building2, Gem, TrendingUp, RefreshCw, Compass, Globe, Target } from 'lucide-react'
+
 export interface AchievementDefinition {
   id: string
   name: string
   description: string
-  icon: string
+  icon: LucideIcon
   tier: 'bronze' | 'silver' | 'gold' | 'platinum'
   category: 'wardrobe' | 'outfits' | 'efficiency' | 'discovery'
   points: number
@@ -28,7 +30,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'wardrobe_starter',
     name: 'Collection Starter',
     description: 'Add your first 10 items to PurrView',
-    icon: '📦',
+    icon: Package,
     tier: 'bronze',
     category: 'wardrobe',
     points: 10,
@@ -38,7 +40,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'wardrobe_curator',
     name: 'Wardrobe Curator',
     description: 'Catalog 25 items in your collection',
-    icon: '👔',
+    icon: Shirt,
     tier: 'silver',
     category: 'wardrobe',
     points: 25,
@@ -48,7 +50,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'style_connoisseur',
     name: 'Style Connoisseur',
     description: 'Build a collection of 50 curated items',
-    icon: '✨',
+    icon: Sparkles,
     tier: 'gold',
     category: 'wardrobe',
     points: 50,
@@ -60,7 +62,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'outfit_creator',
     name: 'Outfit Creator',
     description: 'Create your first outfit composition',
-    icon: '🎨',
+    icon: Palette,
     tier: 'bronze',
     category: 'outfits',
     points: 15,
@@ -70,7 +72,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'fashion_architect',
     name: 'Fashion Architect',
     description: 'Design 10 unique outfit combinations',
-    icon: '🏗️',
+    icon: Building2,
     tier: 'silver',
     category: 'outfits',
     points: 30,
@@ -82,7 +84,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'value_seeker',
     name: 'Value Seeker',
     description: 'Get 5 items to their target cost-per-wear',
-    icon: '💎',
+    icon: Gem,
     tier: 'bronze',
     category: 'efficiency',
     points: 20,
@@ -92,7 +94,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'roi_champion',
     name: 'ROI Champion',
     description: 'Achieve target CPW on 10 items',
-    icon: '📈',
+    icon: TrendingUp,
     tier: 'silver',
     category: 'efficiency',
     points: 40,
@@ -104,7 +106,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'wardrobe_maximizer',
     name: 'Wardrobe Maximizer',
     description: 'Wear 80% of your items at least once this month',
-    icon: '🔄',
+    icon: RefreshCw,
     tier: 'gold',
     category: 'efficiency',
     points: 50,
@@ -116,7 +118,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'category_explorer',
     name: 'Category Explorer',
     description: 'Have items in 5 different categories',
-    icon: '🧭',
+    icon: Compass,
     tier: 'bronze',
     category: 'discovery',
     points: 15,
@@ -126,7 +128,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'brand_adventurer',
     name: 'Brand Adventurer',
     description: 'Explore 10 different brands',
-    icon: '🌍',
+    icon: Globe,
     tier: 'silver',
     category: 'discovery',
     points: 25,
@@ -138,7 +140,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     id: 'deal_hunter',
     name: 'Deal Hunter',
     description: 'Save $50 total from price monitoring',
-    icon: '🎯',
+    icon: Target,
     tier: 'silver',
     category: 'efficiency',
     points: 30,
