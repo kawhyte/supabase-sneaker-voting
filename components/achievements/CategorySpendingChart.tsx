@@ -1,95 +1,118 @@
 'use client'
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { CategorySpending } from '@/lib/financial-stats'
+import { AlertCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 interface CategorySpendingChartProps {
   data: CategorySpending[]
 }
 
 export function CategorySpendingChart({ data }: CategorySpendingChartProps) {
-  if (data.length === 0) {
+  const [hasError, setHasError] = useState(false)
+
+  // Error boundary for chart rendering
+  useEffect(() => {
+    const errorHandler = (event: ErrorEvent) => {
+      if (event.message.includes('recharts') || event.message.includes('chart')) {
+        console.error('Chart rendering error:', event.message)
+        setHasError(true)
+        event.preventDefault()
+      }
+    }
+    window.addEventListener('error', errorHandler)
+    return () => window.removeEventListener('error', errorHandler)
+  }, [])
+
+  // Error state
+  if (hasError) {
     return (
-      <div className="h-80 flex items-center justify-center bg-muted rounded-lg">
-        <p className="text-muted-foreground">
+      <div className="h-[240px] flex flex-col items-center justify-center bg-muted rounded-lg p-4">
+        <AlertCircle className="h-8 w-8 text-amber-500 mb-2" aria-hidden="true" />
+        <p className="text-sm text-muted-foreground text-center">
+          Unable to display chart. Please refresh the page.
+        </p>
+      </div>
+    )
+  }
+
+  // Empty state
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-[240px] flex items-center justify-center bg-muted rounded-lg p-4">
+        <p className="text-sm text-muted-foreground text-center max-w-[200px]">
           No purchase data yet. Add items with prices to see your spending breakdown.
         </p>
       </div>
     )
   }
 
-  const totalSpent = data.reduce((sum, cat) => sum + cat.amount, 0)
+  const total = data.reduce((sum, cat) => sum + cat.amount, 0)
 
-  // Custom label showing percentage
-  const renderLabel = (entry: any) => {
-    const percent = ((entry.amount / totalSpent) * 100).toFixed(0)
-    return `${percent}%`
-  }
+  // Fallback colors if category colors missing
+  const FALLBACK_COLORS = [
+    '#10b981', // green
+    '#3b82f6', // blue
+    '#f59e0b', // amber
+    '#ef4444', // red
+    '#8b5cf6', // purple
+    '#ec4899', // pink
+    '#06b6d4', // cyan
+  ]
 
   return (
-    <div className="space-y-4">
-      {/* Chart */}
-      <ResponsiveContainer width="100%" height={320}>
+    <div
+      className="relative w-full h-[240px]"
+      role="img"
+      aria-label={`Spending by category pie chart. Total spent: $${total.toLocaleString()}`}
+    >
+      <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
             data={data}
             cx="50%"
             cy="50%"
-            labelLine={false}
-            label={renderLabel}
-            outerRadius={100}
-            innerRadius={60} // Donut chart
-            fill="#8884d8"
+            innerRadius={60}
+            outerRadius={80}
+            paddingAngle={2}
             dataKey="amount"
             nameKey="category"
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
+              <Cell
+                key={`cell-${index}`}
+                fill={entry.color || FALLBACK_COLORS[index % FALLBACK_COLORS.length]}
+              />
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number) => `$${value.toFixed(2)}`}
+            formatter={(value: number) => [`$${value.toFixed(2)}`, 'Spent']}
             contentStyle={{
               backgroundColor: 'white',
               border: '1px solid #E2E8F0',
               borderRadius: '8px',
-            }}
-          />
-          <Legend
-            verticalAlign="bottom"
-            height={36}
-            formatter={(value, entry: any) => {
-              const spending = data.find((d) => d.category === value)
-              return `${value} ($${spending?.amount.toFixed(0)})`
+              fontSize: '12px',
+              padding: '8px 12px',
             }}
           />
         </PieChart>
       </ResponsiveContainer>
 
-      {/* Category Breakdown Table */}
-      <div className="space-y-2">
-        {data
-          .sort((a, b) => b.amount - a.amount)
-          .map((cat) => (
-            <div
-              key={cat.category}
-              className="flex items-center justify-between p-3 bg-muted rounded-lg"
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: cat.color }}
-                />
-                <div>
-                  <div className="font-medium text-sm">{cat.category}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {cat.itemCount} items
-                  </div>
-                </div>
-              </div>
-              <div className="font-bold">${cat.amount.toFixed(2)}</div>
-            </div>
-          ))}
+      {/* Center Total - Absolute positioned */}
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
+        aria-live="polite"
+      >
+        <div className="text-2xl font-bold text-foreground">
+          ${total.toLocaleString('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          })}
+        </div>
+        <div className="text-xs text-muted-foreground font-medium">
+          This Year
+        </div>
       </div>
     </div>
   )

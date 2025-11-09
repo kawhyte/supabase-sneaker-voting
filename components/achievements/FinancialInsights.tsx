@@ -69,33 +69,33 @@ export function FinancialInsights({ userId }: FinancialInsightsProps) {
       {/* REMOVED: Time Period Selector (Tabs) */}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <Skeleton className="h-64 rounded-lg" />
           <Skeleton className="h-64 rounded-lg" />
           <Skeleton className="h-64 rounded-lg" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Spending by Category */}
-          <div className="flex flex-col">
-            <h3 className="text-base font-medium text-foreground mb-4 text-center">Spending by Category</h3>
+          <div className="flex flex-col min-h-[280px] sm:min-h-[300px]">
+            <h3 className="text-sm font-medium text-foreground mb-4 text-center">Spending by Category</h3>
             <div className="flex-1 flex items-center justify-center">
               <CategorySpendingChart data={categoryData} />
             </div>
           </div>
 
           {/* Spending Over Time */}
-          <div className="flex flex-col">
-            <h3 className="text-base font-medium text-foreground mb-4 text-center">Spending Over Time</h3>
+          <div className="flex flex-col min-h-[280px] sm:min-h-[300px]">
+            <h3 className="text-sm font-medium text-foreground mb-4 text-center">Spending Over Time</h3>
             <div className="flex-1 flex items-center justify-center">
               <SpendingTrendsChart data={trendsData} />
             </div>
           </div>
 
           {/* Wardrobe Growth */}
-          <div className="flex flex-col">
-            <h3 className="text-base font-medium text-foreground mb-4 text-center">Wardrobe Growth</h3>
-            <div className="flex-1 flex items-end justify-center">
+          <div className="flex flex-col min-h-[280px] sm:min-h-[300px] sm:col-span-2 lg:col-span-1">
+            <h3 className="text-sm font-medium text-foreground mb-4 text-center">Wardrobe Growth</h3>
+            <div className="flex-1 flex items-end justify-center pb-4">
               <WardrobeSizeChart data={wardrobeSizeData} />
             </div>
           </div>
