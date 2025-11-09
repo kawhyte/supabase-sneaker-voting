@@ -1,8 +1,8 @@
-import { Poppins } from 'next/font/google';
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
-import { Navbar } from '@/components/navbar';
+import { Navbar } from "@/components/navbar";
 import { ViewDensityProvider } from "@/lib/view-density-context";
 import { FormModeProvider } from "@/lib/form-mode-context";
 import { UndoProvider } from "@/contexts/UndoContext";
@@ -14,7 +14,8 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata = {
 	metadataBase: new URL(defaultUrl),
 	title: "PurrView: Wardrobe Watchlist",
-	description: "Track your wardrobe items and add items to a watchlist and get notified when prices drop",
+	description:
+		"Track your wardrobe items and add items to a watchlist and get notified when prices drop",
 	manifest: "/manifest.json",
 	icons: {
 		icon: "/icon-192x192.png",
@@ -38,31 +39,28 @@ export const viewport = {
 };
 
 const fontBody = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '600'], // Regular and SemiBold for modern fintech aesthetic
-  variable: '--font-body',
+	subsets: ["latin"],
+	weight: ["400", "600"], // Regular and SemiBold for modern fintech aesthetic
+	variable: "--font-body",
 });
 
 const fontHeading = Poppins({
-  subsets: ['latin'],
-  weight: ['600', '700'], // SemiBold and Bold for headings
-  variable: '--font-heading',
+	subsets: ["latin"],
+	weight: ["600", "700"], // SemiBold and Bold for headings
+	variable: "--font-heading",
 });
-
 
 export default function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	 return (
-
-   <html
-  lang="en"
-  className={cn("light", fontBody.variable, fontHeading.variable)}
-  suppressHydrationWarning
->
-  {/*
+	return (
+		<html
+			lang='en'
+			className={cn("light", fontBody.variable, fontHeading.variable)}
+			suppressHydrationWarning>
+			{/*
     ✅ COLOR & SPACING SYSTEM v2.0 IMPLEMENTATION GUIDE
 
     🎯 DESIGN STRATEGY:
@@ -118,32 +116,32 @@ export default function RootLayout({
 
     📚 Full documentation in globals.css (lines 97-315, 404-476)
   */}
-  <body className="min-h-screen bg-background text-foreground border-t-6 border-primary">
-    <UndoProvider>
-      <FormModeProvider>
-        <ViewDensityProvider>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
+			<body className='min-h-screen bg-background text-foreground border-t-6 border-primary'>
+				<UndoProvider>
+					<FormModeProvider>
+						<ViewDensityProvider>
+							<div className='flex flex-col min-h-screen'>
+								<Navbar />
 
-            {/* Main content inherits bg-background from body, no need to repeat */}
-            <main className="flex-1  py-8 sm:py-12 lg:py-16 container mx-auto w-full">
-              {children}
-            </main>
+								{/* Main content inherits bg-background from body, no need to repeat */}
+								{/* Add responsive horizontal padding so content doesn't touch screen edges on small devices */}
+								<main className='flex-1 py-8 sm:py-12 lg:py-16 px-8 sm:px-8 lg:px-8 container mx-auto w-full'>
+									{children}
+								</main>
 
-            {/* Footer uses card color for subtle differentiation */}
-            <footer className="border-t bg-card text-card-foreground py-8 px-8">
-              <p className="text-sm text-muted-foreground">
-                © 2025 PurrView.
-              </p>
-            </footer>
+								{/* Footer uses card color for subtle differentiation */}
+								<footer className='border-t bg-card text-card-foreground py-8 px-8'>
+									<p className='text-sm text-muted-foreground'>
+										© 2025 PurrView.
+									</p>
+								</footer>
 
-            <Toaster />
-          </div>
-        </ViewDensityProvider>
-      </FormModeProvider>
-    </UndoProvider>
-  </body>
-</html>
-
-    );
+								<Toaster />
+							</div>
+						</ViewDensityProvider>
+					</FormModeProvider>
+				</UndoProvider>
+			</body>
+		</html>
+	);
 }
