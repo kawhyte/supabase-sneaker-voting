@@ -42,13 +42,13 @@ export function ViewDensityToggle() {
 	];
 
 	return (
-		<div className="flex items-center gap-1 bg-stone-100 p-1 rounded-lg">
+		<div className="flex items-center gap-1 bg-stone-100 rounded-lg">
 			{modes.map(({ id, label, description, icon: Icon }) => (
 				<Tooltip key={id}>
 					<TooltipTrigger asChild>
 						<button
 							onClick={() => setDensity(id)}
-							className={`p-2 rounded-md transition-all ${
+							className={`p-2 rounded-md flex items-center gap-x-4 transition-all ${
 								density === id
 									? "bg-white shadow-sm text-primary"
 									: "text-muted-foreground hover:text-foreground hover:bg-stone-200/50"
@@ -57,6 +57,7 @@ export function ViewDensityToggle() {
 							aria-pressed={density === id}
 							type="button">
 							<Icon className="h-4 w-4" />
+							<span className="text-sm font-medium">{label}</span>
 						</button>
 					</TooltipTrigger>
 					<TooltipContent side="bottom">

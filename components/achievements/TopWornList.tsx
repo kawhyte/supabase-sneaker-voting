@@ -17,9 +17,12 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
   if (items.length === 0) {
     return variant === 'sidebar' ? null : (
       <section className="mb-12" aria-labelledby="top-worn-title">
-        <h2 id="top-worn-title" className="text-2xl font-bold text-foreground mb-6">
-          Top 5 Most Worn 👑
-        </h2>
+        <div className="flex items-center gap-3 mb-6">
+          <Crown className="h-6 w-6 text-primary" aria-hidden="true" />
+          <h2 id="top-worn-title" className="text-2xl font-bold text-foreground">
+            Top 5 Most Worn
+          </h2>
+        </div>
         <div className="bg-card border border-border rounded-xl p-12 text-center shadow-sm">
           <p className="text-muted-foreground">
             Start logging wears to see your most worn items here!
@@ -97,9 +100,12 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
 
   return (
     <section className="mb-12" aria-labelledby="top-worn-title">
-      <h2 id="top-worn-title" className="text-2xl font-bold text-foreground mb-6">
-        Top 5 Most Worn 👑
-      </h2>
+      <div className="flex items-center gap-3 mb-6">
+        <Crown className="h-6 w-6 text-primary" aria-hidden="true" />
+        <h2 id="top-worn-title" className="text-2xl font-bold text-foreground">
+          Top 5 Most Worn
+        </h2>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {items.map((item, index) => (

@@ -75,7 +75,7 @@ export function FinancialInsights({ userId }: FinancialInsightsProps) {
             aria-hidden="true"
           />
           <h2 id="financial-title" className="text-2xl font-bold">
-            📊 Financial Insights
+            Financial Insights
           </h2>
         </div>
         <p className="text-sm text-muted-foreground mt-1">This Year</p>

@@ -152,7 +152,7 @@ export function WardrobeFilters({
 	}
 
 	return (
-		<div className="w-full">
+		<div className=" flex flex-col min-w-40 md:h-12 w-full max-w-4xl">
 			{/* Main Filter Bar */}
 			<div className="flex flex-col md:flex-row gap-2 md:gap-4 items-stretch md:items-center animate-in fade-in duration-300">
 				{/* Search Input - Full width on mobile, flex-1 on desktop */}

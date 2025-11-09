@@ -84,7 +84,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
       <div className="flex items-center gap-3 mb-6">
         <AlertCircle className="h-6 w-6 text-amber-600" />
         <h2 id="least-worn-title" className="text-2xl font-bold text-foreground">
-          Items Needing Love 💛
+          Items Needing Love
         </h2>
       </div>
 
