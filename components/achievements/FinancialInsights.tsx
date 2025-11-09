@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { TrendingUp } from 'lucide-react'
 import { CategorySpendingChart } from './CategorySpendingChart'
 import { SpendingTrendsChart } from './SpendingTrendsChart'
 import { WardrobeSizeChart } from './WardrobeSizeChart'
@@ -52,11 +53,15 @@ export function FinancialInsights({ userId }: FinancialInsightsProps) {
 
   return (
     <section className="mb-12 bg-card border border-border rounded-xl p-6 shadow-sm" aria-labelledby="financial-title">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-3 mb-6">
+        <TrendingUp
+          className="h-5 w-5 text-primary"
+          aria-hidden="true"
+        />
         <h2 id="financial-title" className="text-2xl font-bold text-foreground">
-          Financial Insights 💰
+          Financial Insights
         </h2>
-        <span className="text-sm text-muted-foreground font-medium">
+        <span className="ml-auto text-sm text-muted-foreground font-medium">
           This Year
         </span>
       </div>
@@ -73,7 +78,7 @@ export function FinancialInsights({ userId }: FinancialInsightsProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Spending by Category */}
           <div className="flex flex-col">
-            <h3 className="text-base font-medium text-foreground mb-4">Spending by Category</h3>
+            <h3 className="text-base font-medium text-foreground mb-4 text-center">Spending by Category</h3>
             <div className="flex-1 flex items-center justify-center">
               <CategorySpendingChart data={categoryData} />
             </div>
@@ -81,7 +86,7 @@ export function FinancialInsights({ userId }: FinancialInsightsProps) {
 
           {/* Spending Over Time */}
           <div className="flex flex-col">
-            <h3 className="text-base font-medium text-foreground mb-4">Spending Over Time</h3>
+            <h3 className="text-base font-medium text-foreground mb-4 text-center">Spending Over Time</h3>
             <div className="flex-1 flex items-center justify-center">
               <SpendingTrendsChart data={trendsData} />
             </div>
@@ -89,7 +94,7 @@ export function FinancialInsights({ userId }: FinancialInsightsProps) {
 
           {/* Wardrobe Growth */}
           <div className="flex flex-col">
-            <h3 className="text-base font-medium text-foreground mb-4">Wardrobe Growth</h3>
+            <h3 className="text-base font-medium text-foreground mb-4 text-center">Wardrobe Growth</h3>
             <div className="flex-1 flex items-end justify-center">
               <WardrobeSizeChart data={wardrobeSizeData} />
             </div>

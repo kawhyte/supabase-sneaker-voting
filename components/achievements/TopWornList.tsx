@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Crown } from 'lucide-react'
 import { TopWornItem } from '@/lib/achievements-stats'
 import { CATEGORY_CONFIGS } from '@/components/types/item-category'
 import Link from 'next/link'
@@ -31,12 +32,18 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
   if (variant === 'sidebar') {
     return (
       <section className="bg-card border border-border rounded-xl p-6 shadow-sm" aria-labelledby="top-worn-sidebar-title">
-        <h3 id="top-worn-sidebar-title" className="text-lg font-bold text-foreground mb-4">
-          Top 5 Most Worn 👑
-        </h3>
+        <div className="flex items-center gap-3 mb-4">
+          <Crown
+            className="h-5 w-5 text-primary"
+            aria-hidden="true"
+          />
+          <h3 id="top-worn-sidebar-title" className="text-lg font-bold text-foreground">
+            Top 3 Most Worn
+          </h3>
+        </div>
 
         <div className="space-y-3">
-          {items.slice(0, 5).map((item, index) => (
+          {items.slice(0, 3).map((item, index) => (
             <Link
               key={item.id}
               href="/dashboard?tab=owned"

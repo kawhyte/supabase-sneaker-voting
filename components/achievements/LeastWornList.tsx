@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Heart } from 'lucide-react'
 import { LeastWornItem } from '@/lib/achievements-stats'
 import { CATEGORY_CONFIGS } from '@/components/types/item-category'
 import Link from 'next/link'
@@ -21,12 +22,18 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
   if (variant === 'sidebar') {
     return (
       <section className="bg-card border border-border rounded-xl p-6 shadow-sm" aria-labelledby="least-worn-sidebar-title">
-        <h3 id="least-worn-sidebar-title" className="text-lg font-bold text-foreground mb-4">
-          Items Needing Love 💛
-        </h3>
+        <div className="flex items-center gap-3 mb-4">
+          <Heart
+            className="h-5 w-5 text-primary"
+            aria-hidden="true"
+          />
+          <h3 id="least-worn-sidebar-title" className="text-lg font-bold text-foreground">
+            3 Items Needing Love
+          </h3>
+        </div>
 
         <div className="space-y-4">
-          {items.slice(0, 2).map((item) => (
+          {items.slice(0, 3).map((item) => (
             <div key={item.id} className="flex items-center gap-4">
               {/* Thumbnail */}
               <div className="w-14 h-14 rounded-lg bg-cover bg-center flex-shrink-0 relative">

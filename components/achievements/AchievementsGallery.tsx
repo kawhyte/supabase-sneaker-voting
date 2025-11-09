@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { Trophy } from 'lucide-react'
 import { AchievementBadge } from './AchievementBadge'
 import { AchievementModal } from './AchievementModal'
 import { ACHIEVEMENT_DEFINITIONS } from '@/lib/achievement-definitions'
@@ -113,9 +114,15 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
   return (
     <section className="mb-12" aria-labelledby="achievements-gallery-title">
       {/* REMOVED: Filter tabs */}
-      <h2 id="achievements-gallery-title" className="text-2xl font-bold text-foreground mb-6">
-        Achievements 🏆
-      </h2>
+      <div className="flex items-center gap-3 mb-6">
+        <Trophy
+          className="h-5 w-5 text-primary"
+          aria-hidden="true"
+        />
+        <h2 id="achievements-gallery-title" className="text-2xl font-bold text-foreground">
+          Achievements
+        </h2>
+      </div>
 
       {/* Grid - UPDATED: Use achievements instead of filtered */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" role="region" aria-label="Achievement badges">
