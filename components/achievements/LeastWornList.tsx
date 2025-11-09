@@ -20,7 +20,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
   // NEW: Sidebar compact layout
   if (variant === 'sidebar') {
     return (
-      <section className="bg-card border border-border rounded-lg p-6" aria-labelledby="least-worn-sidebar-title">
+      <section className="bg-card border border-border rounded-xl p-6 shadow-sm" aria-labelledby="least-worn-sidebar-title">
         <h3 id="least-worn-sidebar-title" className="text-lg font-bold text-foreground mb-4">
           Items Needing Love 💛
         </h3>
@@ -81,7 +81,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
         </h2>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
         <p className="text-sm text-amber-900">
           These items haven't been worn much. Create an outfit with them or consider if they still spark joy!
         </p>
@@ -97,7 +97,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
           >
             <Link
               href="/dashboard?tab=owned"
-              className="block bg-card border-2 border-amber-300 rounded-lg overflow-hidden hover:shadow-lg hover:border-amber-500 transition-all"
+              className="block bg-card border-2 border-amber-300 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-amber-500 transition-all"
             >
               {/* Image */}
               {item.image_url ? (

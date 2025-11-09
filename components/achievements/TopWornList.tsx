@@ -18,7 +18,7 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
         <h2 id="top-worn-title" className="text-2xl font-bold text-foreground mb-6">
           Top 5 Most Worn 👑
         </h2>
-        <div className="bg-card border border-border rounded-lg p-12 text-center">
+        <div className="bg-card border border-border rounded-xl p-12 text-center shadow-sm">
           <p className="text-muted-foreground">
             Start logging wears to see your most worn items here!
           </p>
@@ -30,7 +30,7 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
   // NEW: Sidebar compact layout
   if (variant === 'sidebar') {
     return (
-      <section className="bg-card border border-border rounded-lg p-6" aria-labelledby="top-worn-sidebar-title">
+      <section className="bg-card border border-border rounded-xl p-6 shadow-sm" aria-labelledby="top-worn-sidebar-title">
         <h3 id="top-worn-sidebar-title" className="text-lg font-bold text-foreground mb-4">
           Top 5 Most Worn 👑
         </h3>
@@ -99,7 +99,7 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
           >
             <Link
               href="/dashboard?tab=owned"
-              className="block bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg hover:border-sun-400 transition-all"
+              className="block bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-sun-400 transition-all"
             >
               {/* Rank Badge */}
               <div className="relative">
