@@ -173,7 +173,7 @@ export function PurchasePreventionSettings() {
 
       <CardContent className="space-y-8">
         {/* Quiz Gate Setting */}
-        <div className="space-y-4 pb-6 border-b border-stone-200">
+        <div className="space-y-4 pb-6 border-b border-stone-200 mt-2">
           <div className="space-y-2">
             <Label className="text-sm font-semibold flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
