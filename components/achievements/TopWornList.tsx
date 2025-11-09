@@ -8,11 +8,12 @@ import Image from 'next/image'
 
 interface TopWornListProps {
   items: TopWornItem[]
+  variant?: 'full' | 'sidebar' // NEW: Support dual layouts
 }
 
-export function TopWornList({ items }: TopWornListProps) {
+export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
   if (items.length === 0) {
-    return (
+    return variant === 'sidebar' ? null : (
       <section className="mb-12" aria-labelledby="top-worn-title">
         <h2 id="top-worn-title" className="text-2xl font-bold text-foreground mb-6">
           Top 5 Most Worn 👑
@@ -21,6 +22,62 @@ export function TopWornList({ items }: TopWornListProps) {
           <p className="text-muted-foreground">
             Start logging wears to see your most worn items here!
           </p>
+        </div>
+      </section>
+    )
+  }
+
+  // NEW: Sidebar compact layout
+  if (variant === 'sidebar') {
+    return (
+      <section className="bg-card border border-border rounded-lg p-6" aria-labelledby="top-worn-sidebar-title">
+        <h3 id="top-worn-sidebar-title" className="text-lg font-bold text-foreground mb-4">
+          Top 5 Most Worn 👑
+        </h3>
+
+        <div className="space-y-3">
+          {items.slice(0, 5).map((item, index) => (
+            <Link
+              key={item.id}
+              href="/dashboard?tab=owned"
+              className="flex items-center gap-4 group hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors"
+            >
+              {/* Thumbnail */}
+              <div className="w-14 h-14 rounded-lg bg-cover bg-center flex-shrink-0 relative">
+                {item.image_url ? (
+                  <Image
+                    src={item.image_url}
+                    alt={`${item.brand} ${item.model}`}
+                    fill
+                    className="object-cover rounded-lg"
+                    sizes="56px"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center">
+                    {(() => {
+                      const CategoryIcon = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS]?.icon
+                      return CategoryIcon ? <CategoryIcon className="h-5 w-5" /> : <span className="text-xl">👕</span>
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Details */}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-foreground truncate">
+                  {item.brand}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  Worn {item.wears}x
+                </p>
+              </div>
+
+              {/* Rank Badge */}
+              <p className="font-bold text-primary flex-shrink-0">
+                #{index + 1}
+              </p>
+            </Link>
+          ))}
         </div>
       </section>
     )

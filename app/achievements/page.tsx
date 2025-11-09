@@ -5,15 +5,13 @@ import { createClient } from '@/utils/supabase/client'
 import './achievements.css'
 import { HeroSection } from '@/components/achievements/HeroSection'
 import { CoreStatsGrid } from '@/components/achievements/CoreStatsGrid'
-import { TopWornList } from '@/components/achievements/TopWornList'
-import { LeastWornList } from '@/components/achievements/LeastWornList'
+import { AchievementsSidebar } from '@/components/achievements/AchievementsSidebar'
 import { AchievementsErrorBoundary } from '@/components/achievements/AchievementsErrorBoundary'
 import { StatsPreferences, type StatsPreferencesType } from '@/components/achievements/StatsPreferences'
 import {
   HeroSkeleton,
   CoreStatsSkeleton,
-  TopWornListSkeleton,
-  LeastWornListSkeleton,
+  SidebarSkeleton,
   FinancialInsightsSkeleton,
   GallerySkeleton,
   FactsSkeleton,
@@ -122,11 +120,16 @@ function AchievementsPageContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <HeroSkeleton />
         <CoreStatsSkeleton />
-        <TopWornListSkeleton />
-        <LeastWornListSkeleton />
-        <FinancialInsightsSkeleton />
-        <GallerySkeleton />
-        <FactsSkeleton />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <FinancialInsightsSkeleton />
+            <GallerySkeleton />
+            <FactsSkeleton />
+          </div>
+          <div>
+            <SidebarSkeleton />
+          </div>
+        </div>
       </div>
     )
   }
@@ -165,38 +168,42 @@ function AchievementsPageContent() {
         <CoreStatsGrid stats={stats} />
       </div>
 
-      <div className="worn-items-grid">
-        <TopWornList items={topWorn} />
-      </div>
+      {/* NEW: Grid Layout (main content + sidebar) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-      {/* Conditionally render based on preferences */}
-      {preferences?.show_least_worn !== false && (
-        <div className="worn-items-grid">
-          <LeastWornList items={leastWorn} />
+        {/* MAIN CONTENT COLUMN (spans 2 columns on lg) */}
+        <div className="lg:col-span-2 space-y-8">
+
+          {userId && (
+            <Suspense fallback={<FinancialInsightsSkeleton />}>
+              <div className="charts-grid">
+                <FinancialInsights userId={userId} />
+              </div>
+            </Suspense>
+          )}
+
+          {userId && (
+            <Suspense fallback={<GallerySkeleton />}>
+              <div className="achievement-gallery">
+                <AchievementsGallery userId={userId} />
+              </div>
+            </Suspense>
+          )}
+
+          {userId && (
+            <Suspense fallback={<FactsSkeleton />}>
+              <FunFactsSection userId={userId} />
+            </Suspense>
+          )}
+
         </div>
-      )}
 
-      {userId && (
-        <Suspense fallback={<FinancialInsightsSkeleton />}>
-          <div className="charts-grid">
-            <FinancialInsights userId={userId} />
-          </div>
-        </Suspense>
-      )}
+        {/* SIDEBAR COLUMN (1 column) */}
+        <div>
+          <AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} />
+        </div>
 
-      {userId && (
-        <Suspense fallback={<GallerySkeleton />}>
-          <div className="achievement-gallery">
-            <AchievementsGallery userId={userId} />
-          </div>
-        </Suspense>
-      )}
-
-      {userId && (
-        <Suspense fallback={<FactsSkeleton />}>
-          <FunFactsSection userId={userId} />
-        </Suspense>
-      )}
+      </div>
     </main>
   )
 }

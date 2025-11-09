@@ -5,15 +5,71 @@ import { LeastWornItem } from '@/lib/achievements-stats'
 import { CATEGORY_CONFIGS } from '@/components/types/item-category'
 import Link from 'next/link'
 import Image from 'next/image'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Plus } from 'lucide-react'
 
 interface LeastWornListProps {
   items: LeastWornItem[]
+  variant?: 'full' | 'sidebar' // NEW: Support dual layouts
 }
 
-export function LeastWornList({ items }: LeastWornListProps) {
+export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
   if (items.length === 0) {
     return null // Don't show section if no data
+  }
+
+  // NEW: Sidebar compact layout
+  if (variant === 'sidebar') {
+    return (
+      <section className="bg-card border border-border rounded-lg p-6" aria-labelledby="least-worn-sidebar-title">
+        <h3 id="least-worn-sidebar-title" className="text-lg font-bold text-foreground mb-4">
+          Items Needing Love 💛
+        </h3>
+
+        <div className="space-y-4">
+          {items.slice(0, 2).map((item) => (
+            <div key={item.id} className="flex items-center gap-4">
+              {/* Thumbnail */}
+              <div className="w-14 h-14 rounded-lg bg-cover bg-center flex-shrink-0 relative">
+                {item.image_url ? (
+                  <Image
+                    src={item.image_url}
+                    alt={`${item.brand} ${item.model}`}
+                    fill
+                    className="object-cover rounded-lg opacity-75"
+                    sizes="56px"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center opacity-75">
+                    {(() => {
+                      const CategoryIcon = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS]?.icon
+                      return CategoryIcon ? <CategoryIcon className="h-5 w-5" /> : <span className="text-xl">👕</span>
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Details */}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-foreground truncate">
+                  {item.brand}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Last worn: {item.daysSinceLastWorn ? `${item.daysSinceLastWorn} days ago` : 'Never'}
+                </p>
+              </div>
+
+              {/* Add Button */}
+              <button
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-colors flex-shrink-0"
+                aria-label={`Add ${item.brand} to outfit`}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
   }
 
   return (
