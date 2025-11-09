@@ -5,7 +5,6 @@ import { AchievementBadge } from './AchievementBadge'
 import { AchievementModal } from './AchievementModal'
 import { ACHIEVEMENT_DEFINITIONS } from '@/lib/achievement-definitions'
 import { createClient } from '@/utils/supabase/client'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 // Analytics removed - not configured yet
 // TODO: Re-add when Google Analytics 4 is set up
 // import analytics, { AnalyticsEvent } from '@/lib/analytics'
@@ -15,7 +14,7 @@ interface AchievementsGalleryProps {
 }
 
 export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
-  const [filter, setFilter] = useState<'all' | 'unlocked' | 'locked'>('all')
+  // REMOVED: const [filter, setFilter] = useState<'all' | 'unlocked' | 'locked'>('all')
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set())
   const [selectedAchievement, setSelectedAchievement] = useState<string | null>(null)
   const [progress, setProgress] = useState<Map<string, number>>(new Map())
@@ -27,22 +26,18 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
     calculateProgress()
   }, [userId])
 
-  const filtered = ACHIEVEMENT_DEFINITIONS.filter((achievement) => {
-    const isUnlocked = unlockedIds.has(achievement.id)
-    if (filter === 'unlocked') return isUnlocked
-    if (filter === 'locked') return !isUnlocked
-    return true
-  })
+  // UPDATED: Use all achievements (no filtering)
+  const achievements = ACHIEVEMENT_DEFINITIONS
 
-  // Keyboard navigation handler
+  // Keyboard navigation handler (PRESERVED)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const gridCols = window.innerWidth >= 1280 ? 5 : window.innerWidth >= 1024 ? 4 : 3
+      const gridCols = window.innerWidth >= 1280 ? 5 : window.innerWidth >= 1024 ? 4 : window.innerWidth >= 640 ? 3 : 2
 
       switch (e.key) {
         case 'ArrowRight':
           e.preventDefault()
-          setFocusedIndex((prev) => Math.min(prev + 1, filtered.length - 1))
+          setFocusedIndex((prev) => Math.min(prev + 1, achievements.length - 1))
           // Track keyboard navigation
           // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
           //   feature: 'achievement_keyboard_nav_right',
@@ -59,7 +54,7 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
           break
         case 'ArrowDown':
           e.preventDefault()
-          setFocusedIndex((prev) => Math.min(prev + gridCols, filtered.length - 1))
+          setFocusedIndex((prev) => Math.min(prev + gridCols, achievements.length - 1))
           // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
           //   feature: 'achievement_keyboard_nav_down',
           //   userId,
@@ -79,7 +74,7 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
           badgeRefs.current[focusedIndex]?.click()
           // analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
           //   feature: 'achievement_keyboard_activated',
-          //   achievementId: filtered[focusedIndex]?.id,
+          //   achievementId: achievements[focusedIndex]?.id,
           //   userId,
           // })
           break
@@ -88,7 +83,7 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [focusedIndex, filtered.length, userId])
+  }, [focusedIndex, achievements.length, userId])
 
   // Focus management
   useEffect(() => {
@@ -117,24 +112,14 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
 
   return (
     <section className="mb-12" aria-labelledby="achievements-gallery-title">
-      <div className="flex items-center justify-between mb-6">
-        <h2 id="achievements-gallery-title" className="text-2xl font-bold text-foreground">
-          Achievement Gallery 🏆
-        </h2>
+      {/* REMOVED: Filter tabs */}
+      <h2 id="achievements-gallery-title" className="text-2xl font-bold text-foreground mb-6">
+        Achievements 🏆
+      </h2>
 
-        {/* Filter */}
-        <Tabs value={filter} onValueChange={(v) => setFilter(v as any)}>
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="unlocked">Unlocked</TabsTrigger>
-            <TabsTrigger value="locked">Locked</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" role="region" aria-label="Achievement badges">
-        {filtered.map((achievement, index) => (
+      {/* Grid - UPDATED: Use achievements instead of filtered */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" role="region" aria-label="Achievement badges">
+        {achievements.map((achievement, index) => (
           <AchievementBadge
             ref={(el) => (badgeRefs.current[index] = el)}
             key={achievement.id}
@@ -158,7 +143,7 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
         ))}
       </div>
 
-      {/* Modal */}
+      {/* Modal (PRESERVED) */}
       {selectedAchievement && (
         <AchievementModal
           achievement={ACHIEVEMENT_DEFINITIONS.find((a) => a.id === selectedAchievement)!}

@@ -87,13 +87,10 @@ export function FinancialInsightsSkeleton() {
 export function GallerySkeleton() {
   return (
     <div className="mb-12">
-      <div className="flex items-center justify-between mb-6">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-10 w-64" />
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {[...Array(10)].map((_, i) => (
-          <Skeleton key={i} className="aspect-square rounded-lg" />
+      <Skeleton className="h-8 w-48 mb-6" /> {/* Title only */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+          <Skeleton key={i} className="h-36 rounded-lg" />
         ))}
       </div>
     </div>
