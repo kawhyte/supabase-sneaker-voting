@@ -1,4 +1,5 @@
-import { Poppins } from "next/font/google";
+// import { Poppins } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -38,17 +39,26 @@ export const viewport = {
 	initialScale: 1,
 };
 
-const fontBody = Poppins({
-	subsets: ["latin"],
-	weight: ["400", "600"], // Regular and SemiBold for modern fintech aesthetic
-	variable: "--font-body",
+
+const fontSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  // Get all weights (200-800) and italics, as per your link
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
+  variable: "--font-sans", // We'll use this as the new base
 });
 
-const fontHeading = Poppins({
-	subsets: ["latin"],
-	weight: ["600", "700"], // SemiBold and Bold for headings
-	variable: "--font-heading",
-});
+// const fontBody = Poppins({
+// 	subsets: ["latin"],
+// 	weight: ["400", "600"], // Regular and SemiBold for modern fintech aesthetic
+// 	variable: "--font-body",
+// });
+
+// const fontHeading = Poppins({
+// 	subsets: ["latin"],
+// 	weight: ["600", "700"], // SemiBold and Bold for headings
+// 	variable: "--font-heading",
+// });
 
 export default function RootLayout({
 	children,
@@ -58,7 +68,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang='en'
-			className={cn("light", fontBody.variable, fontHeading.variable)}
+			className={cn("light", fontSans.variable)}
 			suppressHydrationWarning>
 			{/*
     ✅ COLOR & SPACING SYSTEM v2.0 IMPLEMENTATION GUIDE
