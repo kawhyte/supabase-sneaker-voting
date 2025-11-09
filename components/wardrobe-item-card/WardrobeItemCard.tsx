@@ -261,7 +261,7 @@ function WardrobeItemCardComponent({
 
 						{/* Footer - Outfit Creation & Cost Per Wear Button */}
 						{viewMode === 'collection'  && (
-						<div className='flex items-center gap-2 flex-wrap mt-auto pt-4 border-stone-200'>
+						<div className='flex items-center border-t gap-2 flex-wrap mt-auto pt-4 border-stone-200'>
 							<ItemFooterBadges
 								item={item}
 								viewMode={viewMode}
