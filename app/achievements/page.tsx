@@ -169,7 +169,7 @@ function AchievementsPageContent() {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 achievements-main">
       {/* Header with Preferences */}
       <div className="achievements-header flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-        <h1 className="hero-title text-3xl sm:text-4xl font-bold text-foreground">
+        <h1 className="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">
           {getGreeting(userName || undefined)}
         </h1>
         {userId && (

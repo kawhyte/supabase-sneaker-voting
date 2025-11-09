@@ -126,7 +126,7 @@ export default function RootLayout({
             <Navbar />
 
             {/* Main content inherits bg-background from body, no need to repeat */}
-            <main className="flex-1  sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 container mx-auto px-6 w-full">
+            <main className="flex-1  py-8 sm:py-12 lg:py-16 container mx-auto w-full">
               {children}
             </main>
 

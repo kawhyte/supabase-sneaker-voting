@@ -238,7 +238,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 	return (
 		<nav className='sticky top-0 z-50 w-full bg-background backdrop-blur-md supports-[backdrop-filter]:bg-stone-50'>
-			<div className='container mx-auto px-6'>
+			<div className='container mx-auto'>
 				<div className='flex h-16 items-center justify-between gap-6  '>
 					{/* Logo/Brand - Minimalist Design with Poppins SemiBold (Outside Pill) */}
 					<Link href='/' className='flex items-center gap-2 motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:scale-105 flex-shrink-0'>
