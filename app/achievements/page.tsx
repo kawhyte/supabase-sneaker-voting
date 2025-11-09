@@ -3,14 +3,12 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import './achievements.css'
-import { HeroSection } from '@/components/achievements/HeroSection'
-import { CoreStatsGrid } from '@/components/achievements/CoreStatsGrid'
+import { StatsGrid } from '@/components/achievements/StatsGrid'
 import { AchievementsSidebar } from '@/components/achievements/AchievementsSidebar'
 import { AchievementsErrorBoundary } from '@/components/achievements/AchievementsErrorBoundary'
 import { StatsPreferences, type StatsPreferencesType } from '@/components/achievements/StatsPreferences'
 import {
-  HeroSkeleton,
-  CoreStatsSkeleton,
+  StatsGridSkeleton,
   SidebarSkeleton,
   FinancialInsightsSkeleton,
   GallerySkeleton,
@@ -45,8 +43,17 @@ const FunFactsSection = lazy(() =>
   }))
 )
 
+// Helper function for personalized greeting
+function getGreeting(userName?: string): string {
+  const hour = new Date().getHours()
+  const timeOfDay = hour < 12 ? 'Morning' : hour < 18 ? 'Afternoon' : 'Evening'
+  const name = userName || 'there'
+  return `Good ${timeOfDay}, ${name}!`
+}
+
 function AchievementsPageContent() {
   const [stats, setStats] = useState<WardrobeStats | null>(null)
+  const [userName, setUserName] = useState<string | null>(null)
   const [topWorn, setTopWorn] = useState<TopWornItem[]>([])
   const [leastWorn, setLeastWorn] = useState<LeastWornItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -72,6 +79,17 @@ function AchievementsPageContent() {
         }
 
         setUserId(user.id)
+
+        // Fetch user's first name from profiles table
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name, display_name')
+          .eq('id', user.id)
+          .single()
+
+        if (profile) {
+          setUserName(profile.first_name || profile.display_name || null)
+        }
 
         // Analytics removed - not configured yet
         // try {
@@ -118,8 +136,7 @@ function AchievementsPageContent() {
   if (isLoading || !stats) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <HeroSkeleton />
-        <CoreStatsSkeleton />
+        <StatsGridSkeleton />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <FinancialInsightsSkeleton />
@@ -153,7 +170,7 @@ function AchievementsPageContent() {
       {/* Header with Preferences */}
       <div className="achievements-header flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
         <h1 className="hero-title text-3xl sm:text-4xl font-bold text-foreground">
-          Your Achievements 🏆
+          {getGreeting(userName || undefined)}
         </h1>
         {userId && (
           <div onClick={() => trackInteraction('stats_preferences')}>
@@ -162,11 +179,8 @@ function AchievementsPageContent() {
         )}
       </div>
 
-      <HeroSection stats={stats} />
-
-      <div className="core-stats-grid">
-        <CoreStatsGrid stats={stats} />
-      </div>
+      {/* NEW: Simplified Stats Grid (replaces HeroSection + CoreStatsGrid) */}
+      <StatsGrid stats={stats} />
 
       {/* NEW: Grid Layout (main content + sidebar) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
