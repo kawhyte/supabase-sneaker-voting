@@ -35,6 +35,7 @@ import {
 } from "./EmptyStateIllustrations";
 import { ItemStatus } from "@/types/ItemStatus";
 import { ViewDensityToggle } from "./ViewDensityToggle";
+import { DashboardHeader } from "./DashboardHeader";
 
 interface WardrobeDashboardProps {
 	onAddNew?: () => void;
@@ -515,7 +516,7 @@ export function WardrobeDashboard({
 	return (
 		<div className='max-w-[1920px] mx-auto px-xl py-xl'>
 			<DashboardHeader status={displayStatus} />
-			<div className='flex flex-col lg:flex-row justify-between md:gap-x-4 gap-y-4 lg:gap-y-0'>
+			<div className='flex flex-col lg:flex-row justify-between md:gap-x-4 gap-y-4 lg:gap-y-0  mb-8'>
 				<WardrobeFilters
 					searchTerm={searchTerm}
 					onSearchChange={setSearchTerm}
@@ -532,7 +533,7 @@ export function WardrobeDashboard({
 				<ViewDensityToggle />
 			</div>
 
-			<WardrobeStats journalEntries={journalEntries} />
+			{/* <WardrobeStats journalEntries={journalEntries} /> */}
 
 			<DashboardGrid
 				entries={filteredAndSortedEntries}
@@ -612,32 +613,6 @@ export function WardrobeDashboard({
 					(e) => e.status === ItemStatus.OWNED
 				)}
 			/>
-		</div>
-	);
-}
-
-// Sub-components
-function DashboardHeader({ status }: { status: ItemStatus }) {
-	const titles: Record<ItemStatus, { title: string; description: string }> = {
-		[ItemStatus.OWNED]: {
-			title: "Owned Items",
-			description: "Items you own and have purchased",
-		},
-		[ItemStatus.WISHLISTED]: {
-			title: "Want to Buy",
-			description: "Track items you're interested in and monitor price changes",
-		},
-	};
-
-	const { title, description } =
-		titles[status] || titles[ItemStatus.WISHLISTED];
-
-	return (
-		<div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-4'>
-			<div>
-				<h1 className='text-3xl font-bold font-heading -mb-2'>{title}</h1>
-				<p className='text-slate-600'>{description}</p>
-			</div>
 		</div>
 	);
 }

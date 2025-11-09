@@ -48,7 +48,7 @@ export function ViewDensityToggle() {
 					<TooltipTrigger asChild>
 						<button
 							onClick={() => setDensity(id)}
-							className={`p-2 rounded-md flex items-center gap-x-4 transition-all ${
+							className={`p-2 rounded-md flex items-center gap-x-2 transition-all ${
 								density === id
 									? "bg-white shadow-sm text-primary"
 									: "text-muted-foreground hover:text-foreground hover:bg-stone-200/50"

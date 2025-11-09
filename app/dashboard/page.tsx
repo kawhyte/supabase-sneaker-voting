@@ -9,6 +9,7 @@ import { WardrobeDashboard } from '@/components/WardrobeDashboard'
 import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
 import { Package, Heart, Archive, Sparkles } from 'lucide-react'
 import { ItemStatus } from '@/types/ItemStatus'
+import { DashboardHeader } from '@/components/DashboardHeader'
 
 /*
   ✅ DASHBOARD DESIGN SYSTEM v2.0 IMPLEMENTATION
@@ -91,6 +92,10 @@ import { ItemStatus } from '@/types/ItemStatus'
   📚 Related: globals.css (lines 97-315 spacing, 404-476 colors, 493-496 layout)
 */
 
+	// const displayStatus = status.includes(ItemStatus.WISHLISTED)
+	// 	? ItemStatus.WISHLISTED
+	// 	: status[0];
+    
 function DashboardContent() {
   const searchParams = useSearchParams()
   // Default to 'owned' if no tab is specified in the URL
@@ -103,12 +108,15 @@ function DashboardContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
+
+        <div className='text-3xl font-bold font-heading -mb-2'>My Wardrobe</div>
+        {/* <DashboardHeader status={"displayStatus"} /> */}
         {/* Section spacing between dashboard sections (48px) - Optimized for all screen sizes */}
         <div className="mt-12 mb-6">
           {/* Tabs Container with ultra-wide optimization */}
-          <Tabs defaultValue={defaultTab} className="w-full max-w-[1920px] mx-auto rounded-lg p-6 ">
+          <Tabs defaultValue={defaultTab} className="w-full max-w-[1920px] mx-auto rounded-lg ">
           {/* Header with Tabs and Density Toggle */}
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-16">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 ">
             {/* Tabs */}
             <div className="flex-1">
               <TabsList
@@ -120,7 +128,7 @@ function DashboardContent() {
                   data-variant="underline"
                   className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
                 >
-                  <Package className="h-4 w-4 mr-2" />
+                  {/* <Package className="h-4 w-4 mr-2" /> */}
                   Owned
                 </TabsTrigger>
                 <TabsTrigger
@@ -128,7 +136,7 @@ function DashboardContent() {
                   data-variant="underline"
                   className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
                 >
-                  <Heart className="h-4 w-4 mr-2" />
+                  {/* <Heart className="h-4 w-4 mr-2" /> */}
                   Want to Buy
                 </TabsTrigger>
                 <TabsTrigger
@@ -136,7 +144,7 @@ function DashboardContent() {
                   data-variant="underline"
                   className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
                 >
-                  <Sparkles className="h-4 w-4 mr-2" />
+                  {/* <Sparkles className="h-4 w-4 mr-2" /> */}
                   Outfits
                 </TabsTrigger>
                 <TabsTrigger
@@ -144,13 +152,13 @@ function DashboardContent() {
                   data-variant="underline"
                   className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
                 >
-                  <Archive className="h-4 w-4 mr-2" />
+                  {/* <Archive className="h-4 w-4 mr-2" /> */}
                   Archived Items
                 </TabsTrigger>
               </TabsList>
             </div>
             {/* Density Toggle */}
-            <ViewDensityToggle />
+            {/* <ViewDensityToggle /> */}
           </div>
 
           {/* --- Tab Content --- */}
