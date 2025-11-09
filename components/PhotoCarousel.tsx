@@ -6,7 +6,8 @@ import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { buildCloudinaryUrlWithSize, extractPublicIdFromUrl } from '@/lib/cloudinary-url-builder'
+import { CldImage } from 'next-cloudinary';
+import { buildCloudinaryUrlWithSize, extractPublicIdFromUrl, ImageSize, IMAGE_SIZES } from '@/lib/cloudinary-url-builder'
 
 interface Photo {
   id: string
@@ -23,6 +24,9 @@ interface PhotoCarouselProps {
   showIndicators?: boolean
   category?: string
   onPhotoClick?: (photo: Photo) => void
+  size?: ImageSize
+  crop?: 'fill' | 'fit' | 'pad' | 'limit'
+  gravity?: 'auto' | 'center' | 'face'
 }
 
 export function PhotoCarousel({
@@ -32,7 +36,10 @@ export function PhotoCarousel({
   showControls = true,
   showIndicators = true,
   category,
-  onPhotoClick
+  onPhotoClick,
+  size = 'carousel', // Default to 'carousel' if not provided
+  crop = 'fit',    // Default to 'fit' (like object-contain)
+  gravity,
 }: PhotoCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -101,10 +108,10 @@ export function PhotoCarousel({
 
   if (sortedPhotos.length === 1) {
     const photo = sortedPhotos[0]
-    const displayUrl = buildCloudinaryUrlWithSize(
-      extractPublicIdFromUrl(photo.image_url),
-      'carousel'
-    )
+    // const displayUrl = buildCloudinaryUrlWithSize(
+    //   extractPublicIdFromUrl(photo.image_url),
+    //   'carousel'
+    // )
     return (
       <Card className={`dense ${className}`}>
         <CardContent className="p-0 relative">
@@ -118,7 +125,20 @@ export function PhotoCarousel({
             className="relative cursor-pointer group"
             onClick={() => onPhotoClick?.(photo)}
           >
-            <img
+       <CldImage
+              src={extractPublicIdFromUrl(photo.image_url) || '/images/placeholder.svg'}
+              alt="Item photo"
+              width={IMAGE_SIZES[size]}
+              height={IMAGE_SIZES[size]}
+              crop={crop}
+              gravity={gravity}
+              className={`w-full h-full ${crop === 'fill' ? 'object-cover' : 'object-contain'} rounded-lg`}
+              style={{ aspectRatio: autoHeight ? 'auto' : '1 / 1' }}
+              onError={(e: any) => {
+                e.currentTarget.src = '/images/placeholder.svg';
+              }}
+            />
+            {/* <img
               src={displayUrl}
               alt="Item photo"
               className="w-full h-full object-contain rounded-lg"
@@ -128,7 +148,7 @@ export function PhotoCarousel({
               onError={(e) => {
                 e.currentTarget.src = '/images/placeholder.svg';
               }}
-            />
+            /> */}
 
             {onPhotoClick && (
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
@@ -155,10 +175,10 @@ export function PhotoCarousel({
         <div className="overflow-hidden h-full" ref={emblaRef}>
             <div className="flex h-full">
               {sortedPhotos.map((photo, index) => {
-                const displayUrl = buildCloudinaryUrlWithSize(
-                  extractPublicIdFromUrl(photo.image_url),
-                  'carousel'
-                )
+                // const displayUrl = buildCloudinaryUrlWithSize(
+                //   extractPublicIdFromUrl(photo.image_url),
+                //   'carousel'
+                // )
                 return (
                 <div
                   key={photo.id}
@@ -168,7 +188,19 @@ export function PhotoCarousel({
                     className="relative cursor-pointer group h-full"
                     onClick={() => onPhotoClick?.(photo)}
                   >
-                    <img
+                <CldImage
+                      src={extractPublicIdFromUrl(photo.image_url) || '/images/placeholder.svg'}
+                      alt={`Item photo ${index + 1}`}
+                      width={IMAGE_SIZES[size]}
+                      height={IMAGE_SIZES[size]}
+                      crop={crop}
+                      gravity={gravity}
+                      className={`w-full h-full ${crop === 'fill' ? 'object-cover' : 'object-contain'}`}
+                      onError={(e: any) => {
+                        e.currentTarget.src = '/images/placeholder.svg';
+                      }}
+                    />
+                    {/* <img
                       src={displayUrl}
                       alt={`Item photo ${index + 1}`}
                       className="w-full h-full object-contain"
@@ -177,7 +209,7 @@ export function PhotoCarousel({
                       onError={(e) => {
                         e.currentTarget.src = '/images/placeholder.svg';
                       }}
-                    />
+                    /> */}
 
                     {onPhotoClick && (
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
