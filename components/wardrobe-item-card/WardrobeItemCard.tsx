@@ -141,12 +141,12 @@ function WardrobeItemCardComponent({
 						</div>
 
 						{/* Archive Reason - Archive page only */}
-						{isArchivePage && item.archive_reason && (
+						{/* {isArchivePage && item.archive_reason && (
 							<div className='text-xs text-muted-foreground flex items-center gap-2'>
 								<Archive className='h-3 w-3 text-muted-foreground' />
 								<span>Reason: {item.archive_reason}</span>
 							</div>
-						)}
+						)} */}
 
 						{/* Title */}
 						<h3 className='text-base sm:text-lg font-semibold leading-tight line-clamp-2 font-heading'>
@@ -159,7 +159,7 @@ function WardrobeItemCardComponent({
 						</h3>
 
 						{/* Metadata Grid */}
-						<div className='flex flex-col gap-2.5 mt-3'>
+						<div className='flex flex-col gap-2.5 mt-1'>
 							{/* Date Display - Only show in detailed mode */}
 							{showDates && (
 								<div className='text-sm text-muted-foreground flex items-center gap-1'>
@@ -218,7 +218,7 @@ function WardrobeItemCardComponent({
 						{showNotes && item.notes && item.notes.trim() && item.notes.toLowerCase() !== 'no note added' && (
 							<Tooltip delayDuration={300}>
 								<TooltipTrigger asChild>
-									<div className='mt-3 p-2.5 bg-stone-50 rounded-lg text-sm text-muted-foreground line-clamp-3 leading-relaxed cursor-help transition-colors hover:bg-stone-100'>
+									<div className='mt-1 p-2.5 bg-stone-50 rounded-lg italic text-sm text-muted-foreground line-clamp-3 leading-relaxed cursor-help transition-colors hover:bg-stone-100'>
 										{item.notes}
 									</div>
 								</TooltipTrigger>
@@ -260,7 +260,8 @@ function WardrobeItemCardComponent({
 						</div>
 
 						{/* Footer - Outfit Creation & Cost Per Wear Button */}
-						<div className='flex items-center gap-2 flex-wrap mt-auto pt-4 border-t border-stone-200'>
+						{viewMode === 'collection'  && (
+						<div className='flex items-center gap-2 flex-wrap mt-auto pt-4 border-stone-200'>
 							<ItemFooterBadges
 								item={item}
 								viewMode={viewMode}
@@ -271,6 +272,9 @@ function WardrobeItemCardComponent({
 								userWardrobe={userWardrobe}
 							/>
 						</div>
+
+
+						)}
 					</CardContent>
 				</div>
 			</Card>

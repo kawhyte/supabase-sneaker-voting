@@ -48,7 +48,7 @@ export function ItemFooterBadges({
 						className='flex items-center gap-2 bg-foreground text-white shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95'
 						size='sm'
 						aria-label='View cost per wear statistics'>
-						<TrendingDown className='h-4 w-4' />
+						{/* <TrendingDown className='h-4 w-4' /> */}
 						<span>Cost Per Wear</span>
 					</Button>
 				)}
@@ -61,7 +61,7 @@ export function ItemFooterBadges({
 						className='flex items-center gap-2 bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95'
 						size='sm'
 						aria-label='Create an outfit with this item'>
-						<Sparkles className='h-4 w-4' />
+						{/* <Sparkles className='h-4 w-4' /> */}
 						<span>Create Outfit</span>
 					</Button>
 				)}

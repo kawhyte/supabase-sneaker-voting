@@ -29,11 +29,11 @@ export function ItemPricingDisplay({
 		if (!item.purchase_price) return null;
 
 		return (
-			<div className='flex items-center gap-1.5 px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
+			<div className='flex items-center gap-1.5 px-2 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
 				<span className='text-sm text-muted-foreground'>
-					Paid:
+					Purchase Price:
 				</span>
-				<span className='text-base font-semibold text-foreground'>
+				<span className='text-sm text-muted-foreground'>
 					${item.purchase_price}
 				</span>
 			</div>

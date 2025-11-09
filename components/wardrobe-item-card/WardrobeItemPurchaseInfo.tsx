@@ -34,7 +34,7 @@ export function ItemStoreAndDate({
 			{storeName && (
 				<>
 					<div className='flex items-center gap-1'>
-						<MapPin className='h-4 w-4 text-muted-foreground' />
+						{/* <MapPin className='h-4 w-4 text-muted-foreground' /> */}
 						<span className='truncate text-sm max-w-[160px] sm:max-w-[200px]'>
 							{storeName}
 						</span>
@@ -47,7 +47,7 @@ export function ItemStoreAndDate({
 
 			{showLastWorn && (
 				<div className='flex items-center gap-1'>
-					<Calendar className='h-3.5 w-3.5 text-muted-foreground' />
+					{/* <Calendar className='h-3.5 w-3.5 text-muted-foreground' /> */}
 					<span className='text-xs'>Last worn: {formatDate(lastWornDate!)}</span>
 				</div>
 			)}

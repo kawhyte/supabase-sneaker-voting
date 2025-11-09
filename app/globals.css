@@ -493,7 +493,7 @@
   h3 {
     @apply scroll-m-20 text-3xl font-semibold tracking-tight;
     line-height: var(--text-3xl--line-height);
-    margin-bottom: var(--spacing-4);  /* 16px - Perfect 2 × 8px */
+     /* 16px - Perfect 2 × 8px */
   }
 
   p {
