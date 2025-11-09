@@ -3,101 +3,105 @@
 import { useState, useEffect } from 'react'
 import { TrendingUp } from 'lucide-react'
 import { CategorySpendingChart } from './CategorySpendingChart'
-import { SpendingTrendsChart } from './SpendingTrendsChart'
 import { WardrobeSizeChart } from './WardrobeSizeChart'
 import {
   getCategorySpending,
-  getSpendingTrends,
   getWardrobeSizeOverTime,
   type TimePeriod,
 } from '@/lib/financial-stats'
+import { TimeRange } from '@/types/TimeRange'
 import { Skeleton } from '@/components/ui/skeleton'
 
 interface FinancialInsightsProps {
   userId: string
 }
 
+/**
+ * Financial Insights Section
+ * Displays category spending (pie chart) and wardrobe growth (bar chart)
+ * Spending Over Time chart has been removed
+ * Wardrobe Growth includes time range toggle
+ */
 export function FinancialInsights({ userId }: FinancialInsightsProps) {
-  // REMOVED: period state - now fixed to 'year'
   const period: TimePeriod = 'year'
 
   const [categoryData, setCategoryData] = useState<any[]>([])
-  const [trendsData, setTrendsData] = useState<any[]>([])
   const [wardrobeSizeData, setWardrobeSizeData] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [timeRange, setTimeRange] = useState<TimeRange>('12mo')
+  const [loading, setLoading] = useState(true)
+  const [loadingWardrobeSize, setLoadingWardrobeSize] = useState(false)
 
+  // Load category spending data (once on mount)
   useEffect(() => {
-    async function loadData() {
-      setIsLoading(true)
+    async function loadCategoryData() {
       try {
-        const [categories, trends, wardrobeSize] = await Promise.all([
-          getCategorySpending(userId, period),
-          getSpendingTrends(userId, period),
-          getWardrobeSizeOverTime(userId),
-        ])
-
+        const categories = await getCategorySpending(userId, period)
         setCategoryData(categories)
-        setTrendsData(trends)
-        setWardrobeSizeData(wardrobeSize)
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : JSON.stringify(error)
-        console.error('Error loading financial insights:', errorMessage)
+        console.error('Failed to load category spending:', error)
+        setCategoryData([])
       } finally {
-        setIsLoading(false)
+        setLoading(false)
       }
     }
 
-    loadData()
+    loadCategoryData()
   }, [userId, period])
 
+  // Load wardrobe size data (with time range dependency)
+  useEffect(() => {
+    async function loadWardrobeSizeData() {
+      setLoadingWardrobeSize(true)
+      try {
+        const wardrobeSize = await getWardrobeSizeOverTime(userId, timeRange)
+        setWardrobeSizeData(wardrobeSize)
+      } catch (error) {
+        console.error('Failed to load wardrobe size:', error)
+        setWardrobeSizeData([])
+      } finally {
+        setLoadingWardrobeSize(false)
+      }
+    }
+
+    loadWardrobeSizeData()
+  }, [userId, timeRange])
+
   return (
-    <section className="mb-12 bg-card border border-border rounded-xl p-6 shadow-sm" aria-labelledby="financial-title">
-      <div className="flex items-center gap-3 mb-6">
-        <TrendingUp
-          className="h-5 w-5 text-primary"
-          aria-hidden="true"
-        />
-        <h2 id="financial-title" className="text-2xl font-bold text-foreground">
-          Financial Insights
-        </h2>
-        <span className="ml-auto text-sm text-muted-foreground font-medium">
-          This Year
-        </span>
+    <section className="w-full" aria-labelledby="financial-title">
+      <div className="mb-6">
+        <div className="flex items-center gap-3">
+          <TrendingUp
+            className="h-5 w-5 text-primary"
+            aria-hidden="true"
+          />
+          <h2 id="financial-title" className="text-2xl font-bold">
+            📊 Financial Insights
+          </h2>
+        </div>
+        <p className="text-sm text-muted-foreground mt-1">This Year</p>
       </div>
 
-      {/* REMOVED: Time Period Selector (Tabs) */}
-
-      {isLoading ? (
+      {/* Charts Grid: 2 charts instead of 3 */}
+      {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <Skeleton className="h-64 rounded-lg" />
-          <Skeleton className="h-64 rounded-lg" />
-          <Skeleton className="h-64 rounded-lg" />
+          <Skeleton className="h-64 rounded-lg sm:col-span-2 lg:col-span-2" />
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Spending by Category */}
-          <div className="flex flex-col min-h-[280px] sm:min-h-[300px]">
-            <h3 className="text-sm font-medium text-foreground mb-4 text-center">Spending by Category</h3>
-            <div className="flex-1 flex items-center justify-center">
-              <CategorySpendingChart data={categoryData} />
-            </div>
+          {/* Category Spending: 1 column on all sizes */}
+          <div className="sm:col-span-1 lg:col-span-1">
+            <CategorySpendingChart data={categoryData} />
           </div>
 
-          {/* Spending Over Time */}
-          <div className="flex flex-col min-h-[280px] sm:min-h-[300px]">
-            <h3 className="text-sm font-medium text-foreground mb-4 text-center">Spending Over Time</h3>
-            <div className="flex-1 flex items-center justify-center">
-              <SpendingTrendsChart data={trendsData} />
-            </div>
-          </div>
-
-          {/* Wardrobe Growth */}
-          <div className="flex flex-col min-h-[280px] sm:min-h-[300px] sm:col-span-2 lg:col-span-1">
-            <h3 className="text-sm font-medium text-foreground mb-4 text-center">Wardrobe Growth</h3>
-            <div className="flex-1 flex items-end justify-center pb-4">
-              <WardrobeSizeChart data={wardrobeSizeData} />
-            </div>
+          {/* Wardrobe Growth: Spans 2 columns on lg, full width on sm/mobile */}
+          <div className="sm:col-span-2 lg:col-span-2">
+            <WardrobeSizeChart
+              data={wardrobeSizeData}
+              timeRange={timeRange}
+              onTimeRangeChange={setTimeRange}
+              isLoading={loadingWardrobeSize}
+            />
           </div>
         </div>
       )}

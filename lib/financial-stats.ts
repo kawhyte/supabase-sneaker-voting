@@ -6,6 +6,7 @@
 
 import { createClient } from '@/utils/supabase/client'
 import { ItemStatus } from '@/types/ItemStatus'
+import type { TimeRange as TimeRangeFilter } from '@/types/TimeRange'
 
 export interface CategorySpending {
   category: string
@@ -132,36 +133,110 @@ export async function getSpendingTrends(
 
 /**
  * Get wardrobe size over time (monthly snapshots)
+ * Returns cumulative count of items by month, filtered by time range
+ *
+ * @param userId - User ID
+ * @param timeRange - Time period to include ('6mo' | '12mo' | 'all')
+ * @returns Array of {month, count} objects with month format 'Jan 25'
  */
 export async function getWardrobeSizeOverTime(
-  userId: string
-): Promise<Array<{ date: string; count: number }>> {
-  const supabase = createClient()
+  userId: string,
+  timeRange: TimeRangeFilter = '12mo'
+): Promise<Array<{ month: string; count: number }>> {
+  try {
+    const supabase = createClient()
 
-  // Get all items with created_at dates
-  const { data, error } = await supabase
-    .from('items')
-    .select('created_at, is_archived')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: true })
+    // Determine start date based on time range
+    let startDate: string | null = null
 
-  if (error) throw error
+    switch (timeRange) {
+      case '6mo': {
+        // Calculate date 6 months ago
+        const sixMonthsAgo = new Date()
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+        startDate = sixMonthsAgo.toISOString()
+        break
+      }
+      case '12mo': {
+        // Calculate date 12 months ago
+        const twelveMonthsAgo = new Date()
+        twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12)
+        startDate = twelveMonthsAgo.toISOString()
+        break
+      }
+      case 'all': {
+        // No date restriction
+        startDate = null
+        break
+      }
+      default: {
+        // Fallback to 12 months for unknown values
+        const twelveMonthsAgo = new Date()
+        twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12)
+        startDate = twelveMonthsAgo.toISOString()
+      }
+    }
 
-  // Build monthly snapshots
-  const monthMap = new Map<string, number>()
-  let runningCount = 0
+    // Build query with optional date filter
+    let query = supabase
+      .from('items')
+      .select('created_at')
+      .eq('user_id', userId)
+      .not('is_archived', 'is', true)
+      .order('created_at', { ascending: true })
 
-  data?.forEach((item) => {
-    const date = new Date(item.created_at)
-    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+    // Apply date filter if time range is not 'all'
+    if (startDate) {
+      query = query.gte('created_at', startDate)
+    }
 
-    runningCount++
-    monthMap.set(monthKey, runningCount)
-  })
+    const { data, error } = await query
 
-  return Array.from(monthMap.entries())
-    .map(([date, count]) => ({ date, count }))
-    .sort((a, b) => a.date.localeCompare(b.date))
+    // Handle query errors
+    if (error) {
+      console.error(
+        `Error fetching wardrobe size for timeRange "${timeRange}":`,
+        error
+      )
+      return []
+    }
+
+    // Handle empty result
+    if (!data || data.length === 0) {
+      return []
+    }
+
+    // Aggregate data by month
+    const monthlyData: Record<string, number> = {}
+    let runningTotal = 0
+
+    data.forEach((item) => {
+      const date = new Date(item.created_at)
+      const monthKey = date.toLocaleString('en-US', {
+        year: '2-digit',
+        month: 'short',
+      })
+
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = 0
+      }
+
+      runningTotal++
+      monthlyData[monthKey] = runningTotal
+    })
+
+    // Convert to array format expected by chart component
+    return Object.entries(monthlyData).map(([month, count]) => ({
+      month,
+      count,
+    }))
+  } catch (error) {
+    console.error(
+      'Unexpected error in getWardrobeSizeOverTime:',
+      error instanceof Error ? error.message : String(error)
+    )
+    return []
+  }
 }
 
 /**

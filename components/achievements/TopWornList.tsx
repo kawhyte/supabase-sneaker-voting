@@ -6,6 +6,7 @@ import { TopWornItem } from '@/lib/achievements-stats'
 import { CATEGORY_CONFIGS } from '@/components/types/item-category'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ItemNameDisplay } from '@/components/shared/ItemNameDisplay'
 
 interface TopWornListProps {
   items: TopWornItem[]
@@ -71,9 +72,13 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
 
               {/* Details */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-foreground truncate">
-                  {item.brand}
-                </p>
+                <ItemNameDisplay
+                  brand={item.brand}
+                  model={item.model}
+                  color={item.color}
+                  className="mb-1"
+                  maxLength={35}
+                />
                 <p className="text-xs text-muted-foreground truncate">
                   Worn {item.wears}x
                 </p>
@@ -137,12 +142,13 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
 
               {/* Details */}
               <div className="p-4">
-                <div className="font-semibold text-sm text-foreground mb-1 line-clamp-1">
-                  {item.brand}
-                </div>
-                <div className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                  {item.model}
-                </div>
+                <ItemNameDisplay
+                  brand={item.brand}
+                  model={item.model}
+                  color={item.color}
+                  className="mb-2"
+                  maxLength={30}
+                />
 
                 {/* Wear Count */}
                 <div className="flex items-center gap-2">

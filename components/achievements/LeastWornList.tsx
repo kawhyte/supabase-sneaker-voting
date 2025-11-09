@@ -1,12 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart } from 'lucide-react'
+import { Heart, AlertCircle } from 'lucide-react'
 import { LeastWornItem } from '@/lib/achievements-stats'
 import { CATEGORY_CONFIGS } from '@/components/types/item-category'
 import Link from 'next/link'
 import Image from 'next/image'
-import { AlertCircle, Plus } from 'lucide-react'
+import { ItemNameDisplay } from '@/components/shared/ItemNameDisplay'
 
 interface LeastWornListProps {
   items: LeastWornItem[]
@@ -32,9 +32,13 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
           </h3>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-2">
           {items.slice(0, 3).map((item) => (
-            <div key={item.id} className="flex items-center gap-4">
+            <Link
+              key={item.id}
+              href="/dashboard?tab=owned"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors opacity-75 group"
+            >
               {/* Thumbnail */}
               <div className="w-14 h-14 rounded-lg bg-cover bg-center flex-shrink-0 relative">
                 {item.image_url ? (
@@ -42,11 +46,11 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
                     src={item.image_url}
                     alt={`${item.brand} ${item.model}`}
                     fill
-                    className="object-cover rounded-lg opacity-75"
+                    className="object-cover rounded-lg"
                     sizes="56px"
                   />
                 ) : (
-                  <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center opacity-75">
+                  <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center">
                     {(() => {
                       const CategoryIcon = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS]?.icon
                       return CategoryIcon ? <CategoryIcon className="h-5 w-5" /> : <span className="text-xl">👕</span>
@@ -57,22 +61,18 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
 
               {/* Details */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-foreground truncate">
-                  {item.brand}
-                </p>
+                <ItemNameDisplay
+                  brand={item.brand}
+                  model={item.model}
+                  color={item.color}
+                  className="mb-1"
+                  maxLength={35}
+                />
                 <p className="text-xs text-muted-foreground">
                   Last worn: {item.daysSinceLastWorn ? `${item.daysSinceLastWorn} days ago` : 'Never'}
                 </p>
               </div>
-
-              {/* Add Button */}
-              <button
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-colors flex-shrink-0"
-                aria-label={`Add ${item.brand} to outfit`}
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -128,12 +128,13 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
 
               {/* Details */}
               <div className="p-4">
-                <div className="font-semibold text-sm text-foreground mb-1 line-clamp-1">
-                  {item.brand}
-                </div>
-                <div className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                  {item.model}
-                </div>
+                <ItemNameDisplay
+                  brand={item.brand}
+                  model={item.model}
+                  color={item.color}
+                  className="mb-2"
+                  maxLength={30}
+                />
 
                 {/* Wear Info */}
                 <div className="text-xs text-amber-700 font-medium">

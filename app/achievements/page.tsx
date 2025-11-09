@@ -6,7 +6,6 @@ import './achievements.css'
 import { StatsGrid } from '@/components/achievements/StatsGrid'
 import { AchievementsSidebar } from '@/components/achievements/AchievementsSidebar'
 import { AchievementsErrorBoundary } from '@/components/achievements/AchievementsErrorBoundary'
-import { StatsPreferences, type StatsPreferencesType } from '@/components/achievements/StatsPreferences'
 import {
   StatsGridSkeleton,
   SidebarSkeleton,
@@ -44,10 +43,18 @@ const FunFactsSection = lazy(() =>
 )
 
 // Helper function for personalized greeting
-function getGreeting(userName?: string): string {
+function getGreeting(userName?: string | null): string {
   const hour = new Date().getHours()
   const timeOfDay = hour < 12 ? 'Morning' : hour < 18 ? 'Afternoon' : 'Evening'
-  const name = userName || 'there'
+
+  // Fallback chain: userName → 'there'
+  let name = userName || 'there'
+
+  // Truncate very long names (>20 chars)
+  if (name.length > 20) {
+    name = name.substring(0, 17) + '...'
+  }
+
   return `Good ${timeOfDay}, ${name}!`
 }
 
@@ -59,7 +66,6 @@ function AchievementsPageContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
-  const [preferences, setPreferences] = useState<StatsPreferencesType | null>(null)
 
   const supabase = createClient()
 
@@ -88,7 +94,7 @@ function AchievementsPageContent() {
           .single()
 
         if (profile) {
-          setUserName(profile.first_name || profile.display_name || null)
+          setUserName(profile.display_name || profile.first_name || null)
         }
 
         // Analytics removed - not configured yet
@@ -167,17 +173,10 @@ function AchievementsPageContent() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 achievements-main">
-      {/* Header with Preferences */}
-      <div className="achievements-header flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-        <h1 className="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">
-          {getGreeting(userName || undefined)}
-        </h1>
-        {userId && (
-          <div onClick={() => trackInteraction('stats_preferences')}>
-            <StatsPreferences userId={userId} onPreferencesChange={setPreferences} />
-          </div>
-        )}
-      </div>
+      {/* Header */}
+      <h1 className="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em] mb-8">
+        {getGreeting(userName)}
+      </h1>
 
       {/* NEW: Simplified Stats Grid (replaces HeroSection + CoreStatsGrid) */}
       <StatsGrid stats={stats} />
