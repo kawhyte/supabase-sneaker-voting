@@ -67,18 +67,18 @@ export function FinancialInsights({ userId }: FinancialInsightsProps) {
   }, [userId, timeRange])
 
   return (
-    <section className="w-full" aria-labelledby="financial-title">
+    <section className="w-full bg-card border border-border rounded-xl p-6 shadow-sm" aria-labelledby="financial-title">
       <div className="mb-6">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mb-4">
           <TrendingUp
             className="h-5 w-5 text-primary"
             aria-hidden="true"
           />
-          <h2 id="financial-title" className="text-2xl font-bold">
+          <h3 id="financial-title" className="text-2xl font-bold">
             Financial Insights
-          </h2>
+          </h3>
         </div>
-        <p className="text-sm text-muted-foreground mt-1">This Year</p>
+        {/* <p className="text-sm text-muted-foreground mt-1">This Year</p> */}
       </div>
 
       {/* Charts Grid: 2 charts instead of 3 */}

@@ -54,7 +54,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
             Total Money Saved
           </p>
 
-          <p className="tracking-tight text-4xl font-bold leading-tight text-foreground">
+          <p className="tracking-tight text-2xl font-bold leading-tight text-foreground">
             ${totalSaved.toFixed(2)}
           </p>
 
@@ -64,7 +64,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
             ) : (
               <TrendingDown className="h-4 w-4 text-red-600" />
             )}
-            <p className={`text-base font-medium leading-normal ${savedComparison > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`text-sm font-medium leading-normal ${savedComparison > 0 ? 'text-green-600' : 'text-red-600'}`}>
               {savedComparison > 0 ? '+' : ''}{savedComparison}% vs last month
             </p>
           </div>
@@ -75,13 +75,13 @@ export function StatsGrid({ stats }: StatsGridProps) {
           variants={itemVariants}
           className="flex flex-col gap-2 rounded-xl p-6 bg-card border border-border shadow-sm"
         >
-          <p className="text-base font-medium leading-normal text-foreground">
+          <p className="text-sm font-medium leading-normal text-foreground">
             Best Value (Cost Per Wear)
           </p>
 
           {stats.bestValue ? (
             <>
-              <p className="tracking-tight text-4xl font-bold leading-tight text-foreground">
+              <p className="tracking-tight text-2xl font-bold leading-tight text-foreground">
                 ${stats.bestValue.costPerWear.toFixed(2)}
               </p>
 
@@ -91,13 +91,13 @@ export function StatsGrid({ stats }: StatsGridProps) {
                 ) : (
                   <TrendingUp className="h-4 w-4 text-red-600" />
                 )}
-                <p className={`text-base font-medium leading-normal ${bestValueComparison < 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-sm font-medium leading-normal ${bestValueComparison < 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {bestValueComparison > 0 ? '+' : ''}{bestValueComparison}% vs last month
                 </p>
               </div>
             </>
           ) : (
-            <p className="text-base text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Keep wearing items to unlock
             </p>
           )}
@@ -108,22 +108,22 @@ export function StatsGrid({ stats }: StatsGridProps) {
           variants={itemVariants}
           className="flex flex-col gap-2 rounded-xl p-6 bg-card border border-border shadow-sm"
         >
-          <p className="text-base font-medium leading-normal text-foreground">
+          <p className="text-sm font-medium leading-normal text-foreground">
             Most Worn Item
           </p>
 
           {stats.mostWornItem ? (
             <>
-              <p className="tracking-tight text-4xl font-bold leading-tight text-foreground truncate">
+              <p className="tracking-tight text-2xl font-bold leading-tight text-foreground truncate">
                 {stats.mostWornItem.brand} {stats.mostWornItem.model}
               </p>
 
-              <p className="text-base font-medium leading-normal text-green-600">
+              <p className="text-sm font-medium leading-normal text-green-600">
                 Worn {mostWornThisMonth} times this month
               </p>
             </>
           ) : (
-            <p className="text-base text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Start logging wears
             </p>
           )}

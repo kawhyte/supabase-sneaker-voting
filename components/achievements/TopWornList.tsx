@@ -42,7 +42,7 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
             aria-hidden="true"
           />
           <h3 id="top-worn-sidebar-title" className="text-lg font-bold text-foreground">
-            Top 3 Most Worn
+            Most Worn
           </h3>
         </div>
 

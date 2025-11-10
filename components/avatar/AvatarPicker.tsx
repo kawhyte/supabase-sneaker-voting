@@ -102,7 +102,7 @@ export function AvatarPicker({ isOpen, onClose, currentAvatarId, onSelect }: Ava
       //   currentAvatarId ? 'preset' : null
       // )
 
-      toast.success('Avatar updated successfully!')
+      toast.success('Avatar selected!')
       onClose()
     } catch (error) {
       console.error('Error updating avatar:', error)
@@ -174,7 +174,7 @@ export function AvatarPicker({ isOpen, onClose, currentAvatarId, onSelect }: Ava
                 Saving...
               </>
             ) : (
-              'Save Avatar'
+              'Select Avatar'
             )}
           </Button>
         </div>

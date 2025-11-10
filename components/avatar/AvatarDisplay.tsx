@@ -1,7 +1,7 @@
 // components/avatar/AvatarDisplay.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 
@@ -25,6 +25,15 @@ export function AvatarDisplay({
   className
 }: AvatarDisplayProps) {
   const [isLoading, setIsLoading] = useState(true)
+  const [cacheKey, setCacheKey] = useState(Date.now())
+
+  // Update cache key when avatar changes to force reload
+  useEffect(() => {
+    console.log('🖼️ [AvatarDisplay] Avatar changed, forcing reload:', presetAvatarId)
+    setIsLoading(true)
+    setCacheKey(Date.now())
+  }, [presetAvatarId, avatarUrl, avatarType])
+
   // Size mapping (follows 8px grid)
   const sizeClasses = {
     sm: 'h-8 w-8',      // 32px - navbar
@@ -33,11 +42,16 @@ export function AvatarDisplay({
     xl: 'h-32 w-32',    // 128px - profile page
   }
 
-  // Determine image source
-  const imageSrc =
-    avatarType === 'preset' && presetAvatarId
-      ? `/avatars/${presetAvatarId}.webp`
-      : avatarUrl || undefined
+  // Determine image source with cache busting (memoized to prevent unnecessary recalculations)
+  const imageSrc = useMemo(() => {
+    if (avatarType === 'preset' && presetAvatarId) {
+      // Add cache key to force reload when avatar changes
+      const src = `/avatars/${presetAvatarId}.webp?v=${cacheKey}`
+      console.log('🖼️ [AvatarDisplay] Image URL:', src)
+      return src
+    }
+    return avatarUrl || undefined
+  }, [avatarType, presetAvatarId, avatarUrl, cacheKey])
 
   // Fallback initials
   const getInitials = () => {
@@ -52,11 +66,12 @@ export function AvatarDisplay({
   }
 
   return (
-    <Avatar className={cn(sizeClasses[size], className)}>
+    <Avatar key={imageSrc} className={cn(sizeClasses[size], className)}>
       {isLoading && imageSrc && (
         <div className="absolute inset-0 rounded-full bg-muted animate-pulse" />
       )}
       <AvatarImage
+        key={imageSrc}
         src={imageSrc}
         alt={displayName || 'User avatar'}
         loading="lazy"

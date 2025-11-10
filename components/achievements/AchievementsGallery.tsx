@@ -119,9 +119,9 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
           className="h-5 w-5 text-primary"
           aria-hidden="true"
         />
-        <h2 id="achievements-gallery-title" className="text-2xl font-bold text-foreground">
+        <h3 id="achievements-gallery-title" className="text-2xl font-bold text-foreground">
           Achievements
-        </h2>
+        </h3>
       </div>
 
       {/* Grid - UPDATED: Use achievements instead of filtered */}

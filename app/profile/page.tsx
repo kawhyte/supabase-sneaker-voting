@@ -75,6 +75,14 @@ function SettingsContent() {
     fetchData()
   }, [])
 
+  // Callback to update profile state from child components
+  const handleProfileUpdate = (updatedProfile: Partial<ProfileData> | any) => {
+    if (profile) {
+      console.log('🔄 [SettingsContent] Updating profile state:', updatedProfile)
+      setProfile({ ...profile, ...updatedProfile } as ProfileData)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="w-full py-8 flex items-center justify-center">
@@ -145,7 +153,7 @@ function SettingsContent() {
             value="profile"
             className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300"
           >
-            <ProfileForm profile={profile} user={user} />
+            <ProfileForm profile={profile} user={user} onProfileUpdate={handleProfileUpdate} />
           </TabsContent>
 
           {/* Purchase Prevention Tab */}

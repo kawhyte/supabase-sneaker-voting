@@ -1,7 +1,7 @@
 // components/avatar/AvatarEditor.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { AvatarDisplay } from './AvatarDisplay'
 import { AvatarPicker } from './AvatarPicker'
@@ -26,15 +26,27 @@ export function AvatarEditor({ profile, user, onAvatarChange }: AvatarEditorProp
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const [currentProfile, setCurrentProfile] = useState(profile)
 
+  // Sync local state when profile prop changes
+  useEffect(() => {
+    console.log('🎨 [AvatarEditor] Profile prop changed:', profile.preset_avatar_id)
+    setCurrentProfile(profile)
+  }, [profile])
+
   const handleAvatarSelect = async (avatarId: string) => {
+    console.log('🎨 [AvatarEditor] Avatar selected:', avatarId)
+
     // Update local state only
-    setCurrentProfile({
+    const newProfile = {
       ...currentProfile,
-      avatar_type: 'preset',
+      avatar_type: 'preset' as const,
       preset_avatar_id: avatarId,
-    })
+    }
+
+    console.log('🎨 [AvatarEditor] Updating local profile to:', newProfile)
+    setCurrentProfile(newProfile)
 
     // Notify parent component of change
+    console.log('🎨 [AvatarEditor] Calling onAvatarChange callback')
     onAvatarChange?.(avatarId)
     setIsPickerOpen(false)
   }
@@ -44,6 +56,7 @@ export function AvatarEditor({ profile, user, onAvatarChange }: AvatarEditorProp
       {/* Current Avatar Display */}
       <div className="group relative motion-safe:transition-all motion-safe:duration-300">
         <AvatarDisplay
+          key={currentProfile.preset_avatar_id || 'default'}
           avatarType={currentProfile.avatar_type}
           avatarUrl={currentProfile.avatar_url}
           presetAvatarId={currentProfile.preset_avatar_id}
