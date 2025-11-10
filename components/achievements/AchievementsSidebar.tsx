@@ -11,10 +11,12 @@ interface AchievementsSidebarProps {
 
 export function AchievementsSidebar({ topWorn, leastWorn }: AchievementsSidebarProps) {
   return (
-    <div className="flex  justify-between gap-8 space-y-8" aria-label="Wardrobe highlights sidebar">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Wardrobe highlights sidebar">
       {/* Top Worn Widget */}
       <TopWornList items={topWorn} variant="sidebar" />
 
+      {/* Least Worn Widget */}
+      <LeastWornList items={leastWorn} variant="sidebar" />
       {/* Least Worn Widget */}
       <LeastWornList items={leastWorn} variant="sidebar" />
     </div>

@@ -180,10 +180,10 @@ function AchievementsPageContent() {
 
       {/* NEW: Simplified Stats Grid (replaces HeroSection + CoreStatsGrid) */}
       <StatsGrid stats={stats} />
-
- <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} />
-        </div>
+<AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} />
+ {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+        </div> */}
 
       {/* NEW: Grid Layout (main content + sidebar) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

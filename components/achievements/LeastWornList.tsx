@@ -28,7 +28,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
             aria-hidden="true"
           />
           <h3 id="least-worn-sidebar-title" className="text-lg font-bold text-foreground">
-            3 Items Needing Love
+           Items Needing Love
           </h3>
         </div>
 
