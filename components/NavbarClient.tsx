@@ -229,7 +229,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 	const authenticatedNavLinks: NavLink[] = [
 		{ href: '/dashboard', label: 'My Wardrobe' },
 		{ href: '/achievements', label: 'Achievements' },
-		{ href: '/add-new-item', label: 'Add Item', isAction: true },
+		// { href: '/add-new-item', label: 'Add Item', isAction: true },
 	];
 
 	const navLinks = isAuthenticated
@@ -243,13 +243,13 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					{/* Logo/Brand - Minimalist Design with Poppins SemiBold (Outside Pill) */}
 					<Link href='/' className='flex items-center gap-2 motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:scale-105 flex-shrink-0'>
 						<PawPrint className='text-sun-600 h-8 w-8' />
-						<span className='text-xl font-extrabold text-sun-600'>
+						<span className='text-2xl font-extrabold '>
 							PurrView
 						</span>
 					</Link>
 
 					{/* Desktop Navigation Links - INSIDE PILL */}
-					<div className='dense hidden lg:flex md:justify-evenly items-center gap-6 px-16 py-4 rounded-4xl bg-white/80 border border-border/30 shadow-lg backdrop-blur-sm motion-safe:transition-all motion-safe:duration-150'>
+					<div className='dense hidden lg:flex md:justify-evenly items-center gap-6 px-16 py-4'>
 						{navLinks.map((link) => (
 							link.isAction ? (
 								<Link key={link.href} href={link.href}>
@@ -296,7 +296,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 							{/* User Menu */}
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
-									<button className="dense p-0 rounded-full hover:opacity-80 motion-safe:transition-opacity">
+									<button className="dense  rounded-full hover:opacity-80 motion-safe:transition-opacity p-2 bg-muted hover:bg-muted/60">
 										{userProfile ? (
 											<AvatarDisplay
 												avatarType={userProfile?.avatar_type}

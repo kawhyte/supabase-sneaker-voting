@@ -4,12 +4,14 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ViewDensityToggle } from '@/components/ViewDensityToggle'
+// import { ViewDensityToggle } from '@/components/ViewDensityToggle'
+import { Button } from "@/components/ui/button";
 import { WardrobeDashboard } from '@/components/WardrobeDashboard'
 import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
-import { Package, Heart, Archive, Sparkles } from 'lucide-react'
+import { Package, Heart, Archive, Sparkles, LayoutGrid, Plus } from 'lucide-react'
 import { ItemStatus } from '@/types/ItemStatus'
 import { DashboardHeader } from '@/components/DashboardHeader'
+import Link from 'next/link'
 
 /*
   ✅ DASHBOARD DESIGN SYSTEM v2.0 IMPLEMENTATION
@@ -109,7 +111,21 @@ function DashboardContent() {
         transition={{ duration: 0.5 }}
       >
 
-        <div className='text-3xl font-bold font-heading -mb-2'>My Wardrobe</div>
+<div className='flex justify-between'>
+        <h3 className='text-3xl font-bold font-headin -mb-2'>My Wardrobe</h3>
+        
+        <span>
+
+
+	<Link key={'/add-new-item'} href={'/add-new-item'}>
+									<Button className='flex items-center gap-2  bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-sm  font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
+										<Plus className='h-4 w-4' />
+										{'Add Item'}
+									</Button>
+								</Link>
+
+        </span></div>
+        
         {/* <DashboardHeader status={"displayStatus"} /> */}
         {/* Section spacing between dashboard sections (48px) - Optimized for all screen sizes */}
         <div className="mt-12 mb-6">
