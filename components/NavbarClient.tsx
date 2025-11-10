@@ -368,8 +368,17 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 									{/* Log Out */}
 									<DropdownMenuItem asChild>
 										<button
-											onClick={() => {
-												window.location.href = '/';
+											onClick={async () => {
+												try {
+													// Sign out from Supabase
+													await supabase.auth.signOut();
+													// Redirect to login page
+													window.location.href = '/login';
+												} catch (error) {
+													console.error('Logout error:', error);
+													// Fallback: redirect to login anyway
+													window.location.href = '/login';
+												}
 											}}
 											className="text-red-600 w-full cursor-pointer text-left"
 										>
