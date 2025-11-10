@@ -44,6 +44,8 @@ import {
 	ShoppingBag,
 	Unlock,
 	TrendingUp,
+	Check,
+	Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -75,9 +77,13 @@ interface NotificationPrefs {
 
 export function NotificationPreferences() {
 	const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
+	const [originalPrefs, setOriginalPrefs] = useState<NotificationPrefs | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const supabase = createClient();
+
+	// Track unsaved changes
+	const hasUnsavedChanges = JSON.stringify(prefs) !== JSON.stringify(originalPrefs);
 
 	// Fetch preferences
 	useEffect(() => {
@@ -100,14 +106,15 @@ export function NotificationPreferences() {
 			}
 
 			setPrefs(data);
+			setOriginalPrefs(data);
 			setIsLoading(false);
 		}
 
 		fetchPrefs();
 	}, [supabase]);
 
-	// Save preferences
-	const savePreferences = async (updates: Partial<NotificationPrefs>) => {
+	// Manual save function
+	const handleSave = async () => {
 		if (!prefs) return;
 
 		setIsSaving(true);
@@ -120,13 +127,13 @@ export function NotificationPreferences() {
 
 			const { error } = await supabase
 				.from("notification_preferences")
-				.update(updates)
+				.update(prefs)
 				.eq("user_id", user.id);
 
 			if (error) throw error;
 
-			setPrefs({ ...prefs, ...updates });
-			toast.success("Preferences saved");
+			setOriginalPrefs(prefs);
+			toast.success("Preferences saved successfully");
 		} catch (error: any) {
 			console.error("Error saving preferences:", error);
 			toast.error("Failed to save preferences");
@@ -134,6 +141,39 @@ export function NotificationPreferences() {
 			setIsSaving(false);
 		}
 	};
+
+	// Update local state only (no immediate save)
+	const updatePreference = (updates: Partial<NotificationPrefs>) => {
+		if (!prefs) return;
+		setPrefs({ ...prefs, ...updates });
+	};
+
+	// Auto-save as fallback after 60 seconds
+	useEffect(() => {
+		if (!prefs || !hasUnsavedChanges || isLoading) return;
+
+		const timer = setTimeout(async () => {
+			try {
+				const {
+					data: { user },
+				} = await supabase.auth.getUser();
+				if (!user) return;
+
+				const { error } = await supabase
+					.from("notification_preferences")
+					.update(prefs)
+					.eq("user_id", user.id);
+
+				if (error) throw error;
+
+				setOriginalPrefs(prefs);
+			} catch (error: any) {
+				console.error("Auto-save error:", error);
+			}
+		}, 60000); // 60 seconds
+
+		return () => clearTimeout(timer);
+	}, [prefs, hasUnsavedChanges, isLoading, supabase]);
 
 	// Test notification
 	const sendTestNotification = async () => {
@@ -205,8 +245,9 @@ export function NotificationPreferences() {
 								id='in-app'
 								checked={prefs.enable_in_app}
 								onCheckedChange={(checked) =>
-									savePreferences({ enable_in_app: checked })
+									updatePreference({ enable_in_app: checked })
 								}
+								disabled={isSaving}
 								className='dense'
 							/>
 						</div>
@@ -266,8 +307,9 @@ export function NotificationPreferences() {
 								id='price-alerts'
 								checked={prefs.price_alerts_enabled}
 								onCheckedChange={(checked) =>
-									savePreferences({ price_alerts_enabled: checked })
+									updatePreference({ price_alerts_enabled: checked })
 								}
+								disabled={isSaving}
 								className='dense'
 							/>
 						</div>
@@ -289,8 +331,9 @@ export function NotificationPreferences() {
 								id='wear-reminders'
 								checked={prefs.wear_reminders_enabled}
 								onCheckedChange={(checked) =>
-									savePreferences({ wear_reminders_enabled: checked })
+									updatePreference({ wear_reminders_enabled: checked })
 								}
+								disabled={isSaving}
 								className='dense'
 							/>
 						</div>
@@ -312,8 +355,9 @@ export function NotificationPreferences() {
 								id='seasonal-tips'
 								checked={prefs.seasonal_tips_enabled}
 								onCheckedChange={(checked) =>
-									savePreferences({ seasonal_tips_enabled: checked })
+									updatePreference({ seasonal_tips_enabled: checked })
 								}
+								disabled={isSaving}
 								className='dense'
 							/>
 						</div>
@@ -335,8 +379,9 @@ export function NotificationPreferences() {
 								id='achievements'
 								checked={prefs.achievements_enabled}
 								onCheckedChange={(checked) =>
-									savePreferences({ achievements_enabled: checked })
+									updatePreference({ achievements_enabled: checked })
 								}
+								disabled={isSaving}
 								className='dense'
 							/>
 						</div>
@@ -360,8 +405,9 @@ export function NotificationPreferences() {
 								id='shopping-reminders'
 								checked={prefs.shopping_reminders_in_app}
 								onCheckedChange={(checked) =>
-									savePreferences({ shopping_reminders_in_app: checked })
+									updatePreference({ shopping_reminders_in_app: checked })
 								}
+								disabled={isSaving}
 								className='dense'
 							/>
 						</div>
@@ -385,8 +431,9 @@ export function NotificationPreferences() {
 								id='cooling-off'
 								checked={prefs.cooling_off_ready_in_app}
 								onCheckedChange={(checked) =>
-									savePreferences({ cooling_off_ready_in_app: checked })
+									updatePreference({ cooling_off_ready_in_app: checked })
 								}
+								disabled={isSaving}
 								className='dense'
 							/>
 						</div>
@@ -410,8 +457,9 @@ export function NotificationPreferences() {
 								id='cpw-milestones'
 								checked={prefs.cost_per_wear_milestones_in_app}
 								onCheckedChange={(checked) =>
-									savePreferences({ cost_per_wear_milestones_in_app: checked })
+									updatePreference({ cost_per_wear_milestones_in_app: checked })
 								}
+								disabled={isSaving}
 								className='dense'
 							/>
 						</div>
@@ -440,8 +488,9 @@ export function NotificationPreferences() {
 							id='quiet-hours'
 							checked={prefs.quiet_hours_enabled}
 							onCheckedChange={(checked) =>
-								savePreferences({ quiet_hours_enabled: checked })
+								updatePreference({ quiet_hours_enabled: checked })
 							}
+							disabled={isSaving}
 							className='dense'
 						/>
 					</div>
@@ -456,8 +505,9 @@ export function NotificationPreferences() {
 									<Select
 										value={prefs.quiet_hours_start}
 										onValueChange={(value) =>
-											savePreferences({ quiet_hours_start: value })
-										}>
+											updatePreference({ quiet_hours_start: value })
+										}
+										disabled={isSaving}>
 										<SelectTrigger id='quiet-start' className='dense mt-1 h-9'>
 											<SelectValue />
 										</SelectTrigger>
@@ -478,8 +528,9 @@ export function NotificationPreferences() {
 									<Select
 										value={prefs.quiet_hours_end}
 										onValueChange={(value) =>
-											savePreferences({ quiet_hours_end: value })
-										}>
+											updatePreference({ quiet_hours_end: value })
+										}
+										disabled={isSaving}>
 										<SelectTrigger id='quiet-end' className='dense mt-1 h-9'>
 											<SelectValue />
 										</SelectTrigger>
@@ -515,8 +566,9 @@ export function NotificationPreferences() {
 							id='bundling'
 							checked={prefs.enable_bundling}
 							onCheckedChange={(checked) =>
-								savePreferences({ enable_bundling: checked })
+								updatePreference({ enable_bundling: checked })
 							}
+							disabled={isSaving}
 							className='dense'
 						/>
 					</div>
@@ -533,8 +585,9 @@ export function NotificationPreferences() {
 								step={1}
 								value={[prefs.bundle_threshold]}
 								onValueChange={([value]) =>
-									savePreferences({ bundle_threshold: value })
+									updatePreference({ bundle_threshold: value })
 								}
+								disabled={isSaving}
 								className='mt-2'
 							/>
 							<p className='text-xs text-muted-foreground mt-2'>
@@ -561,10 +614,47 @@ export function NotificationPreferences() {
 							step={1}
 							value={[prefs.max_daily_notifications]}
 							onValueChange={([value]) =>
-								savePreferences({ max_daily_notifications: value })
+								updatePreference({ max_daily_notifications: value })
 							}
+							disabled={isSaving}
 						/>
 					</div>
+				</div>
+
+				{/* Save Button Section */}
+				<div className='border-t border-stone-200 pt-6'>
+					<div className='flex items-center justify-between'>
+						<div className='flex items-center gap-2'>
+							{hasUnsavedChanges && (
+								<div className='flex items-center gap-2 text-xs text-amber-600'>
+									<div className='h-2 w-2 rounded-full bg-amber-400' />
+									<span>You have unsaved changes</span>
+								</div>
+							)}
+							{!hasUnsavedChanges && (
+								<p className='text-xs text-muted-foreground flex items-center gap-2'>
+									<Check className='h-3 w-3' />
+									All changes saved
+								</p>
+							)}
+						</div>
+						<Button
+							onClick={handleSave}
+							disabled={!hasUnsavedChanges || isSaving}
+							className='min-w-[120px]'>
+							{isSaving ? (
+								<>
+									<Loader2 className='h-4 w-4 mr-2 animate-spin' />
+									Saving...
+								</>
+							) : (
+								'Save Changes'
+							)}
+						</Button>
+					</div>
+					<p className='text-xs text-muted-foreground mt-3'>
+						Changes auto-save after 60 seconds of inactivity
+					</p>
 				</div>
 
 				{/* TEST NOTIFICATION */}

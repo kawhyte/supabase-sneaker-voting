@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -42,11 +43,49 @@ export function PurchasePreventionSettings() {
     enable_duplication_warnings: false,
     preferred_cooling_off_days: 7,
   });
+  const [originalSettings, setOriginalSettings] = useState<PurchasePreventionSettings>({
+    enable_quiz_gate: true,
+    quiz_gate_outfit_threshold: 3,
+    enable_duplication_warnings: false,
+    preferred_cooling_off_days: 7,
+  });
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Auto-save settings changes
-  const { isSaving: isAutoSaving, hasUnsavedChanges } = useAutoSave({
+  // Track unsaved changes
+  const hasUnsavedChanges = JSON.stringify(settings) !== JSON.stringify(originalSettings);
+
+  // Manual save function
+  const handleSave = async () => {
+    if (!userId) return;
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          enable_quiz_gate: settings.enable_quiz_gate,
+          quiz_gate_outfit_threshold: settings.quiz_gate_outfit_threshold,
+          enable_duplication_warnings: settings.enable_duplication_warnings,
+          preferred_cooling_off_days: settings.preferred_cooling_off_days,
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      setOriginalSettings(settings);
+      toast.success('Settings saved successfully');
+    } catch (error: any) {
+      console.error('Save error:', error);
+      toast.error('Failed to save settings');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Auto-save as fallback after 60 seconds
+  const { isSaving: isAutoSaving } = useAutoSave({
     data: settings,
     onSave: async (data, signal) => {
       if (!userId) return;
@@ -63,10 +102,12 @@ export function PurchasePreventionSettings() {
         .abortSignal(signal);
 
       if (error) throw error;
+
+      setOriginalSettings(data);
     },
-    delay: 1000,
-    showToasts: true,
-    enabled: !isLoading && userId !== null
+    delay: 60000, // 60 seconds
+    showToasts: false, // Disable toasts for auto-save
+    enabled: !isLoading && userId !== null && hasUnsavedChanges
   });
 
   // Load current settings
@@ -87,12 +128,14 @@ export function PurchasePreventionSettings() {
         if (error) throw error;
 
         if (profile) {
-          setSettings({
+          const loadedSettings = {
             enable_quiz_gate: profile.enable_quiz_gate ?? true,
             quiz_gate_outfit_threshold: profile.quiz_gate_outfit_threshold ?? 3,
             enable_duplication_warnings: profile.enable_duplication_warnings ?? false,
             preferred_cooling_off_days: profile.preferred_cooling_off_days ?? 7,
-          });
+          };
+          setSettings(loadedSettings);
+          setOriginalSettings(loadedSettings);
         }
       } catch (error) {
         console.error('Failed to load settings:', error);
@@ -195,7 +238,7 @@ export function PurchasePreventionSettings() {
             <Switch
               checked={settings.enable_quiz_gate}
               onCheckedChange={handleQuizGateToggle}
-              disabled={isAutoSaving}
+              disabled={isSaving}
               className="dense ml-2"
             />
           </div>
@@ -219,7 +262,7 @@ export function PurchasePreventionSettings() {
                 step={1}
                 value={[settings.quiz_gate_outfit_threshold]}
                 onValueChange={handleQuizGateThresholdChange}
-                disabled={isAutoSaving}
+                disabled={isSaving}
                 className="mt-3"
               />
 
@@ -257,7 +300,7 @@ export function PurchasePreventionSettings() {
           <Select
             value={settings.preferred_cooling_off_days.toString()}
             onValueChange={handleCoolingOffChange}
-            disabled={isAutoSaving}
+            disabled={isSaving}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select cooling-off period" />
@@ -295,7 +338,7 @@ export function PurchasePreventionSettings() {
             <Switch
               checked={settings.enable_duplication_warnings}
               onCheckedChange={handleDuplicationToggle}
-              disabled={isAutoSaving}
+              disabled={isSaving}
               className="dense ml-2"
             />
           </div>
@@ -312,20 +355,47 @@ export function PurchasePreventionSettings() {
           )}
         </div>
 
-        {/* Auto-save status */}
+        {/* Save Button Section */}
         <div className="pt-4 border-t border-stone-200">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-muted-foreground flex items-center gap-2">
-              <Check className="h-3 w-3" />
-              Changes are saved automatically
-            </p>
-            {isAutoSaving && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                <span>Saving...</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {hasUnsavedChanges && (
+                <div className="flex items-center gap-2 text-xs text-amber-600">
+                  <div className="h-2 w-2 rounded-full bg-amber-400" />
+                  <span>You have unsaved changes</span>
+                </div>
+              )}
+              {!hasUnsavedChanges && (
+                <p className="text-xs text-muted-foreground flex items-center gap-2">
+                  <Check className="h-3 w-3" />
+                  All changes saved
+                </p>
+              )}
+              {isAutoSaving && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground ml-3">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Auto-saving...</span>
+                </div>
+              )}
+            </div>
+            <Button
+              onClick={handleSave}
+              disabled={!hasUnsavedChanges || isSaving}
+              className="min-w-[120px]"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save Changes'
+              )}
+            </Button>
           </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            Changes auto-save after 60 seconds of inactivity
+          </p>
         </div>
 
         {/* Info section */}

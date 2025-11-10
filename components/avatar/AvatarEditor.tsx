@@ -19,39 +19,24 @@ interface Profile {
 interface AvatarEditorProps {
   profile: Profile
   user: User
+  onAvatarChange?: (avatarId: string) => void
 }
 
-export function AvatarEditor({ profile, user }: AvatarEditorProps) {
+export function AvatarEditor({ profile, user, onAvatarChange }: AvatarEditorProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const [currentProfile, setCurrentProfile] = useState(profile)
-  const supabase = createClient()
 
   const handleAvatarSelect = async (avatarId: string) => {
-    // Optimistic update
-    const previousProfile = currentProfile
+    // Update local state only
     setCurrentProfile({
       ...currentProfile,
       avatar_type: 'preset',
       preset_avatar_id: avatarId,
     })
 
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          avatar_type: 'preset',
-          preset_avatar_id: avatarId,
-          avatar_updated_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
-
-      if (error) throw error
-    } catch (error) {
-      // Revert on error
-      setCurrentProfile(previousProfile)
-      throw error
-    }
+    // Notify parent component of change
+    onAvatarChange?.(avatarId)
+    setIsPickerOpen(false)
   }
 
   return (
