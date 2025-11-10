@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, AlertCircle } from 'lucide-react'
+import { Heart, AlertCircle, Shirt } from 'lucide-react'
 import { LeastWornItem } from '@/lib/achievements-stats'
 import { CATEGORY_CONFIGS } from '@/components/types/item-category'
 import Link from 'next/link'
@@ -53,7 +53,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
                   <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center">
                     {(() => {
                       const CategoryIcon = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS]?.icon
-                      return CategoryIcon ? <CategoryIcon className="h-5 w-5" /> : <span className="text-xl">👕</span>
+                      return CategoryIcon ? <CategoryIcon className="h-5 w-5" /> : <Shirt className="h-5 w-5 text-muted-foreground" />
                     })()}
                   </div>
                 )}
@@ -121,7 +121,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
                 <div className="aspect-square bg-muted flex items-center justify-center opacity-75">
                   {(() => {
                     const CategoryIcon = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS]?.icon
-                    return CategoryIcon ? <CategoryIcon className="h-16 w-16" /> : <span className="text-4xl">👕</span>
+                    return CategoryIcon ? <CategoryIcon className="h-16 w-16" /> : <Shirt className="h-16 w-16 text-muted-foreground" />
                   })()}
                 </div>
               )}

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { FunFactCard } from './FunFactCard'
 import { generateFunFacts, type FunFact } from '@/lib/fun-facts-generator'
 import { Button } from '@/components/ui/button'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Sparkles } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 
 interface FunFactsSectionProps {
@@ -47,7 +47,10 @@ export function FunFactsSection({ userId }: FunFactsSectionProps) {
   if (isLoading) {
     return (
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-foreground mb-6">Fun Facts 🎉</h2>
+        <div className="flex items-center gap-3 mb-6">
+          <Sparkles className="h-6 w-6 text-primary" aria-hidden="true" />
+          <h2 className="text-2xl font-bold text-foreground">Fun Facts</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-48 rounded-lg" />
@@ -60,9 +63,12 @@ export function FunFactsSection({ userId }: FunFactsSectionProps) {
   return (
     <section className="mb-12" aria-labelledby="fun-facts-title">
       <div className="flex items-center justify-between mb-6">
-        <h2 id="fun-facts-title" className="text-2xl font-bold text-foreground">
-          Fun Facts 🎉
-        </h2>
+        <div className="flex items-center gap-3">
+          <Sparkles className="h-6 w-6 text-primary" aria-hidden="true" />
+          <h2 id="fun-facts-title" className="text-2xl font-bold text-foreground">
+            Fun Facts
+          </h2>
+        </div>
 
         <Button
           onClick={refreshFacts}

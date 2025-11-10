@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Trophy, Zap, DollarSign, Flame } from 'lucide-react'
+import { Trophy, Zap, DollarSign, Flame, Sparkles } from 'lucide-react'
 import { WardrobeStats } from '@/lib/achievements-stats'
 import Link from 'next/link'
 
@@ -27,9 +27,12 @@ export function CoreStatsGrid({ stats }: CoreStatsGridProps) {
 
   return (
     <section className="mb-12" aria-labelledby="core-stats-title">
-      <h2 id="core-stats-title" className="text-2xl font-bold text-foreground mb-6">
-        Your Highlights ✨
-      </h2>
+      <div className="flex items-center gap-3 mb-6">
+        <Sparkles className="h-6 w-6 text-primary" aria-hidden="true" />
+        <h2 id="core-stats-title" className="text-2xl font-bold text-foreground">
+          Your Highlights
+        </h2>
+      </div>
 
       <motion.div
         variants={containerVariants}
