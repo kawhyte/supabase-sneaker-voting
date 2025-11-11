@@ -1,94 +1,68 @@
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { User } from '@supabase/supabase-js'
 import { Loader2, Check } from 'lucide-react'
 import { AvatarEditor } from '@/components/avatar/AvatarEditor'
 import { AvatarErrorBoundary } from '@/components/avatar/AvatarErrorBoundary'
 import { useAutoSave } from '@/hooks/useAutoSave'
-
-interface Profile {
-  id: string
-  display_name: string | null
-  avatar_url: string | null
-  avatar_type: 'custom' | 'preset' | null
-  preset_avatar_id: string | null
-  avatar_updated_at?: string | null
-  updated_at?: string | null
-}
+import { useProfile } from '@/contexts/ProfileContext'
 
 interface ProfileFormProps {
-  profile: Profile
-  user: User
-  onProfileUpdate?: (updatedProfile: Partial<Profile>) => void
+  onProfileUpdate?: () => void
 }
 
-export function ProfileForm({ profile, user, onProfileUpdate }: ProfileFormProps) {
-  const [displayName, setDisplayName] = useState(profile.display_name || '')
-  const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(profile.preset_avatar_id)
+export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
+  const { profile, user, updateProfile, updateAvatar } = useProfile()
+  const [displayName, setDisplayName] = useState(profile?.display_name || '')
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(profile?.preset_avatar_id || null)
   const [isSaving, setIsSaving] = useState(false)
-  const supabase = createClient()
+
+  // Sync local state when profile changes from context
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.display_name || '')
+      setSelectedAvatarId(profile.preset_avatar_id)
+    }
+  }, [profile])
+
+  if (!profile || !user) {
+    return null
+  }
 
   // Track if there are unsaved changes
   const hasUnsavedChanges =
     displayName.trim() !== (profile.display_name || '') ||
     selectedAvatarId !== profile.preset_avatar_id
 
-  // Manual save function
+  // Manual save function with optimistic updates
   const handleSave = async () => {
     if (!displayName.trim()) {
       toast.error('Display name cannot be empty')
       return
     }
 
-    console.log('🔵 [ProfileForm] Save started:', {
-      selectedAvatarId,
-      currentProfileAvatarId: profile.preset_avatar_id,
-      displayName
-    })
-
     setIsSaving(true)
     try {
-      const updateData = {
-        display_name: displayName.trim(),
-        avatar_type: selectedAvatarId ? 'preset' as const : profile.avatar_type,
-        preset_avatar_id: selectedAvatarId,
-        avatar_updated_at: selectedAvatarId !== profile.preset_avatar_id ? new Date().toISOString() : profile.avatar_updated_at,
-        updated_at: new Date().toISOString()
+      // Update avatar if changed
+      if (selectedAvatarId && selectedAvatarId !== profile.preset_avatar_id) {
+        await updateAvatar(selectedAvatarId)
       }
 
-      console.log('🔵 [ProfileForm] Saving to database:', updateData)
-
-      const { error } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', user.id)
-
-      if (error) throw error
-
-      console.log('✅ [ProfileForm] Database save successful')
-
-      // Update parent profile state via callback
-      const profileUpdates = {
-        display_name: updateData.display_name,
-        avatar_type: updateData.avatar_type,
-        preset_avatar_id: updateData.preset_avatar_id,
-        avatar_updated_at: updateData.avatar_updated_at,
-        updated_at: updateData.updated_at
+      // Update display name if changed
+      if (displayName.trim() !== profile.display_name) {
+        await updateProfile({
+          display_name: displayName.trim()
+        })
       }
 
-      console.log('🔵 [ProfileForm] Calling onProfileUpdate with:', profileUpdates)
-      onProfileUpdate?.(profileUpdates)
-
+      onProfileUpdate?.()
       toast.success('Profile saved successfully')
     } catch (error: any) {
-      console.error('❌ [ProfileForm] Save error:', error)
       toast.error('Failed to save profile')
     } finally {
       setIsSaving(false)
@@ -98,35 +72,24 @@ export function ProfileForm({ profile, user, onProfileUpdate }: ProfileFormProps
   // Auto-save as fallback after 60 seconds
   const { isSaving: isAutoSaving } = useAutoSave({
     data: { display_name: displayName, preset_avatar_id: selectedAvatarId },
-    onSave: async (data, signal) => {
+    onSave: async (data) => {
       if (!data.display_name.trim()) {
         throw new Error('Display name cannot be empty')
       }
 
-      const updateData = {
-        display_name: data.display_name.trim(),
-        avatar_type: data.preset_avatar_id ? 'preset' as const : profile.avatar_type,
-        preset_avatar_id: data.preset_avatar_id,
-        avatar_updated_at: data.preset_avatar_id !== profile.preset_avatar_id ? new Date().toISOString() : profile.avatar_updated_at,
-        updated_at: new Date().toISOString()
+      // Update avatar if changed
+      if (data.preset_avatar_id && data.preset_avatar_id !== profile.preset_avatar_id) {
+        await updateAvatar(data.preset_avatar_id)
       }
 
-      const { error } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', user.id)
-        .abortSignal(signal)
+      // Update display name if changed
+      if (data.display_name.trim() !== profile.display_name) {
+        await updateProfile({
+          display_name: data.display_name.trim()
+        })
+      }
 
-      if (error) throw error
-
-      // Update parent profile state via callback after auto-save
-      onProfileUpdate?.({
-        display_name: updateData.display_name,
-        avatar_type: updateData.avatar_type,
-        preset_avatar_id: updateData.preset_avatar_id,
-        avatar_updated_at: updateData.avatar_updated_at,
-        updated_at: updateData.updated_at
-      })
+      onProfileUpdate?.()
     },
     delay: 60000, // 60 seconds
     showToasts: false // Disable toasts for auto-save
