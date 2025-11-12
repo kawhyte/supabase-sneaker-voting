@@ -32,13 +32,14 @@ import { Outfit, OutfitWithItems, OutfitItem, OutfitOccasion, CropArea } from '@
 import { OutfitCanvas } from './OutfitCanvas'
 import { ManualCropTool } from './ManualCropTool'
 import { CanYouStyleThisQuiz } from './CanYouStyleThisQuiz'
+import { ItemLibrary } from './ItemLibrary'
 import { MilestoneCelebrationModal, useMilestoneCelebration } from '@/components/MilestoneCelebration'
 import {
   calculateAutoPosition,
   calculateSuggestedSize,
 } from '@/lib/outfit-layout-engine'
 import { createClient } from '@/utils/supabase/client'
-import { X, Check, Loader2 } from 'lucide-react'
+import { X, Check, Loader2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useOutfitQuotas } from '@/hooks/useOutfitQuotas'
 import { getQuotaMessage } from '@/lib/quota-validation'
 import { getQuotaForCategory } from '@/components/types/outfit'
@@ -112,6 +113,10 @@ export function OutfitStudio({
     new: WardrobeItem
     category: string
   } | null>(null)
+
+  // Mobile Wizard Tabs (for responsive design)
+  type WizardTab = 'items' | 'arrange' | 'details'
+  const [mobileActiveTab, setMobileActiveTab] = useState<WizardTab>('items')
 
   // Milestone celebrations
   const {
@@ -378,6 +383,32 @@ export function OutfitStudio({
     toast.success('Item removed')
   }
 
+  // Handle clearing entire canvas
+  const handleClearCanvas = () => {
+    if (outfitItems.length === 0) return
+
+    const previousState = [...outfitItems]
+    setOutfitItems([])
+
+    // Push to undo stack
+    pushAction({
+      type: 'CLEAR_CANVAS',
+      timestamp: Date.now(),
+      data: {
+        previous: previousState,
+        current: [],
+      },
+    })
+
+    toast.success('Canvas cleared', {
+      duration: 5000,
+      action: {
+        label: 'Undo',
+        onClick: handleUndo,
+      },
+    })
+  }
+
   // Handle item position update (dragging)
   const handleUpdateItemPosition = (itemId: string, positionX: number, positionY: number) => {
     setOutfitItems(
@@ -536,289 +567,536 @@ export function OutfitStudio({
       {/* Main Outfit Studio Modal */}
       <TooltipProvider>
         <Dialog open={isOpen && !showQuizModal} onOpenChange={onClose}>
-        <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto p-8 sm:p-12 ">
-          <DialogHeader className='mb-8'>
-            <DialogTitle>Create Outfit</DialogTitle>
-            <DialogDescription>
-              Add items from your wardrobe and arrange them on the canvas
+        <DialogContent className="w-[95vw] max-w-[1400px] max-h-[90vh] p-0 gap-0 overflow-hidden flex flex-col">
+          {/* Header */}
+          <DialogHeader className='px-6 sm:px-8 pt-6 sm:pt-8 pb-4'>
+            <DialogTitle className="text-2xl sm:text-4xl font-black">
+              {mode === 'edit' ? 'Edit Outfit' : 'Outfit Designer'}
+            </DialogTitle>
+            <DialogDescription className="text-sm sm:text-base">
+              {mode === 'edit' ? 'Update your outfit details and arrangement' : 'Add items from your wardrobe and arrange them on the canvas'}
             </DialogDescription>
           </DialogHeader>
 
-          {/* Main Content */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Left: Canvas */}
-            <div className="md:col-span-2">
-              {croppingItemId ? (
-                // Crop Tool
-                <ManualCropTool
-                  imageUrl={
-                    outfitItems.find(i => i.id === croppingItemId)?.item?.image_url ||
-                    outfitItems.find(i => i.id === croppingItemId)?.item?.item_photos?.[0]?.image_url ||
-                    ''
-                  }
-                  itemName={`${outfitItems.find(i => i.id === croppingItemId)?.item?.brand || ''} ${outfitItems.find(i => i.id === croppingItemId)?.item?.model || ''}`}
-                  onCropComplete={handleCropComplete}
-                  onCancel={() => setCroppingItemId(null)}
-                />
-              ) : (
-                // Outfit Canvas
-                <OutfitCanvas
-                  items={outfitItems}
-                  backgroundColor={backgroundColor}
-                  onUpdateItemPosition={handleUpdateItemPosition}
-                  onRemoveItem={handleRemoveItem}
-                  onResetAutoArrange={handleResetAutoArrange}
-                />
-              )}
+          {/* Mobile Wizard Tabs (visible only on mobile/tablet) */}
+          <div className="lg:hidden border-b border-stone-200 px-4">
+            <div className="flex gap-0">
+              {[
+                { id: 'items' as WizardTab, label: '1. Items', number: 1 },
+                { id: 'arrange' as WizardTab, label: '2. Arrange', number: 2 },
+                { id: 'details' as WizardTab, label: '3. Details', number: 3 },
+              ].map(({ id, label, number }) => (
+                <button
+                  key={id}
+                  onClick={() => setMobileActiveTab(id)}
+                  className={cn(
+                    'flex-1 py-3 px-2 text-xs sm:text-sm font-bold border-b-[3px] transition-colors',
+                    mobileActiveTab === id
+                      ? 'border-b-primary text-primary'
+                      : 'border-b-transparent text-muted-foreground'
+                  )}
+                  aria-current={mobileActiveTab === id ? 'step' : undefined}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
+          </div>
 
-            {/* Right: Sidebar */}
-            <div className="space-y-4">
-              {/* Outfit Details */}
-              <div className="space-y-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
-                <div>
-                  <Label htmlFor="outfit-name" className="text-sm">
-                    Outfit Name
-                  </Label>
-                  <Input
-                    id="outfit-name"
-                    value={outfitName}
-                    onChange={e => setOutfitName(e.target.value)}
-                    placeholder="e.g., Cozy Coffee Date"
-                    className="mt-1"
-                  />
-                </div>
+          {/* Main Content - Scrollable */}
+          <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-6">
+            {/* Desktop Layout: 1/3 library + 2/3 canvas */}
+            <div className="hidden lg:grid lg:grid-cols-3 gap-8 h-full">
+              {/* Left: Item Library */}
+              <div className="lg:col-span-1 h-full min-h-[600px]">
+                <ItemLibrary
+                  userWardrobe={userWardrobe}
+                  outfitItems={outfitItems}
+                  onAddItem={handleAddItem}
+                  canAddItem={canAddItem}
+                />
+              </div>
 
-                <div>
-                  <Label htmlFor="occasion" className="text-sm">
-                    Occasion
-                  </Label>
-                  <Select value={occasion} onValueChange={(val) => setOccasion(val as OutfitOccasion)}>
-                    <SelectTrigger id="occasion" className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {OUTFIT_OCCASIONS.map(occ => (
-                        <SelectItem key={occ} value={occ}>
-                          {occ.charAt(0).toUpperCase() + occ.slice(1).replace('_', ' ')}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="bg-color" className="text-sm">
-                    Background Color
-                  </Label>
-                  <div className="flex gap-2 mt-1">
-                    <input
-                      id="bg-color"
-                      type="color"
-                      value={backgroundColor}
-                      onChange={e => setBackgroundColor(e.target.value)}
-                      className="h-10 w-12 rounded border border-slate-300 cursor-pointer"
+              {/* Right: Canvas + Details */}
+              <div className="lg:col-span-2 flex flex-col gap-6">
+                {/* Canvas Area */}
+                <div className="bg-white dark:bg-[#1a2b2f] rounded-xl shadow-sm flex-grow p-8 min-h-[500px] border-2 border-dashed border-gray-200 dark:border-gray-700">
+                  {croppingItemId ? (
+                    // Crop Tool
+                    <ManualCropTool
+                      imageUrl={
+                        outfitItems.find(i => i.id === croppingItemId)?.item?.image_url ||
+                        outfitItems.find(i => i.id === croppingItemId)?.item?.item_photos?.[0]?.image_url ||
+                        ''
+                      }
+                      itemName={`${outfitItems.find(i => i.id === croppingItemId)?.item?.brand || ''} ${outfitItems.find(i => i.id === croppingItemId)?.item?.model || ''}`}
+                      onCropComplete={handleCropComplete}
+                      onCancel={() => setCroppingItemId(null)}
                     />
-                    <span className="text-xs text-slate-600 mt-2">{backgroundColor}</span>
+                  ) : outfitItems.length === 0 ? (
+                    // Enhanced Empty State
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        <div className="mx-auto w-16 h-16 text-primary/30 dark:text-primary/50">
+                          <svg className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" strokeLinecap="round" strokeLinejoin="round"></path>
+                          </svg>
+                        </div>
+                        <h3 className="mt-4 text-lg font-semibold text-[#111718] dark:text-white">Your Outfit Canvas</h3>
+                        <p className="mt-1 text-sm text-[#618389] dark:text-gray-400">Drag and drop items here to create an outfit.</p>
+                      </div>
+                    </div>
+                  ) : (
+                    // Outfit Canvas
+                    <OutfitCanvas
+                      items={outfitItems}
+                      backgroundColor={backgroundColor}
+                      onUpdateItemPosition={handleUpdateItemPosition}
+                      onRemoveItem={handleRemoveItem}
+                      onResetAutoArrange={handleResetAutoArrange}
+                    />
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-4 justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={handleClearCanvas}
+                    disabled={outfitItems.length === 0}
+                    className="min-w-[120px] h-12"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Clear Canvas
+                  </Button>
+                  <Button
+                    onClick={handleSaveOutfit}
+                    disabled={isSaving || outfitItems.length === 0}
+                    className="bg-primary text-white min-w-[120px] h-12"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {mode === 'edit' ? 'Saving...' : 'Creating...'}
+                      </>
+                    ) : (
+                      <>{mode === 'edit' ? 'Save Changes' : 'Save Outfit'}</>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Outfit Details Form */}
+                <div className="space-y-4 bg-slate-50 rounded-lg p-6 border border-slate-200">
+                  <h3 className="font-semibold text-lg">Outfit Details</h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="outfit-name" className="text-sm">Outfit Name</Label>
+                      <Input
+                        id="outfit-name"
+                        value={outfitName}
+                        onChange={e => setOutfitName(e.target.value)}
+                        placeholder="e.g., Cozy Coffee Date"
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="occasion" className="text-sm">Occasion</Label>
+                      <Select value={occasion} onValueChange={(val) => setOccasion(val as OutfitOccasion)}>
+                        <SelectTrigger id="occasion" className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {OUTFIT_OCCASIONS.map(occ => (
+                            <SelectItem key={occ} value={occ}>
+                              {occ.charAt(0).toUpperCase() + occ.slice(1).replace('_', ' ')}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="bg-color" className="text-sm">Background Color</Label>
+                    <div className="flex gap-2 mt-1">
+                      <input
+                        id="bg-color"
+                        type="color"
+                        value={backgroundColor}
+                        onChange={e => setBackgroundColor(e.target.value)}
+                        className="h-10 w-12 rounded border border-slate-300 cursor-pointer"
+                      />
+                      <span className="text-xs text-slate-600 mt-2">{backgroundColor}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="description" className="text-sm">
+                      Description <span className="text-muted-foreground text-xs">(optional)</span>
+                    </Label>
+                    <Textarea
+                      id="description"
+                      placeholder="e.g., Wore to Sarah's wedding, perfect for summer brunch..."
+                      value={description}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        if (value.length <= 500) {
+                          setDescription(value)
+                        }
+                      }}
+                      maxLength={500}
+                      rows={3}
+                      className="resize-none mt-1"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {description.length}/500 characters
+                    </p>
+                  </div>
+
+                  {/* Items in Outfit */}
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Items ({outfitItems.length})</h4>
+                    <div className="dense space-y-2 max-h-48 overflow-y-auto">
+                      {outfitItems.map(item => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between bg-white p-2 rounded border border-slate-200 text-xs"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">
+                              {item.item?.brand} {item.item?.model}
+                            </p>
+                            <p className="text-xs text-slate-600 capitalize">{item.item?.category}</p>
+                          </div>
+                          <button
+                            onClick={() => handleRemoveItem(item.id)}
+                            aria-label={`Remove ${item.item?.brand} ${item.item?.model} from outfit`}
+                            className="text-red-500 hover:text-red-700 flex-shrink-0"
+                          >
+                            <X className="h-4 w-4" aria-hidden="true" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quota Status */}
+                  <div className="space-y-2 border-t border-border pt-4">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Outfit Quotas
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.entries(quotaStatus.quotas)
+                        .filter(([_, validation]) => validation.max !== null)
+                        .map(([category, validation]) => {
+                          const isAtLimit = validation.isAtLimit && validation.current > 0
+                          const tooltipMessage = validation.canAdd
+                            ? `Can add ${validation.max! - validation.current} more ${validation.category}`
+                            : `Already have ${validation.category} in outfit (${validation.current}/${validation.max})`
+
+                          return (
+                            <Tooltip key={category}>
+                              <TooltipTrigger asChild>
+                                <div
+                                  className={cn(
+                                    'rounded-md border px-3 py-2 text-xs cursor-help transition-colors',
+                                    isAtLimit
+                                      ? 'border-sun-400 bg-sun-100'
+                                      : 'border-border bg-background hover:bg-muted'
+                                  )}
+                                  aria-label={tooltipMessage}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">
+                                      {getQuotaMessage(category, validation.current, validation.max)}
+                                    </span>
+                                    {isAtLimit && (
+                                      <Check className="h-3 w-3 text-sun-600 flex-shrink-0" aria-hidden="true" />
+                                    )}
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{tooltipMessage}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )
+                        })}
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Description Field */}
-                <div>
-                  <Label htmlFor="description" className="text-sm">
-                    Description <span className="text-muted-foreground text-xs">(optional)</span>
-                  </Label>
-                  <Textarea
-                    id="description"
-                    placeholder="e.g., Wore to Sarah's wedding, perfect for summer brunch..."
-                    value={description}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      if (value.length <= 500) {
-                        setDescription(value)
-                      }
-                    }}
-                    maxLength={500}
-                    rows={3}
-                    className="resize-none mt-1"
+            {/* Mobile Layout: Wizard Tabs */}
+            <div className="lg:hidden space-y-6">
+              {/* Tab 1: Items */}
+              {mobileActiveTab === 'items' && (
+                <div className="min-h-[500px]">
+                  <ItemLibrary
+                    userWardrobe={userWardrobe}
+                    outfitItems={outfitItems}
+                    onAddItem={handleAddItem}
+                    canAddItem={canAddItem}
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {description.length}/500 characters
-                  </p>
                 </div>
-              </div>
+              )}
 
-              {/* Items in Outfit */}
-              <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                <h3 className="font-semibold text-sm mb-3">Items ({outfitItems.length})</h3>
-                <div className="dense space-y-2 max-h-48 overflow-y-auto">
-                  {outfitItems.map(item => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between bg-white p-2 rounded border border-slate-200 text-xs"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">
-                          {item.item?.brand} {item.item?.model}
-                        </p>
-                        <p className="text-xs text-slate-600 capitalize">{item.item?.category}</p>
+              {/* Tab 2: Arrange */}
+              {mobileActiveTab === 'arrange' && (
+                <div className="space-y-4">
+                  <div className="bg-white dark:bg-[#1a2b2f] rounded-xl shadow-sm p-6 min-h-[500px] border-2 border-dashed border-gray-200">
+                    {croppingItemId ? (
+                      <ManualCropTool
+                        imageUrl={
+                          outfitItems.find(i => i.id === croppingItemId)?.item?.image_url ||
+                          outfitItems.find(i => i.id === croppingItemId)?.item?.item_photos?.[0]?.image_url ||
+                          ''
+                        }
+                        itemName={`${outfitItems.find(i => i.id === croppingItemId)?.item?.brand || ''} ${outfitItems.find(i => i.id === croppingItemId)?.item?.model || ''}`}
+                        onCropComplete={handleCropComplete}
+                        onCancel={() => setCroppingItemId(null)}
+                      />
+                    ) : outfitItems.length === 0 ? (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center">
+                          <div className="mx-auto w-16 h-16 text-primary/30">
+                            <svg className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                              <path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" strokeLinecap="round" strokeLinejoin="round"></path>
+                            </svg>
+                          </div>
+                          <h3 className="mt-4 text-lg font-semibold">Your Outfit Canvas</h3>
+                          <p className="mt-1 text-sm text-muted-foreground">Add items from the Items tab to get started.</p>
+                        </div>
                       </div>
-                      <button
-                        onClick={() => handleRemoveItem(item.id)}
-                        aria-label={`Remove ${item.item?.brand} ${item.item?.model} from outfit`}
-                        className="text-red-500 hover:text-red-700 flex-shrink-0"
-                      >
-                        <X className="h-4 w-4" aria-hidden="true" />
-                      </button>
-                    </div>
-                  ))}
+                    ) : (
+                      <OutfitCanvas
+                        items={outfitItems}
+                        backgroundColor={backgroundColor}
+                        onUpdateItemPosition={handleUpdateItemPosition}
+                        onRemoveItem={handleRemoveItem}
+                        onResetAutoArrange={handleResetAutoArrange}
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={handleClearCanvas}
+                      disabled={outfitItems.length === 0}
+                      className="flex-1 h-12"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Clear
+                    </Button>
+                    <Button
+                      onClick={handleSaveOutfit}
+                      disabled={isSaving || outfitItems.length === 0}
+                      className="flex-1 bg-primary text-white h-12"
+                    >
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>Save</>
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Quota Status Badges (with tooltips) */}
-              <div className="space-y-2 border-t border-border pt-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Outfit Quotas
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(quotaStatus.quotas)
-                    .filter(([_, validation]) => validation.max !== null)
-                    .map(([category, validation]) => {
-                      const isAtLimit = validation.isAtLimit && validation.current > 0
+              {/* Tab 3: Details */}
+              {mobileActiveTab === 'details' && (
+                <div className="space-y-4 bg-slate-50 rounded-lg p-6 border border-slate-200">
+                  <h3 className="font-semibold text-lg">Outfit Details</h3>
 
-                      const tooltipMessage = validation.canAdd
-                        ? `Can add ${validation.max! - validation.current} more ${validation.category}`
-                        : `Already have ${validation.category} in outfit (${validation.current}/${validation.max})`
+                  <div>
+                    <Label htmlFor="outfit-name-mobile" className="text-sm">Outfit Name</Label>
+                    <Input
+                      id="outfit-name-mobile"
+                      value={outfitName}
+                      onChange={e => setOutfitName(e.target.value)}
+                      placeholder="e.g., Cozy Coffee Date"
+                      className="mt-1"
+                    />
+                  </div>
 
-                      return (
-                        <Tooltip key={category}>
-                          <TooltipTrigger asChild>
+                  <div>
+                    <Label htmlFor="occasion-mobile" className="text-sm">Occasion</Label>
+                    <Select value={occasion} onValueChange={(val) => setOccasion(val as OutfitOccasion)}>
+                      <SelectTrigger id="occasion-mobile" className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {OUTFIT_OCCASIONS.map(occ => (
+                          <SelectItem key={occ} value={occ}>
+                            {occ.charAt(0).toUpperCase() + occ.slice(1).replace('_', ' ')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="bg-color-mobile" className="text-sm">Background Color</Label>
+                    <div className="flex gap-2 mt-1">
+                      <input
+                        id="bg-color-mobile"
+                        type="color"
+                        value={backgroundColor}
+                        onChange={e => setBackgroundColor(e.target.value)}
+                        className="h-10 w-12 rounded border border-slate-300 cursor-pointer"
+                      />
+                      <span className="text-xs text-slate-600 mt-2">{backgroundColor}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="description-mobile" className="text-sm">
+                      Description <span className="text-muted-foreground text-xs">(optional)</span>
+                    </Label>
+                    <Textarea
+                      id="description-mobile"
+                      placeholder="e.g., Wore to Sarah's wedding..."
+                      value={description}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        if (value.length <= 500) {
+                          setDescription(value)
+                        }
+                      }}
+                      maxLength={500}
+                      rows={3}
+                      className="resize-none mt-1"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {description.length}/500 characters
+                    </p>
+                  </div>
+
+                  {/* Items in Outfit */}
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Items ({outfitItems.length})</h4>
+                    <div className="dense space-y-2 max-h-48 overflow-y-auto">
+                      {outfitItems.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">No items added yet</p>
+                      ) : (
+                        outfitItems.map(item => (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between bg-white p-2 rounded border border-slate-200 text-xs"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate">
+                                {item.item?.brand} {item.item?.model}
+                              </p>
+                              <p className="text-xs text-slate-600 capitalize">{item.item?.category}</p>
+                            </div>
+                            <button
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="text-red-500 hover:text-red-700 flex-shrink-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Quota Status */}
+                  <div className="space-y-2 border-t border-border pt-4">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Outfit Quotas
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.entries(quotaStatus.quotas)
+                        .filter(([_, validation]) => validation.max !== null)
+                        .map(([category, validation]) => {
+                          const isAtLimit = validation.isAtLimit && validation.current > 0
+
+                          return (
                             <div
+                              key={category}
                               className={cn(
-                                'rounded-md border px-3 py-2 text-xs cursor-help transition-colors',
+                                'rounded-md border px-3 py-2 text-xs',
                                 isAtLimit
                                   ? 'border-sun-400 bg-sun-100'
-                                  : 'border-border bg-background hover:bg-muted'
+                                  : 'border-border bg-background'
                               )}
-                              aria-label={tooltipMessage}
                             >
                               <div className="flex items-center gap-2">
                                 <span className="font-medium">
                                   {getQuotaMessage(category, validation.current, validation.max)}
                                 </span>
                                 {isAtLimit && (
-                                  <Check className="h-3 w-3 text-sun-600 flex-shrink-0" aria-hidden="true" />
+                                  <Check className="h-3 w-3 text-sun-600 flex-shrink-0" />
                                 )}
                               </div>
                             </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{tooltipMessage}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )
-                    })}
-                </div>
-              </div>
-
-              {/* Add Item Dropdown */}
-              <div className="space-y-2">
-                <Label className="text-sm" htmlFor="add-item-select">Add Item</Label>
-                {userWardrobe.length === 0 && (
-                  <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
-                    ⚠️ No items in wardrobe. Add items to your collection first.
-                  </div>
-                )}
-                {userWardrobe.length > 0 && (
-                  <Select
-                    value=""
-                    onValueChange={(itemId) => {
-                      const item = userWardrobe.find(i => i.id === itemId)
-                      if (item) {
-                        handleAddItem(item)
-                      }
-                    }}
-                  >
-                    <SelectTrigger id="add-item-select" aria-label="Select item to add to outfit" aria-describedby="quota-help-text">
-                      <SelectValue placeholder="Select item to add..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {userWardrobe.length === 0 ? (
-                        <div className="p-4 text-sm text-muted-foreground text-center">
-                          No items in wardrobe
-                        </div>
-                      ) : (
-                        userWardrobe.map(item => {
-                          // Check if already in outfit
-                          const alreadyInOutfit = outfitItems.find(oi => oi.item_id === item.id)
-
-                          // Check quota status
-                          const { canAdd: canAddCheck, reason } = canAddItem(item)
-                          const isDisabled = !!alreadyInOutfit || !canAddCheck
-
-                          return (
-                            <SelectItem
-                              key={item.id}
-                              value={item.id}
-                              disabled={isDisabled}
-                              className={cn(
-                                isDisabled && 'opacity-50 cursor-not-allowed line-through'
-                              )}
-                            >
-                              <div className="flex items-center gap-2">
-                                <span>
-                                  {item.brand} {item.model} - {item.color}
-                                </span>
-                                {isDisabled && (
-                                  <span className="text-xs text-muted-foreground">
-                                    {alreadyInOutfit
-                                      ? '(already added)'
-                                      : reason
-                                      ? `(${reason})`
-                                      : '(quota reached)'}
-                                  </span>
-                                )}
-                              </div>
-                            </SelectItem>
                           )
-                        })
-                      )}
-                    </SelectContent>
-                  </Select>
-                )}
-                <p id="quota-help-text" className="text-xs text-muted-foreground">
-                  You can add 1 shoe, 1 top, 1 bottom, 1 outerwear, and unlimited accessories.
-                </p>
+                        })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile Navigation Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-stone-200">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (mobileActiveTab === 'arrange') setMobileActiveTab('items')
+                    if (mobileActiveTab === 'details') setMobileActiveTab('arrange')
+                  }}
+                  disabled={mobileActiveTab === 'items'}
+                  className="flex-1"
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (mobileActiveTab === 'items') setMobileActiveTab('arrange')
+                    else if (mobileActiveTab === 'arrange') setMobileActiveTab('details')
+                    else if (mobileActiveTab === 'details') handleSaveOutfit()
+                  }}
+                  disabled={mobileActiveTab === 'details' && (isSaving || outfitItems.length === 0)}
+                  className="flex-1 bg-primary text-white"
+                >
+                  {mobileActiveTab === 'details' ? (
+                    isSaving ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>Save Outfit</>
+                    )
+                  ) : (
+                    <>
+                      Next
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
 
-          {/* Footer */}
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button className='mx-6' variant="outline" onClick={onClose} disabled={isSaving}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSaveOutfit}
-              disabled={isSaving || outfitItems.length === 0}
-              aria-busy={isSaving}
-              aria-label={isSaving
-                ? mode === 'edit' ? 'Saving changes...' : 'Creating outfit...'
-                : mode === 'edit' ? 'Save changes to outfit' : 'Create new outfit'}
-              className="w-full"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-                  {mode === 'edit' ? 'Saving Changes...' : 'Creating Outfit...'}
-                </>
-              ) : (
-                <>
-                  {mode === 'edit' ? 'Save Changes' : 'Create Outfit'}
-                </>
-              )}
-            </Button>
-          </DialogFooter>
+          {/* Footer - Only on Desktop */}
+          <div className="hidden lg:block border-t border-stone-200 px-6 sm:px-8 py-4">
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={onClose} disabled={isSaving}>
+                Cancel
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
       </TooltipProvider>
