@@ -93,7 +93,7 @@ VALUES
     '💰',
     '{
       "type": "sql",
-      "query": "SELECT COUNT(*) FROM sneakers WHERE user_id = $1 AND status = ''owned'' AND wears > 0 AND (purchase_price / wears) < CASE WHEN purchase_price < 50 THEN 2 WHEN purchase_price < 150 THEN 5 ELSE 10 END",
+      "query": "SELECT COUNT(*) FROM items WHERE user_id = $1 AND status = ''owned'' AND wears > 0 AND (purchase_price / wears) < CASE WHEN purchase_price < 50 THEN 2 WHEN purchase_price < 150 THEN 5 ELSE 10 END",
       "threshold": 5
     }'::jsonb,
     'financial',
@@ -119,7 +119,7 @@ VALUES
     '👗',
     '{
       "type": "sql",
-      "query": "SELECT COUNT(*) FROM sneakers WHERE user_id = $1 AND status = ''owned'' AND last_worn_date >= NOW() - INTERVAL ''30 days''",
+      "query": "SELECT COUNT(*) FROM items WHERE user_id = $1 AND status = ''owned'' AND last_worn_date >= NOW() - INTERVAL ''30 days''",
       "threshold_type": "all_items"
     }'::jsonb,
     'engagement',
@@ -145,7 +145,7 @@ VALUES
     '👕',
     '{
       "type": "sql",
-      "query": "SELECT COUNT(*) FROM sneakers WHERE user_id = $1 AND status = ''owned''",
+      "query": "SELECT COUNT(*) FROM items WHERE user_id = $1 AND status = ''owned''",
       "threshold": 50
     }'::jsonb,
     'engagement',
