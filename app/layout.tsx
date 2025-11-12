@@ -18,7 +18,6 @@ export const metadata = {
 	title: "PurrView: Wardrobe Watchlist",
 	description:
 		"Track your wardrobe items and add items to a watchlist and get notified when prices drop",
-	manifest: "/manifest.json",
 	icons: {
 		icon: "/icon-192x192.png",
 		shortcut: "/icon-192x192.png",
@@ -27,7 +26,7 @@ export const metadata = {
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "default",
-		title: "SoleTracker",
+		title: "PurrView",
 	},
 	formatDetection: {
 		telephone: false,
@@ -47,6 +46,9 @@ const fontSans = Plus_Jakarta_Sans({
   weight: ["200", "300", "400", "500", "600", "700", "800"],
   style: ["normal", "italic"],
   variable: "--font-sans", // We'll use this as the new base
+  display: "swap", // Prevent blocking - show fallback text while font loads
+  preload: true, // Explicitly enable preloading
+  adjustFontFallback: false, // Disable layout shift adjustments to reduce preload warnings
 });
 
 // const fontBody = Poppins({
