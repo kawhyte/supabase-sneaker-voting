@@ -29,7 +29,7 @@ export async function checkAchievements(userId: string) {
 
     for (const achievement of achievements) {
       // Skip if already unlocked
-      if (unlockedSet.has(achievement.id)) continue
+      if (unlockedSet.has(achievement.achievement_key)) continue
 
       // Check unlock criteria
       const isUnlocked = await checkCriteria(userId, achievement.unlock_criteria)
@@ -40,7 +40,7 @@ export async function checkAchievements(userId: string) {
           .from('user_achievements')
           .insert({
             user_id: userId,
-            achievement_id: achievement.id,
+            achievement_id: achievement.achievement_key,
             unlocked_at: new Date().toISOString()
           })
 
@@ -54,7 +54,7 @@ export async function checkAchievements(userId: string) {
             message: achievement.description,
             severity: 'low',
             metadata: {
-              achievement_id: achievement.id,
+              achievement_id: achievement.achievement_key,
               achievement_emoji: achievement.icon_emoji,
               points: achievement.points
             },

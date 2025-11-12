@@ -213,7 +213,14 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
             })
 
           if (insertError) {
-            console.error('Error unlocking achievement:', insertError)
+            console.error('Error unlocking achievement:', {
+              achievementId: achievement.id,
+              achievementName: achievement.name,
+              error: insertError,
+              errorMessage: insertError.message,
+              errorDetails: insertError.details,
+              errorHint: insertError.hint,
+            })
             continue
           }
 
@@ -235,7 +242,11 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
 
           console.log(`✨ Unlocked achievement: ${achievement.name} (+${achievement.points} points)`)
         } catch (error) {
-          console.error('Error unlocking achievement:', error)
+          console.error('Error unlocking achievement (exception):', {
+            achievementId: achievement.id,
+            achievementName: achievement.name,
+            error,
+          })
         }
       }
     }
