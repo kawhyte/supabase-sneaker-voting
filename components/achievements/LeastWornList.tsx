@@ -37,7 +37,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
             <Link
               key={item.id}
               href="/dashboard?tab=owned"
-              className={`flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors opacity-75 group ${index >= 3 ? 'hidden lg:flex' : ''}`}
+              className={`flex items-center gap-4 p-2 rounded-lg hover:bg-muted/50 -m-2 transition-colors opacity-75 group ${index >= 3 ? 'hidden lg:flex' : ''}`}
             >
               {/* Thumbnail */}
               <div className="w-14 h-14 rounded-lg bg-cover bg-center flex-shrink-0 relative">
@@ -69,7 +69,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
                   maxLength={35}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Last worn: {item.daysSinceLastWorn ? `${item.daysSinceLastWorn} days ago` : 'Never'}
+                  Worn: {item.daysSinceLastWorn ? `${item.daysSinceLastWorn} days ago` : 'Never'}
                 </p>
               </div>
 

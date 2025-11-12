@@ -17,7 +17,7 @@ export function AchievementModal({ achievement, isUnlocked, onClose }: Achieveme
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md p-8">
         <DialogHeader>
           <DialogTitle className="text-center">
             <div className="mb-4 flex justify-center">
