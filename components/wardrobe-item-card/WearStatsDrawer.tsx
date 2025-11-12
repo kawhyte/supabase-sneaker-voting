@@ -52,7 +52,7 @@ export function WearStatsDrawer({
 				<SheetHeader className="px-6 pt-6 pb-4 border-b border-stone-200">
 					<SheetTitle className="text-lg font-semibold">Wear Statistics</SheetTitle>
 					<SheetDescription className="text-xs text-muted-foreground">
-						{item.brand} {item.model}
+						 {item.model}
 					</SheetDescription>
 				</SheetHeader>
 

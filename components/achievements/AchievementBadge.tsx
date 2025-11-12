@@ -7,7 +7,7 @@ interface AchievementBadgeProps {
   id: string
   name: string
   icon: LucideIcon
-  tier: 'bronze' | 'silver' | 'gold' | 'platinum'
+  tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum'
   isUnlocked: boolean
   progress?: number // 0-100
   onClick: () => void
