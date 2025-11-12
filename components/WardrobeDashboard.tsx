@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, RefreshCw } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import { DashboardGrid } from "./DashboardGrid";
@@ -71,6 +71,10 @@ export function WardrobeDashboard({
 	const [isPurchasedModalOpen, setIsPurchasedModalOpen] = useState(false);
 	const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
 	const [isOutfitStudioOpen, setIsOutfitStudioOpen] = useState(false);
+
+	// State - Bulk Price Checking
+	const [isBulkChecking, setIsBulkChecking] = useState(false);
+	const [bulkCheckProgress, setBulkCheckProgress] = useState({ current: 0, total: 0 });
 
 	const supabase = createClient();
 
@@ -345,6 +349,135 @@ export function WardrobeDashboard({
 		}
 	};
 
+	/**
+	 * Bulk Price Check - Check all wishlist items sequentially
+	 * Features:
+	 * - Sequential checking (2s delay between each)
+	 * - Real-time UI updates
+	 * - Progress tracking
+	 * - Skip items already checked today
+	 * - Max 30 items per batch
+	 */
+	const handleBulkPriceCheck = async () => {
+		// Filter items that need price checking
+		const today = new Date().toISOString().split('T')[0];
+		const itemsToCheck = journalEntries.filter(item => {
+			// Only check wishlist items
+			if (item.status !== ItemStatus.WISHLISTED) return false;
+
+			// Must have product URL
+			if (!item.product_url) return false;
+
+			// Must have tracking enabled
+			if (item.auto_price_tracking_enabled === false) return false;
+
+			// Skip items already checked today
+			if (item.last_price_check_at) {
+				const lastCheckDate = new Date(item.last_price_check_at).toISOString().split('T')[0];
+				if (lastCheckDate === today) return false;
+			}
+
+			return true;
+		});
+
+		if (itemsToCheck.length === 0) {
+			toast.info('All prices are up to date! ✅', {
+				description: 'No items need checking. All wishlist items were checked today or have no product URL.',
+				duration: 5000
+			});
+			return;
+		}
+
+		// Limit to 30 items to avoid timeouts
+		const itemsBatch = itemsToCheck.slice(0, 30);
+
+		if (itemsToCheck.length > 30) {
+			toast.info(`Checking first 30 of ${itemsToCheck.length} items`, {
+				description: 'Run again to check remaining items',
+				duration: 5000
+			});
+		}
+
+		setIsBulkChecking(true);
+		setBulkCheckProgress({ current: 0, total: itemsBatch.length });
+
+		let successCount = 0;
+		let failCount = 0;
+		let skippedCount = 0;
+
+		// Show initial progress toast
+		const progressToastId = toast.loading(`Checking prices... 0/${itemsBatch.length}`, {
+			description: 'This may take a few minutes'
+		});
+
+		for (let i = 0; i < itemsBatch.length; i++) {
+			const item = itemsBatch[i];
+
+			try {
+				// Update progress
+				setBulkCheckProgress({ current: i + 1, total: itemsBatch.length });
+				toast.loading(`Checking prices... ${i + 1}/${itemsBatch.length}`, {
+					id: progressToastId,
+					description: `Checking ${item.brand} ${item.model}...`
+				});
+
+				const response = await fetch('/api/check-price-now', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ itemId: item.id })
+				});
+
+				const data = await response.json();
+
+				if (data.success) {
+					successCount++;
+					// Update local state immediately
+					setJournalEntries((prev) =>
+						prev.map((entry) =>
+							entry.id === item.id
+								? {
+										...entry,
+										sale_price: data.price,
+										last_price_check_at: data.lastChecked,
+										price_check_failures: 0,
+								  }
+								: entry
+						)
+					);
+				} else {
+					failCount++;
+					// Reload to show updated failure count
+					await loadJournalEntries();
+				}
+
+				// 2-second delay between requests to avoid rate limits
+				if (i < itemsBatch.length - 1) {
+					await new Promise(resolve => setTimeout(resolve, 2000));
+				}
+
+			} catch (error) {
+				console.error(`Failed to check price for ${item.brand} ${item.model}:`, error);
+				failCount++;
+			}
+		}
+
+		// Dismiss progress toast and show summary
+		toast.dismiss(progressToastId);
+
+		const summaryParts = [];
+		if (successCount > 0) summaryParts.push(`✅ ${successCount} updated`);
+		if (failCount > 0) summaryParts.push(`❌ ${failCount} failed`);
+		if (skippedCount > 0) summaryParts.push(`⏭️ ${skippedCount} skipped`);
+
+		toast.success(`Bulk price check complete!`, {
+			description: summaryParts.join(' • '),
+			duration: 6000
+		});
+
+		setIsBulkChecking(false);
+		setBulkCheckProgress({ current: 0, total: 0 });
+	};
+
 	// Database Functions
 	const markItemAsPurchased = async (
 		purchasePrice: number,
@@ -593,9 +726,29 @@ export function WardrobeDashboard({
 					onCategoriesChange={setSelectedCategories}
 				/>
 
-        
-				{/* Density Toggle */}
-				<ViewDensityToggle />
+
+				{/* Bulk Actions & View Controls */}
+				<div className='flex items-center gap-3'>
+					{/* Bulk Price Check - Only show for wishlist items */}
+					{displayStatus === ItemStatus.WISHLISTED && (
+						<Button
+							onClick={handleBulkPriceCheck}
+							disabled={isBulkChecking}
+							variant="outline"
+							size="sm"
+							className="gap-2"
+						>
+							<RefreshCw className={`h-4 w-4 ${isBulkChecking ? 'animate-spin' : ''}`} />
+							{isBulkChecking
+								? `Checking ${bulkCheckProgress.current}/${bulkCheckProgress.total}...`
+								: 'Check All Prices'
+							}
+						</Button>
+					)}
+
+					{/* Density Toggle */}
+					<ViewDensityToggle />
+				</div>
 			</div>
 
 			{/* <WardrobeStats journalEntries={journalEntries} /> */}
