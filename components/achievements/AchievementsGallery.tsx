@@ -6,6 +6,7 @@ import { AchievementBadge } from './AchievementBadge'
 import { AchievementModal } from './AchievementModal'
 import { ACHIEVEMENT_DEFINITIONS } from '@/lib/achievement-definitions'
 import { createClient } from '@/utils/supabase/client'
+import { toast } from '@/components/ui/use-toast'
 // Analytics removed - not configured yet
 // TODO: Re-add when Google Analytics 4 is set up
 // import analytics, { AnalyticsEvent } from '@/lib/analytics'
@@ -104,11 +105,149 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
   }
 
   async function calculateProgress() {
-    // TODO: Implement progress calculation based on criteria
-    // For now, placeholder
+    const supabase = createClient()
     const progressMap = new Map<string, number>()
-    // Example: progressMap.set('wardrobe_starter', 60)
-    setProgress(progressMap)
+
+    try {
+      // Fetch all data needed for calculations
+      const [itemsResult, outfitsResult] = await Promise.all([
+        supabase
+          .from('items')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('status', 'owned')
+          .eq('is_archived', false),
+        supabase
+          .from('outfits')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('is_archived', false),
+      ])
+
+      const items = itemsResult.data || []
+      const outfits = outfitsResult.data || []
+
+      // Calculate metrics for each achievement type
+      const metrics = {
+        // Wardrobe size
+        total_items: items.length,
+
+        // Outfit creation
+        outfits_created: outfits.length,
+
+        // Cost-per-wear achievements
+        items_hit_cpw_target: items.filter((item) => {
+          const price = item.purchase_price || item.retail_price
+          const wears = item.wears || 0
+          if (!price || wears === 0) return false
+
+          const cpw = price / wears
+          const target = getTargetCPW(price)
+          return cpw <= target
+        }).length,
+
+        // Category diversity
+        unique_categories: new Set(items.map((item) => item.category)).size,
+
+        // Brand diversity
+        unique_brands: new Set(items.map((item) => item.brand).filter(Boolean)).size,
+
+        // Wardrobe utilization (items worn this month)
+        items_worn_this_month: items.filter((item) => {
+          if (!item.last_worn_date) return false
+          const lastWorn = new Date(item.last_worn_date)
+          const thirtyDaysAgo = new Date()
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+          return lastWorn >= thirtyDaysAgo
+        }).length,
+
+        // Price monitoring savings (placeholder for now)
+        total_saved_dollars: 0, // TODO: Query price_alerts table when implemented
+      }
+
+      // Calculate progress percentage for each achievement
+      for (const achievement of ACHIEVEMENT_DEFINITIONS) {
+        const currentValue = metrics[achievement.criteria.metric as keyof typeof metrics] || 0
+        const threshold = achievement.criteria.threshold
+
+        // Calculate progress (0-100%)
+        const progress = Math.min(100, (currentValue / threshold) * 100)
+        progressMap.set(achievement.id, progress)
+      }
+
+      setProgress(progressMap)
+
+      // Check for newly unlocked achievements
+      await checkAndUnlockAchievements(progressMap)
+    } catch (error) {
+      console.error('Error calculating progress:', error)
+    }
+  }
+
+  // Helper: Calculate target cost-per-wear based on price tier
+  function getTargetCPW(price: number): number {
+    if (price < 50) return 2 // Budget: $2/wear
+    if (price < 150) return 5 // Mid-range: $5/wear
+    return 10 // Premium: $10/wear
+  }
+
+  // Auto-unlock achievements when progress reaches 100%
+  async function checkAndUnlockAchievements(progressMap: Map<string, number>) {
+    const supabase = createClient()
+    const newlyUnlocked: string[] = []
+
+    for (const achievement of ACHIEVEMENT_DEFINITIONS) {
+      const progress = progressMap.get(achievement.id) || 0
+      const isAlreadyUnlocked = unlockedIds.has(achievement.id)
+
+      // Check if achievement should be unlocked
+      if (progress >= 100 && !isAlreadyUnlocked) {
+        try {
+          // Insert into user_achievements table
+          const { error: insertError } = await supabase
+            .from('user_achievements')
+            .insert({
+              user_id: userId,
+              achievement_id: achievement.id,
+              unlocked_at: new Date().toISOString(),
+            })
+
+          if (insertError) {
+            console.error('Error unlocking achievement:', insertError)
+            continue
+          }
+
+          // Track newly unlocked achievement
+          newlyUnlocked.push(achievement.id)
+
+          // Show toast notification
+          toast({
+            title: `🎉 Achievement Unlocked!`,
+            description: (
+              <div className="mt-2">
+                <p className="font-bold text-primary">{achievement.name}</p>
+                <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                <p className="text-xs text-primary mt-1">+{achievement.points} points</p>
+              </div>
+            ),
+            duration: 5000,
+          })
+
+          console.log(`✨ Unlocked achievement: ${achievement.name} (+${achievement.points} points)`)
+        } catch (error) {
+          console.error('Error unlocking achievement:', error)
+        }
+      }
+    }
+
+    // Update unlocked IDs state if new achievements were unlocked
+    if (newlyUnlocked.length > 0) {
+      setUnlockedIds((prev) => {
+        const updated = new Set(prev)
+        newlyUnlocked.forEach((id) => updated.add(id))
+        return updated
+      })
+    }
   }
 
   return (

@@ -72,6 +72,11 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
                   Last worn: {item.daysSinceLastWorn ? `${item.daysSinceLastWorn} days ago` : 'Never'}
                 </p>
               </div>
+
+              {/* Rank Badge (matches TopWornList pattern) */}
+              <p className="font-bold text-primary flex-shrink-0" aria-label={`Ranked number ${index + 1}`}>
+                #{index + 1}
+              </p>
             </Link>
           ))}
         </div>

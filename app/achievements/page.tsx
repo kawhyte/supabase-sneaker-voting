@@ -3,11 +3,9 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import './achievements.css'
-import { StatsGrid } from '@/components/achievements/StatsGrid'
 import { AchievementsSidebar } from '@/components/achievements/AchievementsSidebar'
 import { AchievementsErrorBoundary } from '@/components/achievements/AchievementsErrorBoundary'
 import {
-  StatsGridSkeleton,
   SidebarSkeleton,
   FinancialInsightsSkeleton,
   GallerySkeleton,
@@ -89,15 +87,15 @@ function AchievementsPageContent() {
 
         setUserId(user.id)
 
-        // Fetch user's first name from profiles table
+        // Fetch user's display name from profiles table
         const { data: profile } = await supabase
           .from('profiles')
-          .select('first_name, display_name')
+          .select('display_name')
           .eq('id', user.id)
           .single()
 
         if (profile) {
-          setUserName(profile.display_name || profile.first_name || null)
+          setUserName(profile.display_name || null)
         }
 
         // Analytics removed - not configured yet
@@ -147,7 +145,6 @@ function AchievementsPageContent() {
   if (isLoading || !stats) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <StatsGridSkeleton />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <FinancialInsightsSkeleton />
@@ -182,9 +179,6 @@ function AchievementsPageContent() {
       <h1 className="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em] mb-8">
         {getGreeting(userName)}
       </h1>
-
-      {/* NEW: Simplified Stats Grid (replaces HeroSection + CoreStatsGrid) */}
-      <StatsGrid stats={stats} />
 
       {/* Sidebar: Top/Least/Best Value Lists */}
       <AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} bestValue={bestValue} />

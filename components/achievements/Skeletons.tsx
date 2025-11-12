@@ -1,21 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton'
 
-export function StatsGridSkeleton() {
-  return (
-    <div className="mb-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex flex-col gap-2 rounded-xl p-6 bg-card border border-border shadow-sm">
-            <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-12 w-32" />
-            <Skeleton className="h-6 w-48" />
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 export function SidebarSkeleton() {
   return (
     <div className="space-y-8">
@@ -113,7 +97,6 @@ export function FactsSkeleton() {
 export function PageSkeleton() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <StatsGridSkeleton />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <FinancialInsightsSkeleton />
