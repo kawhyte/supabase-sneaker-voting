@@ -301,6 +301,15 @@ export function WardrobeDashboard({
 
 			const data = await response.json();
 
+			// Log debug info to browser console for troubleshooting
+			if (data.debug) {
+				console.group('🔍 Price Check Debug');
+				console.log('URL:', data.storeName || 'Unknown');
+				console.log('Success:', data.success);
+				console.log('Details:', data.debug.join('\n'));
+				console.groupEnd();
+			}
+
 			if (!data.success) {
 				toast.error(data.message || 'Failed to check price', {
 					description: data.storeName ? `${data.storeName} - ${data.supportLevel || 'unknown'} support` : undefined,

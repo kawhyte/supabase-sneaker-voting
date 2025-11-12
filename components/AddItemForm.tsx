@@ -320,7 +320,8 @@ export function AddItemForm({
 	const [outfitCount, setOutfitCount] = useState(0);
 	const [pendingWishlistItem, setPendingWishlistItem] = useState<any>(null);
 	// Purchase prevention settings
-	const [enableQuizGate, setEnableQuizGate] = useState(true);
+	// TEMPORARILY DISABLED FOR TESTING - Set to false to skip quiz
+	const [enableQuizGate, setEnableQuizGate] = useState(false); // Was: true
 	const [quizGateThreshold, setQuizGateThreshold] = useState(3);
 	const formRef = useRef<HTMLFormElement>(null);
 	const supabase = createClient();
