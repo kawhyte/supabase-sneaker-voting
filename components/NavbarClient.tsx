@@ -145,14 +145,35 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 		async function fetchUnreadCount() {
 			if (!user?.id) return; // Guard clause for TypeScript
 
-			// Get unread count from user_stats
-			const { data: stats } = await supabase
+			// Get unread count from user_stats (use maybeSingle to handle missing row)
+			const { data: stats, error } = await supabase
 				.from('user_stats')
 				.select('unread_notification_count')
 				.eq('user_id', user.id)
-				.single();
+				.maybeSingle();
 
-			setUnreadCount(stats?.unread_notification_count || 0);
+			// If error occurred, log it but don't crash
+			if (error) {
+				console.error('Error fetching unread count:', error);
+				setUnreadCount(0);
+				return;
+			}
+
+			// If no user_stats row exists, create one
+			if (!stats) {
+				console.log('No user_stats found, creating default row...');
+				const { error: insertError } = await supabase
+					.from('user_stats')
+					.insert({ user_id: user.id });
+
+				if (insertError) {
+					console.error('Error creating user_stats:', insertError);
+				}
+				setUnreadCount(0);
+				return;
+			}
+
+			setUnreadCount(stats.unread_notification_count || 0);
 		}
 
 		fetchUnreadCount();
