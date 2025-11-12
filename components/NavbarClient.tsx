@@ -143,6 +143,8 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 		if (!isAuthenticated || !user?.id) return;
 
 		async function fetchUnreadCount() {
+			if (!user?.id) return; // Guard clause for TypeScript
+
 			// Get unread count from user_stats
 			const { data: stats } = await supabase
 				.from('user_stats')
