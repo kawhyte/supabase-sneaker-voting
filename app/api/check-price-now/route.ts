@@ -62,7 +62,7 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
       price: ['.product-price', '[data-price]', '[itemprop="price"]', 'meta[property="og:price:amount"]'],
       originalPrice: ['.price-was', '.price-original']
     },
-    supportLevel: 'high'
+    supportLevel: 'low' // Downgraded: Strong anti-bot protection (403 errors)
   },
   {
     domain: 'myshopify.com',
