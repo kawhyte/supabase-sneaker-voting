@@ -38,8 +38,12 @@ export function AchievementsPreview({ userId }: { userId?: string }) {
           // Handle "not found" error - user_stats row doesn't exist yet
           if (error.code === 'PGRST116') {
             console.warn('user_stats row not found for user:', userId);
-            // Set default stats
-            setStats({ achievements_unlocked: 0, total_achievements: 8 });
+            // Fetch actual count from achievements table
+            const { count } = await supabase
+              .from('achievements')
+              .select('*', { count: 'exact', head: true })
+              .eq('is_active', true);
+            setStats({ achievements_unlocked: 0, total_achievements: count || 11 });
           } else {
             throw error;
           }
@@ -53,8 +57,12 @@ export function AchievementsPreview({ userId }: { userId?: string }) {
           ? (error as any).message
           : String(error);
         console.error('Error fetching achievement stats:', errorMessage, error);
-        // Set safe default to prevent blank display
-        setStats({ achievements_unlocked: 0, total_achievements: 8 });
+        // Fetch actual count as fallback
+        const { count } = await supabase
+          .from('achievements')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true);
+        setStats({ achievements_unlocked: 0, total_achievements: count || 11 });
       } finally {
         setIsLoading(false);
       }

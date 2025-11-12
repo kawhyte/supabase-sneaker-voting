@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
     for (const user of users || []) {
       // Get items unworn for 30+ days
       const { data: unwornItems, error: itemsError } = await supabase
-        .from('sneakers')
+        .from('items')
         .select('id, brand, model, color, image_url, last_worn_date, category')
         .eq('user_id', user.user_id)
         .eq('status', 'owned')

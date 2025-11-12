@@ -14,7 +14,7 @@ export async function updateWardrobeStats(userId: string) {
   try {
     // Get all items
     const { data: allItems } = await supabase
-      .from('sneakers')
+      .from('items')
       .select('status, purchase_price, wears')
       .eq('user_id', userId)
 
