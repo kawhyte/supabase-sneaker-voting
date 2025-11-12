@@ -287,6 +287,184 @@ function getTimeRange(period: TimePeriod): TimeRange | null {
 }
 
 /**
+ * Get average cost-per-wear by category
+ * Returns categories with their average CPW, target CPW, and comparison
+ */
+export interface CategoryCPW {
+  category: string
+  avgCostPerWear: number
+  targetCostPerWear: number
+  percentOfTarget: number
+  itemCount: number
+  color: string
+}
+
+export async function getAverageCPWByCategory(
+  userId: string
+): Promise<CategoryCPW[]> {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('items')
+    .select('category, purchase_price, retail_price, wears')
+    .eq('user_id', userId)
+    .eq('status', ItemStatus.OWNED)
+    .eq('is_archived', false)
+    .gte('wears', 1) // Only items with at least 1 wear
+
+  if (error) {
+    console.error('Error fetching CPW by category:', error)
+    return []
+  }
+
+  if (!data || data.length === 0) {
+    return []
+  }
+
+  // Aggregate by category
+  const categoryMap = new Map<
+    string,
+    { totalCPW: number; count: number; totalPrice: number }
+  >()
+
+  data.forEach((item) => {
+    const price = item.purchase_price || item.retail_price
+    if (!price || !item.wears) return
+
+    const cpw = price / item.wears
+    const existing = categoryMap.get(item.category) || {
+      totalCPW: 0,
+      count: 0,
+      totalPrice: 0,
+    }
+    categoryMap.set(item.category, {
+      totalCPW: existing.totalCPW + cpw,
+      count: existing.count + 1,
+      totalPrice: existing.totalPrice + price,
+    })
+  })
+
+  const categoryColors: Record<string, string> = {
+    sneakers: '#3B82F6',
+    tops: '#10B981',
+    bottoms: '#F59E0B',
+    outerwear: '#8B5CF6',
+    accessories: '#EC4899',
+    bags: '#14B8A6',
+    hats: '#F97316',
+    other: '#6B7280',
+  }
+
+  return Array.from(categoryMap.entries())
+    .map(([category, data]) => {
+      const avgCPW = data.totalCPW / data.count
+      const avgPrice = data.totalPrice / data.count
+      const target = getTargetCostPerWear(avgPrice, category)
+      const percentOfTarget = (avgCPW / target) * 100
+
+      return {
+        category: category.charAt(0).toUpperCase() + category.slice(1),
+        avgCostPerWear: avgCPW,
+        targetCostPerWear: target,
+        percentOfTarget,
+        itemCount: data.count,
+        color: categoryColors[category] || '#6B7280',
+      }
+    })
+    .sort((a, b) => a.avgCostPerWear - b.avgCostPerWear) // Best value first
+}
+
+/**
+ * Get ROI progress data (percentage of items that hit CPW target by category)
+ */
+export interface ROIProgress {
+  category: string
+  totalItems: number
+  itemsHitTarget: number
+  percentageHitTarget: number
+  color: string
+}
+
+export async function getROIProgressData(
+  userId: string
+): Promise<ROIProgress[]> {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('items')
+    .select('category, purchase_price, retail_price, wears')
+    .eq('user_id', userId)
+    .eq('status', ItemStatus.OWNED)
+    .eq('is_archived', false)
+
+  if (error) {
+    console.error('Error fetching ROI progress:', error)
+    return []
+  }
+
+  if (!data || data.length === 0) {
+    return []
+  }
+
+  // Group by category and calculate hit rate
+  const categoryMap = new Map<
+    string,
+    { total: number; hitTarget: number }
+  >()
+
+  data.forEach((item) => {
+    const price = item.purchase_price || item.retail_price
+    if (!price) return
+
+    const existing = categoryMap.get(item.category) || {
+      total: 0,
+      hitTarget: 0,
+    }
+
+    const wears = item.wears || 0
+    const cpw = wears > 0 ? price / wears : Infinity
+    const target = getTargetCostPerWear(price, item.category)
+    const hitTarget = cpw <= target
+
+    categoryMap.set(item.category, {
+      total: existing.total + 1,
+      hitTarget: existing.hitTarget + (hitTarget ? 1 : 0),
+    })
+  })
+
+  const categoryColors: Record<string, string> = {
+    sneakers: '#3B82F6',
+    tops: '#10B981',
+    bottoms: '#F59E0B',
+    outerwear: '#8B5CF6',
+    accessories: '#EC4899',
+    bags: '#14B8A6',
+    hats: '#F97316',
+    other: '#6B7280',
+  }
+
+  return Array.from(categoryMap.entries())
+    .map(([category, data]) => ({
+      category: category.charAt(0).toUpperCase() + category.slice(1),
+      totalItems: data.total,
+      itemsHitTarget: data.hitTarget,
+      percentageHitTarget: (data.hitTarget / data.total) * 100,
+      color: categoryColors[category] || '#6B7280',
+    }))
+    .sort((a, b) => b.percentageHitTarget - a.percentageHitTarget) // Best performers first
+}
+
+/**
+ * Get target cost-per-wear based on price
+ * (Copied from achievements-stats.ts for consistency)
+ */
+function getTargetCostPerWear(price: number, _category: string): number {
+  if (price < 50) return 2 // Budget items: $2/wear
+  if (price < 150) return 5 // Mid-range: $5/wear
+  return 10 // Premium: $10/wear
+}
+
+/**
  * Aggregate spending by month
  */
 function aggregateByMonth(items: any[]): SpendingTrend[] {

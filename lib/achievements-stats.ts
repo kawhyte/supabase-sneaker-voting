@@ -32,10 +32,14 @@ export interface BestValueItem {
   brand: string
   model: string
   color: string
+  category: string
   costPerWear: number
   targetCostPerWear: number
   image_url: string | null
   percentOfTarget: number
+  wears: number
+  purchase_price?: number
+  retail_price?: number
 }
 
 export interface TopWornItem {
@@ -331,6 +335,87 @@ export async function getLeastWornItems(userId: string, limit: number = 3): Prom
     })
   } catch (error) {
     console.error('Error in getLeastWornItems:', error)
+    return []  // Graceful degradation: return empty array instead of throwing
+  }
+}
+
+/**
+ * Get best value items for user (lowest cost-per-wear that hit target)
+ * @param userId - User ID
+ * @param limit - Number of items to return (default: 5)
+ * @returns Array of best value items, sorted by cost-per-wear ascending
+ * @throws Returns empty array on error (graceful degradation)
+ */
+export async function getBestValueItems(userId: string, limit: number = 5): Promise<BestValueItem[]> {
+  const supabase = createClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('items')
+      .select(`
+        id,
+        brand,
+        model,
+        color,
+        category,
+        wears,
+        purchase_price,
+        retail_price,
+        item_photos (
+          image_url,
+          is_main_image
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'owned')
+      .eq('is_archived', false)
+      .gte('wears', 1)  // Only items worn at least once
+
+    if (error) {
+      console.error('Error fetching best value items:', error)
+      throw error
+    }
+
+    // Handle null/empty data gracefully
+    if (!data || data.length === 0) {
+      return []
+    }
+
+    // Calculate cost-per-wear for each item and filter those that hit target
+    const itemsWithCPW = data
+      .map((item) => {
+        const price = item.purchase_price || item.retail_price
+        if (!price || !item.wears) return null
+
+        const cpw = price / item.wears
+        const target = getTargetCostPerWear(price, item.category)
+        const percentOfTarget = (cpw / target) * 100
+
+        // Only include items that hit or beat their target
+        if (cpw > target) return null
+
+        return {
+          id: item.id,
+          brand: item.brand || 'Unknown Brand',
+          model: item.model || item.brand || 'Unnamed Item',
+          color: item.color || '',
+          category: item.category || 'other',
+          costPerWear: cpw,
+          targetCostPerWear: target,
+          percentOfTarget,
+          wears: item.wears,
+          image_url: getMainImage(item),
+          purchase_price: item.purchase_price || undefined,
+          retail_price: item.retail_price || undefined,
+        }
+      })
+      .filter((item): item is BestValueItem => item !== null)
+      .sort((a, b) => a.costPerWear - b.costPerWear)  // Sort by CPW ascending (best value first)
+      .slice(0, limit)
+
+    return itemsWithCPW
+  } catch (error) {
+    console.error('Error in getBestValueItems:', error)
     return []  // Graceful degradation: return empty array instead of throwing
   }
 }

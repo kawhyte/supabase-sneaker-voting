@@ -17,9 +17,11 @@ import {
   getWardrobeStats,
   getTopWornItems,
   getLeastWornItems,
+  getBestValueItems,
   type WardrobeStats,
   type TopWornItem,
   type LeastWornItem,
+  type BestValueItem,
 } from '@/lib/achievements-stats'
 // Analytics removed - not configured yet
 // TODO: Re-add when Google Analytics 4 is set up
@@ -63,6 +65,7 @@ function AchievementsPageContent() {
   const [userName, setUserName] = useState<string | null>(null)
   const [topWorn, setTopWorn] = useState<TopWornItem[]>([])
   const [leastWorn, setLeastWorn] = useState<LeastWornItem[]>([])
+  const [bestValue, setBestValue] = useState<BestValueItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
@@ -108,16 +111,18 @@ function AchievementsPageContent() {
         //   console.error('Failed to track page view:', e)
         // }
 
-        // Fetch all stats in parallel
-        const [statsData, topWornData, leastWornData] = await Promise.all([
+        // Fetch all stats in parallel (fetch 5 items for responsive Top 3/5 display)
+        const [statsData, topWornData, leastWornData, bestValueData] = await Promise.all([
           getWardrobeStats(user.id),
-          getTopWornItems(user.id),
-          getLeastWornItems(user.id),
+          getTopWornItems(user.id, 5),   // Fetch 5 for desktop, component will slice to 3 on mobile
+          getLeastWornItems(user.id, 5), // Fetch 5 for desktop, component will slice to 3 on mobile
+          getBestValueItems(user.id, 5), // Fetch 5 for desktop, component will slice to 3 on mobile
         ])
 
         setStats(statsData)
         setTopWorn(topWornData)
         setLeastWorn(leastWornData)
+        setBestValue(bestValueData)
       } catch (err) {
         console.error('Error loading achievements:', err)
         setError('Failed to load achievements. Please try again.')
@@ -180,10 +185,9 @@ function AchievementsPageContent() {
 
       {/* NEW: Simplified Stats Grid (replaces HeroSection + CoreStatsGrid) */}
       <StatsGrid stats={stats} />
-<AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} />
- {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-        </div> */}
+
+      {/* Sidebar: Top/Least/Best Value Lists */}
+      <AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} bestValue={bestValue} />
 
       {/* NEW: Grid Layout (main content + sidebar) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -215,11 +219,6 @@ function AchievementsPageContent() {
             </Suspense>
           )}
 
-        </div>
-
-        {/* SIDEBAR COLUMN (1 column) */}
-        <div>
-          <AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} />
         </div>
 
       </div>

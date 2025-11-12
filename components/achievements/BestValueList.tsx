@@ -1,48 +1,48 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Crown, Shirt } from 'lucide-react'
-import { TopWornItem } from '@/lib/achievements-stats'
+import { TrendingDown, Shirt } from 'lucide-react'
+import { BestValueItem } from '@/lib/achievements-stats'
 import { CATEGORY_CONFIGS } from '@/components/types/item-category'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ItemNameDisplay } from '@/components/shared/ItemNameDisplay'
 
-interface TopWornListProps {
-  items: TopWornItem[]
-  variant?: 'full' | 'sidebar' // NEW: Support dual layouts
+interface BestValueListProps {
+  items: BestValueItem[]
+  variant?: 'full' | 'sidebar' // Support dual layouts
 }
 
-export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
+export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
   if (items.length === 0) {
     return variant === 'sidebar' ? null : (
-      <section className="mb-12" aria-labelledby="top-worn-title">
+      <section className="mb-12" aria-labelledby="best-value-title">
         <div className="flex items-center gap-3 mb-6">
-          <Crown className="h-6 w-6 text-primary" aria-hidden="true" />
-          <h2 id="top-worn-title" className="text-2xl font-bold text-foreground">
-            Top 5 Most Worn
+          <TrendingDown className="h-6 w-6 text-primary" aria-hidden="true" />
+          <h2 id="best-value-title" className="text-2xl font-bold text-foreground">
+            Top 5 Best Value
           </h2>
         </div>
         <div className="bg-card border border-border rounded-xl p-12 text-center shadow-sm">
           <p className="text-muted-foreground">
-            Start logging wears to see your most worn items here!
+            Keep wearing your items to unlock cost-per-wear insights!
           </p>
         </div>
       </section>
     )
   }
 
-  // NEW: Sidebar compact layout
+  // Sidebar compact layout
   if (variant === 'sidebar') {
     return (
-      <section className="bg-card border border-border rounded-xl p-6 shadow-sm" aria-labelledby="top-worn-sidebar-title">
+      <section className="bg-card border border-border rounded-xl p-6 shadow-sm" aria-labelledby="best-value-sidebar-title">
         <div className="flex items-center gap-3 mb-4">
-          <Crown
+          <TrendingDown
             className="h-5 w-5 text-primary"
             aria-hidden="true"
           />
-          <h3 id="top-worn-sidebar-title" className="text-lg font-bold text-foreground">
-            Most Worn
+          <h3 id="best-value-sidebar-title" className="text-lg font-bold text-foreground">
+            Best Value
           </h3>
         </div>
 
@@ -83,14 +83,19 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
                   maxLength={35}
                 />
                 <p className="text-xs text-muted-foreground truncate">
-                  Worn {item.wears}x
+                  ${item.costPerWear.toFixed(2)}/wear
                 </p>
               </div>
 
-              {/* Rank Badge */}
-              <p className="font-bold text-primary flex-shrink-0">
-                #{index + 1}
-              </p>
+              {/* Badge */}
+              <div className="flex-shrink-0 text-right">
+                <p className="text-xs font-bold text-green-600">
+                  {Math.round(item.percentOfTarget)}%
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  of target
+                </p>
+              </div>
             </Link>
           ))}
         </div>
@@ -99,11 +104,11 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
   }
 
   return (
-    <section className="mb-12" aria-labelledby="top-worn-title">
+    <section className="mb-12" aria-labelledby="best-value-title">
       <div className="flex items-center gap-3 mb-6">
-        <Crown className="h-6 w-6 text-primary" aria-hidden="true" />
-        <h2 id="top-worn-title" className="text-2xl font-bold text-foreground">
-          Top 5 Most Worn
+        <TrendingDown className="h-6 w-6 text-primary" aria-hidden="true" />
+        <h2 id="best-value-title" className="text-2xl font-bold text-foreground">
+          Top 5 Best Value
         </h2>
       </div>
 
@@ -119,10 +124,10 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
               href="/dashboard?tab=owned"
               className="block bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-sun-400 transition-all"
             >
-              {/* Rank Badge */}
+              {/* Value Badge */}
               <div className="relative">
-                <div className="absolute top-2 left-2 bg-sun-400 text-foreground font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm z-10">
-                  #{index + 1}
+                <div className="absolute top-2 left-2 bg-green-600 text-white font-bold rounded-full px-3 py-1 text-xs z-10">
+                  {Math.round(item.percentOfTarget)}% of target
                 </div>
 
                 {/* Image */}
@@ -156,16 +161,25 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
                   maxLength={30}
                 />
 
-                {/* Wear Count */}
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-sun-200 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-sun-400 h-full"
-                      style={{ width: `${Math.min(100, (item.wears / (items[0]?.wears || 1)) * 100)}%` }}
-                    />
+                {/* Cost Per Wear */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">CPW:</span>
+                    <span className="font-bold text-foreground">
+                      ${item.costPerWear.toFixed(2)}
+                    </span>
                   </div>
-                  <div className="text-sm font-bold text-foreground">
-                    {item.wears}
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Target:</span>
+                    <span className="font-bold text-muted-foreground">
+                      ${item.targetCostPerWear.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex-1 bg-green-100 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-green-600 h-full"
+                      style={{ width: `${Math.min(100, item.percentOfTarget)}%` }}
+                    />
                   </div>
                 </div>
               </div>

@@ -33,11 +33,11 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
         </div>
 
         <div className="space-y-2">
-          {items.slice(0, 3).map((item) => (
+          {items.slice(0, 5).map((item, index) => (
             <Link
               key={item.id}
               href="/dashboard?tab=owned"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors opacity-75 group"
+              className={`flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors opacity-75 group ${index >= 3 ? 'hidden lg:flex' : ''}`}
             >
               {/* Thumbnail */}
               <div className="w-14 h-14 rounded-lg bg-cover bg-center flex-shrink-0 relative">
