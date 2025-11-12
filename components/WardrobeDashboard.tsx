@@ -353,6 +353,16 @@ export function WardrobeDashboard({
 			toast.error("Failed to update wears");
 			// Revert on error
 			loadJournalEntries();
+		} else {
+			// Check for new achievements (stats auto-updated via DB trigger)
+			const { data: { user } } = await supabase.auth.getUser();
+			if (user) {
+				fetch('/api/check-achievements', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ userId: user.id }),
+				}).catch((err) => console.warn('Achievement check failed:', err));
+			}
 		}
 	};
 

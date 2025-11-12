@@ -352,6 +352,16 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 				description: mode === 'edit' ? 'Item updated!' : 'Item added to your wardrobe!',
 			})
 
+			// Check for new achievements (stats auto-updated via DB trigger)
+			if (mode !== 'edit') {
+				// Only check on new items, not edits
+				fetch('/api/check-achievements', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ userId: user.id }),
+				}).catch((err) => console.warn('Achievement check failed:', err))
+			}
+
 			// Call success callback and refresh
 			onSuccess?.()
 			router.refresh()

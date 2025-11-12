@@ -179,7 +179,7 @@ export function OutfitStudio({
 
       // Update item status to 'wishlisted'
       const { error } = await supabase
-        .from('sneakers')
+        .from('items')
         .update({ status: 'wishlisted', purchase_date: null })
         .eq('id', newWishlistItem.id)
         .eq('user_id', user.id)
