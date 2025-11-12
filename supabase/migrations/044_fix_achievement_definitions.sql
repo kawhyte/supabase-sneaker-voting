@@ -190,13 +190,17 @@ ON CONFLICT (achievement_key) DO UPDATE SET
   points = EXCLUDED.points;
 
 -- Step 4: Change user_achievements to use achievement_key instead of UUID foreign key
--- Drop the old foreign key constraint
+-- Drop both old and new foreign key constraints (idempotent)
 ALTER TABLE public.user_achievements
   DROP CONSTRAINT IF EXISTS user_achievements_achievement_id_fkey;
 
--- Change achievement_id column from UUID to VARCHAR(50) to match achievement_key
 ALTER TABLE public.user_achievements
-  ALTER COLUMN achievement_id TYPE VARCHAR(50);
+  DROP CONSTRAINT IF EXISTS user_achievements_achievement_key_fkey;
+
+-- Change achievement_id column from UUID to VARCHAR(50) to match achievement_key
+-- Use USING clause to handle conversion if column is currently UUID
+ALTER TABLE public.user_achievements
+  ALTER COLUMN achievement_id TYPE VARCHAR(50) USING achievement_id::VARCHAR(50);
 
 -- Add new foreign key constraint referencing achievement_key
 ALTER TABLE public.user_achievements
