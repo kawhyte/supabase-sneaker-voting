@@ -766,6 +766,7 @@ export function WardrobeDashboard({
 				onArchive={handleOpenArchiveDialog}
 				onCreateOutfit={() => setIsOutfitStudioOpen(true)}
 				onRefreshPrice={handleRefreshPrice}
+				onManualEntrySuccess={loadJournalEntries}
 				userWardrobe={journalEntries.filter(
 					(e) => e.status === ItemStatus.OWNED
 				)}

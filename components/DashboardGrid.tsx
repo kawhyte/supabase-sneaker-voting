@@ -23,6 +23,7 @@ interface DashboardGridProps {
 	onMarkAsPurchased?: (entry: WardrobeItem) => void;
 	onCreateOutfit?: (entry: WardrobeItem) => void;
 	onRefreshPrice?: (itemId: string) => Promise<void>;
+	onManualEntrySuccess?: () => void;
 	emptyState?: ReactNode;
 	viewMode?: "journal" | "collection" | "archive" | "wishlist";
 	isArchivePage?: boolean;
@@ -40,6 +41,7 @@ export function DashboardGrid({
 	onMarkAsPurchased,
 	onCreateOutfit,
 	onRefreshPrice,
+	onManualEntrySuccess,
 	emptyState,
 	viewMode = "journal",
 	isArchivePage = false,
@@ -72,6 +74,7 @@ export function DashboardGrid({
 					onMarkAsPurchased={onMarkAsPurchased}
 					onCreateOutfit={onCreateOutfit}
 					onRefreshPrice={onRefreshPrice}
+					onManualEntrySuccess={onManualEntrySuccess}
 					isArchivePage={isArchivePage}
 					userWardrobe={userWardrobe}
 				/>
