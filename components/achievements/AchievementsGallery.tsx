@@ -213,6 +213,15 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
             })
 
           if (insertError) {
+            // Handle duplicate key error (23505) - achievement already unlocked
+            if (insertError.code === '23505') {
+              console.log(`Achievement already unlocked: ${achievement.name}`)
+              // Add to newly unlocked to update UI state
+              newlyUnlocked.push(achievement.id)
+              continue
+            }
+
+            // Log other errors for debugging
             console.error('Error unlocking achievement:', {
               achievementId: achievement.id,
               achievementName: achievement.name,
