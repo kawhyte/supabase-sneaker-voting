@@ -50,14 +50,21 @@ export function OutfitCardCanvas({
 				overflow: "visible",
 			}}>
 			{/* Render items in z-index order */}
-			{items.map((item) => {
-				// Get image source (prefer cropped, fallback to original)
-				const imageUrl =
-					item.cropped_image_url ||
-					item.item?.image_url ||
-					item.item?.item_photos?.[0]?.image_url;
-
-				if (!imageUrl) return null;
+			{items
+				.filter((item) => {
+					// Filter out items without images
+					const imageUrl =
+						item.cropped_image_url ||
+						item.item?.image_url ||
+						item.item?.item_photos?.[0]?.image_url;
+					return !!imageUrl;
+				})
+				.map((item) => {
+					// Get image source (prefer cropped, fallback to original)
+					const imageUrl =
+						item.cropped_image_url ||
+						item.item?.image_url ||
+						item.item?.item_photos?.[0]?.image_url;
 
 				// Apply standardization transformation (FREE tier)
 				const standardizedUrl = getStandardizedImageUrl(
