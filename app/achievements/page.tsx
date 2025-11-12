@@ -184,7 +184,7 @@ function AchievementsPageContent() {
       </h1>
 
       {/* NEW: Simplified Stats Grid (replaces HeroSection + CoreStatsGrid) */}
-      <StatsGrid stats={stats} />
+      {/* <StatsGrid stats={stats} /> */}
 
       {/* Sidebar: Top/Least/Best Value Lists */}
       <AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} bestValue={bestValue} />
@@ -197,13 +197,13 @@ function AchievementsPageContent() {
 
 
      
-          {userId && (
+          {/* {userId && (
             <Suspense fallback={<FinancialInsightsSkeleton />}>
               <div className="charts-grid">
                 <FinancialInsights userId={userId} />
               </div>
             </Suspense>
-          )}
+          )} */}
 
           {userId && (
             <Suspense fallback={<GallerySkeleton />}>
@@ -213,11 +213,11 @@ function AchievementsPageContent() {
             </Suspense>
           )}
 
-          {userId && (
+          {/* {userId && (
             <Suspense fallback={<FactsSkeleton />}>
               <FunFactsSection userId={userId} />
             </Suspense>
-          )}
+          )} */}
 
         </div>
 
