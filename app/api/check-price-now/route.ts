@@ -126,13 +126,13 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
     supportLevel: 'medium'
   },
   {
-    domain: 'lululemon.com',
+    domain: 'shop.lululemon.com',
     name: 'Lululemon',
     selectors: {
       price: ['[itemprop="price"]', '.price', '[class*="price"]', 'meta[property="og:price:amount"]'],
       originalPrice: ['.price-original', '.price--compare', '[class*="original"]']
     },
-    supportLevel: 'medium' // Verified working - user successfully scraped $138 price
+    supportLevel: 'medium' // Verified working - user successfully scraped $138 price twice
   },
 
   // LOW SUCCESS RATE (5-20%) - Will try but warn users
