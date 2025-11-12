@@ -818,3 +818,13 @@ nav {
   border-width: 0;
 }
 
+/* Hide scrollbar for horizontal scrolling elements (category tabs, carousels) */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
