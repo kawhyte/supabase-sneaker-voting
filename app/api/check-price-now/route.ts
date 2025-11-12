@@ -80,7 +80,7 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
       price: ['[data-test="product-price"]', '.ProductPrice-price', '[itemprop="price"]'],
       originalPrice: ['.ProductPrice-original']
     },
-    supportLevel: 'high'
+    supportLevel: 'low' // Downgraded: Strong anti-bot protection (403 errors)
   },
   {
     domain: 'champssports.com',
