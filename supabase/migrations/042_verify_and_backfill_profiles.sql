@@ -18,8 +18,7 @@ INSERT INTO public.profiles (
   avatar_url,
   avatar_type,
   avatar_version,
-  updated_at,
-  created_at
+  updated_at
 )
 SELECT
   u.id,
@@ -30,7 +29,6 @@ SELECT
     ELSE NULL
   END,
   1, -- Default avatar version
-  NOW(),
   NOW()
 FROM auth.users u
 LEFT JOIN public.profiles p ON u.id = p.id
@@ -39,20 +37,22 @@ WHERE p.id IS NULL; -- Only users without profiles
 -- Step 2: Log results for verification
 DO $$
 DECLARE
-  backfilled_count integer;
   total_users integer;
   total_profiles integer;
+  missing_profiles integer;
 BEGIN
-  -- Count how many profiles were just created
+  -- Count users and profiles
   SELECT COUNT(*) INTO total_users FROM auth.users;
   SELECT COUNT(*) INTO total_profiles FROM public.profiles;
-
-  backfilled_count := total_profiles - (SELECT COUNT(*) FROM public.profiles WHERE created_at < NOW() - INTERVAL '1 second');
+  SELECT COUNT(*) INTO missing_profiles
+    FROM auth.users u
+    LEFT JOIN public.profiles p ON u.id = p.id
+    WHERE p.id IS NULL;
 
   RAISE NOTICE 'Migration 042 completed:';
   RAISE NOTICE '  Total auth.users: %', total_users;
   RAISE NOTICE '  Total profiles: %', total_profiles;
-  RAISE NOTICE '  Profiles created in this migration: %', backfilled_count;
+  RAISE NOTICE '  Missing profiles after migration: %', missing_profiles;
 
   IF total_users = total_profiles THEN
     RAISE NOTICE '  ✅ All users have profiles!';
