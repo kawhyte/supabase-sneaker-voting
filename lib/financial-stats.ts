@@ -94,6 +94,7 @@ export async function getCategorySpending(
 
 /**
  * Get spending trends over time (monthly aggregation)
+ * Includes ALL purchased items (owned + archived) for accurate spending history
  */
 export async function getSpendingTrends(
   userId: string,
@@ -103,16 +104,18 @@ export async function getSpendingTrends(
   const timeRange = getTimeRange(period)
 
   if (!timeRange) {
-    // For 'all', get monthly aggregates
+    // For 'all', get monthly aggregates (includes archived items)
     const { data, error } = await supabase
       .from('items')
       .select('purchase_date, purchase_price, retail_price')
       .eq('user_id', userId)
-      .eq('status', ItemStatus.OWNED)
       .not('purchase_date', 'is', null)
       .order('purchase_date', { ascending: true })
 
-    if (error) throw error
+    if (error) {
+      console.error('Error fetching spending trends:', error)
+      return []
+    }
 
     return aggregateByMonth(data || [])
   }
@@ -121,12 +124,14 @@ export async function getSpendingTrends(
     .from('items')
     .select('purchase_date, purchase_price, retail_price')
     .eq('user_id', userId)
-    .eq('status', ItemStatus.OWNED)
     .gte('purchase_date', timeRange.start.toISOString())
     .lte('purchase_date', timeRange.end.toISOString())
     .order('purchase_date', { ascending: true })
 
-  if (error) throw error
+  if (error) {
+    console.error('Error fetching spending trends:', error)
+    return []
+  }
 
   return aggregateByMonth(data || [])
 }
