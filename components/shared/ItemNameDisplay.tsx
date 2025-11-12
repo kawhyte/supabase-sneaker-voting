@@ -31,9 +31,9 @@ export function ItemNameDisplay({
       title={tooltipText}
       style={{ minWidth: 0 }}
     >
-      <span className="text-muted-foreground text-sm truncate flex-shrink-0">
+      {/* <span className="text-muted-foreground text-sm truncate flex-shrink-0">
         {brand}
-      </span>
+      </span> */}
       <span className="text-foreground text-sm font-medium truncate">
         {model}
       </span>

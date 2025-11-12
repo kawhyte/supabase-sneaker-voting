@@ -54,6 +54,8 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
               className={`flex items-center gap-4 group hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors ${index >= 3 ? 'hidden lg:flex' : ''}`}
             >
               {/* Thumbnail */}
+
+              
               <div className="w-14 h-14 rounded-lg bg-cover bg-center flex-shrink-0 relative">
                 {item.image_url ? (
                   <Image
