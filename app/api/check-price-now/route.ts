@@ -179,6 +179,7 @@ async function scrapePrice(url: string, config: RetailerConfig | null, retailPri
   error?: string
   storeName: string
   supportLevel?: 'high' | 'medium' | 'low'
+  debug?: string[]
 }> {
   const storeName = config?.name || new URL(url).hostname.replace('www.', '').split('.')[0]
   const supportLevel = config?.supportLevel || 'low'
@@ -218,21 +219,32 @@ async function scrapePrice(url: string, config: RetailerConfig | null, retailPri
 
     let price: number | null = null
     let originalPrice: number | null = null
+    const debugInfo: string[] = [] // Track what we tried
 
     // Try retailer-specific selectors
     if (config) {
+      debugInfo.push(`Retailer: ${config.name}`)
+
       // Try price selectors
       for (const selector of config.selectors.price) {
         const element = $(selector).first()
+        debugInfo.push(`Trying selector: "${selector}" → found: ${element.length > 0}`)
+
         if (element.length > 0) {
           const priceText = element.is('meta')
             ? element.attr('content')
             : element.text().trim()
 
+          debugInfo.push(`  Price text: "${priceText}"`)
+
           if (priceText) {
             const parsedPrice = parsePrice(priceText)
-            if (parsedPrice && validatePrice(parsedPrice, retailPrice)) {
+            const isValid = parsedPrice ? validatePrice(parsedPrice, retailPrice) : false
+            debugInfo.push(`  Parsed: $${parsedPrice}, Valid: ${isValid}`)
+
+            if (parsedPrice && isValid) {
               price = parsedPrice
+              debugInfo.push(`  ✅ SUCCESS: Using price $${price}`)
               break
             }
           }
@@ -259,6 +271,8 @@ async function scrapePrice(url: string, config: RetailerConfig | null, retailPri
 
     // Generic fallback selectors if config didn't work
     if (!price) {
+      debugInfo.push('Trying generic selectors...')
+
       const genericSelectors = [
         '[itemprop="price"]',
         'meta[property="product:price:amount"]',
@@ -269,15 +283,23 @@ async function scrapePrice(url: string, config: RetailerConfig | null, retailPri
 
       for (const selector of genericSelectors) {
         const element = $(selector).first()
+        debugInfo.push(`Generic selector: "${selector}" → found: ${element.length > 0}`)
+
         if (element.length > 0) {
           const priceText = element.is('meta')
             ? element.attr('content')
             : element.text().trim()
 
+          debugInfo.push(`  Price text: "${priceText}"`)
+
           if (priceText) {
             const parsedPrice = parsePrice(priceText)
-            if (parsedPrice && validatePrice(parsedPrice, retailPrice)) {
+            const isValid = parsedPrice ? validatePrice(parsedPrice, retailPrice) : false
+            debugInfo.push(`  Parsed: $${parsedPrice}, Valid: ${isValid}`)
+
+            if (parsedPrice && isValid) {
               price = parsedPrice
+              debugInfo.push(`  ✅ SUCCESS: Using price $${price}`)
               break
             }
           }
@@ -285,14 +307,18 @@ async function scrapePrice(url: string, config: RetailerConfig | null, retailPri
       }
     }
 
+    // Log debug info to server console
+    console.log('🔍 Price Check Debug:', debugInfo.join('\n'))
+
     if (!price) {
       return {
         success: false,
         error: supportLevel === 'low'
           ? `${storeName} uses advanced anti-bot protection. Free price checking has limited success for this retailer. Try visiting the site directly.`
-          : 'Could not find price on page. The site layout may have changed.',
+          : `Could not find price on page. The site layout may have changed. Debug: ${debugInfo.slice(-3).join(' | ')}`,
         storeName,
-        supportLevel
+        supportLevel,
+        debug: debugInfo // Include in API response for client-side debugging
       }
     }
 
@@ -301,7 +327,8 @@ async function scrapePrice(url: string, config: RetailerConfig | null, retailPri
       price,
       originalPrice,
       storeName,
-      supportLevel
+      supportLevel,
+      debug: debugInfo // Include debug info in success response too
     }
 
   } catch (error) {
