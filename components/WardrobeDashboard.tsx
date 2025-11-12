@@ -401,9 +401,13 @@ export function WardrobeDashboard({
 		setIsBulkChecking(true);
 		setBulkCheckProgress({ current: 0, total: itemsBatch.length });
 
-		let successCount = 0;
-		let failCount = 0;
-		let skippedCount = 0;
+		const results: Array<{
+			item: WardrobeItem;
+			success: boolean;
+			price?: number;
+			storeName?: string;
+			error?: string;
+		}> = [];
 
 		// Show initial progress toast
 		const progressToastId = toast.loading(`Checking prices... 0/${itemsBatch.length}`, {
@@ -430,7 +434,13 @@ export function WardrobeDashboard({
 				const data = await response.json();
 
 				if (data.success) {
-					successCount++;
+					results.push({
+						item,
+						success: true,
+						price: data.price,
+						storeName: data.storeName
+					});
+
 					// Update local state immediately
 					setJournalEntries((prev) =>
 						prev.map((entry) =>
@@ -445,7 +455,13 @@ export function WardrobeDashboard({
 						)
 					);
 				} else {
-					failCount++;
+					results.push({
+						item,
+						success: false,
+						storeName: data.storeName,
+						error: data.message
+					});
+
 					// Reload to show updated failure count
 					await loadJournalEntries();
 				}
@@ -457,21 +473,46 @@ export function WardrobeDashboard({
 
 			} catch (error) {
 				console.error(`Failed to check price for ${item.brand} ${item.model}:`, error);
-				failCount++;
+				results.push({
+					item,
+					success: false,
+					error: 'Network error'
+				});
 			}
 		}
 
-		// Dismiss progress toast and show summary
+		// Dismiss progress toast
 		toast.dismiss(progressToastId);
 
-		const summaryParts = [];
-		if (successCount > 0) summaryParts.push(`✅ ${successCount} updated`);
-		if (failCount > 0) summaryParts.push(`❌ ${failCount} failed`);
-		if (skippedCount > 0) summaryParts.push(`⏭️ ${skippedCount} skipped`);
+		// Show detailed summary
+		const successResults = results.filter(r => r.success);
+		const failResults = results.filter(r => !r.success);
+
+		// Build detailed description
+		let description = '';
+
+		if (successResults.length > 0) {
+			description += '✅ Updated:\n';
+			successResults.forEach(r => {
+				description += `• ${r.item.brand} ${r.item.model}: $${r.price}\n`;
+			});
+		}
+
+		if (failResults.length > 0) {
+			if (description) description += '\n';
+			description += '❌ Failed:\n';
+			failResults.forEach(r => {
+				const reason = r.error?.includes('403') ? 'Bot blocked' :
+				               r.error?.includes('Could not find') ? 'Price not found' :
+				               r.error || 'Unknown error';
+				description += `• ${r.item.brand} ${r.item.model}: ${reason}\n`;
+			});
+		}
 
 		toast.success(`Bulk price check complete!`, {
-			description: summaryParts.join(' • '),
-			duration: 6000
+			description: description.trim(),
+			duration: 10000, // Longer duration for detailed results
+			style: { whiteSpace: 'pre-line' } // Preserve line breaks
 		});
 
 		setIsBulkChecking(false);
