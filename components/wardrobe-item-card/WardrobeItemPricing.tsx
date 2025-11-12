@@ -17,12 +17,14 @@ interface ItemPricingDisplayProps {
 	item: WardrobeItem;
 	isOwned: boolean;
 	isOnSale: boolean;
+	onRefreshPrice?: (itemId: string) => Promise<void>;
 }
 
 export function ItemPricingDisplay({
 	item,
 	isOwned,
 	isOnSale,
+	onRefreshPrice,
 }: ItemPricingDisplayProps) {
 	if (isOwned) {
 		// OWNED ITEMS: Show purchase price
@@ -84,6 +86,7 @@ export function ItemPricingDisplay({
 				lastPriceCheckAt={item.last_price_check_at || null}
 				isAutoTrackingEnabled={item.auto_price_tracking_enabled !== false}
 				priceCheckFailures={item.price_check_failures || 0}
+				onRefreshPrice={onRefreshPrice}
 			/>
 		</div>
 	);

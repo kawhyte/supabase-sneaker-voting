@@ -290,6 +290,52 @@ export function WardrobeDashboard({
 		setIsArchiveDialogOpen(true);
 	};
 
+	// Manual Price Check Handler
+	const handleRefreshPrice = async (itemId: string) => {
+		try {
+			const response = await fetch('/api/check-price-now', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ itemId })
+			});
+
+			const data = await response.json();
+
+			if (!data.success) {
+				toast.error(data.message || 'Failed to check price', {
+					description: data.storeName ? `${data.storeName} - ${data.supportLevel || 'unknown'} support` : undefined,
+					duration: 5000
+				});
+				// Reload to show updated failure count
+				loadJournalEntries();
+				return;
+			}
+
+			// Success! Update local state immediately for instant UI feedback
+			setJournalEntries((prev) =>
+				prev.map((item) =>
+					item.id === itemId
+						? {
+								...item,
+								sale_price: data.price,
+								last_price_check_at: data.lastChecked,
+								price_check_failures: 0,
+						  }
+						: item
+				)
+			);
+
+			toast.success(data.message || `Price updated: $${data.price}`, {
+				description: `${data.storeName} - Last checked just now`,
+				duration: 4000
+			});
+
+		} catch (error) {
+			console.error('Price check error:', error);
+			toast.error('Network error - failed to check price');
+		}
+	};
+
 	// Database Functions
 	const markItemAsPurchased = async (
 		purchasePrice: number,
@@ -557,6 +603,7 @@ export function WardrobeDashboard({
 				onMarkAsPurchased={handleOpenPurchasedModal}
 				onArchive={handleOpenArchiveDialog}
 				onCreateOutfit={() => setIsOutfitStudioOpen(true)}
+				onRefreshPrice={handleRefreshPrice}
 				userWardrobe={journalEntries.filter(
 					(e) => e.status === ItemStatus.OWNED
 				)}
