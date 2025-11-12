@@ -383,7 +383,7 @@ export async function getBestValueItems(userId: string, limit: number = 5): Prom
 
     // Calculate cost-per-wear for each item and filter those that hit target
     const itemsWithCPW = data
-      .map((item) => {
+      .map((item): BestValueItem | null => {
         const price = item.purchase_price || item.retail_price
         if (!price || !item.wears) return null
 
@@ -405,8 +405,8 @@ export async function getBestValueItems(userId: string, limit: number = 5): Prom
           percentOfTarget,
           wears: item.wears,
           image_url: getMainImage(item),
-          purchase_price: item.purchase_price || undefined,
-          retail_price: item.retail_price || undefined,
+          purchase_price: item.purchase_price,
+          retail_price: item.retail_price,
         }
       })
       .filter((item): item is BestValueItem => item !== null)

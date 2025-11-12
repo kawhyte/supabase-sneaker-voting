@@ -111,8 +111,7 @@ export function NotificationPreferences() {
 			if (!data) {
 				console.log("No preferences found, creating defaults...");
 				const defaultPrefs: Partial<NotificationPrefs> = {
-					user_id: user.id,
-					enable_in_app: true,
+						enable_in_app: true,
 					enable_push: false,
 					enable_email: false,
 					price_alerts_enabled: true,
@@ -139,7 +138,7 @@ export function NotificationPreferences() {
 
 				const { data: newPrefs, error: insertError } = await supabase
 					.from("notification_preferences")
-					.insert(defaultPrefs)
+					.insert({ ...defaultPrefs, user_id: user.id })
 					.select()
 					.single();
 

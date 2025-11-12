@@ -14,7 +14,7 @@ import type { OutfitItem } from "@/components/types/outfit";
 // ============================================================================
 
 interface UndoAction {
-	type: "ADD_ITEM" | "REMOVE_ITEM" | "REPLACE_ITEM";
+	type: "ADD_ITEM" | "REMOVE_ITEM" | "REPLACE_ITEM" | "CLEAR_CANVAS";
 	timestamp: number;
 	outfitId?: string; // For outfit-specific undo stacks
 	data: {
