@@ -137,6 +137,15 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
 
   // LOW SUCCESS RATE (5-20%) - Will try but warn users
   {
+    domain: 'newbalance.com',
+    name: 'New Balance',
+    selectors: {
+      price: ['[data-test="product-price"]', '.price', '[itemprop="price"]', 'meta[property="og:price:amount"]'],
+      originalPrice: ['.price-original', '.price--compare']
+    },
+    supportLevel: 'low' // Verified failing: 403 anti-bot protection
+  },
+  {
     domain: 'nike.com',
     name: 'Nike',
     selectors: {
