@@ -93,20 +93,71 @@ export function NotificationPreferences() {
 			} = await supabase.auth.getUser();
 			if (!user) return;
 
+			// Use maybeSingle() to handle case where no preferences exist yet
 			const { data, error } = await supabase
 				.from("notification_preferences")
 				.select("*")
 				.eq("user_id", user.id)
-				.single();
+				.maybeSingle();
 
 			if (error) {
 				console.error("Error fetching preferences:", error);
 				toast.error("Failed to load preferences");
+				setIsLoading(false);
 				return;
 			}
 
-			setPrefs(data);
-			setOriginalPrefs(data);
+			// If no preferences exist, create default ones
+			if (!data) {
+				console.log("No preferences found, creating defaults...");
+				const defaultPrefs: Partial<NotificationPrefs> = {
+					user_id: user.id,
+					enable_in_app: true,
+					enable_push: false,
+					enable_email: false,
+					price_alerts_enabled: true,
+					wear_reminders_enabled: true,
+					seasonal_tips_enabled: true,
+					achievements_enabled: true,
+					shopping_reminders_in_app: true,
+					shopping_reminders_push: false,
+					shopping_reminders_email: false,
+					cooling_off_ready_in_app: false,
+					cooling_off_ready_push: false,
+					cooling_off_ready_email: false,
+					cost_per_wear_milestones_in_app: true,
+					cost_per_wear_milestones_push: false,
+					cost_per_wear_milestones_email: false,
+					quiet_hours_enabled: false,
+					quiet_hours_start: "22:00",
+					quiet_hours_end: "08:00",
+					user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+					max_daily_notifications: 10,
+					enable_bundling: true,
+					bundle_threshold: 3,
+				};
+
+				const { data: newPrefs, error: insertError } = await supabase
+					.from("notification_preferences")
+					.insert(defaultPrefs)
+					.select()
+					.single();
+
+				if (insertError) {
+					console.error("Error creating default preferences:", insertError);
+					toast.error("Failed to create notification preferences");
+					setIsLoading(false);
+					return;
+				}
+
+				setPrefs(newPrefs);
+				setOriginalPrefs(newPrefs);
+				toast.success("Notification preferences initialized");
+			} else {
+				setPrefs(data);
+				setOriginalPrefs(data);
+			}
+
 			setIsLoading(false);
 		}
 
