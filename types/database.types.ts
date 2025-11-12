@@ -988,11 +988,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "user_achievements_achievement_id_fkey"
+            foreignKeyName: "user_achievements_achievement_key_fkey"
             columns: ["achievement_id"]
             isOneToOne: false
             referencedRelation: "achievements"
-            referencedColumns: ["id"]
+            referencedColumns: ["achievement_key"]
           },
         ]
       }
