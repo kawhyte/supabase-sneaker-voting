@@ -45,31 +45,47 @@ export function ItemPricingDisplay({
 	// WISHLIST ITEMS: Show retail/sale price and target price
 	return (
 		<div className='flex flex-col gap-2.5'>
-			{item.retail_price && (
+			{/* Show pricing if we have either retail price OR sale price */}
+			{(item.retail_price || item.sale_price) && (
 				<div className='flex items-center gap-1.5 flex-wrap px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
-					<span className='text-sm text-muted-foreground'>Retail:</span>
-					{isOnSale ? (
+					{item.retail_price && (
 						<>
-							<span className='text-sm line-through text-muted-foreground'>
-								${item.retail_price}
-							</span>
-							<span className='text-base font-bold text-meadow-600'>
+							<span className='text-sm text-muted-foreground'>Retail:</span>
+							{isOnSale ? (
+								<>
+									<span className='text-sm line-through text-muted-foreground'>
+										${item.retail_price}
+									</span>
+									<span className='text-base font-bold text-meadow-600'>
+										${item.sale_price}
+									</span>
+									<Badge
+										variant='outline'
+										className='text-xs px-1.5 py-0 rounded-md border-meadow-400 bg-meadow-50 text-meadow-600 transition-all duration-200'
+									>
+										On Sale!
+									</Badge>
+								</>
+							) : (
+								<span className='text-base font-semibold text-foreground'>
+									${item.retail_price}
+								</span>
+							)}
+						</>
+					)}
+
+					{/* Show sale price even without retail price (from price check) */}
+					{!item.retail_price && item.sale_price && (
+						<>
+							<span className='text-sm text-muted-foreground'>Current Price:</span>
+							<span className='text-base font-semibold text-foreground'>
 								${item.sale_price}
 							</span>
-							<Badge
-								variant='outline'
-								className='text-xs px-1.5 py-0 rounded-md border-meadow-400 bg-meadow-50 text-meadow-600 transition-all duration-200'
-							>
-								On Sale!
-							</Badge>
 						</>
-					) : (
-						<span className='text-base font-semibold text-foreground'>
-							${item.retail_price}
-						</span>
 					)}
 				</div>
 			)}
+
 			{item.target_price && (
 				<div className='flex items-center gap-1.5 px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
 					<span className='text-sm text-muted-foreground'>Target:</span>

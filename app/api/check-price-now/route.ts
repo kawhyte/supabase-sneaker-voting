@@ -62,7 +62,7 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
       price: ['.product-price', '[data-price]', '[itemprop="price"]', 'meta[property="og:price:amount"]'],
       originalPrice: ['.price-was', '.price-original']
     },
-    supportLevel: 'high'
+    supportLevel: 'low' // Downgraded: Strong anti-bot protection (403 errors)
   },
   {
     domain: 'myshopify.com',
@@ -80,15 +80,22 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
       price: ['[data-test="product-price"]', '.ProductPrice-price', '[itemprop="price"]'],
       originalPrice: ['.ProductPrice-original']
     },
-    supportLevel: 'high'
+    supportLevel: 'low' // Downgraded: Strong anti-bot protection (403 errors)
   },
   {
     domain: 'champssports.com',
     name: 'Champs Sports',
     selectors: {
-      price: ['[data-test="product-price"]', '.ProductPrice', '[class*="price"]'],
+      price: [
+        '[data-test="product-price"]',
+        '.ProductPrice-final',
+        '.ProductPrice span:first-child',
+        'meta[property="og:price:amount"]',
+        '[itemprop="price"]'
+      ],
+      originalPrice: ['.ProductPrice-original', '.ProductPrice-compare']
     },
-    supportLevel: 'high'
+    supportLevel: 'medium' // Downgraded: Inconsistent bot protection + broad selectors need refinement
   },
 
   // MEDIUM SUCCESS RATE (40-70%)
@@ -118,8 +125,26 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
     },
     supportLevel: 'medium'
   },
+  {
+    domain: 'shop.lululemon.com',
+    name: 'Lululemon',
+    selectors: {
+      price: ['[itemprop="price"]', '.price', '[class*="price"]', 'meta[property="og:price:amount"]'],
+      originalPrice: ['.price-original', '.price--compare', '[class*="original"]']
+    },
+    supportLevel: 'medium' // Verified working - user successfully scraped $138 price twice
+  },
 
   // LOW SUCCESS RATE (5-20%) - Will try but warn users
+  {
+    domain: 'newbalance.com',
+    name: 'New Balance',
+    selectors: {
+      price: ['[data-test="product-price"]', '.price', '[itemprop="price"]', 'meta[property="og:price:amount"]'],
+      originalPrice: ['.price-original', '.price--compare']
+    },
+    supportLevel: 'low' // Verified failing: 403 anti-bot protection
+  },
   {
     domain: 'nike.com',
     name: 'Nike',
