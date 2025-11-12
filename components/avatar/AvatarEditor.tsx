@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { AvatarDisplay } from './AvatarDisplay'
 import { AvatarPicker } from './AvatarPicker'
-import { createClient } from '@/utils/supabase/client'
 import { User } from '@supabase/supabase-js'
 
 interface Profile {
@@ -14,6 +13,7 @@ interface Profile {
   avatar_url: string | null
   avatar_type: 'custom' | 'preset' | null
   preset_avatar_id: string | null
+  avatar_version?: number
 }
 
 interface AvatarEditorProps {
@@ -28,25 +28,21 @@ export function AvatarEditor({ profile, user, onAvatarChange }: AvatarEditorProp
 
   // Sync local state when profile prop changes
   useEffect(() => {
-    console.log('🎨 [AvatarEditor] Profile prop changed:', profile.preset_avatar_id)
     setCurrentProfile(profile)
   }, [profile])
 
   const handleAvatarSelect = async (avatarId: string) => {
-    console.log('🎨 [AvatarEditor] Avatar selected:', avatarId)
-
-    // Update local state only
+    // Update local state optimistically
     const newProfile = {
       ...currentProfile,
       avatar_type: 'preset' as const,
       preset_avatar_id: avatarId,
+      avatar_version: (currentProfile.avatar_version || 1) + 1
     }
 
-    console.log('🎨 [AvatarEditor] Updating local profile to:', newProfile)
     setCurrentProfile(newProfile)
 
     // Notify parent component of change
-    console.log('🎨 [AvatarEditor] Calling onAvatarChange callback')
     onAvatarChange?.(avatarId)
     setIsPickerOpen(false)
   }
@@ -60,6 +56,7 @@ export function AvatarEditor({ profile, user, onAvatarChange }: AvatarEditorProp
           avatarType={currentProfile.avatar_type}
           avatarUrl={currentProfile.avatar_url}
           presetAvatarId={currentProfile.preset_avatar_id}
+          avatarVersion={currentProfile.avatar_version}
           displayName={currentProfile.display_name}
           email={user.email}
           size="xl"

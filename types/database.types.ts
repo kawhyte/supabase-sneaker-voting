@@ -813,6 +813,7 @@ export type Database = {
           avatar_type: Database["public"]["Enums"]["avatar_type"] | null
           avatar_updated_at: string | null
           avatar_url: string | null
+          avatar_version: number
           display_name: string | null
           enable_duplication_warnings: boolean | null
           enable_quiz_gate: boolean | null
@@ -826,6 +827,7 @@ export type Database = {
           avatar_type?: Database["public"]["Enums"]["avatar_type"] | null
           avatar_updated_at?: string | null
           avatar_url?: string | null
+          avatar_version?: number
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
           enable_quiz_gate?: boolean | null
@@ -839,6 +841,7 @@ export type Database = {
           avatar_type?: Database["public"]["Enums"]["avatar_type"] | null
           avatar_updated_at?: string | null
           avatar_url?: string | null
+          avatar_version?: number
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
           enable_quiz_gate?: boolean | null

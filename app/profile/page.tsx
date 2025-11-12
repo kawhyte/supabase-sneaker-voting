@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { Suspense } from 'react'
 import { motion } from 'framer-motion'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { useTabNavigation, useTabKeyboardShortcuts } from '@/hooks/useTabNavigation'
@@ -9,22 +8,10 @@ import { User, ShieldCheck, Bell } from 'lucide-react'
 import { ProfileForm } from '@/components/ProfileForm'
 import { PurchasePreventionSettings } from '@/components/PurchasePreventionSettings'
 import { NotificationPreferences } from '@/components/NotificationPreferences'
-import type { User as AuthUser } from '@supabase/supabase-js'
-
-interface ProfileData {
-  id: string
-  display_name: string | null
-  avatar_url: string | null
-  avatar_type: 'custom' | 'preset' | null
-  preset_avatar_id: string | null
-  avatar_updated_at?: string
-  updated_at?: string
-}
+import { useProfile } from '@/contexts/ProfileContext'
 
 function SettingsContent() {
-  const [user, setUser] = useState<AuthUser | null>(null)
-  const [profile, setProfile] = useState<ProfileData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const { profile, user, isLoading } = useProfile()
 
   // Tab navigation with hash routing
   const { activeTab, setActiveTab } = useTabNavigation('profile')
@@ -34,54 +21,6 @@ function SettingsContent() {
     ['profile', 'purchase-prevention', 'notifications'],
     setActiveTab
   )
-
-  // Fetch user and profile data
-  useEffect(() => {
-    async function fetchData() {
-      const supabase = createClient()
-
-      // Get user
-      const { data: { user: currentUser } } = await supabase.auth.getUser()
-      if (!currentUser) {
-        // Redirect to login via client-side navigation
-        window.location.href = '/login'
-        return
-      }
-      setUser(currentUser)
-
-      // Get profile
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar_url, avatar_type, preset_avatar_id, avatar_updated_at, updated_at')
-        .eq('id', currentUser.id)
-        .single()
-
-      if (profileData) {
-        setProfile(profileData)
-      } else {
-        // Create default profile if doesn't exist
-        setProfile({
-          id: currentUser.id,
-          display_name: currentUser.email?.split('@')[0] || 'User',
-          avatar_url: null,
-          avatar_type: 'custom',
-          preset_avatar_id: null
-        })
-      }
-
-      setIsLoading(false)
-    }
-
-    fetchData()
-  }, [])
-
-  // Callback to update profile state from child components
-  const handleProfileUpdate = (updatedProfile: Partial<ProfileData> | any) => {
-    if (profile) {
-      console.log('🔄 [SettingsContent] Updating profile state:', updatedProfile)
-      setProfile({ ...profile, ...updatedProfile } as ProfileData)
-    }
-  }
 
   if (isLoading) {
     return (
@@ -153,7 +92,7 @@ function SettingsContent() {
             value="profile"
             className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300"
           >
-            <ProfileForm profile={profile} user={user} onProfileUpdate={handleProfileUpdate} />
+            <ProfileForm />
           </TabsContent>
 
           {/* Purchase Prevention Tab */}

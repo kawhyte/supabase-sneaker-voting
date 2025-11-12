@@ -9,6 +9,7 @@ interface AvatarDisplayProps {
   avatarType: 'custom' | 'preset' | null
   avatarUrl?: string | null
   presetAvatarId?: string | null
+  avatarVersion?: number
   displayName?: string | null
   email?: string
   size?: 'sm' | 'md' | 'lg' | 'xl' // 32, 48, 96, 128
@@ -19,20 +20,18 @@ export function AvatarDisplay({
   avatarType,
   avatarUrl,
   presetAvatarId,
+  avatarVersion = 1,
   displayName,
   email,
   size = 'md',
   className
 }: AvatarDisplayProps) {
   const [isLoading, setIsLoading] = useState(true)
-  const [cacheKey, setCacheKey] = useState(Date.now())
 
-  // Update cache key when avatar changes to force reload
+  // Update loading state when avatar changes
   useEffect(() => {
-    console.log('🖼️ [AvatarDisplay] Avatar changed, forcing reload:', presetAvatarId)
     setIsLoading(true)
-    setCacheKey(Date.now())
-  }, [presetAvatarId, avatarUrl, avatarType])
+  }, [presetAvatarId, avatarUrl, avatarType, avatarVersion])
 
   // Size mapping (follows 8px grid)
   const sizeClasses = {
@@ -42,16 +41,13 @@ export function AvatarDisplay({
     xl: 'h-32 w-32',    // 128px - profile page
   }
 
-  // Determine image source with cache busting (memoized to prevent unnecessary recalculations)
+  // Determine image source with version-based cache busting
   const imageSrc = useMemo(() => {
     if (avatarType === 'preset' && presetAvatarId) {
-      // Add cache key to force reload when avatar changes
-      const src = `/avatars/${presetAvatarId}.webp?v=${cacheKey}`
-      console.log('🖼️ [AvatarDisplay] Image URL:', src)
-      return src
+      return `/avatars/${presetAvatarId}.webp?v=${avatarVersion}`
     }
     return avatarUrl || undefined
-  }, [avatarType, presetAvatarId, avatarUrl, cacheKey])
+  }, [avatarType, presetAvatarId, avatarUrl, avatarVersion])
 
   // Fallback initials
   const getInitials = () => {

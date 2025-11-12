@@ -7,6 +7,7 @@ import { Navbar } from "@/components/navbar";
 import { ViewDensityProvider } from "@/lib/view-density-context";
 import { FormModeProvider } from "@/lib/form-mode-context";
 import { UndoProvider } from "@/contexts/UndoContext";
+import { ProfileProvider } from "@/contexts/ProfileContext";
 
 const defaultUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
@@ -127,30 +128,32 @@ export default function RootLayout({
     📚 Full documentation in globals.css (lines 97-315, 404-476)
   */}
 			<body className='min-h-screen bg-background text-foreground border-t-6 border-primary'>
-				<UndoProvider>
-					<FormModeProvider>
-						<ViewDensityProvider>
-							<div className='flex flex-col min-h-screen'>
-								<Navbar />
+				<ProfileProvider>
+					<UndoProvider>
+						<FormModeProvider>
+							<ViewDensityProvider>
+								<div className='flex flex-col min-h-screen'>
+									<Navbar />
 
-								{/* Main content inherits bg-background from body, no need to repeat */}
-								{/* Add responsive horizontal padding so content doesn't touch screen edges on small devices */}
-								<main className='flex-1 py-8 sm:py-12 lg:py-16 px-8 sm:px-8 lg:px-8 container mx-auto w-full'>
-									{children}
-								</main>
+									{/* Main content inherits bg-background from body, no need to repeat */}
+									{/* Add responsive horizontal padding so content doesn't touch screen edges on small devices */}
+									<main className='flex-1 py-8 sm:py-12 lg:py-16 px-8 sm:px-8 lg:px-8 container mx-auto w-full'>
+										{children}
+									</main>
 
-								{/* Footer uses card color for subtle differentiation */}
-								<footer className='border-t bg-card text-card-foreground py-8 px-8'>
-									<p className='text-sm text-muted-foreground'>
-										© 2025 PurrView.
-									</p>
-								</footer>
+									{/* Footer uses card color for subtle differentiation */}
+									<footer className='border-t bg-card text-card-foreground py-8 px-8'>
+										<p className='text-sm text-muted-foreground'>
+											© 2025 PurrView.
+										</p>
+									</footer>
 
-								<Toaster />
-							</div>
-						</ViewDensityProvider>
-					</FormModeProvider>
-				</UndoProvider>
+									<Toaster />
+								</div>
+							</ViewDensityProvider>
+						</FormModeProvider>
+					</UndoProvider>
+				</ProfileProvider>
 			</body>
 		</html>
 	);

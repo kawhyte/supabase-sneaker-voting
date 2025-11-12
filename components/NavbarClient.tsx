@@ -115,6 +115,8 @@ import { NotificationCenter } from "@/components/notification-center/Notificatio
 import { WardrobeStatsWidget } from "@/components/navbar/WardrobeStatsWidget";
 import { AchievementsPreview } from "@/components/navbar/AchievementsPreview";
 import { AvatarDisplay } from "@/components/avatar/AvatarDisplay";
+import { useProfile } from "@/contexts/ProfileContext";
+
 interface NavLink {
 	href: string;
 	label: string;
@@ -131,87 +133,41 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const [unreadCount, setUnreadCount] = useState(0);
 	const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
-	const [user, setUser] = useState<any>(null);
-	const [userProfile, setUserProfile] = useState<any>(null);
+	const { profile: userProfile, user } = useProfile();
 	const supabase = createClient();
 
 	const isActive = (path: string) => pathname === path;
 
-	// Fetch user and unread count
+	// Fetch unread notification count
 	useEffect(() => {
-		if (!isAuthenticated) return;
+		if (!isAuthenticated || !user?.id) return;
 
-		async function fetchData() {
-			const { data: { user: authUser } } = await supabase.auth.getUser();
-			if (!authUser) return;
-
-			setUser(authUser);
-
+		async function fetchUnreadCount() {
 			// Get unread count from user_stats
 			const { data: stats } = await supabase
 				.from('user_stats')
 				.select('unread_notification_count')
-				.eq('user_id', authUser.id)
+				.eq('user_id', user.id)
 				.single();
 
 			setUnreadCount(stats?.unread_notification_count || 0);
 		}
 
-		fetchData();
+		fetchUnreadCount();
 
 		// Real-time subscription for unread count
-		if (user?.id) {
-			const channel = supabase
-				.channel('user-stats-changes')
-				.on(
-					'postgres_changes',
-					{
-						event: 'UPDATE',
-						schema: 'public',
-						table: 'user_stats',
-						filter: `user_id=eq.${user.id}`
-					},
-					(payload) => {
-						setUnreadCount(payload.new.unread_notification_count || 0);
-					}
-				)
-				.subscribe();
-
-			return () => {
-				supabase.removeChannel(channel);
-			};
-		}
-	}, [isAuthenticated, supabase, user?.id]);
-
-	// Fetch user profile with avatar data
-	useEffect(() => {
-		if (!isAuthenticated || !user?.id) return;
-
-		async function fetchProfile() {
-			const { data: profile } = await supabase
-				.from('profiles')
-				.select('id, display_name, avatar_url, avatar_type, preset_avatar_id, avatar_updated_at')
-				.eq('id', user.id)
-				.single();
-
-			setUserProfile(profile);
-		}
-
-		fetchProfile();
-
-		// Refetch when avatar updates
 		const channel = supabase
-			.channel('profile-changes')
+			.channel('user-stats-changes')
 			.on(
 				'postgres_changes',
 				{
 					event: 'UPDATE',
 					schema: 'public',
-					table: 'profiles',
-					filter: `id=eq.${user.id}`
+					table: 'user_stats',
+					filter: `user_id=eq.${user.id}`
 				},
 				(payload) => {
-					setUserProfile(payload.new);
+					setUnreadCount(payload.new.unread_notification_count || 0);
 				}
 			)
 			.subscribe();
@@ -219,7 +175,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 		return () => {
 			supabase.removeChannel(channel);
 		};
-	}, [isAuthenticated, user?.id, supabase]);
+	}, [isAuthenticated, supabase, user?.id]);
 
 	const publicNavLinks: NavLink[] = [
 		{ href: '/', label: 'Home' },
@@ -302,6 +258,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 												avatarType={userProfile?.avatar_type}
 												avatarUrl={userProfile?.avatar_url}
 												presetAvatarId={userProfile?.preset_avatar_id}
+												avatarVersion={userProfile?.avatar_version}
 												displayName={userProfile?.display_name}
 												email={user?.email}
 												size="sm"
@@ -326,6 +283,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 													avatarType={userProfile?.avatar_type}
 													avatarUrl={userProfile?.avatar_url}
 													presetAvatarId={userProfile?.preset_avatar_id}
+													avatarVersion={userProfile?.avatar_version}
 													displayName={userProfile?.display_name}
 													email={user?.email}
 													size="md"
