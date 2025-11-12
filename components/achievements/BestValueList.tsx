@@ -87,15 +87,10 @@ export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
                 </p>
               </div>
 
-              {/* Badge */}
-              <div className="flex-shrink-0 text-right">
-                <p className="text-xs font-bold text-green-600">
-                  {Math.round(item.percentOfTarget)}%
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  of target
-                </p>
-              </div>
+              {/* Rank Badge (matches TopWornList pattern) */}
+              <p className="font-bold text-primary flex-shrink-0" aria-label={`Ranked number ${index + 1}`}>
+                #{index + 1}
+              </p>
             </Link>
           ))}
         </div>
