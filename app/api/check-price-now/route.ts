@@ -86,9 +86,16 @@ const RETAILER_CONFIGS: RetailerConfig[] = [
     domain: 'champssports.com',
     name: 'Champs Sports',
     selectors: {
-      price: ['[data-test="product-price"]', '.ProductPrice', '[class*="price"]'],
+      price: [
+        '[data-test="product-price"]',
+        '.ProductPrice-final',
+        '.ProductPrice span:first-child',
+        'meta[property="og:price:amount"]',
+        '[itemprop="price"]'
+      ],
+      originalPrice: ['.ProductPrice-original', '.ProductPrice-compare']
     },
-    supportLevel: 'high'
+    supportLevel: 'medium' // Downgraded: Inconsistent bot protection + broad selectors need refinement
   },
 
   // MEDIUM SUCCESS RATE (40-70%)
