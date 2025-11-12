@@ -28,7 +28,7 @@ export async function generateFunFacts(userId: string, count: number = 6): Promi
 
   // Fetch user data
   const { data: items } = await supabase
-    .from('sneakers')
+    .from('items')
     .select('*')
     .eq('user_id', userId)
     .eq('status', 'owned')
