@@ -22,10 +22,25 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
   const [progress, setProgress] = useState<Map<string, number>>(new Map())
   const [focusedIndex, setFocusedIndex] = useState(0)
   const badgeRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const isCalculatingRef = useRef(false) // Prevent concurrent calculations
 
   useEffect(() => {
-    loadUnlockedAchievements()
-    calculateProgress()
+    // Sequential loading: Load unlocked achievements FIRST, then calculate progress
+    async function initializeAchievements() {
+      if (isCalculatingRef.current) return // Guard: prevent concurrent runs
+
+      isCalculatingRef.current = true
+      try {
+        await loadUnlockedAchievements() // MUST complete before calculateProgress
+        await calculateProgress()
+      } catch (error) {
+        console.error('Error initializing achievements:', error)
+      } finally {
+        isCalculatingRef.current = false
+      }
+    }
+
+    initializeAchievements()
   }, [userId])
 
   // UPDATED: Use all achievements (no filtering)
@@ -203,7 +218,21 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
       // Check if achievement should be unlocked
       if (progress >= 100 && !isAlreadyUnlocked) {
         try {
-          // Insert into user_achievements table
+          // DEFENSE LAYER 1: Check database for existing unlock (prevents race conditions)
+          const { data: existingUnlock } = await supabase
+            .from('user_achievements')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('achievement_id', achievement.id)
+            .maybeSingle()
+
+          if (existingUnlock) {
+            // Achievement already unlocked in database - update local state and skip insert
+            setUnlockedIds((prev) => new Set(prev).add(achievement.id))
+            continue
+          }
+
+          // DEFENSE LAYER 2: Insert with proper error handling
           const { error: insertError } = await supabase
             .from('user_achievements')
             .insert({
@@ -213,19 +242,30 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
             })
 
           if (insertError) {
+            // DEFENSE LAYER 3: Gracefully handle 409 Conflict (duplicate key)
+            // This is expected behavior when multiple tabs/sessions unlock simultaneously
+            if (insertError.code === '23505') {
+              // Duplicate key constraint - silently update state and continue
+              setUnlockedIds((prev) => new Set(prev).add(achievement.id))
+              continue
+            }
+
+            // Log unexpected errors
             console.error('Error unlocking achievement:', {
               achievementId: achievement.id,
               achievementName: achievement.name,
               error: insertError,
               errorMessage: insertError.message,
-              errorDetails: insertError.details,
-              errorHint: insertError.hint,
+              errorCode: insertError.code,
             })
             continue
           }
 
           // Track newly unlocked achievement
           newlyUnlocked.push(achievement.id)
+
+          // Optimistically update state IMMEDIATELY
+          setUnlockedIds((prev) => new Set(prev).add(achievement.id))
 
           // Show toast notification
           toast({
@@ -249,15 +289,6 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
           })
         }
       }
-    }
-
-    // Update unlocked IDs state if new achievements were unlocked
-    if (newlyUnlocked.length > 0) {
-      setUnlockedIds((prev) => {
-        const updated = new Set(prev)
-        newlyUnlocked.forEach((id) => updated.add(id))
-        return updated
-      })
     }
   }
 
