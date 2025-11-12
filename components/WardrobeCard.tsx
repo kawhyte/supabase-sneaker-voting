@@ -29,6 +29,7 @@ export interface WardrobeItemCardProps {
 	onMarkAsPurchased?: (entry: WardrobeItem) => void;
 	onUnarchive?: (entry: WardrobeItem) => void;
 	onCreateOutfit?: (entry: WardrobeItem) => void;
+	onRefreshPrice?: (itemId: string) => Promise<void>;
 	isArchivePage?: boolean;
 	purchaseDate?: string | null;
 	userWardrobe?: WardrobeItem[];
@@ -72,6 +73,7 @@ export function WardrobeCard({
 	onMarkAsPurchased,
 	onUnarchive,
 	onCreateOutfit,
+	onRefreshPrice,
 	isArchivePage = false,
 	purchaseDate,
 	userWardrobe = [],
@@ -90,6 +92,7 @@ export function WardrobeCard({
 				onUnarchive,
 				onMarkAsPurchased,
 				onCreateOutfit,
+				onRefreshPrice,
 			}}
 			isArchivePage={isArchivePage}
 			purchaseDate={purchaseDate}
