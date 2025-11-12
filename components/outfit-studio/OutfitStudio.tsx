@@ -33,15 +33,16 @@ import { OutfitCanvas } from './OutfitCanvas'
 import { ManualCropTool } from './ManualCropTool'
 import { CanYouStyleThisQuiz } from './CanYouStyleThisQuiz'
 import { ItemLibrary } from './ItemLibrary'
+import { QuotaProgressPanel } from './QuotaProgressPanel'
+import { OutfitDetailsPanel } from './OutfitDetailsPanel'
 import { MilestoneCelebrationModal, useMilestoneCelebration } from '@/components/MilestoneCelebration'
 import {
   calculateAutoPosition,
   calculateSuggestedSize,
 } from '@/lib/outfit-layout-engine'
 import { createClient } from '@/utils/supabase/client'
-import { X, Check, Loader2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { X, Loader2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useOutfitQuotas } from '@/hooks/useOutfitQuotas'
-import { getQuotaMessage } from '@/lib/quota-validation'
 import { getQuotaForCategory } from '@/components/types/outfit'
 import { cn } from '@/lib/utils'
 import { useUndo } from '@/contexts/UndoContext'
@@ -605,10 +606,12 @@ export function OutfitStudio({
 
           {/* Main Content - Scrollable */}
           <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-6">
-            {/* Desktop Layout: 1/3 library + 2/3 canvas */}
-            <div className="hidden lg:grid lg:grid-cols-3 gap-8 h-full">
-              {/* Left: Item Library */}
-              <div className="lg:col-span-1 h-full min-h-[600px]">
+            {/* ============================================================ */}
+            {/* DESKTOP LAYOUT: 3-Column (Library | Canvas + Quotas | Details) */}
+            {/* ============================================================ */}
+            <div className="hidden lg:grid lg:grid-cols-12 gap-6 h-full min-h-[700px]">
+              {/* Column 1: Item Library (3/12 width) */}
+              <div className="lg:col-span-3 h-full">
                 <ItemLibrary
                   userWardrobe={userWardrobe}
                   outfitItems={outfitItems}
@@ -617,8 +620,11 @@ export function OutfitStudio({
                 />
               </div>
 
-              {/* Right: Canvas + Details */}
-              <div className="lg:col-span-2 flex flex-col gap-6">
+              {/* Column 2: Canvas + Floating Quota HUD (6/12 width) */}
+              <div className="lg:col-span-6 flex flex-col gap-4">
+                {/* Floating Quota HUD - Always Visible */}
+                <QuotaProgressPanel outfitItems={outfitItems} />
+
                 {/* Canvas Area */}
                 <div className="bg-white dark:bg-[#1a2b2f] rounded-xl shadow-sm flex-grow p-8 min-h-[500px] border-2 border-dashed border-gray-200 dark:border-gray-700">
                   {croppingItemId ? (
@@ -643,7 +649,7 @@ export function OutfitStudio({
                           </svg>
                         </div>
                         <h3 className="mt-4 text-lg font-semibold text-[#111718] dark:text-white">Your Outfit Canvas</h3>
-                        <p className="mt-1 text-sm text-[#618389] dark:text-gray-400">Drag and drop items here to create an outfit.</p>
+                        <p className="mt-1 text-sm text-[#618389] dark:text-gray-400">Click items to add them to your outfit.</p>
                       </div>
                     </div>
                   ) : (
@@ -658,195 +664,67 @@ export function OutfitStudio({
                   )}
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-4 justify-end">
+                {/* Clear Canvas Button */}
+                {outfitItems.length > 0 && (
                   <Button
                     variant="outline"
                     onClick={handleClearCanvas}
-                    disabled={outfitItems.length === 0}
-                    className="min-w-[120px] h-12"
+                    className="w-full h-11"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Clear Canvas
                   </Button>
-                  <Button
-                    onClick={handleSaveOutfit}
-                    disabled={isSaving || outfitItems.length === 0}
-                    className="bg-primary text-white min-w-[120px] h-12"
-                  >
-                    {isSaving ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {mode === 'edit' ? 'Saving...' : 'Creating...'}
-                      </>
-                    ) : (
-                      <>{mode === 'edit' ? 'Save Changes' : 'Save Outfit'}</>
-                    )}
-                  </Button>
-                </div>
+                )}
+              </div>
 
-                {/* Outfit Details Form */}
-                <div className="space-y-4 bg-slate-50 rounded-lg p-6 border border-slate-200">
-                  <h3 className="font-semibold text-lg">Outfit Details</h3>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="outfit-name" className="text-sm">Outfit Name</Label>
-                      <Input
-                        id="outfit-name"
-                        value={outfitName}
-                        onChange={e => setOutfitName(e.target.value)}
-                        placeholder="e.g., Cozy Coffee Date"
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="occasion" className="text-sm">Occasion</Label>
-                      <Select value={occasion} onValueChange={(val) => setOccasion(val as OutfitOccasion)}>
-                        <SelectTrigger id="occasion" className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {OUTFIT_OCCASIONS.map(occ => (
-                            <SelectItem key={occ} value={occ}>
-                              {occ.charAt(0).toUpperCase() + occ.slice(1).replace('_', ' ')}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="bg-color" className="text-sm">Background Color</Label>
-                    <div className="flex gap-2 mt-1">
-                      <input
-                        id="bg-color"
-                        type="color"
-                        value={backgroundColor}
-                        onChange={e => setBackgroundColor(e.target.value)}
-                        className="h-10 w-12 rounded border border-slate-300 cursor-pointer"
-                      />
-                      <span className="text-xs text-slate-600 mt-2">{backgroundColor}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="description" className="text-sm">
-                      Description <span className="text-muted-foreground text-xs">(optional)</span>
-                    </Label>
-                    <Textarea
-                      id="description"
-                      placeholder="e.g., Wore to Sarah's wedding, perfect for summer brunch..."
-                      value={description}
-                      onChange={(e) => {
-                        const value = e.target.value
-                        if (value.length <= 500) {
-                          setDescription(value)
-                        }
-                      }}
-                      maxLength={500}
-                      rows={3}
-                      className="resize-none mt-1"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {description.length}/500 characters
-                    </p>
-                  </div>
-
-                  {/* Items in Outfit */}
-                  <div>
-                    <h4 className="font-semibold text-sm mb-2">Items ({outfitItems.length})</h4>
-                    <div className="dense space-y-2 max-h-48 overflow-y-auto">
-                      {outfitItems.map(item => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between bg-white p-2 rounded border border-slate-200 text-xs"
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">
-                              {item.item?.brand} {item.item?.model}
-                            </p>
-                            <p className="text-xs text-slate-600 capitalize">{item.item?.category}</p>
-                          </div>
-                          <button
-                            onClick={() => handleRemoveItem(item.id)}
-                            aria-label={`Remove ${item.item?.brand} ${item.item?.model} from outfit`}
-                            className="text-red-500 hover:text-red-700 flex-shrink-0"
-                          >
-                            <X className="h-4 w-4" aria-hidden="true" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Quota Status */}
-                  <div className="space-y-2 border-t border-border pt-4">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Outfit Quotas
-                    </p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {Object.entries(quotaStatus.quotas)
-                        .filter(([_, validation]) => validation.max !== null)
-                        .map(([category, validation]) => {
-                          const isAtLimit = validation.isAtLimit && validation.current > 0
-                          const tooltipMessage = validation.canAdd
-                            ? `Can add ${validation.max! - validation.current} more ${validation.category}`
-                            : `Already have ${validation.category} in outfit (${validation.current}/${validation.max})`
-
-                          return (
-                            <Tooltip key={category}>
-                              <TooltipTrigger asChild>
-                                <div
-                                  className={cn(
-                                    'rounded-md border px-3 py-2 text-xs cursor-help transition-colors',
-                                    isAtLimit
-                                      ? 'border-sun-400 bg-sun-100'
-                                      : 'border-border bg-background hover:bg-muted'
-                                  )}
-                                  aria-label={tooltipMessage}
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium">
-                                      {getQuotaMessage(category, validation.current, validation.max)}
-                                    </span>
-                                    {isAtLimit && (
-                                      <Check className="h-3 w-3 text-sun-600 flex-shrink-0" aria-hidden="true" />
-                                    )}
-                                  </div>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>{tooltipMessage}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          )
-                        })}
-                    </div>
-                  </div>
-                </div>
+              {/* Column 3: Details Panel (3/12 width) */}
+              <div className="lg:col-span-3">
+                <OutfitDetailsPanel
+                  outfitName={outfitName}
+                  occasion={occasion}
+                  backgroundColor={backgroundColor}
+                  description={description}
+                  outfitItems={outfitItems}
+                  isSaving={isSaving}
+                  mode={mode}
+                  onOutfitNameChange={setOutfitName}
+                  onOccasionChange={setOccasion}
+                  onBackgroundColorChange={setBackgroundColor}
+                  onDescriptionChange={setDescription}
+                  onRemoveItem={handleRemoveItem}
+                  onSave={handleSaveOutfit}
+                  onCancel={onClose}
+                />
               </div>
             </div>
 
-            {/* Mobile Layout: Wizard Tabs */}
+            {/* ============================================================ */}
+            {/* MOBILE LAYOUT: 3-Tab Wizard with Floating Quota HUD */}
+            {/* ============================================================ */}
             <div className="lg:hidden space-y-6">
               {/* Tab 1: Items */}
               {mobileActiveTab === 'items' && (
-                <div className="min-h-[500px]">
-                  <ItemLibrary
-                    userWardrobe={userWardrobe}
-                    outfitItems={outfitItems}
-                    onAddItem={handleAddItem}
-                    canAddItem={canAddItem}
-                  />
+                <div className="space-y-4">
+                  {/* Floating Quota HUD (mobile) */}
+                  <QuotaProgressPanel outfitItems={outfitItems} />
+
+                  <div className="min-h-[500px]">
+                    <ItemLibrary
+                      userWardrobe={userWardrobe}
+                      outfitItems={outfitItems}
+                      onAddItem={handleAddItem}
+                      canAddItem={canAddItem}
+                    />
+                  </div>
                 </div>
               )}
 
               {/* Tab 2: Arrange */}
               {mobileActiveTab === 'arrange' && (
                 <div className="space-y-4">
+                  {/* Floating Quota HUD (mobile) */}
+                  <QuotaProgressPanel outfitItems={outfitItems} />
+
                   <div className="bg-white dark:bg-[#1a2b2f] rounded-xl shadow-sm p-6 min-h-[500px] border-2 border-dashed border-gray-200">
                     {croppingItemId ? (
                       <ManualCropTool
@@ -912,8 +790,12 @@ export function OutfitStudio({
 
               {/* Tab 3: Details */}
               {mobileActiveTab === 'details' && (
-                <div className="space-y-4 bg-slate-50 rounded-lg p-6 border border-slate-200">
-                  <h3 className="font-semibold text-lg">Outfit Details</h3>
+                <div className="space-y-4">
+                  {/* Floating Quota HUD (mobile) */}
+                  <QuotaProgressPanel outfitItems={outfitItems} />
+
+                  <div className="bg-slate-50 rounded-lg p-6 border border-slate-200 space-y-4">
+                    <h3 className="font-semibold text-lg">Outfit Details</h3>
 
                   <div>
                     <Label htmlFor="outfit-name-mobile" className="text-sm">Outfit Name</Label>
@@ -1008,40 +890,6 @@ export function OutfitStudio({
                       )}
                     </div>
                   </div>
-
-                  {/* Quota Status */}
-                  <div className="space-y-2 border-t border-border pt-4">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Outfit Quotas
-                    </p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {Object.entries(quotaStatus.quotas)
-                        .filter(([_, validation]) => validation.max !== null)
-                        .map(([category, validation]) => {
-                          const isAtLimit = validation.isAtLimit && validation.current > 0
-
-                          return (
-                            <div
-                              key={category}
-                              className={cn(
-                                'rounded-md border px-3 py-2 text-xs',
-                                isAtLimit
-                                  ? 'border-sun-400 bg-sun-100'
-                                  : 'border-border bg-background'
-                              )}
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium">
-                                  {getQuotaMessage(category, validation.current, validation.max)}
-                                </span>
-                                {isAtLimit && (
-                                  <Check className="h-3 w-3 text-sun-600 flex-shrink-0" />
-                                )}
-                              </div>
-                            </div>
-                          )
-                        })}
-                    </div>
                   </div>
                 </div>
               )}
@@ -1086,15 +934,6 @@ export function OutfitStudio({
                   )}
                 </Button>
               </div>
-            </div>
-          </div>
-
-          {/* Footer - Only on Desktop */}
-          <div className="hidden lg:block border-t border-stone-200 px-6 sm:px-8 py-4">
-            <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={onClose} disabled={isSaving}>
-                Cancel
-              </Button>
             </div>
           </div>
         </DialogContent>
