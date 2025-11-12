@@ -146,11 +146,24 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 			if (!user?.id) return; // Guard clause for TypeScript
 
 			// Get unread count from user_stats
-			const { data: stats } = await supabase
+			const { data: stats, error } = await supabase
 				.from('user_stats')
 				.select('unread_notification_count')
 				.eq('user_id', user.id)
 				.single();
+
+			if (error) {
+				// If user_stats record doesn't exist, create it
+				if (error.code === 'PGRST116') {
+					await supabase
+						.from('user_stats')
+						.insert({ user_id: user.id, unread_notification_count: 0 });
+					setUnreadCount(0);
+				} else {
+					console.error('Error fetching unread count:', error);
+				}
+				return;
+			}
 
 			setUnreadCount(stats?.unread_notification_count || 0);
 		}
