@@ -1,3 +1,7 @@
+-- ⚠️ NOTE: This script has been superseded by migration 043
+-- Use: supabase/migrations/043_cleanup_sample_cloudinary_images.sql instead
+-- This file is kept for reference only
+
 -- Cleanup script for Cloudinary sample/test images
 -- Run this AFTER reviewing the results from find-sample-images.sql
 

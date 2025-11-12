@@ -1,3 +1,7 @@
+-- ⚠️ NOTE: This script has been superseded by migration 043
+-- Use: supabase/migrations/043_cleanup_sample_cloudinary_images.sql instead
+-- This file is kept for reference only
+
 -- Find items with Cloudinary sample/test images
 -- These are demo images that don't exist in your Cloudinary account
 
