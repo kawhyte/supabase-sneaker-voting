@@ -154,7 +154,11 @@ function NotificationCardComponent({
 
   // Mark as read
   const handleMarkAsRead = async () => {
-    if (notification.is_read) return
+    // If already read, just trigger UI update to remove from list
+    if (notification.is_read) {
+      onUpdate()
+      return
+    }
 
     try {
       const response = await fetch(`/api/notifications/${notification.id}/read`, {
