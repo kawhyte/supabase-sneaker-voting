@@ -18,6 +18,7 @@ interface ItemPricingDisplayProps {
 	isOwned: boolean;
 	isOnSale: boolean;
 	onRefreshPrice?: (itemId: string) => Promise<void>;
+	onManualEntrySuccess?: () => void;
 }
 
 export function ItemPricingDisplay({
@@ -25,6 +26,7 @@ export function ItemPricingDisplay({
 	isOwned,
 	isOnSale,
 	onRefreshPrice,
+	onManualEntrySuccess,
 }: ItemPricingDisplayProps) {
 	if (isOwned) {
 		// OWNED ITEMS: Show purchase price
@@ -103,6 +105,9 @@ export function ItemPricingDisplay({
 				isAutoTrackingEnabled={item.auto_price_tracking_enabled !== false}
 				priceCheckFailures={item.price_check_failures || 0}
 				onRefreshPrice={onRefreshPrice}
+				retailPrice={item.retail_price}
+				currentPrice={item.sale_price}
+				onManualEntrySuccess={onManualEntrySuccess}
 			/>
 		</div>
 	);
