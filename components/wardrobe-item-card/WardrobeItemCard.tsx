@@ -57,6 +57,7 @@ interface WardrobeItemCardProps {
 		onMarkAsPurchased?: (item: WardrobeItem) => void;
 		onCreateOutfit?: (item: WardrobeItem) => void;
 		onRefreshPrice?: (itemId: string) => Promise<void>;
+		onManualEntrySuccess?: () => void;
 	};
 	isArchivePage?: boolean;
 	purchaseDate?: string | null;
@@ -178,6 +179,7 @@ function WardrobeItemCardComponent({
 								isOwned={displayLogic.isOwned}
 								isOnSale={displayLogic.isOnSale}
 								onRefreshPrice={actions.onRefreshPrice}
+								onManualEntrySuccess={actions.onManualEntrySuccess}
 							/>
 
 							{/* Size, Comfort, Wears */}

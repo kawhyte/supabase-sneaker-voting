@@ -8,11 +8,12 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle, RefreshCw, Edit3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { isPriceStale, getDaysSincePriceCheck } from '@/lib/price-tracking-utils';
 import { toast } from 'sonner';
+import { ManualPriceEntryDialog } from './ManualPriceEntryDialog';
 
 interface StalePriceWarningProps {
   itemId: string;
@@ -21,6 +22,9 @@ interface StalePriceWarningProps {
   onRefreshPrice?: (itemId: string) => Promise<void>;
   isAutoTrackingEnabled?: boolean;
   priceCheckFailures?: number;
+  retailPrice?: number | null;
+  currentPrice?: number | null;
+  onManualEntrySuccess?: () => void;
 }
 
 export function StalePriceWarning({
@@ -30,8 +34,12 @@ export function StalePriceWarning({
   onRefreshPrice,
   isAutoTrackingEnabled = true,
   priceCheckFailures = 0,
+  retailPrice,
+  currentPrice,
+  onManualEntrySuccess,
 }: StalePriceWarningProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isManualEntryOpen, setIsManualEntryOpen] = useState(false);
 
   // Don't show if tracking is disabled
   if (!isAutoTrackingEnabled) {
@@ -87,41 +95,72 @@ export function StalePriceWarning({
 
   // Always show if tracking is enabled (for testing/manual checks)
   return (
-    <div className="space-y-2">
-      {/* Show badge only if stale or never checked */}
-      {(isStale || !lastPriceCheckAt) && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-md w-fit">
-              <AlertCircle className="h-3.5 w-3.5 text-amber-600" />
-              <span className="text-xs font-medium text-amber-700">
-                {displayText}
-              </span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent className="max-w-xs">
-            <p>{tooltipText}</p>
-            <p className="text-xs opacity-90 mt-1">
-              Prices are checked automatically every Sunday, or you can refresh manually.
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      )}
+    <>
+      <div className="space-y-2">
+        {/* Show badge only if stale or never checked */}
+        {(isStale || !lastPriceCheckAt) && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-md w-fit">
+                <AlertCircle className="h-3.5 w-3.5 text-amber-600" />
+                <span className="text-xs font-medium text-amber-700">
+                  {displayText}
+                </span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              <p>{tooltipText}</p>
+              <p className="text-xs opacity-90 mt-1">
+                Prices are checked automatically every Sunday, or you can refresh manually.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        )}
 
-      {/* Always show button if callback is provided (for manual checks) */}
-      {onRefreshPrice && (
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          className="h-7 text-xs gap-1.5"
-          title={tooltipText}
-        >
-          <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-          {isRefreshing ? 'Checking...' : 'Check now'}
-        </Button>
-      )}
-    </div>
+        {/* Action buttons */}
+        <div className="flex items-center gap-2">
+          {/* Auto check button */}
+          {onRefreshPrice && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="h-7 text-xs gap-1.5"
+              title={tooltipText}
+            >
+              <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Checking...' : 'Check now'}
+            </Button>
+          )}
+
+          {/* Manual entry button */}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setIsManualEntryOpen(true)}
+            className="h-7 text-xs gap-1.5"
+            title="Enter price manually if automatic check fails"
+          >
+            <Edit3 className="h-3 w-3" />
+            Enter manually
+          </Button>
+        </div>
+      </div>
+
+      {/* Manual price entry dialog */}
+      <ManualPriceEntryDialog
+        itemId={itemId}
+        itemName={itemName}
+        retailPrice={retailPrice}
+        currentPrice={currentPrice}
+        isOpen={isManualEntryOpen}
+        onClose={() => setIsManualEntryOpen(false)}
+        onSuccess={() => {
+          setIsManualEntryOpen(false);
+          onManualEntrySuccess?.();
+        }}
+      />
+    </>
   );
 }
