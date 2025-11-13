@@ -132,6 +132,8 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 	const pathname = usePathname();
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const [unreadCount, setUnreadCount] = useState(0);
+	const [prevUnreadCount, setPrevUnreadCount] = useState(0);
+	const [hasNewNotification, setHasNewNotification] = useState(false);
 	const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
 	const { profile: userProfile, user } = useProfile();
 	const supabase = createClient();
@@ -182,7 +184,17 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					filter: `user_id=eq.${user.id}`
 				},
 				(payload) => {
-					setUnreadCount(payload.new.unread_notification_count || 0);
+					const newCount = payload.new.unread_notification_count || 0;
+
+					// Detect new notifications (count increased)
+					if (newCount > unreadCount) {
+						setHasNewNotification(true);
+						// Reset animation after 3 seconds
+						setTimeout(() => setHasNewNotification(false), 3000);
+					}
+
+					setPrevUnreadCount(unreadCount);
+					setUnreadCount(newCount);
 				}
 			)
 			.subscribe();
@@ -190,7 +202,23 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 		return () => {
 			supabase.removeChannel(channel);
 		};
-	}, [isAuthenticated, supabase, user?.id]);
+	}, [isAuthenticated, supabase, user?.id, unreadCount]);
+
+	// Global keyboard shortcut: Shift+N to open notifications
+	useEffect(() => {
+		if (!isAuthenticated) return;
+
+		const handleKeyDown = (e: KeyboardEvent) => {
+			// Shift+N to open notifications
+			if (e.shiftKey && e.key === 'N') {
+				e.preventDefault();
+				setIsNotificationCenterOpen(true);
+			}
+		};
+
+		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [isAuthenticated]);
 
 	const publicNavLinks: NavLink[] = [
 		{ href: '/', label: 'Home' },
@@ -250,17 +278,25 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					{/* Desktop Notification Bell + User Menu */}
 					{isAuthenticated && user && (
 						<div className='hidden lg:flex items-center gap-3 flex-shrink-0'>
-							{/* Bell Icon */}
+							{/* Bell Icon with new notification animation */}
 							<button
 								onClick={() => setIsNotificationCenterOpen(true)}
-								className="dense relative flex items-center justify-center p-2 rounded-full bg-muted hover:bg-muted/60 motion-safe:transition-colors"
+								className={`dense relative flex items-center justify-center p-2 rounded-full bg-muted hover:bg-muted/60 motion-safe:transition-colors ${
+									hasNewNotification ? 'motion-safe:animate-bounce' : ''
+								}`}
 								aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
+								title="Notifications (Shift+N)"
 							>
-								<Bell className="h-5 w-5 text-foreground" />
+								<Bell className={`h-5 w-5 text-foreground ${hasNewNotification ? 'text-sun-600' : ''}`} />
 								{unreadCount > 0 && (
-									<span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-xs font-bold motion-safe:animate-pulse">
+									<span className={`absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-xs font-bold ${
+										hasNewNotification ? 'motion-safe:animate-pulse motion-safe:scale-110' : 'motion-safe:animate-pulse'
+									}`}>
 										{unreadCount > 99 ? '99+' : unreadCount}
 									</span>
+								)}
+								{hasNewNotification && (
+									<span className="absolute inset-0 rounded-full bg-sun-400/20 motion-safe:animate-ping" />
 								)}
 							</button>
 
@@ -391,6 +427,31 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 				{isMobileMenuOpen && (
 					<div className='dense md:hidden py-6 border-t border-border/40 motion-safe:animate-in motion-safe:duration-200'>
 						<div className='flex flex-col gap-6'>
+							{/* Mobile Bell Icon - Top Position */}
+							{isAuthenticated && user && (
+								<button
+									onClick={() => {
+										setIsNotificationCenterOpen(true);
+										setIsMobileMenuOpen(false);
+									}}
+									className={`flex items-center justify-between p-3 rounded-lg bg-muted hover:bg-muted/60 motion-safe:transition-colors ${
+										hasNewNotification ? 'motion-safe:animate-pulse' : ''
+									}`}
+									aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
+								>
+									<div className="flex items-center gap-3">
+										<Bell className={`h-5 w-5 ${hasNewNotification ? 'text-sun-600' : 'text-foreground'}`} />
+										<span className="text-sm font-medium">Notifications</span>
+									</div>
+									{unreadCount > 0 && (
+										<span className="flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-red-500 text-white text-xs font-bold">
+											{unreadCount > 99 ? '99+' : unreadCount}
+										</span>
+									)}
+								</button>
+							)}
+
+							{/* Navigation Links */}
 							{navLinks.map((link) => (
 								link.isAction ? (
 									<Link key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
@@ -416,6 +477,8 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 									</Link>
 								)
 							))}
+
+							{/* Auth Button */}
 							<div onClick={() => setIsMobileMenuOpen(false)} className='motion-safe:transition-transform motion-safe:duration-150'>
 								{authButton}
 							</div>
@@ -423,6 +486,15 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 					</div>
 				)}
 			</div>
+
+			{/* Notification Center Drawer - Renders outside navbar */}
+			{isAuthenticated && user && (
+				<NotificationCenter
+					isOpen={isNotificationCenterOpen}
+					onClose={() => setIsNotificationCenterOpen(false)}
+					userId={user.id}
+				/>
+			)}
 		</nav>
 	);
 }

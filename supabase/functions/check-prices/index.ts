@@ -12,6 +12,16 @@
  * - Rate limiting: 2 second delay between requests
  * - Auto-disable: After 3 consecutive failures
  * - Price validation: Rejects $0, extreme values, >200% markup
+ *
+ * Notification Types:
+ * 1. Price Drop Alerts: When price decreases from previous check
+ *    - High severity: ≥30% drop
+ *    - Medium severity: 15-29% drop
+ *    - Low severity: 1-14% drop
+ * 2. Target Price Alerts: When price meets/drops below user's target_price
+ *    - Always high severity
+ *    - One-time notification (prevents duplicates)
+ *    - Only triggers if no unread target alert exists
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
@@ -575,7 +585,7 @@ serve(async (req) => {
     // Query items table (legacy "sneakers" table)
     const { data: items, error: fetchError } = await supabase
       .from('items')
-      .select('id, product_url, retail_price, brand, model, price_check_failures, user_id')
+      .select('id, product_url, retail_price, target_price, brand, model, price_check_failures, user_id')
       .eq('status', 'wishlisted')
       .not('product_url', 'is', null)
       .eq('auto_price_tracking_enabled', true)
@@ -686,6 +696,51 @@ serve(async (req) => {
             .single()
 
           if (notification) alerts.push(notification)
+        }
+
+        // Check if target price is met (independent of price drop)
+        if (item.target_price && result.price <= item.target_price) {
+          // Check if we've already sent a target price alert for this item
+          const { data: existingTargetAlert } = await supabase
+            .from('notifications')
+            .select('id')
+            .eq('user_id', item.user_id)
+            .eq('notification_type', 'price_alert')
+            .contains('metadata', { item_id: item.id, target_reached: true })
+            .eq('is_read', false)
+            .maybeSingle()
+
+          if (!existingTargetAlert) {
+            console.log(`🎯 TARGET REACHED: $${result.price} ≤ $${item.target_price}`)
+
+            const { data: targetNotification } = await supabase
+              .from('notifications')
+              .insert({
+                user_id: item.user_id,
+                notification_type: 'price_alert',
+                title: 'Target Price Reached! 🎯',
+                message: `${item.brand} ${item.model} is now $${result.price} (your target: $${item.target_price})`,
+                severity: 'high', // Always high priority for target price
+                link_url: `/dashboard?tab=wishlist&item=${item.id}`,
+                action_label: 'Buy Now',
+                is_read: false,
+                is_bundled: false,
+                bundled_count: 0,
+                metadata: {
+                  item_id: item.id,
+                  current_price: result.price,
+                  target_price: item.target_price,
+                  target_reached: true // Flag to prevent duplicate alerts
+                },
+                created_at: new Date().toISOString()
+              })
+              .select()
+              .single()
+
+            if (targetNotification) alerts.push(targetNotification)
+          } else {
+            console.log(`ℹ️  Target already met, skipping duplicate alert`)
+          }
         }
 
         // Reset failure count and update last check
