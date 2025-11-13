@@ -32,8 +32,13 @@ CREATE TABLE IF NOT EXISTS price_check_log (
   FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
 );
 
--- Enable RLS
+-- Enable RLS (safe to run multiple times)
 ALTER TABLE price_check_log ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist (idempotent migration)
+DROP POLICY IF EXISTS "Users can view own price check logs" ON price_check_log;
+DROP POLICY IF EXISTS "Service role can insert price check logs" ON price_check_log;
+DROP POLICY IF EXISTS "Users can insert own price check logs" ON price_check_log;
 
 -- RLS Policy: Users can only view their own price check logs
 CREATE POLICY "Users can view own price check logs" ON price_check_log FOR SELECT
