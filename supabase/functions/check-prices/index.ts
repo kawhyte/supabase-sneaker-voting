@@ -18,10 +18,11 @@
  *    - High severity: ≥30% drop
  *    - Medium severity: 15-29% drop
  *    - Low severity: 1-14% drop
+ *    - Deduplication: Max 1 alert per item per 7 days (prevents spam)
  * 2. Target Price Alerts: When price meets/drops below user's target_price
  *    - Always high severity
- *    - One-time notification (prevents duplicates)
- *    - Only triggers if no unread target alert exists
+ *    - Deduplication: Max 1 alert per item per 7 days (read or unread)
+ *    - Prevents re-alerting after user dismisses notification
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
@@ -663,54 +664,81 @@ serve(async (req) => {
 
           console.log(`🎉 DROP: $${previousPrice} → $${result.price} (-${dropPercentage.toFixed(1)}%)`)
 
-          // Create notification instead of price_alerts table
-          const notificationTitle =
-            severity === 'high'
-              ? 'Big Price Drop! 🎉'
-              : severity === 'medium'
-              ? 'Price Drop Alert 💰'
-              : 'Small Price Drop 👀'
+          // Check for recent price drop notification (within 7 days)
+          const sevenDaysAgo = new Date()
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
-          const { data: notification } = await supabase
+          const { data: recentPriceDropAlert } = await supabase
             .from('notifications')
-            .insert({
-              user_id: item.user_id,
-              notification_type: 'price_alert',
-              title: notificationTitle,
-              message: `${item.brand} ${item.model} dropped to $${result.price} (${Math.round(dropPercentage)}% off)`,
-              severity,
-              link_url: `/dashboard?tab=wishlist&item=${item.id}`,
-              action_label: 'View Item',
-              is_read: false,
-              is_bundled: false,
-              bundled_count: 0,
-              metadata: {
-                item_id: item.id,
-                current_price: result.price,
-                previous_price: previousPrice,
-                percentage_off: Math.round(dropPercentage)
-              },
-              created_at: new Date().toISOString()
-            })
-            .select()
-            .single()
+            .select('id, created_at')
+            .eq('user_id', item.user_id)
+            .eq('notification_type', 'price_alert')
+            .contains('metadata', { item_id: item.id })
+            .not('metadata', 'cs', JSON.stringify({ target_reached: true })) // Exclude target price alerts
+            .gte('created_at', sevenDaysAgo.toISOString())
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
 
-          if (notification) alerts.push(notification)
+          if (recentPriceDropAlert) {
+            console.log(`ℹ️  Price drop alert already sent recently (${new Date(recentPriceDropAlert.created_at).toLocaleDateString()}), skipping duplicate`)
+          } else {
+            // Create notification instead of price_alerts table
+            const notificationTitle =
+              severity === 'high'
+                ? 'Big Price Drop! 🎉'
+                : severity === 'medium'
+                ? 'Price Drop Alert 💰'
+                : 'Small Price Drop 👀'
+
+            const { data: notification } = await supabase
+              .from('notifications')
+              .insert({
+                user_id: item.user_id,
+                notification_type: 'price_alert',
+                title: notificationTitle,
+                message: `${item.brand} ${item.model} dropped to $${result.price} (${Math.round(dropPercentage)}% off)`,
+                severity,
+                link_url: `/dashboard?tab=wishlist&item=${item.id}`,
+                action_label: 'View Item',
+                is_read: false,
+                is_bundled: false,
+                bundled_count: 0,
+                metadata: {
+                  item_id: item.id,
+                  current_price: result.price,
+                  previous_price: previousPrice,
+                  percentage_off: Math.round(dropPercentage)
+                },
+                created_at: new Date().toISOString()
+              })
+              .select()
+              .single()
+
+            if (notification) alerts.push(notification)
+          }
         }
 
         // Check if target price is met (independent of price drop)
         if (item.target_price && result.price <= item.target_price) {
-          // Check if we've already sent a target price alert for this item
+          // Check if we've already sent a target price alert for this item (within 7 days)
+          const sevenDaysAgo = new Date()
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
           const { data: existingTargetAlert } = await supabase
             .from('notifications')
-            .select('id')
+            .select('id, created_at, is_read')
             .eq('user_id', item.user_id)
             .eq('notification_type', 'price_alert')
             .contains('metadata', { item_id: item.id, target_reached: true })
-            .eq('is_read', false)
+            .gte('created_at', sevenDaysAgo.toISOString())
+            .order('created_at', { ascending: false })
+            .limit(1)
             .maybeSingle()
 
-          if (!existingTargetAlert) {
+          if (existingTargetAlert) {
+            console.log(`ℹ️  Target price alert already sent recently (${new Date(existingTargetAlert.created_at).toLocaleDateString()}, read: ${existingTargetAlert.is_read}), skipping duplicate`)
+          } else {
             console.log(`🎯 TARGET REACHED: $${result.price} ≤ $${item.target_price}`)
 
             const { data: targetNotification } = await supabase
@@ -738,8 +766,6 @@ serve(async (req) => {
               .single()
 
             if (targetNotification) alerts.push(targetNotification)
-          } else {
-            console.log(`ℹ️  Target already met, skipping duplicate alert`)
           }
         }
 
