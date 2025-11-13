@@ -17,7 +17,7 @@ SELECT cron.unschedule('weekly-price-check') WHERE EXISTS (
 -- Calls the check-prices edge function
 SELECT cron.schedule(
   'weekly-price-check',
-  '0 2 * * 0', -- Every Sunday at 2:00 AM UTC
+  '0 2 * * 1,3,5', -- Every Sunday at 2:00 AM UTC
   $$
   SELECT net.http_post(
     url := 'https://ayfabzqcjedgvhhityxc.supabase.co/functions/v1/check-prices',
