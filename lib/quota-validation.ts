@@ -53,7 +53,8 @@ export function getCategoryCount(
 	return outfitItems.filter((item) => {
 		const itemCategory = item.item?.category?.toLowerCase();
 		if (!itemCategory) return false;
-		return config.variants.includes(itemCategory);
+		// Type assertion: variants array needs to accept string type for includes()
+		return (config.variants as readonly string[]).includes(itemCategory);
 	}).length;
 }
 
@@ -112,7 +113,8 @@ export function getQuotaValidation(
 	const currentCount = outfitItems.filter((item) => {
 		const itemCategory = item.item?.category?.toLowerCase();
 		if (!itemCategory) return false;
-		return config.variants.includes(itemCategory);
+		// Type assertion: variants array needs to accept string type for includes()
+		return (config.variants as readonly string[]).includes(itemCategory);
 	}).length;
 
 	const isUnlimited = config.max === null;

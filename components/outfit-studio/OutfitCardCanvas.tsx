@@ -68,7 +68,7 @@ export function OutfitCardCanvas({
 
 				// Apply standardization transformation (FREE tier)
 				const standardizedUrl = getStandardizedImageUrl(
-					imageUrl,
+					imageUrl!,
 					item.item?.category || "other"
 				);
 

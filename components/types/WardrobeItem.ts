@@ -59,6 +59,7 @@ export interface WardrobeItem {
   cooling_off_days?: number
   can_purchase_after?: string | null
   // Price tracking
+  product_url?: string | null
   lowest_price_seen?: number | null
   auto_price_tracking_enabled?: boolean
   price_check_failures?: number | null

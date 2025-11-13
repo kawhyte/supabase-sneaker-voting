@@ -77,7 +77,8 @@ export function getCanonicalCategory(
 	const normalized = category.toLowerCase();
 
 	for (const [key, config] of Object.entries(CANONICAL_CATEGORIES)) {
-		if (config.variants.includes(normalized)) {
+		// Type assertion: variants array needs to accept string type for includes()
+		if ((config.variants as readonly string[]).includes(normalized)) {
 			return key as CanonicalCategoryKey;
 		}
 	}

@@ -350,7 +350,7 @@ async function scrapePrice(url: string, config: RetailerConfig | null, retailPri
     return {
       success: true,
       price,
-      originalPrice,
+      originalPrice: originalPrice ?? undefined,
       storeName,
       supportLevel,
       debug: debugInfo // Include debug info in success response too
@@ -472,6 +472,14 @@ export async function POST(request: NextRequest) {
     }
 
     // SUCCESS - Update database
+    // Type guard: result.price is guaranteed to exist when success is true
+    if (!result.price) {
+      return NextResponse.json({
+        success: false,
+        message: 'Price check succeeded but no price was returned'
+      }, { status: 500 })
+    }
+
     const updateData: any = {
       sale_price: result.price,
       last_price_check_at: new Date().toISOString(),
