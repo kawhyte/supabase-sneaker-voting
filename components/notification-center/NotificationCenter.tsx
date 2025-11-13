@@ -55,11 +55,11 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
   const notificationRefs = useRef<(HTMLDivElement | null)[]>([])
   const supabase = createClient()
 
-  // Fetch notifications
+  // Fetch notifications (unread only by default)
   const fetchNotifications = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/notifications')
+      const response = await fetch('/api/notifications?unread_only=true')
       const data = await response.json()
       setNotifications(data.notifications || [])
     } catch (error) {
