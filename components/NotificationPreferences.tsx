@@ -35,14 +35,11 @@ import {
 } from "@/components/ui/select";
 import {
 	Bell,
-	Clock,
 	Package,
 	Tag,
 	Sparkles,
 	Trophy,
 	AlertCircle,
-	ShoppingBag,
-	Unlock,
 	TrendingUp,
 	Check,
 	Loader2,
@@ -57,19 +54,9 @@ interface NotificationPrefs {
 	wear_reminders_enabled: boolean;
 	seasonal_tips_enabled: boolean;
 	achievements_enabled: boolean;
-	shopping_reminders_in_app: boolean;
-	shopping_reminders_push: boolean;
-	shopping_reminders_email: boolean;
-	cooling_off_ready_in_app: boolean;
-	cooling_off_ready_push: boolean;
-	cooling_off_ready_email: boolean;
 	cost_per_wear_milestones_in_app: boolean;
 	cost_per_wear_milestones_push: boolean;
 	cost_per_wear_milestones_email: boolean;
-	quiet_hours_enabled: boolean;
-	quiet_hours_start: string;
-	quiet_hours_end: string;
-	user_timezone: string;
 	max_daily_notifications: number;
 	enable_bundling: boolean;
 	bundle_threshold: number;
@@ -118,19 +105,9 @@ export function NotificationPreferences() {
 					wear_reminders_enabled: true,
 					seasonal_tips_enabled: true,
 					achievements_enabled: true,
-					shopping_reminders_in_app: true,
-					shopping_reminders_push: false,
-					shopping_reminders_email: false,
-					cooling_off_ready_in_app: false,
-					cooling_off_ready_push: false,
-					cooling_off_ready_email: false,
 					cost_per_wear_milestones_in_app: true,
 					cost_per_wear_milestones_push: false,
 					cost_per_wear_milestones_email: false,
-					quiet_hours_enabled: false,
-					quiet_hours_start: "22:00",
-					quiet_hours_end: "08:00",
-					user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
 					max_daily_notifications: 10,
 					enable_bundling: true,
 					bundle_threshold: 3,
@@ -436,58 +413,6 @@ export function NotificationPreferences() {
 							/>
 						</div>
 
-						{/* Shopping Reminders */}
-						<div className=' dense flex items-center justify-between space-y-4'>
-							<div className='flex items-start gap-4'>
-								<div className='flex gap-x-4'>
-									<ShoppingBag className='h-4 w-4 text-muted-foreground' />
-									<div className=''>
-										<Label htmlFor='shopping-reminders'>
-											Shopping Reminders
-										</Label>
-										<p className='text-xs text-muted-foreground'>
-											Gentle reminders to use what you have
-										</p>
-									</div>
-								</div>
-							</div>
-							<Switch
-								id='shopping-reminders'
-								checked={prefs.shopping_reminders_in_app}
-								onCheckedChange={(checked) =>
-									updatePreference({ shopping_reminders_in_app: checked })
-								}
-								disabled={isSaving}
-								className='dense'
-							/>
-						</div>
-
-						{/* Cooling-Off Ready */}
-						<div className=' dense flex items-center justify-between space-y-4'>
-							<div className='flex items-start gap-4'>
-								<div className='flex gap-x-4'>
-									<Unlock className='h-4 w-4 text-muted-foreground' />
-									<div className=''>
-										<Label htmlFor='cooling-off'>
-											Cooling-Off Period Complete
-										</Label>
-										<p className='text-xs text-muted-foreground'>
-											Notify when wishlist items are ready to purchase
-										</p>
-									</div>
-								</div>
-							</div>
-							<Switch
-								id='cooling-off'
-								checked={prefs.cooling_off_ready_in_app}
-								onCheckedChange={(checked) =>
-									updatePreference({ cooling_off_ready_in_app: checked })
-								}
-								disabled={isSaving}
-								className='dense'
-							/>
-						</div>
-
 						{/* Cost-Per-Wear Milestones */}
 						<div className=' dense flex items-center justify-between space-y-4'>
 							<div className='flex items-start gap-4'>
@@ -514,93 +439,6 @@ export function NotificationPreferences() {
 							/>
 						</div>
 					</div>
-				</div>
-
-				{/* QUIET HOURS */}
-				<div className='border-t border-stone-200 pt-6'>
-					<div className=' dense flex items-center justify-between space-y-4'>
-						<div className='flex items-center gap-4'>
-							<div className='flex gap-x-4'>
-								<Clock className='h-4 w-4 text-muted-foreground' />
-	<div className=''>
-										<Label htmlFor='cpw-milestones'>
-											Quiet Hours
-										</Label>
-										<p className='text-xs text-muted-foreground'>
-											Get some Quiet Hours goals
-										</p>
-									</div>
-
-							
-							</div>
-						</div>
-						<Switch
-							id='quiet-hours'
-							checked={prefs.quiet_hours_enabled}
-							onCheckedChange={(checked) =>
-								updatePreference({ quiet_hours_enabled: checked })
-							}
-							disabled={isSaving}
-							className='dense'
-						/>
-					</div>
-
-					{prefs.quiet_hours_enabled && (
-						<div className='dense space-y-3 mt-4 p-3 rounded-lg bg-muted/50'>
-							<div className='grid grid-cols-2 gap-3'>
-								<div>
-									<Label htmlFor='quiet-start' className='text-xs'>
-										Start Time
-									</Label>
-									<Select
-										value={prefs.quiet_hours_start}
-										onValueChange={(value) =>
-											updatePreference({ quiet_hours_start: value })
-										}
-										disabled={isSaving}>
-										<SelectTrigger id='quiet-start' className='dense mt-1 h-9'>
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											{generateTimeOptions().map((time) => (
-												<SelectItem key={time} value={time}>
-													{formatTime(time)}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-								</div>
-
-								<div>
-									<Label htmlFor='quiet-end' className='text-xs'>
-										End Time
-									</Label>
-									<Select
-										value={prefs.quiet_hours_end}
-										onValueChange={(value) =>
-											updatePreference({ quiet_hours_end: value })
-										}
-										disabled={isSaving}>
-										<SelectTrigger id='quiet-end' className='dense mt-1 h-9'>
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											{generateTimeOptions().map((time) => (
-												<SelectItem key={time} value={time}>
-													{formatTime(time)}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-								</div>
-							</div>
-
-							<p className='text-xs text-muted-foreground'>
-								No notifications will be created during quiet hours. Your
-								timezone: {prefs.user_timezone}
-							</p>
-						</div>
-					)}
 				</div>
 
 				{/* BUNDLING PREFERENCES */}
@@ -731,25 +569,4 @@ export function NotificationPreferences() {
 			</CardContent>
 		</Card>
 	);
-}
-
-// Helper: Generate time options (HH:MM)
-function generateTimeOptions() {
-	const times: string[] = [];
-	for (let hour = 0; hour < 24; hour++) {
-		for (let minute = 0; minute < 60; minute += 30) {
-			const h = hour.toString().padStart(2, "0");
-			const m = minute.toString().padStart(2, "0");
-			times.push(`${h}:${m}`);
-		}
-	}
-	return times;
-}
-
-// Helper: Format time for display (12-hour format)
-function formatTime(time24: string) {
-	const [hour, minute] = time24.split(":").map(Number);
-	const period = hour >= 12 ? "PM" : "AM";
-	const hour12 = hour % 12 || 12;
-	return `${hour12}:${minute.toString().padStart(2, "0")} ${period}`;
 }

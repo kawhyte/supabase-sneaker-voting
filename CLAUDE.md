@@ -288,9 +288,81 @@ npm run build              # Build verification
 
 See `CHANGELOG.md` for detailed phase-by-phase history of migrations, refactors, and feature additions.
 
+### Icon System Update (November 2025) ✅ COMPLETED
+Replaced emoji icons with Lucide icons in WardrobeStatsWidget and AchievementsPreview for better accessibility and visual consistency.
+
+**Changes Made:**
+- Replaced emoji icons with Lucide React icons (Trophy, Target, TrendingUp, Calendar, Star)
+- Improved semantic clarity and accessibility
+- Better cross-platform rendering consistency
+- Consistent icon sizing and styling across components
+
+**Files Modified:**
+- `components/navbar/WardrobeStatsWidget.tsx`
+- `components/navbar/AchievementsPreview.tsx`
+
+### Notification Types Removal (November 2025) ✅ COMPLETED
+Removed three unnecessary notification features to simplify the notification system and reduce user complexity.
+
+**Status**: ✅ All code changes complete, migration created, ready for database migration
+
+**Notification Types Removed:**
+1. **Shopping Reminders** - "Gentle reminders to use what you have" notifications
+2. **Cooling-Off Period** - Notifications when wishlist items finished cooling-off period
+3. **Quiet Hours** - Timezone-aware notification scheduling feature
+
+**Rationale**: These features added unnecessary complexity without providing significant user value. Core notification types (Price Alerts, Wear Reminders, Seasonal Tips, Cost-Per-Wear Milestones, Achievements) remain fully functional.
+
+**Database Changes:**
+- **Migration 051**: Drops 7 columns from `notification_preferences` table
+  - Removed: `shopping_reminders_in_app`, `shopping_reminders_push`, `shopping_reminders_email`
+  - Removed: `quiet_hours_enabled`, `quiet_hours_start`, `quiet_hours_end`, `user_timezone`
+  - Note: `cooling_off_ready_*` columns already removed in Migration 049
+- Marks existing `shopping_reminder` and `cooling_off_ready` notifications as read (preserves history)
+
+**Code Changes (7 files modified):**
+1. **`lib/notification-creator.ts`** (73 lines removed)
+   - Removed `'shopping_reminder'` and `'cooling_off_ready'` from `NotificationType` union
+   - Removed `isInQuietHours()` function (33 lines) and quiet hours checking logic
+   - Removed preference mappings for deleted notification types
+
+2. **`components/NotificationPreferences.tsx`** (165 lines removed)
+   - Removed Shopping Reminders UI toggle and settings
+   - Removed Cooling-Off Ready UI toggle and settings
+   - Removed Quiet Hours UI section (toggle, time pickers, timezone display)
+   - Removed unused imports: `ShoppingBag`, `Unlock`, `Clock` from lucide-react
+
+3. **`components/notification-center/NotificationCard.tsx`** (2 lines removed)
+   - Removed icon mappings for `shopping_reminder` and `cooling_off_ready`
+
+4. **`components/notification-center/NotificationCenter.tsx`** (3 lines removed)
+   - Removed "Cooling-Off" filter button from notification type filters
+
+5. **`app/api/user-preferences/route.ts`** (4 lines removed)
+   - Removed quiet hours default values from POST endpoint initialization
+
+6. **`types/database.types.ts`** (Auto-regenerated)
+   - Will automatically update after migration 051 is applied
+
+7. **`supabase/migrations/051_remove_notification_types.sql`** (New file created)
+   - Transaction-safe migration with BEGIN/COMMIT
+   - Marks old notifications as read before dropping columns
+
+**Total Lines Removed**: ~250 lines across 7 files
+
+**Remaining Notification Types** (6 active):
+1. `price_alert` - Price drop notifications for wishlist items
+2. `wear_reminder` - Reminders to wear underutilized items
+3. `seasonal_tip` - Seasonal wardrobe suggestions
+4. `achievement_unlock` - Gamification achievements
+5. `outfit_suggestion` - Outfit composition suggestions
+6. `cost_per_wear_milestone` - Cost-per-wear goal celebrations
+
 **Latest Status:**
 - ✅ Phase 1-6 refactoring complete (foundation cleanup, outfit studio, component modularization, type system)
 - ✅ Smart duplicate detection with fuzzy matching
+- ✅ Icon system update with Lucide icons
+- ✅ Notification system simplified (3 types removed)
 - ✅ Add/Edit form UX improvements (color required, smart target price, sale price in Quick mode)
 - ✅ Database: `items` table (renamed from `sneakers`)
 - ✅ Status types: `owned` | `wishlisted` (removed `journaled`)

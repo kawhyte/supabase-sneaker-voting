@@ -444,7 +444,6 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
                       { type: 'price_alert', label: 'Price Alerts' },
                       { type: 'wear_reminder', label: 'Wear Reminders' },
                       { type: 'seasonal_tip', label: 'Seasonal Tips' },
-                      { type: 'cooling_off_ready', label: 'Cooling-Off' },
                       { type: 'cost_per_wear_milestone', label: 'Milestones' },
                     ].map(({ type, label }) => (
                       <button
@@ -606,13 +605,11 @@ function sortByPriority(notifications: Notification[]): Notification[] {
   const getPriority = (notificationType: string): number => {
     const priorityMap: Record<string, number> = {
       'price_alert': 1,
-      'cooling_off_ready': 2,
       'cost_per_wear_milestone': 3,
       'achievement_unlock': 3,
       'wear_reminder': 4,
       'seasonal_tip': 5,
       'outfit_suggestion': 6,
-      'shopping_reminder': 5,
     }
     return priorityMap[notificationType] || 6 // Default to lowest priority
   }

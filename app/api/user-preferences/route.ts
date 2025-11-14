@@ -64,10 +64,6 @@ export async function POST(request: NextRequest) {
         seasonal_tips_enabled: true,
         achievements_enabled: true,
         outfit_suggestions_enabled: true,
-        quiet_hours_enabled: false,
-        quiet_hours_start: '22:00',
-        quiet_hours_end: '08:00',
-        user_timezone: 'UTC',
         enable_bundling: true,
         bundle_threshold: 3,
         max_daily_notifications: 20
