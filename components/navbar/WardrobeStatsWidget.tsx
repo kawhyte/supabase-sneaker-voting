@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { Trophy } from 'lucide-react';
+import { Trophy, Crown, Star, Check, Minus, XCircle } from 'lucide-react';
 import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -110,14 +110,14 @@ export function WardrobeStatsWidget({ userId }: { userId?: string }) {
    * Get cost per wear quality rating and color
    * Portfolio-level thresholds (higher than individual targets)
    */
-  const getCostPerWearQuality = (costPerWear: number | null): { label: string; color: string; emoji: string } => {
-    if (!costPerWear) return { label: 'Not tracked', color: 'text-muted-foreground', emoji: '' };
+  const getCostPerWearQuality = (costPerWear: number | null): { label: string; color: string; icon: React.ComponentType<{ className?: string }> | null } => {
+    if (!costPerWear) return { label: 'Not tracked', color: 'text-muted-foreground', icon: null };
 
-    if (costPerWear < 3) return { label: 'Excellent', color: 'text-green-600', emoji: '✨' };
-    if (costPerWear < 7) return { label: 'Great', color: 'text-green-500', emoji: '⭐' };
-    if (costPerWear < 12) return { label: 'Good', color: 'text-yellow-600', emoji: '👍' };
-    if (costPerWear < 20) return { label: 'Fair', color: 'text-orange-600', emoji: '📊' };
-    return { label: 'Needs Work', color: 'text-red-600', emoji: '⚠️' };
+    if (costPerWear < 3) return { label: 'Excellent', color: 'text-green-600', icon: Crown };
+    if (costPerWear < 7) return { label: 'Great', color: 'text-green-500', icon: Star };
+    if (costPerWear < 12) return { label: 'Good', color: 'text-yellow-600', icon: Check };
+    if (costPerWear < 20) return { label: 'Fair', color: 'text-orange-600', icon: Minus };
+    return { label: 'Needs Work', color: 'text-red-600', icon: XCircle };
   };
 
   const getCostPerWearLabel = (costPerWear: number | null) => {
@@ -157,17 +157,18 @@ export function WardrobeStatsWidget({ userId }: { userId?: string }) {
                 {getCostPerWearLabel(avgCostPerWear)}
               </span>
             </div>
-            {avgCostPerWear && (
+            {avgCostPerWear && quality.icon && (
               <div className="flex justify-end items-center gap-1">
-                <span className={`text-xs font-medium ${quality.color}`}>
-                  {quality.emoji} {quality.label}
+                <span className={`text-xs font-medium flex items-center gap-1 ${quality.color}`}>
+                  <quality.icon className="h-3.5 w-3.5 inline-block" aria-hidden="true" />
+                  {quality.label}
                 </span>
               </div>
             )}
           </div>
 
           {/* Achievements with Progress Bar */}
-          <div className="flex flex-col gap-2 pt-1">
+          {/* <div className="flex flex-col gap-2 pt-1">
             <div className="flex items-center gap-2">
               <Trophy className="h-3 w-3 text-sun-400" />
               <span className="text-muted-foreground">
@@ -180,10 +181,10 @@ export function WardrobeStatsWidget({ userId }: { userId?: string }) {
                 style={{ width: `${achievementPercentage}%` }}
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </DropdownMenuLabel>
-      <DropdownMenuSeparator className="my-2" />
+      {/* <DropdownMenuSeparator className="my-2" /> */}
     </>
   );
 }
