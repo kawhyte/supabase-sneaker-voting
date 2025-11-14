@@ -106,7 +106,7 @@ export function AchievementsPreview({ userId }: { userId?: string }) {
           </DropdownMenuItem>
         </div>
       </DropdownMenuLabel>
-      <DropdownMenuSeparator className="my-2" />
+      {/* <DropdownMenuSeparator className="my-2" /> */}
     </>
   );
 }

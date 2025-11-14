@@ -168,7 +168,7 @@ export function WardrobeStatsWidget({ userId }: { userId?: string }) {
           </div>
 
           {/* Achievements with Progress Bar */}
-          <div className="flex flex-col gap-2 pt-1">
+          {/* <div className="flex flex-col gap-2 pt-1">
             <div className="flex items-center gap-2">
               <Trophy className="h-3 w-3 text-sun-400" />
               <span className="text-muted-foreground">
@@ -181,10 +181,10 @@ export function WardrobeStatsWidget({ userId }: { userId?: string }) {
                 style={{ width: `${achievementPercentage}%` }}
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </DropdownMenuLabel>
-      <DropdownMenuSeparator className="my-2" />
+      {/* <DropdownMenuSeparator className="my-2" /> */}
     </>
   );
 }
