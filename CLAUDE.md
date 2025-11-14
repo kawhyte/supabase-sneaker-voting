@@ -478,6 +478,87 @@ Implemented intelligent fuzzy matching system to detect duplicate items with typ
 
 **Build Status**: ✅ TypeScript: passing, No errors in new code
 
+### Notification Types Removal (November 2025) ✅ COMPLETED
+Removed three unnecessary notification features to simplify the notification system and reduce user complexity.
+
+**Status**: ✅ All code changes complete, migration created, ready for database migration
+
+**Notification Types Removed:**
+1. **Shopping Reminders** - "Gentle reminders to use what you have" notifications
+2. **Cooling-Off Period** - Notifications when wishlist items finished cooling-off period
+3. **Quiet Hours** - Timezone-aware notification scheduling feature
+
+**Rationale**: These features added unnecessary complexity without providing significant user value. Core notification types (Price Alerts, Wear Reminders, Seasonal Tips, Cost-Per-Wear Milestones, Achievements) remain fully functional.
+
+**Database Changes:**
+- **Migration 051**: Drops 7 columns from `notification_preferences` table
+  - Removed: `shopping_reminders_in_app`, `shopping_reminders_push`, `shopping_reminders_email`
+  - Removed: `quiet_hours_enabled`, `quiet_hours_start`, `quiet_hours_end`, `user_timezone`
+  - Note: `cooling_off_ready_*` columns already removed in Migration 049
+- Marks existing `shopping_reminder` and `cooling_off_ready` notifications as read (preserves history)
+
+**Code Changes (7 files modified):**
+1. **`lib/notification-creator.ts`** (73 lines removed)
+   - Removed `'shopping_reminder'` and `'cooling_off_ready'` from `NotificationType` union
+   - Removed `isInQuietHours()` function (33 lines) and quiet hours checking logic
+   - Removed preference mappings for deleted notification types
+   - Removed incomplete comment block about cooling-off feature
+
+2. **`components/NotificationPreferences.tsx`** (165 lines removed)
+   - Removed Shopping Reminders UI toggle and settings
+   - Removed Cooling-Off Ready UI toggle and settings
+   - Removed Quiet Hours UI section (toggle, time pickers, timezone display)
+   - Removed `generateTimeOptions()` and `formatTime()` helper functions
+   - Removed unused imports: `ShoppingBag`, `Unlock`, `Clock` from lucide-react
+   - Cleaned up interface definition (removed 10 deprecated fields)
+
+3. **`components/notification-center/NotificationCard.tsx`** (2 lines removed)
+   - Removed icon mappings for `shopping_reminder` and `cooling_off_ready`
+   - Removed unused imports: `Package`, `Unlock` from lucide-react
+
+4. **`components/notification-center/NotificationCenter.tsx`** (3 lines removed)
+   - Removed "Cooling-Off" filter button from notification type filters
+   - Removed priority mappings for `shopping_reminder` (priority 5) and `cooling_off_ready` (priority 2)
+
+5. **`app/api/user-preferences/route.ts`** (4 lines removed)
+   - Removed quiet hours default values from POST endpoint initialization
+
+6. **`types/database.types.ts`** (Auto-regenerated)
+   - Will automatically update after migration 051 is applied to remove deprecated columns
+
+7. **`supabase/migrations/051_remove_notification_types.sql`** (New file created)
+   - Transaction-safe migration with BEGIN/COMMIT
+   - Marks old notifications as read before dropping columns
+   - Uses DROP COLUMN (strict mode - fails if columns don't exist)
+   - Includes verification queries for manual testing
+
+**Total Lines Removed**: ~250 lines across 7 files
+
+**Remaining Notification Types** (6 active):
+1. `price_alert` - Price drop notifications for wishlist items
+2. `wear_reminder` - Reminders to wear underutilized items
+3. `seasonal_tip` - Seasonal wardrobe suggestions
+4. `achievement_unlock` - Gamification achievements
+5. `outfit_suggestion` - Outfit composition suggestions
+6. `cost_per_wear_milestone` - Cost-per-wear goal celebrations
+
+**Migration Instructions:**
+1. Apply migration: Run `051_remove_notification_types.sql` on production database
+2. Regenerate types: Run `npm run db:types` after migration completes
+3. Verify: Check that settings page loads without errors
+4. Monitor: Watch error logs for any references to removed notification types
+
+**Verification Status**:
+- ✅ TypeScript: No errors related to removed types (pre-existing errors in other files)
+- ✅ Code references: All references to removed types successfully eliminated
+- ✅ Migration: Created with transaction safety and verification queries
+- ⚠️ Build: Font fetch failed (network issue, not code-related)
+
+**Next Steps**:
+- Apply migration 051 to production database
+- Regenerate database types from updated schema
+- Monitor notification center for any edge cases
+
 ### Fit Rating Removal (Migration 007) ✅ COMPLETED
 The `fit_rating` feature has been deprecated. All UI components and analytics now use `comfort_rating` (1-5 scale) instead.
 

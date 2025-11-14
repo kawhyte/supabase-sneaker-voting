@@ -18,7 +18,6 @@ import confetti from 'canvas-confetti'
 import { Button } from '@/components/ui/button'
 import {
   Bell,
-  Package,
   Tag,
   Sparkles,
   Trophy,
@@ -28,7 +27,6 @@ import {
   ChevronUp,
   Heart,
   Palette,
-  Unlock,
   TrendingUp
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
@@ -437,9 +435,7 @@ function getNotificationIcon(type: string) {
     seasonal_tip: <Sparkles className="h-4 w-4" />,
     achievement_unlock: <Trophy className="h-4 w-4" />,
     outfit_suggestion: <Palette className="h-4 w-4" />,
-    cooling_off_ready: <Unlock className="h-4 w-4" />,
-    cost_per_wear_milestone: <TrendingUp className="h-4 w-4" />,
-    shopping_reminder: <Package className="h-4 w-4" />
+    cost_per_wear_milestone: <TrendingUp className="h-4 w-4" />
   }
 
   return icons[type] || <Bell className="h-4 w-4" />

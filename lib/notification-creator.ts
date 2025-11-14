@@ -13,8 +13,6 @@ export type NotificationType =
   | 'seasonal_tip'
   | 'achievement_unlock'
   | 'outfit_suggestion'
-  | 'shopping_reminder'
-  | 'cooling_off_ready'
   | 'cost_per_wear_milestone'
 
 export type NotificationSeverity = 'low' | 'medium' | 'high'
@@ -69,13 +67,7 @@ export async function createNotification(params: CreateNotificationParams) {
       return null
     }
 
-    // 3. Check quiet hours
-    if (prefs.quiet_hours_enabled && isInQuietHours(prefs)) {
-      console.log(`Skipping notification - in quiet hours`)
-      return null
-    }
-
-    // 4. Check daily limit
+    // 3. Check daily limit
     const todayCount = await getTodayNotificationCount(params.userId)
     if (todayCount >= prefs.max_daily_notifications) {
       console.log(
@@ -84,12 +76,12 @@ export async function createNotification(params: CreateNotificationParams) {
       return null
     }
 
-    // 5. Check if should bundle
+    // 4. Check if should bundle
     if (prefs.enable_bundling && params.groupKey) {
       return await createOrUpdateBundle(params, prefs.bundle_threshold)
     }
 
-    // 6. Create individual notification
+    // 5. Create individual notification
     const { data, error } = await supabase
       .from('notifications')
       .insert({
@@ -221,47 +213,11 @@ function getNotificationTypeEnabled(type: NotificationType, prefs: any): boolean
     seasonal_tip: 'seasonal_tips_enabled',
     achievement_unlock: 'achievements_enabled',
     outfit_suggestion: 'outfit_suggestions_enabled',
-    shopping_reminder: 'shopping_reminders_in_app',
-    cooling_off_ready: 'cooling_off_ready_in_app',
     cost_per_wear_milestone: 'cost_per_wear_milestones_in_app'
   }
 
   const prefKey = typeMap[type]
   return prefs[prefKey] !== false
-}
-
-/**
- * Helper: Check if current time is in quiet hours
- * Timezone-aware calculation
- */
-function isInQuietHours(prefs: any): boolean {
-  if (!prefs.quiet_hours_start || !prefs.quiet_hours_end) return false
-
-  const now = new Date()
-  const userTimezone = prefs.user_timezone || 'UTC'
-
-  // Convert current time to user's timezone
-  const userTime = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }))
-  const userHour = userTime.getHours()
-  const userMinute = userTime.getMinutes()
-  const currentMinutes = userHour * 60 + userMinute
-
-  // Parse quiet hours (format: "HH:MM")
-  const startParts = prefs.quiet_hours_start.split(':')
-  const endParts = prefs.quiet_hours_end.split(':')
-  const startHour = parseInt(startParts[0])
-  const startMin = parseInt(startParts[1])
-  const endHour = parseInt(endParts[0])
-  const endMin = parseInt(endParts[1])
-  const startMinutes = startHour * 60 + startMin
-  const endMinutes = endHour * 60 + endMin
-
-  // Handle overnight quiet hours (e.g., 22:00 - 08:00)
-  if (startMinutes > endMinutes) {
-    return currentMinutes >= startMinutes || currentMinutes <= endMinutes
-  }
-
-  return currentMinutes >= startMinutes && currentMinutes <= endMinutes
 }
 
 /**
@@ -282,11 +238,7 @@ async function getTodayNotificationCount(userId: string): Promise<number> {
 }
 
 /**
- * PHASE 4: Create a "Ready to Buy" notification when cooling-off period ends
- * User preference: cooling_off_ready_in_app (default: false)
-
-/**
- * PHASE 4: Create a cost-per-wear milestone achievement notification
+ * Create a cost-per-wear milestone achievement notification
  * Triggered when item reaches its target cost-per-wear goal
  */
 export async function createCostPerWearMilestone(
