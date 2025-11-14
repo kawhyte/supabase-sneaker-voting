@@ -56,26 +56,6 @@ export function shouldShowCostPerWear(item: WardrobeItem): boolean {
 }
 
 /**
- * Determines if an item should show cooling-off period countdown.
- *
- * Only for wishlisted items that are within the cooling-off period.
- */
-export function shouldShowCoolingOff(item: WardrobeItem): boolean {
-	if (item.status !== ItemStatus.WISHLISTED) return false
-
-	// Check if created_at is within last 7 days
-	if (!item.created_at) return false
-
-	const createdDate = new Date(item.created_at)
-	const now = new Date()
-	const daysSinceCreated = Math.floor(
-		(now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)
-	)
-
-	return daysSinceCreated < 7
-}
-
-/**
  * Determines if an item should show price monitoring badge.
  *
  * Only for wishlisted items with a product URL configured.
@@ -93,7 +73,6 @@ export function getItemDisplayFlags(item: WardrobeItem) {
 	return {
 		showWearCounter: shouldShowWearCounter(item),
 		showCostPerWear: shouldShowCostPerWear(item),
-		showCoolingOff: shouldShowCoolingOff(item),
 		showPriceMonitoring: shouldShowPriceMonitoring(item),
 	}
 }
