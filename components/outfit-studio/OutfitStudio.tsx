@@ -31,7 +31,7 @@ import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Outfit, OutfitWithItems, OutfitItem, OutfitOccasion, CropArea } from '@/components/types/outfit'
 import { OutfitCanvas } from './OutfitCanvas'
 import { ManualCropTool } from './ManualCropTool'
-import { CanYouStyleThisQuiz } from './CanYouStyleThisQuiz'
+// import { CanYouStyleThisQuiz } from './CanYouStyleThisQuiz'
 import { ItemLibrary } from './ItemLibrary'
 import { QuotaProgressPanel } from './QuotaProgressPanel'
 import { OutfitDetailsPanel } from './OutfitDetailsPanel'
@@ -956,7 +956,7 @@ export function OutfitStudio({
       )}
 
       {/* Quiz Modal (if showing) */}
-      {showQuizModal && (
+      {/* {showQuizModal && (
         <CanYouStyleThisQuiz
           outfitsCreated={outfitsCreated}
           isOpen={true}
@@ -967,7 +967,7 @@ export function OutfitStudio({
           onCreateOutfits={() => setShowQuiz(false)}
           onSkip={handleQuizSkip}
         />
-      )}
+      )} */}
     </>
   )
 }
