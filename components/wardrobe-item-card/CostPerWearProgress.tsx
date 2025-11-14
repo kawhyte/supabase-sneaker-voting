@@ -40,11 +40,13 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 	const targetCPW = metrics.targetCPW;
 
 	// Determine progress bar color - returns hex color for inline styles (more reliable than dynamic classes)
+	// Fixed: Use higher contrast colors that are visible against stone-300 background
 	const getProgressColor = (): string => {
 		if (isWorthIt) return '#62a663'; // meadow-500 - Deep green for achieved
 		if (progressPercentage >= 75) return '#81b682'; // meadow-400 - Light green nearing goal
-		if (progressPercentage >= 50) return '#D4A574'; // sun-400 - Yellow at midpoint
-		return '#E8DCC8'; // sun-300 - Light yellow at start
+		if (progressPercentage >= 50) return '#FFC700'; // sun-400 - Bright yellow at midpoint
+		if (progressPercentage >= 25) return '#FFD966'; // Brighter yellow for visibility
+		return '#FFC700'; // sun-400 - Bright yellow for early progress (high contrast)
 	};
 
 	const tooltipContent = (
@@ -112,7 +114,7 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 					</div>
 
 					{/* Progress Bar */}
-					<div className='w-full bg-stone-300 rounded-full h-2 overflow-hidden'>
+					<div className='w-full bg-stone-200 rounded-full h-2.5 overflow-hidden border border-stone-300'>
 						<div
 							className='h-full rounded-full transition-all duration-500 ease-out'
 							style={{
