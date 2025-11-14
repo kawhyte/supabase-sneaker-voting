@@ -89,7 +89,7 @@ export const CATEGORY_CONFIGS: Record<ItemCategory, CategoryConfig> = {
 		// Permissions
 		allowCollection: false,
 		allowPurchased: true,
-		allowWears: false,
+		allowWears: true,
 		// Field requirements
 		requiresSize: true,
 		requiresFit: false,
@@ -111,7 +111,7 @@ export const CATEGORY_CONFIGS: Record<ItemCategory, CategoryConfig> = {
 		// Permissions
 		allowCollection: false,
 		allowPurchased: true,
-		allowWears: false,
+		allowWears: true,
 		// Field requirements
 		requiresSize: true,
 		requiresFit: false,
@@ -133,7 +133,7 @@ export const CATEGORY_CONFIGS: Record<ItemCategory, CategoryConfig> = {
 		// Permissions
 		allowCollection: false,
 		allowPurchased: true,
-		allowWears: false,
+		allowWears: true,
 		// Field requirements
 		requiresSize: true,
 		requiresFit: false,
