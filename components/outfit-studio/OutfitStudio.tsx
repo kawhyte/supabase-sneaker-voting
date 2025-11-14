@@ -31,7 +31,7 @@ import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Outfit, OutfitWithItems, OutfitItem, OutfitOccasion, CropArea } from '@/components/types/outfit'
 import { OutfitCanvas } from './OutfitCanvas'
 import { ManualCropTool } from './ManualCropTool'
-import { CanYouStyleThisQuiz } from './CanYouStyleThisQuiz'
+// import { CanYouStyleThisQuiz } from './CanYouStyleThisQuiz' // Commented out - file not found
 import { ItemLibrary } from './ItemLibrary'
 import { QuotaProgressPanel } from './QuotaProgressPanel'
 import { OutfitDetailsPanel } from './OutfitDetailsPanel'
@@ -956,6 +956,7 @@ export function OutfitStudio({
       )}
 
       {/* Quiz Modal (if showing) */}
+      {/* Commented out - CanYouStyleThisQuiz component not found
       {showQuizModal && (
         <CanYouStyleThisQuiz
           outfitsCreated={outfitsCreated}
@@ -968,6 +969,7 @@ export function OutfitStudio({
           onSkip={handleQuizSkip}
         />
       )}
+      */}
     </>
   )
 }

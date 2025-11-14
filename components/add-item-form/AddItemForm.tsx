@@ -6,6 +6,8 @@ import { PricingSection } from './PricingSection'
 import { PhotoSection } from './PhotoSection'
 import { NotesSection } from './NotesSection'
 import { FormActions } from './FormActions'
+import { DuplicationWarningBanner } from '@/components/DuplicationWarningBanner'
+import { Button } from '@/components/ui/button'
 
 export interface AddItemFormProps {
 	mode: 'add' | 'edit'
@@ -38,14 +40,42 @@ export default function AddItemForm({
 		form,
 		isSubmitting,
 		photos,
+		duplicationWarning,
+		userId,
 		onSubmit,
 		handlePhotosChange,
+		handleDismissWarning,
+		handleAddAnyway,
 	} = useFormLogic({ mode, initialData, onSuccess })
 
 	return (
 		<form onSubmit={onSubmit} className='space-y-8'>
 			{/* Basic Info */}
 			<BasicInfoSection form={form} />
+
+			{/* Duplication Warning Banner */}
+			{duplicationWarning && (
+				<div className="space-y-4">
+					<DuplicationWarningBanner
+						warning={duplicationWarning}
+						onDismiss={handleDismissWarning}
+						userId={userId || undefined}
+						newItemName={`${form.getValues('brand')} ${form.getValues('model')}`}
+					/>
+
+					{/* Add Anyway Button */}
+					<div className="flex justify-end">
+						<Button
+							type="button"
+							onClick={handleAddAnyway}
+							variant="outline"
+							className="min-w-[160px]"
+						>
+							Add Item Anyway
+						</Button>
+					</div>
+				</div>
+			)}
 
 			{/* Pricing */}
 			<PricingSection form={form} />
