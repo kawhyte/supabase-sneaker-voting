@@ -227,7 +227,8 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 			setUserId(user.id)
 
 			// Check for duplicates (only when adding new items, not editing, and warning not already dismissed)
-			if (mode !== 'edit' && !warningDismissed && data.brand && data.category && data.color) {
+			// Note: color is optional, so we check brand and category only
+			if (mode !== 'edit' && !warningDismissed && data.brand && data.category) {
 				// Fetch user's duplicate detection settings
 				const { data: profile } = await supabase
 					.from('profiles')

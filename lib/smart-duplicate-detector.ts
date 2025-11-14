@@ -143,11 +143,16 @@ function calculateCategoryMatch(category1: string, category2: string): number {
 /**
  * Calculate composite similarity score with weighted components
  *
- * Weights:
+ * Default Weights (when all fields present):
  * - Category: 40% (must match for item to be considered similar)
  * - Color: 30% (important for distinguishing colorways)
  * - Brand: 20% (helps identify duplicates across typos)
  * - Model: 10% (least important, often has variations)
+ *
+ * Dynamic Weight Adjustment (when color is missing):
+ * - Category: 57% (40/70 normalized)
+ * - Brand: 29% (20/70 normalized)
+ * - Model: 14% (10/70 normalized)
  */
 function calculateCompositeSimilarity(
   newItem: Partial<WardrobeItem>,
@@ -156,11 +161,6 @@ function calculateCompositeSimilarity(
   const categoryMatch = calculateCategoryMatch(
     newItem.category || '',
     existingItem.category || ''
-  );
-
-  const colorMatch = calculateColorSimilarity(
-    newItem.color || '',
-    existingItem.color || ''
   );
 
   const brandMatch = calculateStringSimilarity(
@@ -177,16 +177,42 @@ function calculateCompositeSimilarity(
   if (categoryMatch === 0) {
     return {
       score: 0,
-      details: { categoryMatch, colorMatch, brandMatch, modelMatch }
+      details: { categoryMatch, colorMatch: 0, brandMatch, modelMatch }
     };
   }
 
-  // Calculate weighted score
-  const weightedScore =
-    (categoryMatch * 0.40) +
-    (colorMatch * 0.30) +
-    (brandMatch * 0.20) +
-    (modelMatch * 0.10);
+  // Check if color is present on BOTH items
+  const hasColor = (newItem.color && newItem.color.trim() !== '') &&
+                   (existingItem.color && existingItem.color.trim() !== '');
+
+  let weightedScore: number;
+  let colorMatch = 0;
+
+  if (hasColor) {
+    // Standard weighting with color
+    colorMatch = calculateColorSimilarity(
+      newItem.color || '',
+      existingItem.color || ''
+    );
+
+    weightedScore =
+      (categoryMatch * 0.40) +
+      (colorMatch * 0.30) +
+      (brandMatch * 0.20) +
+      (modelMatch * 0.10);
+  } else {
+    // Adjusted weighting without color (normalize remaining 70% to 100%)
+    // Category: 40/70 = 57%
+    // Brand: 20/70 = 29%
+    // Model: 10/70 = 14%
+    weightedScore =
+      (categoryMatch * 0.57) +
+      (brandMatch * 0.29) +
+      (modelMatch * 0.14);
+
+    // Set colorMatch to 0 to indicate it wasn't used
+    colorMatch = 0;
+  }
 
   return {
     score: Math.round(weightedScore),
@@ -204,11 +230,22 @@ function calculateCompositeSimilarity(
  * Same brand + same model + DIFFERENT colors = colorway variation (NOT duplicate)
  *
  * Example: "Black Nike Hoodie" vs "White Nike Hoodie" = colorway (don't warn)
+ *
+ * Note: If color is missing on either item, we can't determine colorway status,
+ * so we return false (don't skip detection)
  */
 function isColorwayVariation(
   newItem: Partial<WardrobeItem>,
   existingItem: WardrobeItem
 ): boolean {
+  // If either item is missing color, we can't determine colorway status
+  const hasColor = (newItem.color && newItem.color.trim() !== '') &&
+                   (existingItem.color && existingItem.color.trim() !== '');
+
+  if (!hasColor) {
+    return false; // Can't determine colorway without colors
+  }
+
   const brandMatch = calculateStringSimilarity(newItem.brand || '', existingItem.brand || '');
   const modelMatch = calculateStringSimilarity(newItem.model || '', existingItem.model || '');
   const colorMatch = calculateColorSimilarity(newItem.color || '', existingItem.color || '');
@@ -226,7 +263,9 @@ function isColorwayVariation(
  * - Exact: ≥85% similarity (high confidence duplicate)
  * - Similar: 60-84% similarity (possible duplicate)
  *
- * @param newItem - Item being added to wardrobe
+ * Note: Color is optional. If missing, detection still runs with adjusted weights.
+ *
+ * @param newItem - Item being added to wardrobe (category and brand required)
  * @param existingWardrobe - User's current owned items
  * @returns SmartDuplicationWarning or null if no duplicates detected
  */
@@ -234,7 +273,8 @@ export function detectSmartDuplicates(
   newItem: Partial<WardrobeItem>,
   existingWardrobe: WardrobeItem[]
 ): SmartDuplicationWarning | null {
-  if (!newItem.category || !newItem.color || !newItem.brand) {
+  // Only category and brand are required (color is optional)
+  if (!newItem.category || !newItem.brand) {
     return null;
   }
 
@@ -308,13 +348,16 @@ export function detectSmartDuplicates(
 /**
  * Get all smart matches for an item
  * Useful for debugging or showing detailed match information
+ *
+ * Note: Color is optional. If missing, detection still runs with adjusted weights.
  */
 export function getSmartMatches(
   item: Partial<WardrobeItem>,
   wardrobe: WardrobeItem[],
   minSimilarity: number = 60
 ): SmartDuplicationMatch[] {
-  if (!item.category || !item.color || !item.brand) {
+  // Only category and brand are required (color is optional)
+  if (!item.category || !item.brand) {
     return [];
   }
 
