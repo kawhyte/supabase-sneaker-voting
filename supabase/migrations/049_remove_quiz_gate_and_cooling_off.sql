@@ -72,8 +72,6 @@ UPDATE notifications
 SET is_read = true, read_at = NOW()
 WHERE notification_type = 'cooling_off_ready' AND is_read = false;
 
-COMMENT ON UPDATE IS 'Mark orphaned cooling-off notifications as read (migration 049)';
-
 -- ==================================================
 -- Verification Query (for manual testing)
 -- ==================================================
