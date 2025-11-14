@@ -81,7 +81,7 @@
 'use client'
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { AddItemForm } from '@/components/AddItemForm'
+import AddItemForm from '@/components/add-item-form/AddItemForm'
 
 interface EditItemModalProps {
   experience: any
@@ -91,7 +91,7 @@ interface EditItemModalProps {
 }
 
 export function EditItemModal({ experience, isOpen, onClose, onSave }: EditItemModalProps) {
-  const handleItemUpdated = () => {
+  const handleSuccess = () => {
     onSave() // Refresh the parent list
     onClose() // Close the modal
   }
@@ -107,7 +107,8 @@ export function EditItemModal({ experience, isOpen, onClose, onSave }: EditItemM
           <AddItemForm
             initialData={experience}
             mode="edit"
-            onItemAdded={handleItemUpdated}
+            onSuccess={handleSuccess}
+            onCancel={onClose}
           />
         </div>
       </DialogContent>
