@@ -20,15 +20,18 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 
 interface DuplicationWarningSettings {
   enable_duplication_warnings: boolean;
+  enable_similar_item_warnings: boolean;
 }
 
 export function PurchasePreventionSettings() {
   const supabase = createClient();
   const [settings, setSettings] = useState<DuplicationWarningSettings>({
-    enable_duplication_warnings: false,
+    enable_duplication_warnings: true,
+    enable_similar_item_warnings: true,
   });
   const [originalSettings, setOriginalSettings] = useState<DuplicationWarningSettings>({
-    enable_duplication_warnings: false,
+    enable_duplication_warnings: true,
+    enable_similar_item_warnings: true,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -47,6 +50,7 @@ export function PurchasePreventionSettings() {
         .from('profiles')
         .update({
           enable_duplication_warnings: settings.enable_duplication_warnings,
+          enable_similar_item_warnings: settings.enable_similar_item_warnings,
         })
         .eq('id', userId);
 
@@ -72,6 +76,7 @@ export function PurchasePreventionSettings() {
         .from('profiles')
         .update({
           enable_duplication_warnings: data.enable_duplication_warnings,
+          enable_similar_item_warnings: data.enable_similar_item_warnings,
         })
         .eq('id', userId)
         .abortSignal(signal);
@@ -96,7 +101,7 @@ export function PurchasePreventionSettings() {
 
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('enable_duplication_warnings')
+          .select('enable_duplication_warnings, enable_similar_item_warnings')
           .eq('id', user.id)
           .single();
 
@@ -104,7 +109,8 @@ export function PurchasePreventionSettings() {
 
         if (profile) {
           const loadedSettings = {
-            enable_duplication_warnings: profile.enable_duplication_warnings ?? false,
+            enable_duplication_warnings: profile.enable_duplication_warnings ?? true,
+            enable_similar_item_warnings: profile.enable_similar_item_warnings ?? true,
           };
           setSettings(loadedSettings);
           setOriginalSettings(loadedSettings);
@@ -125,6 +131,14 @@ export function PurchasePreventionSettings() {
     setSettings((prev) => ({
       ...prev,
       enable_duplication_warnings: checked,
+    }));
+  };
+
+  // Handle similar item warnings toggle
+  const handleSimilarItemToggle = (checked: boolean) => {
+    setSettings((prev) => ({
+      ...prev,
+      enable_similar_item_warnings: checked,
     }));
   };
 
@@ -162,16 +176,17 @@ export function PurchasePreventionSettings() {
       </CardHeader>
 
       <CardContent className="space-y-8">
-        {/* Duplication Warnings Setting */}
+        {/* Exact Duplicate Detection Setting */}
         <div className="space-y-4">
           <div className=" dense flex items-start justify-between">
             <div className="space-y-2 flex-1">
               <Label className="text-sm font-semibold flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Warn About Duplicate Items
+                <AlertTriangle className="h-4 w-4 text-red-600" />
+                Exact Duplicate Detection
+                <span className="text-xs font-normal text-muted-foreground">(Recommended)</span>
               </Label>
               <p className="text-xs text-muted-foreground">
-                Get notified when adding items similar to ones you already own (same category + color)
+                Warns when adding items that are nearly identical (≥85% match). Catches typos and variations.
               </p>
             </div>
             <Switch
@@ -183,21 +198,67 @@ export function PurchasePreventionSettings() {
           </div>
 
           {settings.enable_duplication_warnings && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex gap-2">
-              <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-700">
-                When enabled, you'll see a warning if you try to add a{' '}
-                <span className="font-semibold">top in black</span> when you already have 2+ black tops.
-                This helps you identify where you might already have what you want to buy.
-              </p>
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex gap-2">
+              <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="text-xs text-red-700">
+                <p className="font-semibold mb-1">Example:</p>
+                <p>
+                  Adding <span className="font-semibold">"Black Nike Hoodie"</span> when you own{' '}
+                  <span className="font-semibold">"Black Nike Hoody"</span> (typo) → Shows warning with 92% match
+                </p>
+              </div>
             </div>
           )}
 
           {!settings.enable_duplication_warnings && (
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex gap-2">
-              <AlertCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-blue-700">
-                Duplication warnings are currently disabled. You won't be notified about similar items in your wardrobe.
+            <div className="p-3 bg-slate-100 border border-slate-300 rounded-lg flex gap-2">
+              <AlertCircle className="h-4 w-4 text-slate-600 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-slate-700">
+                Exact duplicate detection is disabled. You won't be warned about nearly identical items.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Similar Item Detection Setting */}
+        <div className="space-y-4 pt-4 border-t border-stone-200">
+          <div className=" dense flex items-start justify-between">
+            <div className="space-y-2 flex-1">
+              <Label className="text-sm font-semibold flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
+                Similar Item Detection
+                <span className="text-xs font-normal text-muted-foreground">(Advanced)</span>
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Warns when adding items that are very similar but not exact duplicates (60-84% match).
+              </p>
+            </div>
+            <Switch
+              checked={settings.enable_similar_item_warnings}
+              onCheckedChange={handleSimilarItemToggle}
+              disabled={isSaving}
+              className="dense ml-2"
+            />
+          </div>
+
+          {settings.enable_similar_item_warnings && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex gap-2">
+              <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="text-xs text-amber-700">
+                <p className="font-semibold mb-1">Example:</p>
+                <p>
+                  Adding <span className="font-semibold">"Charcoal Nike Hoodie"</span> when you own{' '}
+                  <span className="font-semibold">"Dark Grey Nike Hoodie"</span> → Shows warning with 68% match
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!settings.enable_similar_item_warnings && (
+            <div className="p-3 bg-slate-100 border border-slate-300 rounded-lg flex gap-2">
+              <AlertCircle className="h-4 w-4 text-slate-600 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-slate-700">
+                Similar item detection is disabled. You'll only be warned about exact duplicates.
               </p>
             </div>
           )}
@@ -253,19 +314,25 @@ export function PurchasePreventionSettings() {
             <li className="flex gap-2">
               <span className="text-sun-400 font-bold">•</span>
               <span>
-                When adding an item, we check if you already own similar items (same category and color)
+                <span className="font-semibold">Smart Matching:</span> Uses fuzzy text matching with weighted scoring (Category 40%, Color 30%, Brand 20%, Model 10%)
               </span>
             </li>
             <li className="flex gap-2">
               <span className="text-sun-400 font-bold">•</span>
               <span>
-                You'll see a warning banner showing your similar items before you add the new one
+                <span className="font-semibold">Typo Tolerant:</span> Catches duplicates even with spelling errors or formatting differences
               </span>
             </li>
             <li className="flex gap-2">
               <span className="text-sun-400 font-bold">•</span>
               <span>
-                This helps you avoid buying duplicates and encourages exploring what you already have
+                <span className="font-semibold">Colorway Smart:</span> Won't warn about same brand + different colors (e.g., Black Hoodie vs White Hoodie)
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-sun-400 font-bold">•</span>
+              <span>
+                <span className="font-semibold">Non-Blocking:</span> Warnings show similarity score and similar items, but you can still add the item
               </span>
             </li>
           </ul>
