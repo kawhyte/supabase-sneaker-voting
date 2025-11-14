@@ -76,6 +76,9 @@ export default function AddItemForm({
 		handleAddAnyway,
 	} = useFormLogic({ mode, initialData, onSuccess })
 
+	// Normalize mode: "add" and "create" both mean creating a new item
+	const normalizedMode = mode === 'add' ? 'create' : mode
+
 	// Form mode context (Quick vs Advanced)
 	const { mode: formMode, setMode: setFormMode } = useFormMode()
 
@@ -363,7 +366,7 @@ export default function AddItemForm({
 								photosLength={photos.length}
 								isDirty={form.formState.isDirty}
 								isValid={form.formState.isValid}
-								mode={mode}
+								mode={normalizedMode}
 								initialDataStatus={initialData?.status}
 								shouldShowCard={shouldShowCard}
 								isSticky={isSticky}
