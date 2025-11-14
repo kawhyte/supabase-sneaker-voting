@@ -263,9 +263,10 @@ function isColorwayVariation(
  * - Exact: ≥85% similarity (high confidence duplicate)
  * - Similar: 60-84% similarity (possible duplicate)
  *
- * Note: Color is optional. If missing, detection still runs with adjusted weights.
+ * Note: Color is now required for new items. Legacy items without color are handled
+ * with dynamic weight adjustment (see calculateCompositeSimilarity).
  *
- * @param newItem - Item being added to wardrobe (category and brand required)
+ * @param newItem - Item being added to wardrobe (category, brand, and color required)
  * @param existingWardrobe - User's current owned items
  * @returns SmartDuplicationWarning or null if no duplicates detected
  */
@@ -273,8 +274,8 @@ export function detectSmartDuplicates(
   newItem: Partial<WardrobeItem>,
   existingWardrobe: WardrobeItem[]
 ): SmartDuplicationWarning | null {
-  // Only category and brand are required (color is optional)
-  if (!newItem.category || !newItem.brand) {
+  // Category, brand, and color are required for new items
+  if (!newItem.category || !newItem.brand || !newItem.color) {
     return null;
   }
 
@@ -349,15 +350,16 @@ export function detectSmartDuplicates(
  * Get all smart matches for an item
  * Useful for debugging or showing detailed match information
  *
- * Note: Color is optional. If missing, detection still runs with adjusted weights.
+ * Note: Color is now required for new items. Legacy items without color are handled
+ * with dynamic weight adjustment.
  */
 export function getSmartMatches(
   item: Partial<WardrobeItem>,
   wardrobe: WardrobeItem[],
   minSimilarity: number = 60
 ): SmartDuplicationMatch[] {
-  // Only category and brand are required (color is optional)
-  if (!item.category || !item.brand) {
+  // Category, brand, and color are required for new items
+  if (!item.category || !item.brand || !item.color) {
     return [];
   }
 

@@ -49,7 +49,7 @@ export const itemFormSchema = z
 		brand: z.string().min(1, 'Brand is required').max(50).trim(),
 		model: z.string().min(2, 'Item name is required').max(100).trim(),
 		sku: z.string().max(50).optional().or(z.literal('')),
-		color: z.string().max(100).trim().optional().or(z.literal('')),
+		color: z.string().min(1, 'Color is required').max(100).trim(),
 		sizeTried: z.string().optional(),
 		comfortRating: z.coerce.number().min(1).max(5).optional(),
 		retailPrice: z
@@ -227,8 +227,8 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 			setUserId(user.id)
 
 			// Check for duplicates (only when adding new items, not editing, and warning not already dismissed)
-			// Note: color is optional, so we check brand and category only
-			if (mode !== 'edit' && !warningDismissed && data.brand && data.category) {
+			// Required fields: brand, category, color
+			if (mode !== 'edit' && !warningDismissed && data.brand && data.category && data.color) {
 				// Fetch user's duplicate detection settings
 				const { data: profile } = await supabase
 					.from('profiles')
