@@ -118,7 +118,7 @@ export function StalePriceWarning({
         )}
 
         {/* Action buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 border-t my-2">
           {/* Auto check button */}
           {onRefreshPrice && (
             <Button
@@ -130,7 +130,7 @@ export function StalePriceWarning({
               title={tooltipText}
             >
               <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-              {isRefreshing ? 'Checking...' : 'Check now'}
+              {isRefreshing ? 'Checking...' : 'Check price'}
             </Button>
           )}
 

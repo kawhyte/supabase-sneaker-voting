@@ -138,7 +138,7 @@ export function ManualPriceEntryDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md p-4">
         <DialogHeader>
           <DialogTitle>Manual Price Entry</DialogTitle>
           <DialogDescription>
@@ -201,7 +201,7 @@ export function ManualPriceEntryDialog({
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className='gap-x-4'>
           <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
             Cancel
           </Button>
