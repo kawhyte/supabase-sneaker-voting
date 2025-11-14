@@ -65,25 +65,24 @@ export const itemFormSchema = z
 			}, 'Price must be between $0 and $10,000'),
 		salePrice: z
 			.string()
-			.regex(/^\d+(\.\d{1,2})?$/)
+			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 150 or 150.00)')
 			.refine((val) => {
 				if (val === '') return true
 				const price = parseFloat(val)
 				return price >= 0 && price <= 10000
-			})
+			}, 'Sale price must be between $0 and $10,000')
 			.optional()
 			.or(z.literal('')),
 		targetPrice: z
 			.string()
-			.regex(
-				/^\d+(\.\d{1,2})?$/,
-				'Please enter a valid price (e.g., 100 or 100.00)'
-			)
+			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 100 or 100.00)')
 			.refine((val) => {
 				if (val === '') return true
 				const price = parseFloat(val)
 				return price >= 0 && price <= 10000
-			}, 'Target price must be between $0 and $10,000'),
+			}, 'Target price must be between $0 and $10,000')
+			.optional()
+			.or(z.literal('')),
 		wears: z.coerce.number().min(0).max(10000).optional().default(0),
 		notes: z.string().max(120).trim().optional().or(z.literal('')),
 	})
