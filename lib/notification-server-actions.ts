@@ -8,28 +8,9 @@
  */
 
 import {
-  createCoolingOffReadyNotification,
   createCostPerWearMilestone,
   createDuplicationFollowUp,
 } from './notification-creator'
-
-/**
- * Server action to trigger cooling-off ready notification
- * Called from cooling-off-badge.tsx (client component)
- */
-export async function triggerCoolingOffNotification(
-  userId: string,
-  item: {
-    id: string
-    brand: string
-    model: string
-    color: string
-    target_price?: number
-    image_url?: string
-  }
-) {
-  return await createCoolingOffReadyNotification(userId, item)
-}
 
 /**
  * Server action to trigger cost-per-wear milestone notification

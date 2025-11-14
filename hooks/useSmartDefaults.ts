@@ -3,7 +3,6 @@ import { createClient } from '@/utils/supabase/client'
 import type { ItemCategory } from '@/components/types/item-category'
 
 interface SmartDefaults {
-  preferredCoolingOffDays?: number
   enableDuplicationWarnings?: boolean
   lastBrand?: string
   lastBrandId?: number
@@ -18,7 +17,7 @@ interface SmartDefaults {
  * useSmartDefaults - Load smart defaults from user profile and recent items
  *
  * Implements hybrid smart defaults strategy for better UX in forms:
- * 1. Query profiles table for user preferences (cooling_off_days, duplication warnings)
+ * 1. Query profiles table for user preferences (duplication warnings)
  * 2. Query recent items for usage patterns (last brand, category, color, size)
  * 3. Merge results with sensible fallbacks and return for form initialization
  *
@@ -69,7 +68,7 @@ export function useSmartDefaults(): SmartDefaults {
         // Load profile preferences
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('preferred_cooling_off_days, enable_duplication_warnings')
+          .select('enable_duplication_warnings')
           .eq('id', user.id)
           .single()
 
@@ -93,7 +92,6 @@ export function useSmartDefaults(): SmartDefaults {
         }
 
         setDefaults({
-          preferredCoolingOffDays: profile?.preferred_cooling_off_days ?? 7,
           enableDuplicationWarnings: profile?.enable_duplication_warnings ?? true,
           lastBrand: recentItem?.brand || undefined,
           lastBrandId: recentItem?.brand_id || undefined,

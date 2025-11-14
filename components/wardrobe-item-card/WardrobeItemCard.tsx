@@ -28,7 +28,6 @@ import { ItemSizeComfortWears } from "./WardrobeItemMetadata";
 import { ItemStoreAndDate } from "./WardrobeItemPurchaseInfo";
 import { ItemFooterBadges } from "./WardrobeItemFooter";
 import { CostPerWearProgress } from "./CostPerWearProgress";
-import { CoolingOffBadge } from "./CoolingOffBadge";
 
 /**
  * Props for WardrobeItemCard component
@@ -201,14 +200,6 @@ function WardrobeItemCardComponent({
 								/>
 							)}
 
-							{/* Cooling-Off Badge - Only for wishlist items in cooling-off period */}
-							{item.status === 'wishlisted' && item.created_at && (
-								<CoolingOffBadge
-									createdAt={item.created_at}
-									canPurchaseAfter={item.can_purchase_after || null}
-									coolingOffDays={item.cooling_off_days}
-								/>
-							)}
 
 						{/* Cost Per Wear Progress - Only show for owned items in collection/archive views */}
 						{/* {displayLogic.isOwned && (viewMode === 'collection' || viewMode === 'archive') && (

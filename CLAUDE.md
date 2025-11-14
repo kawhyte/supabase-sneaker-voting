@@ -39,7 +39,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Outfit Gallery**: View all created outfits in grid or list view
 - **Wear Tracking**: Mark outfits as worn, track times worn and last worn date
 - **Outfit Details**: Name, description, occasion, background color
-- **Purchase Prevention**: "Can You Style This?" quiz before adding to wishlist
 - **Occasion Tracking**: Categorize outfits by occasion (casual, work, party, etc.)
 
 #### 4. Price Monitoring System (Phase 7.1-7.3)
@@ -71,10 +70,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Size Recommendations**: Store preferred sizes per brand
 
 #### 7. Purchase Prevention (Phase 3)
-- **Cooling Off Period**: Configurable delay before purchase (default: 7 days)
-- **Quiz Gate**: "Can You Style This?" modal before adding to wishlist (requires 3+ outfits)
-- **Smart Warnings**: Psychology-driven messaging to reduce impulse buying
-- **Duplication Detection**: Warn about similar items already owned
+- **Duplication Detection**: Warn about similar items already owned (same category + color)
+- **Configurable Settings**: Enable/disable duplication warnings via profile settings
+- **Smart Warnings**: Color-coded severity levels (low/medium/high) based on number of similar items
 - **Budget Tracking**: Monitor spending against budget preferences
 
 #### 8. Dashboard & Views (Phase 1-2)
@@ -490,7 +488,6 @@ Complete outfit composition and visualization system with smart layout, manual c
 5. **Outfit Gallery** - Grid/list view for all created outfits with detail modal
 6. **Wear Tracking** - Mark outfits as worn, track times worn and last worn date
 7. **Dashboard Integration** - New "Outfits" tab in main dashboard with creation CTA
-8. **Purchase Prevention Quiz** - "Can You Style This?" modal gate (3 outfit minimum before wishlist add)
 
 **Database Schemas Created**:
 - **outfits** table: id, user_id, name, description, occasion, background_color, date_created, date_worn, times_worn, is_archived, created_at, updated_at
@@ -508,7 +505,6 @@ Complete outfit composition and visualization system with smart layout, manual c
 - `components/outfit-studio/OutfitStudio.tsx` (~360 lines) - Main creation modal orchestrator
 - `components/outfit-studio/OutfitCanvas.tsx` (~250 lines) - Phone mockup with draggable items
 - `components/outfit-studio/ManualCropTool.tsx` (~280 lines) - Crop tool with resize handles
-- `components/outfit-studio/CanYouStyleThisQuiz.tsx` (~180 lines) - Psychology-driven purchase gate
 - `components/outfit-studio/OutfitListView.tsx` (~280 lines) - Gallery with detail modal
 - `components/outfit-studio/OutfitsDashboard.tsx` (~230 lines) - Dashboard tab integration
 - `lib/outfit-layout-engine.ts` (~250 lines) - Smart positioning and normalization
@@ -533,9 +529,8 @@ Complete outfit composition and visualization system with smart layout, manual c
 1. **Normalized Positioning**: Store 0-1 coordinates for responsive rendering across screen sizes
 2. **Smart Auto-Arrange**: Category layer map with automatic spacing (shoes bottom, outerwear top)
 3. **Soft Delete**: Archive outfits instead of hard delete for audit trail
-4. **Quiz Gate**: Psychology-driven modal to reduce impulse buying of wishlist items
-5. **Draggable Canvas**: Real-time position updates without server round-trips
-6. **Type-Safe Layout Engine**: Generic functions prevent runtime position type errors
+4. **Draggable Canvas**: Real-time position updates without server round-trips
+5. **Type-Safe Layout Engine**: Generic functions prevent runtime position type errors
 
 **Files Modified**:
 - `app/dashboard/page.tsx` - Added Outfits tab with Sparkles icon, grid-cols-4
@@ -575,7 +570,6 @@ Complete modularization of the AddItemForm component into focused, reusable sect
 - `lib/wardrobe-item-display-logic.ts` - Pure functions for UI visibility:
   - `shouldShowWearCounter()` - Determine if wear tracking UI should display
   - `shouldShowCostPerWear()` - Check cost-per-wear eligibility
-  - `shouldShowCoolingOff()` - Wishlisted items within cooling-off period
   - `shouldShowPriceMonitoring()` - Price tracking badge visibility
   - `canAddToOutfit()` - Check if item can be added to outfit
   - `getItemDisplayFlags()` - Batch all display checks
