@@ -34,16 +34,17 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 	}
 
 	const isWorthIt = metrics.isWorthIt;
-	const progressPercentage = metrics.progress;
+	// Ensure progressPercentage is always a valid number (defensive coding)
+	const progressPercentage = Number.isFinite(metrics.progress) ? metrics.progress : 0;
 	const currentCPW = metrics.currentCPW;
 	const targetCPW = metrics.targetCPW;
 
-	// Determine progress bar color based on progress percentage
-	const getProgressColor = () => {
-		if (isWorthIt) return 'bg-meadow-500'; // Deep green for achieved
-		if (progressPercentage >= 75) return 'bg-meadow-400'; // Light green nearing goal
-		if (progressPercentage >= 50) return 'bg-sun-400'; // Yellow at midpoint
-		return 'bg-sun-300'; // Light yellow at start
+	// Determine progress bar color - returns hex color for inline styles (more reliable than dynamic classes)
+	const getProgressColor = (): string => {
+		if (isWorthIt) return '#62a663'; // meadow-500 - Deep green for achieved
+		if (progressPercentage >= 75) return '#81b682'; // meadow-400 - Light green nearing goal
+		if (progressPercentage >= 50) return '#D4A574'; // sun-400 - Yellow at midpoint
+		return '#E8DCC8'; // sun-300 - Light yellow at start
 	};
 
 	const tooltipContent = (
@@ -113,8 +114,11 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 					{/* Progress Bar */}
 					<div className='w-full bg-stone-300 rounded-full h-2 overflow-hidden'>
 						<div
-							className={`${getProgressColor()} h-full rounded-full transition-all duration-500 ease-out`}
-							style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+							className='h-full rounded-full transition-all duration-500 ease-out'
+							style={{
+								width: `${Math.min(Math.max(progressPercentage, 0), 100)}%`,
+								backgroundColor: getProgressColor()
+							}}
 							role='progressbar'
 							aria-valuenow={Math.round(progressPercentage)}
 							aria-valuemin={0}
