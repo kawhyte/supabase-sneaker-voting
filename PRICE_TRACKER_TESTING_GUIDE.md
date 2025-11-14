@@ -8,22 +8,25 @@ All code changes have been committed and pushed to: `claude/audit-price-checker-
 
 ## 🚀 DEPLOYMENT STEPS
 
-### Step 1: Apply Database Migration
+### Step 1: Apply Database Migrations
 
-Run the migration to create the missing `price_check_log` table:
+Run the migrations to create the missing `price_check_log` table and enable pg_cron:
 
 ```bash
 # Option A: Using Supabase CLI (recommended)
 supabase migration up
 
 # Option B: Run SQL directly in Supabase Dashboard
-# Go to SQL Editor and run: supabase/migrations/047_create_price_check_log_table.sql
+# 1. Go to SQL Editor and run: supabase/migrations/047_create_price_check_log_table.sql
+# 2. Then run: supabase/migrations/048_enable_pgnet_and_fix_cron.sql
 ```
 
 **What this fixes:**
 - Creates `price_check_log` table that the edge function writes to
 - Adds audit trail for all price checks (success + failure)
 - Enables per-retailer analytics and debugging
+- Enables `pg_net` extension (required for pg_cron HTTP calls)
+- Sets up weekly automated price checking via pg_cron
 
 ### Step 2: Deploy Code to Production
 
@@ -37,29 +40,46 @@ netlify deploy --prod
 # Or your deployment command
 ```
 
-### Step 3: Set Up Cron Job (cron-job.org)
+### Step 3: Verify Automated Cron Job (pg_cron)
 
-Since you're already using cron-job.org for other functions, add the price checker as your 3rd job:
+After running migration 048, verify the weekly price checker cron job is set up:
 
-**Add to cron-job.org:**
-1. Go to https://cron-job.org/en/members/jobs/
-2. Click "Create cronjob"
-3. Configure:
-   ```
-   Title: Weekly Price Checker
-   URL: https://ayfabzqcjedgvhhityxc.supabase.co/functions/v1/check-prices
-   Schedule: Every Sunday at 2:00 AM (your timezone)
-   Request method: POST
-   Request body: {}
-   ```
-4. Add header:
-   ```
-   Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5ZmFienFjamVkZ3ZoaGl0eXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4Mjk4OTQsImV4cCI6MjA3NDQwNTg5NH0.bh3AuNE9MKGYfER8kF8i3qm_ZLfb1yF9r94DqAH6H6o
-   ```
-5. Click "Create cronjob"
-6. **Test now:** Click "Run job" to test immediately
+**Verify cron job exists:**
+```sql
+-- Check cron job is scheduled
+SELECT
+  jobid,
+  jobname,
+  schedule,
+  active,
+  command
+FROM cron.job
+WHERE jobname = 'weekly-price-check';
+```
 
-**Expected Response:** HTTP 200 with JSON showing checked items
+**Expected result:**
+- jobname: `weekly-price-check`
+- schedule: `0 2 * * 0` (Every Sunday at 2:00 AM UTC)
+- active: `true`
+
+**Test the cron job manually (optional):**
+```sql
+-- Manually trigger the price check (don't wait for Sunday)
+SELECT net.http_post(
+  url := 'https://ayfabzqcjedgvhhityxc.supabase.co/functions/v1/check-prices',
+  headers := jsonb_build_object(
+    'Content-Type', 'application/json',
+    'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5ZmFienFjamVkZ3ZoaGl0eXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4Mjk4OTQsImV4cCI6MjA3NDQwNTg5NH0.bh3AuNE9MKGYfER8kF8i3qm_ZLfb1yF9r94DqAH6H6o'
+  ),
+  body := '{}'::jsonb
+) AS request_id;
+
+-- Wait 30-60 seconds, then check if items were updated
+SELECT brand, model, sale_price, last_price_check_at
+FROM items
+WHERE status = 'wishlisted'
+  AND last_price_check_at > NOW() - INTERVAL '2 minutes';
+```
 
 **Verify logs:** Go to Supabase → Edge Functions → check-prices → Check invocation logs
 
@@ -202,42 +222,59 @@ ORDER BY success_rate DESC;
 
 ### Test 8: Cron Job (Weekly Automated Check)
 
-**Scenario:** Verify cron job runs automatically via cron-job.org
+**Scenario:** Verify cron job runs automatically via pg_cron
 
-**Option A: Wait for Sunday 2 AM** 😴
-- Check cron-job.org execution history
+**Option A: Wait for Sunday 2 AM UTC** 😴
+- Check cron job history in database
 - Check edge function logs on Sunday morning
 
 **Option B: Manual test (recommended)** 🚀
-1. Go to https://cron-job.org/en/members/jobs/
-2. Find "Weekly Price Checker" job
-3. Click **"Run job"** button (test immediately)
-4. Check execution log for HTTP 200 response
-5. Expected response body:
-```json
-{
-  "success": true,
-  "checked": 5,
-  "successCount": 4,
-  "failureCount": 1,
-  "successRate": "80.0%",
-  "alertsCreated": 2
-}
+
+1. **Check cron job is scheduled:**
+```sql
+SELECT jobid, jobname, schedule, active
+FROM cron.job
+WHERE jobname = 'weekly-price-check';
 ```
 
-**Verify in database:**
+2. **Manually trigger the cron job:**
+```sql
+SELECT net.http_post(
+  url := 'https://ayfabzqcjedgvhhityxc.supabase.co/functions/v1/check-prices',
+  headers := jsonb_build_object(
+    'Content-Type', 'application/json',
+    'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5ZmFienFjamVkZ3ZoaGl0eXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4Mjk4OTQsImV4cCI6MjA3NDQwNTg5NH0.bh3AuNE9MKGYfER8kF8i3qm_ZLfb1yF9r94DqAH6H6o'
+  ),
+  body := '{}'::jsonb
+) AS request_id;
+```
+
+3. **Wait 30-60 seconds** (edge function takes time to scrape all items)
+
+4. **Verify in database:**
 ```sql
 -- Check items were updated
 SELECT brand, model, sale_price, last_price_check_at
 FROM items
 WHERE status = 'wishlisted'
-  AND last_price_check_at > NOW() - INTERVAL '1 hour';
+  AND last_price_check_at > NOW() - INTERVAL '2 minutes';
+
+-- Check price_check_log has new entries
+SELECT item_id, price, checked_at, source, retailer, success
+FROM price_check_log
+WHERE checked_at > NOW() - INTERVAL '2 minutes'
+ORDER BY checked_at DESC;
 
 -- Check notifications were created
 SELECT * FROM notifications
 WHERE notification_type = 'price_alert'
-  AND created_at > NOW() - INTERVAL '1 hour';
+  AND created_at > NOW() - INTERVAL '2 minutes';
 ```
+
+**Expected results:**
+- ✅ Items have updated `last_price_check_at` timestamps
+- ✅ New entries in `price_check_log` table
+- ✅ Price drop alerts created in `notifications` table (if prices dropped)
 
 ---
 
@@ -256,23 +293,42 @@ WHERE notification_type = 'price_alert'
 
 ### Issue: Cron job not running
 
-**Fix #1: Check cron-job.org status**
-1. Go to https://cron-job.org/en/members/jobs/
-2. Find "Weekly Price Checker" job
-3. Check "Status" column (should be "Enabled")
-4. Check "Execution history" for recent runs
+**Fix #1: Check pg_net extension is enabled**
+```sql
+-- Verify pg_net extension exists
+SELECT * FROM pg_extension WHERE extname = 'pg_net';
 
-**Fix #2: Verify URL and headers**
-1. Click "Edit" on the job
-2. Verify URL: `https://ayfabzqcjedgvhhityxc.supabase.co/functions/v1/check-prices`
-3. Verify Authorization header is present
-4. Click "Test run" to execute immediately
+-- If not found, enable it:
+CREATE EXTENSION IF NOT EXISTS pg_net;
+```
+
+**Fix #2: Check cron job status**
+```sql
+-- Verify cron job exists and is active
+SELECT jobid, jobname, schedule, active, command
+FROM cron.job
+WHERE jobname = 'weekly-price-check';
+
+-- Check cron job run history
+SELECT
+  jobid,
+  runid,
+  job_pid,
+  status,
+  return_message,
+  start_time,
+  end_time
+FROM cron.job_run_details
+WHERE jobid = (SELECT jobid FROM cron.job WHERE jobname = 'weekly-price-check')
+ORDER BY start_time DESC
+LIMIT 10;
+```
 
 **Fix #3: Check edge function logs**
 1. Go to Supabase Dashboard → Edge Functions
 2. Click `check-prices` function
 3. Check "Logs" tab for errors
-4. Look for invocations matching cron schedule
+4. Look for invocations matching cron schedule (Sundays at 2 AM UTC)
 
 ---
 
@@ -378,17 +434,22 @@ Contact or check:
 
 ## 📝 CRON SETUP SUMMARY
 
-You already have 2 working cron jobs on cron-job.org:
-1. ✅ `trigger-seasonal-alerts` - Working
-2. ✅ `cleanup-old-notifications` - Working
-3. 🆕 **ADD THIS:** `check-prices` - Weekly price checker (see Step 3 above)
+**Automated Price Checking:**
+- ✅ Uses pg_cron (PostgreSQL native cron scheduler)
+- ✅ Runs every Sunday at 2:00 AM UTC
+- ✅ Calls `check-prices` edge function automatically
+- ✅ No external dependencies (100% free!)
 
-**Why cron-job.org instead of pg_cron?**
-- ✅ You're already using it successfully
-- ✅ Easy to monitor (email alerts on failure)
-- ✅ Easy to test ("Run job" button)
-- ✅ Easy to pause/modify (no SQL required)
-- ✅ More reliable for small apps
+**Your existing cron-job.org jobs (unaffected):**
+1. ✅ `trigger-seasonal-alerts` - Still using cron-job.org
+2. ✅ `cleanup-old-notifications` - Still using cron-job.org
+
+**Why pg_cron for price checking?**
+- ✅ No timeout limits (cron-job.org has 30-second max)
+- ✅ Native to PostgreSQL (no external service)
+- ✅ Requires pg_net extension (enabled in migration 048)
+- ✅ 100% free and reliable
+- ✅ Logs stored in `cron.job_run_details` table
 
 ---
 
