@@ -2,11 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { Trophy, Crown, Star, Check, Minus, XCircle } from 'lucide-react';
-import {
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+import { Crown, Star, Check, Minus, XCircle } from 'lucide-react';
+import { DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 
 interface UserStats {
   total_items: number | null;
@@ -135,9 +132,6 @@ export function WardrobeStatsWidget({ userId }: { userId?: string }) {
 
   const avgCostPerWear = stats?.average_cost_per_wear ?? null;
   const quality = getCostPerWearQuality(avgCostPerWear);
-  const unlockedCount = stats?.achievements_unlocked || 0;
-  const totalCount = stats?.total_achievements || 11;
-  const achievementPercentage = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
 
   return (
     <>
