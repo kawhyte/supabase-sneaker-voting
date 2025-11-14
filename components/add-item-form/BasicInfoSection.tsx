@@ -102,7 +102,7 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 						</div>
 						{watchedTriedOn && (
 							<p className="text-xs text-meadow-600 mt-2">
-								<span className="sr-only">Shirt emoji:</span> Great!
+								Great! Your feedback will help track the fit.
 							</p>
 						)}
 					</div>
@@ -169,6 +169,25 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 					{errors.model && (
 						<p className="text-sm text-red-600 mt-1">
 							{String(errors.model.message || "Item name is required")}
+						</p>
+					)}
+				</div>
+			</div>
+
+			{/* Row 3: Color (Required for duplicate detection) */}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<div>
+					<Label className="text-sm font-medium text-slate-900">
+						Color <span className="text-red-500">*</span>
+					</Label>
+					<Input
+						{...register("color")}
+						className="mt-2"
+						placeholder="e.g., Black, Navy Blue, Red"
+					/>
+					{errors.color && (
+						<p className="text-sm text-red-600 mt-1">
+							{String(errors.color.message || "Color is required")}
 						</p>
 					)}
 				</div>

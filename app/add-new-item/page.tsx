@@ -64,28 +64,22 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { AddItemForm } from '@/components/AddItemForm'
+import AddItemForm from '@/components/add-item-form/AddItemForm'
 
 export default function AddNewItemPage() {
   const router = useRouter()
 
-  const handleItemAdded = () => {
+  const handleSuccess = () => {
     // Auto-redirect to dashboard after successful submission
     // Short delay allows user to see success toast before transition
     setTimeout(() => {
       router.push('/dashboard')
-    }, 100) // Minimal delay - form already waited 800ms
+    }, 100)
   }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Container with responsive padding + max-width constraint */}
-      <div className="container mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8 py-12">
-        {/* Form Card - Elevated above background */}
-        <div className="bg-card rounded-lg shadow-md p-6 sm:p-8">
-          <AddItemForm onItemAdded={handleItemAdded} mode="create" />
-        </div>
-      </div>
+      <AddItemForm mode="create" onSuccess={handleSuccess} />
     </div>
   )
 }
