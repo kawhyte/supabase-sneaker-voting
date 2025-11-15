@@ -69,7 +69,7 @@ function LottieAnimationWrapper() {
 export default function HomePage() {
 
   return (
-    <main className="relative bg-background flex items-center justify-center">
+    <main className="relative bg-background flex flex-col items-center justify-center">
       {/* Gradient background accent (subtle) */}
       {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-sun-100 rounded-full blur-3xl opacity-20" />
