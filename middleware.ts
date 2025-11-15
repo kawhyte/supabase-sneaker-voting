@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  const publicPaths = ['/', '/login'] // Define public paths
+  const publicPaths = ['/', '/login', '/cost-per-wear-calculator'] // Define public paths
 
   // If user is not logged in and the path is not public, redirect to login
   if (!user && !publicPaths.includes(pathname)) {
