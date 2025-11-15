@@ -182,11 +182,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Decorative bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-
       {/* Cost Per Wear Calculator CTA Section */}
-      <section className="relative z-10 py-16 px-6 bg-gradient-to-b from-white to-stone-50 border-t border-stone-200">
+      <section className="w-full py-16 px-6 bg-gradient-to-b from-white to-stone-50 border-t border-stone-200">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
