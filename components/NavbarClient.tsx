@@ -222,6 +222,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 	const publicNavLinks: NavLink[] = [
 		{ href: '/', label: 'Home' },
+		{ href: '/cost-per-wear-calculator', label: 'Cost Per Wear Calculator' },
 		// { href: '/discover', label: 'Discover' },
 	];
 

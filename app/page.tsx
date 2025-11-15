@@ -184,6 +184,56 @@ export default function HomePage() {
 
       {/* Decorative bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+
+      {/* Cost Per Wear Calculator CTA Section */}
+      <section className="relative z-10 py-16 px-6 bg-gradient-to-b from-white to-stone-50 border-t border-stone-200">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl sm:text-4xl font-bold text-foreground"
+          >
+            Before You Buy, Know If It's Worth It
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto"
+          >
+            Use our free calculator to see if that clothing item is really worth the investment.
+            Calculate cost-per-wear in seconds—no signup required.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="pt-2"
+          >
+            <Link href="/cost-per-wear-calculator" prefetch={true}>
+              <motion.button
+                whileHover={{
+                  scale: 1.02,
+                  boxShadow:
+                    '0 20px 25px -5px rgba(255, 199, 0, 0.2), 0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold rounded-full bg-sun-400 text-slate-900 hover:bg-sun-500 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-sun-300 focus:ring-offset-2 min-h-[44px]"
+                aria-label="Calculate cost per wear"
+              >
+                Calculate Now
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
     </main>
   )
 }
