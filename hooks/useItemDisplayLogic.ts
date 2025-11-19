@@ -30,6 +30,7 @@ export interface ItemDisplayLogic {
 	isOwned: boolean;
 	isWishlist: boolean;
 	isOnSale: boolean;
+	isPinned: boolean; // Pinned to public profile (featured items)
 }
 
 /**
@@ -58,10 +59,12 @@ export function useItemDisplayLogic(item: WardrobeItem): ItemDisplayLogic {
 		item.retail_price &&
 		item.sale_price < item.retail_price
 	);
+	const isPinned = item.is_pinned === true;
 
 	return {
 		isOwned,
 		isWishlist,
 		isOnSale,
+		isPinned,
 	};
 }

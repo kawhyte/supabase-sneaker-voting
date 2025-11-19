@@ -72,6 +72,8 @@ interface OutfitStudioProps {
   mode?: 'create' | 'edit'
   editingOutfitId?: string
   editingOutfit?: OutfitWithItems
+  // ✅ NEW: Anchor item for "Style This" workflow (shoe-first)
+  anchorItem?: WardrobeItem | null
 }
 
 /**
@@ -93,6 +95,7 @@ export function OutfitStudio({
   mode = 'create',
   editingOutfitId,
   editingOutfit,
+  anchorItem,
 }: OutfitStudioProps) {
   // Form State
   const [outfitName, setOutfitName] = useState('Untitled Outfit')
@@ -157,6 +160,15 @@ export function OutfitStudio({
       clearStack()
     }
   }, [isOpen, clearStack])
+
+  // ✅ NEW: Auto-add anchor item when provided (Shoe-First "Style This" workflow)
+  useEffect(() => {
+    if (isOpen && anchorItem && mode === 'create' && outfitItems.length === 0) {
+      // Automatically add the anchor item to the canvas
+      // This creates the "Style This" workflow where the shoe is pre-selected
+      handleAddItem(anchorItem)
+    }
+  }, [isOpen, anchorItem, mode])
 
   // 🎯 STEP 3.5c: Quiz modal callbacks for OutfitStudio
   const handleQuizProceed = async () => {

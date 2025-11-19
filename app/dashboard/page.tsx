@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from "@/components/ui/button";
 import { WardrobeDashboard } from '@/components/WardrobeDashboard'
 import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
-import { Package, Heart, Archive, Sparkles, LayoutGrid, Plus } from 'lucide-react'
+import { Footprints, Shirt, Heart, Sparkles, Archive, Plus, Users } from 'lucide-react'
 import { ItemStatus } from '@/types/ItemStatus'
 import { DashboardHeader } from '@/components/DashboardHeader'
 import Link from 'next/link'
@@ -100,8 +100,8 @@ import Link from 'next/link'
     
 function DashboardContent() {
   const searchParams = useSearchParams()
-  // Default to 'owned' if no tab is specified in the URL
-  const defaultTab = searchParams.get('tab') || 'owned'
+  // Default to 'rotation' (shoe-first) if no tab is specified in the URL
+  const defaultTab = searchParams.get('tab') || 'rotation'
 
   return (
     <div className="w-full min-h-screen">
@@ -111,20 +111,35 @@ function DashboardContent() {
         transition={{ duration: 0.5 }}
       >
 
-<div className='flex justify-between'>
-        <h3 className='text-3xl font-bold font-headin -mb-2'>My Wardrobe</h3>
-        
-        <span>
+<div className='flex justify-between items-center'>
+        <h3 className='text-3xl font-bold font-heading -mb-2'>My Wardrobe</h3>
 
+        <div className="flex items-center gap-3">
+          {/* View Archive Button - Secondary Action */}
+          <Link href="/dashboard?tab=archive">
+            <Button variant="outline" className='flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:shadow-sm motion-safe:hover:scale-105 will-change-transform'>
+              <Archive className='h-4 w-4' />
+              Archive
+            </Button>
+          </Link>
 
-	<Link key={'/add-new-item'} href={'/add-new-item'}>
-									<Button className='flex items-center gap-2  bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-sm  font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
-										<Plus className='h-4 w-4' />
-										{'Add Item'}
-									</Button>
-								</Link>
+          {/* Privacy Settings Button - Secondary Action */}
+          <Link href="/profile#privacy">
+            <Button variant="outline" className='flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:shadow-sm motion-safe:hover:scale-105 will-change-transform'>
+              <Users className='h-4 w-4' />
+              Privacy
+            </Button>
+          </Link>
 
-        </span></div>
+          {/* Add Item Button - Primary CTA */}
+          <Link href='/add-new-item'>
+            <Button className='flex items-center gap-2 bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-sm font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
+              <Plus className='h-4 w-4' />
+              Add Item
+            </Button>
+          </Link>
+        </div>
+      </div>
         
         {/* <DashboardHeader status={"displayStatus"} /> */}
         {/* Section spacing between dashboard sections (48px) - Optimized for all screen sizes */}
@@ -140,36 +155,36 @@ function DashboardContent() {
                 className="w-full justify-start border-b border-stone-200 bg-transparent p-0 gap-8 mb-8"
               >
                 <TabsTrigger
-                  value="owned"
+                  value="rotation"
                   data-variant="underline"
-                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2"
                 >
-                  {/* <Package className="h-4 w-4 mr-2" /> */}
-                  Owned
+                  <Footprints className="h-4 w-4" />
+                  The Rotation
+                </TabsTrigger>
+                <TabsTrigger
+                  value="closet"
+                  data-variant="underline"
+                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2"
+                >
+                  <Shirt className="h-4 w-4" />
+                  The Closet
                 </TabsTrigger>
                 <TabsTrigger
                   value="wishlist"
                   data-variant="underline"
-                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2"
                 >
-                  {/* <Heart className="h-4 w-4 mr-2" /> */}
-                  Want to Buy
+                  <Heart className="h-4 w-4" />
+                  Wishlist
                 </TabsTrigger>
                 <TabsTrigger
-                  value="outfits"
+                  value="fits"
                   data-variant="underline"
-                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2"
                 >
-                  {/* <Sparkles className="h-4 w-4 mr-2" /> */}
-                  Outfits
-                </TabsTrigger>
-                <TabsTrigger
-                  value="archive"
-                  data-variant="underline"
-                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
-                >
-                  {/* <Archive className="h-4 w-4 mr-2" /> */}
-                  Archived Items
+                  <Sparkles className="h-4 w-4" />
+                  Fits
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -178,17 +193,37 @@ function DashboardContent() {
           </div>
 
           {/* --- Tab Content --- */}
-            <TabsContent value="owned">
+            {/* Tab 1: The Rotation - Shoes Only (Owned) */}
+            <TabsContent value="rotation">
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.3 }}
               >
-                <WardrobeDashboard status={[ItemStatus.OWNED]} />
+                <WardrobeDashboard
+                  status={[ItemStatus.OWNED]}
+                  categoryFilter={['shoes']}
+                />
               </motion.div>
             </TabsContent>
 
+            {/* Tab 2: The Closet - Everything Except Shoes (Owned) */}
+            <TabsContent value="closet">
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <WardrobeDashboard
+                  status={[ItemStatus.OWNED]}
+                  categoryFilter={['tops', 'bottoms', 'outerwear', 'accessories']}
+                />
+              </motion.div>
+            </TabsContent>
+
+            {/* Tab 3: Wishlist - All Wishlisted Items */}
             <TabsContent value="wishlist">
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
@@ -200,7 +235,8 @@ function DashboardContent() {
               </motion.div>
             </TabsContent>
 
-            <TabsContent value="outfits">
+            {/* Tab 4: Fits - Outfits */}
+            <TabsContent value="fits">
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -211,6 +247,7 @@ function DashboardContent() {
               </motion.div>
             </TabsContent>
 
+            {/* Archive Tab - Accessible via header button */}
             <TabsContent value="archive">
               <motion.div
                 initial={{ opacity: 0, y: 8 }}

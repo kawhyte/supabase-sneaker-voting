@@ -4,10 +4,11 @@ import { Suspense } from 'react'
 import { motion } from 'framer-motion'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { useTabNavigation, useTabKeyboardShortcuts } from '@/hooks/useTabNavigation'
-import { User, ShieldCheck, Bell } from 'lucide-react'
+import { User, ShieldCheck, Bell, Users } from 'lucide-react'
 import { ProfileForm } from '@/components/ProfileForm'
 import { PurchasePreventionSettings } from '@/components/PurchasePreventionSettings'
 import { NotificationPreferences } from '@/components/NotificationPreferences'
+import { PrivacySettings } from '@/components/PrivacySettings'
 import { useProfile } from '@/contexts/ProfileContext'
 
 function SettingsContent() {
@@ -16,9 +17,9 @@ function SettingsContent() {
   // Tab navigation with hash routing
   const { activeTab, setActiveTab } = useTabNavigation('profile')
 
-  // Keyboard shortcuts (Cmd/Ctrl + 1/2/3)
+  // Keyboard shortcuts (Cmd/Ctrl + 1/2/3/4)
   useTabKeyboardShortcuts(
-    ['profile', 'purchase-prevention', 'notifications'],
+    ['profile', 'purchase-prevention', 'notifications', 'privacy'],
     setActiveTab
   )
 
@@ -83,6 +84,15 @@ function SettingsContent() {
               <Bell className="h-4 w-4 mr-2" />
               Notifications
             </TabsTrigger>
+
+            <TabsTrigger
+              value="privacy"
+              data-variant="underline"
+              className="relative px-0 py-3 pb-4 bg-transparent flex items-center"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Privacy & Sharing
+            </TabsTrigger>
           </TabsList>
 
           {/* ⭐ TAB CONTENT */}
@@ -110,12 +120,20 @@ function SettingsContent() {
           >
             <NotificationPreferences />
           </TabsContent>
+
+          {/* Privacy & Sharing Tab */}
+          <TabsContent
+            value="privacy"
+            className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300"
+          >
+            <PrivacySettings />
+          </TabsContent>
         </Tabs>
 
         {/* Keyboard Shortcuts Help */}
         <div className="mt-8 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-xs text-slate-600">
-            💡 <strong>Tip:</strong> Use <kbd className="px-1 py-0.5 bg-white border rounded text-xs">Cmd</kbd> + <kbd className="px-1 py-0.5 bg-white border rounded text-xs">1/2/3</kbd> to quickly switch between tabs
+            💡 <strong>Tip:</strong> Use <kbd className="px-1 py-0.5 bg-white border rounded text-xs">Cmd</kbd> + <kbd className="px-1 py-0.5 bg-white border rounded text-xs">1/2/3/4</kbd> to quickly switch between tabs
           </p>
         </div>
       </motion.div>

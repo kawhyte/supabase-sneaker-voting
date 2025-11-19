@@ -13,7 +13,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Archive } from "lucide-react";
+import { Archive, Pin } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { prepareItemPhotos, isItemOnSale, formatDate } from "@/lib/wardrobe-item-utils";
@@ -57,8 +57,10 @@ interface WardrobeItemCardProps {
 		onCreateOutfit?: (item: WardrobeItem) => void;
 		onRefreshPrice?: (itemId: string) => Promise<void>;
 		onManualEntrySuccess?: () => void;
+		onTogglePinned?: (item: WardrobeItem) => void; // Toggle pinned status (featured items)
 	};
 	isArchivePage?: boolean;
+	isReadOnly?: boolean; // NEW: If true, viewing someone else's item (hide edit/delete)
 	purchaseDate?: string | null;
 	userWardrobe?: WardrobeItem[];
 }
@@ -68,6 +70,7 @@ function WardrobeItemCardComponent({
 	viewMode = 'journal',
 	actions,
 	isArchivePage = false,
+	isReadOnly = false,
 	purchaseDate,
 	userWardrobe = [],
 }: WardrobeItemCardProps) {
@@ -98,12 +101,14 @@ function WardrobeItemCardComponent({
 					<ItemCardActions
 						item={item}
 						isArchivePage={isArchivePage}
+						isReadOnly={isReadOnly}
 						onEdit={actions.onEdit}
 						onDelete={actions.onDelete}
 						onUnarchive={actions.onUnarchive}
 						onMarkAsPurchased={actions.onMarkAsPurchased}
 						onMoveToWatchlist={actions.onMoveToWatchlist}
 						onArchive={actions.onArchive}
+						onTogglePinned={actions.onTogglePinned}
 					/>
 
 					{/* Archived Badge - Show when archived but not in archive view */}
@@ -112,6 +117,20 @@ function WardrobeItemCardComponent({
 							<Archive className='h-3 w-3' />
 							Archived
 						</div>
+					)}
+
+					{/* Pinned Indicator - Show when item is pinned to profile */}
+					{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
+						<Tooltip delayDuration={200}>
+							<TooltipTrigger asChild>
+								<div className='absolute top-2 left-2 z-40 p-1.5 rounded-full bg-sun-100 text-sun-600 shadow-sm hover:bg-sun-200 transition-colors cursor-help'>
+									<Pin className='h-3.5 w-3.5' />
+								</div>
+							</TooltipTrigger>
+							<TooltipContent side="right">
+								<p className="text-xs">Pinned to your profile</p>
+							</TooltipContent>
+						</Tooltip>
 					)}
 
 					{/* Image Section */}

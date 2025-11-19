@@ -41,12 +41,14 @@ interface WardrobeDashboardProps {
 	onAddNew?: () => void;
 	status: ItemStatus[];
 	isArchivePage?: boolean;
+	categoryFilter?: ItemCategory[]; // NEW: Filter by specific categories (e.g., ['shoes'] for The Rotation)
 }
 
 export function WardrobeDashboard({
 	onAddNew,
 	status = [ItemStatus.WISHLISTED],
 	isArchivePage = false,
+	categoryFilter,
 }: WardrobeDashboardProps) {
 	// State - Data
 	const [journalEntries, setJournalEntries] = useState<WardrobeItem[]>([]);
@@ -80,7 +82,7 @@ export function WardrobeDashboard({
 
 	useEffect(() => {
 		loadJournalEntries();
-	}, [status, isArchivePage]);
+	}, [status, isArchivePage, categoryFilter]);
 
 	const loadJournalEntries = async () => {
 		try {
@@ -94,6 +96,11 @@ export function WardrobeDashboard({
 				.in("status", status)
 				.order("image_order", { foreignTable: "item_photos", ascending: true });
 
+			// Apply category filter if provided (for shoe-first tabs)
+			if (categoryFilter && categoryFilter.length > 0) {
+				query = query.in("category", categoryFilter);
+			}
+
 			let { data, error } = await query.order("created_at", {
 				ascending: false,
 			});
@@ -104,6 +111,12 @@ export function WardrobeDashboard({
 					.select(`*, brands (id, name, brand_logo)`)
 					.eq("is_archived", isArchivePage)
 					.in("status", status);
+
+				// Apply category filter to fallback query as well
+				if (categoryFilter && categoryFilter.length > 0) {
+					basicQuery = basicQuery.in("category", categoryFilter);
+				}
+
 				const basicResult = await basicQuery.order("created_at", {
 					ascending: false,
 				});
