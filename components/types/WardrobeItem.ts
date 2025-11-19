@@ -60,4 +60,7 @@ export interface WardrobeItem {
   auto_price_tracking_enabled?: boolean
   price_check_failures?: number | null
   last_price_check_at?: string | null
+
+  // Sharing (Partner Model)
+  is_shared?: boolean
 }

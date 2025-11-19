@@ -23,6 +23,8 @@ import {
 	Bookmark,
 	ShoppingBag,
 	Archive,
+	Users,
+	Lock,
 } from "lucide-react";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { ItemStatus } from '@/types/ItemStatus';
@@ -30,23 +32,27 @@ import { ItemStatus } from '@/types/ItemStatus';
 interface ItemCardActionsProps {
 	item: WardrobeItem;
 	isArchivePage: boolean;
+	isReadOnly?: boolean; // NEW: If true, hide destructive/edit actions
 	onEdit: (item: WardrobeItem) => void;
 	onDelete: (item: WardrobeItem) => void;
 	onUnarchive?: (item: WardrobeItem) => void;
 	onMarkAsPurchased?: (item: WardrobeItem) => void;
 	onMoveToWatchlist?: (item: WardrobeItem) => void;
 	onArchive?: (item: WardrobeItem) => void;
+	onToggleSharing?: (item: WardrobeItem) => void; // NEW: Toggle is_shared status
 }
 
 export function ItemCardActions({
 	item,
 	isArchivePage,
+	isReadOnly = false,
 	onEdit,
 	onDelete,
 	onUnarchive,
 	onMarkAsPurchased,
 	onMoveToWatchlist,
 	onArchive,
+	onToggleSharing,
 }: ItemCardActionsProps) {
 	const isWishlisted = item.status === ItemStatus.WISHLISTED;
 	const isOwned = item.status === ItemStatus.OWNED;
@@ -66,7 +72,7 @@ export function ItemCardActions({
 					{isArchivePage ? (
 						// Archive page actions
 						<>
-							{onUnarchive && (
+							{!isReadOnly && onUnarchive && (
 								<DropdownMenuItem
 									onSelect={() => onUnarchive(item)}
 									className='cursor-pointer'>
@@ -75,17 +81,38 @@ export function ItemCardActions({
 								</DropdownMenuItem>
 							)}
 
-							<DropdownMenuItem
-								onSelect={() => onDelete(item)}
-								className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
-								<Trash2 className='h-3 w-3 mr-2' />
-								Delete Permanently
-							</DropdownMenuItem>
+							{!isReadOnly && (
+								<DropdownMenuItem
+									onSelect={() => onDelete(item)}
+									className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
+									<Trash2 className='h-3 w-3 mr-2' />
+									Delete Permanently
+								</DropdownMenuItem>
+							)}
 						</>
 					) : (
 						// Normal actions
 						<>
-							{isWishlisted && onMarkAsPurchased && (
+							{/* Sharing Controls - Only show if not read-only and callback exists */}
+							{!isReadOnly && onToggleSharing && (
+								<DropdownMenuItem
+									onSelect={() => onToggleSharing(item)}
+									className='cursor-pointer'>
+									{item.is_shared ? (
+										<>
+											<Lock className='h-3 w-3 mr-2' />
+											Make Private
+										</>
+									) : (
+										<>
+											<Users className='h-3 w-3 mr-2' />
+											Share with Partner
+										</>
+									)}
+								</DropdownMenuItem>
+							)}
+
+							{!isReadOnly && isWishlisted && onMarkAsPurchased && (
 								<DropdownMenuItem
 									onSelect={() => onMarkAsPurchased(item)}
 									className='cursor-pointer'>
@@ -94,7 +121,7 @@ export function ItemCardActions({
 								</DropdownMenuItem>
 							)}
 
-							{isOwned && onMoveToWatchlist && (
+							{!isReadOnly && isOwned && onMoveToWatchlist && (
 								<DropdownMenuItem
 									onSelect={() => onMoveToWatchlist(item)}
 									className='cursor-pointer'>
@@ -103,14 +130,16 @@ export function ItemCardActions({
 								</DropdownMenuItem>
 							)}
 
-							<DropdownMenuItem
-								onSelect={() => onEdit(item)}
-								className='cursor-pointer'>
-								<Edit className='h-3 w-3 mr-2' />
-								Edit
-							</DropdownMenuItem>
+							{!isReadOnly && (
+								<DropdownMenuItem
+									onSelect={() => onEdit(item)}
+									className='cursor-pointer'>
+									<Edit className='h-3 w-3 mr-2' />
+									Edit
+								</DropdownMenuItem>
+							)}
 
-							{onArchive && (
+							{!isReadOnly && onArchive && (
 								<DropdownMenuItem
 									onSelect={() => onArchive(item)}
 									className='cursor-pointer'>
@@ -119,12 +148,14 @@ export function ItemCardActions({
 								</DropdownMenuItem>
 							)}
 
-							<DropdownMenuItem
-								onSelect={() => onDelete(item)}
-								className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
-								<Trash2 className='h-3 w-3 mr-2' />
-								Delete...
-							</DropdownMenuItem>
+							{!isReadOnly && (
+								<DropdownMenuItem
+									onSelect={() => onDelete(item)}
+									className='cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50'>
+									<Trash2 className='h-3 w-3 mr-2' />
+									Delete...
+								</DropdownMenuItem>
+							)}
 						</>
 					)}
 				</DropdownMenuContent>

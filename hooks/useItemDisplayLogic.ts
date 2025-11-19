@@ -30,6 +30,7 @@ export interface ItemDisplayLogic {
 	isOwned: boolean;
 	isWishlist: boolean;
 	isOnSale: boolean;
+	isShared: boolean;
 }
 
 /**
@@ -58,10 +59,12 @@ export function useItemDisplayLogic(item: WardrobeItem): ItemDisplayLogic {
 		item.retail_price &&
 		item.sale_price < item.retail_price
 	);
+	const isShared = item.is_shared === true;
 
 	return {
 		isOwned,
 		isWishlist,
 		isOnSale,
+		isShared,
 	};
 }
