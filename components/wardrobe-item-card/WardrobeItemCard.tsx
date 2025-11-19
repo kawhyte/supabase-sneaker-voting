@@ -13,7 +13,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Archive, Users } from "lucide-react";
+import { Archive, Pin } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { prepareItemPhotos, isItemOnSale, formatDate } from "@/lib/wardrobe-item-utils";
@@ -57,7 +57,7 @@ interface WardrobeItemCardProps {
 		onCreateOutfit?: (item: WardrobeItem) => void;
 		onRefreshPrice?: (itemId: string) => Promise<void>;
 		onManualEntrySuccess?: () => void;
-		onToggleSharing?: (item: WardrobeItem) => void; // NEW: Toggle sharing status
+		onTogglePinned?: (item: WardrobeItem) => void; // Toggle pinned status (featured items)
 	};
 	isArchivePage?: boolean;
 	isReadOnly?: boolean; // NEW: If true, viewing someone else's item (hide edit/delete)
@@ -108,7 +108,7 @@ function WardrobeItemCardComponent({
 						onMarkAsPurchased={actions.onMarkAsPurchased}
 						onMoveToWatchlist={actions.onMoveToWatchlist}
 						onArchive={actions.onArchive}
-						onToggleSharing={actions.onToggleSharing}
+						onTogglePinned={actions.onTogglePinned}
 					/>
 
 					{/* Archived Badge - Show when archived but not in archive view */}
@@ -119,16 +119,16 @@ function WardrobeItemCardComponent({
 						</div>
 					)}
 
-					{/* Shared Indicator - Show when item is shared with partner */}
-					{!isReadOnly && displayLogic.isShared && !item.is_archived && (
+					{/* Pinned Indicator - Show when item is pinned to profile */}
+					{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
 						<Tooltip delayDuration={200}>
 							<TooltipTrigger asChild>
-								<div className='absolute top-2 left-2 z-40 p-1.5 rounded-full bg-blue-100 text-blue-600 shadow-sm hover:bg-blue-200 transition-colors cursor-help'>
-									<Users className='h-3.5 w-3.5' />
+								<div className='absolute top-2 left-2 z-40 p-1.5 rounded-full bg-sun-100 text-sun-600 shadow-sm hover:bg-sun-200 transition-colors cursor-help'>
+									<Pin className='h-3.5 w-3.5' />
 								</div>
 							</TooltipTrigger>
 							<TooltipContent side="right">
-								<p className="text-xs">Shared with your partner</p>
+								<p className="text-xs">Pinned to your profile</p>
 							</TooltipContent>
 						</Tooltip>
 					)}

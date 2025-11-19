@@ -23,8 +23,8 @@ import {
 	Bookmark,
 	ShoppingBag,
 	Archive,
-	Users,
-	Lock,
+	Pin,
+	PinOff,
 } from "lucide-react";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { ItemStatus } from '@/types/ItemStatus';
@@ -32,14 +32,14 @@ import { ItemStatus } from '@/types/ItemStatus';
 interface ItemCardActionsProps {
 	item: WardrobeItem;
 	isArchivePage: boolean;
-	isReadOnly?: boolean; // NEW: If true, hide destructive/edit actions
+	isReadOnly?: boolean; // If true, hide destructive/edit actions
 	onEdit: (item: WardrobeItem) => void;
 	onDelete: (item: WardrobeItem) => void;
 	onUnarchive?: (item: WardrobeItem) => void;
 	onMarkAsPurchased?: (item: WardrobeItem) => void;
 	onMoveToWatchlist?: (item: WardrobeItem) => void;
 	onArchive?: (item: WardrobeItem) => void;
-	onToggleSharing?: (item: WardrobeItem) => void; // NEW: Toggle is_shared status
+	onTogglePinned?: (item: WardrobeItem) => void; // Toggle is_pinned status (featured items)
 }
 
 export function ItemCardActions({
@@ -52,7 +52,7 @@ export function ItemCardActions({
 	onMarkAsPurchased,
 	onMoveToWatchlist,
 	onArchive,
-	onToggleSharing,
+	onTogglePinned,
 }: ItemCardActionsProps) {
 	const isWishlisted = item.status === ItemStatus.WISHLISTED;
 	const isOwned = item.status === ItemStatus.OWNED;
@@ -93,20 +93,20 @@ export function ItemCardActions({
 					) : (
 						// Normal actions
 						<>
-							{/* Sharing Controls - Only show if not read-only and callback exists */}
-							{!isReadOnly && onToggleSharing && (
+							{/* Pin Controls - Only show for wishlist items if not read-only */}
+							{!isReadOnly && isWishlisted && onTogglePinned && (
 								<DropdownMenuItem
-									onSelect={() => onToggleSharing(item)}
+									onSelect={() => onTogglePinned(item)}
 									className='cursor-pointer'>
-									{item.is_shared ? (
+									{item.is_pinned ? (
 										<>
-											<Lock className='h-3 w-3 mr-2' />
-											Make Private
+											<PinOff className='h-3 w-3 mr-2' />
+											Unpin from Profile
 										</>
 									) : (
 										<>
-											<Users className='h-3 w-3 mr-2' />
-											Share with Partner
+											<Pin className='h-3 w-3 mr-2' />
+											Pin to Profile
 										</>
 									)}
 								</DropdownMenuItem>

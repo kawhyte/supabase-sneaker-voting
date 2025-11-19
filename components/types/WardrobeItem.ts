@@ -61,6 +61,6 @@ export interface WardrobeItem {
   price_check_failures?: number | null
   last_price_check_at?: string | null
 
-  // Sharing (Partner Model)
-  is_shared?: boolean
+  // Social Sharing (Pinned to Profile)
+  is_pinned?: boolean // Featured items on user's public profile
 }
