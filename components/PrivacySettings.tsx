@@ -31,7 +31,7 @@ export function PrivacySettings() {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('wishlist_privacy, follower_count, following_count')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single()
 
         if (error) throw error
@@ -72,7 +72,7 @@ export function PrivacySettings() {
       const { error } = await supabase
         .from('profiles')
         .update({ wishlist_privacy: wishlistPrivacy })
-        .eq('user_id', user.id)
+        .eq('id', user.id)
 
       if (error) throw error
 
