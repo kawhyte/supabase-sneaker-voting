@@ -123,11 +123,11 @@ function DashboardContent() {
             </Button>
           </Link>
 
-          {/* Sharing Settings Button - Secondary Action */}
-          <Link href="/sharing-settings">
+          {/* Privacy Settings Button - Secondary Action */}
+          <Link href="/profile#privacy">
             <Button variant="outline" className='flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:shadow-sm motion-safe:hover:scale-105 will-change-transform'>
               <Users className='h-4 w-4' />
-              Sharing
+              Privacy
             </Button>
           </Link>
 
