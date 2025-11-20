@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     // Step 1: Get users with public wishlists
     const { data: publicProfiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id, display_name, username, avatar_url, follower_count, following_count')
+      .select('id, display_name, avatar_url, follower_count, following_count')
       .eq('wishlist_privacy', 'public')
       .neq('id', user.id) // Exclude current user
       .order('follower_count', { ascending: false }) // Sort by popularity
@@ -95,11 +95,10 @@ export async function GET(request: NextRequest) {
     // Step 4: Get preview items for each user (4 items per user)
     const { data: previewItems, error: itemsError } = await supabase
       .from('items')
-      .select('id, user_id, brand, model, item_photos(photo_url)')
+      .select('id, user_id, brand, model, item_photos(image_url)')
       .eq('status', 'wishlisted')
       .eq('is_archived', false)
       .in('user_id', userIds)
-      .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false });
 
     if (itemsError) {
@@ -131,7 +130,7 @@ export async function GET(request: NextRequest) {
       return {
         user_id: profile.id,
         display_name: profile.display_name,
-        username: profile.username,
+        username: null, // Username column not yet added to profiles table
         avatar_url: profile.avatar_url,
         follower_count: profile.follower_count || 0,
         following_count: profile.following_count || 0,
@@ -139,7 +138,7 @@ export async function GET(request: NextRequest) {
         preview_items: items.map((item) => ({
           id: item.id,
           photo_url: Array.isArray(item.item_photos) && item.item_photos.length > 0
-            ? item.item_photos[0].photo_url
+            ? item.item_photos[0].image_url
             : null,
           brand: item.brand,
           model: item.model,
