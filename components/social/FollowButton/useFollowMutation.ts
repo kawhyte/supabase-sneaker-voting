@@ -13,6 +13,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { trackEvent, AnalyticsEvent } from '@/lib/analytics';
 import type { FollowActionSource, FollowMutationResponse } from './types';
 
 interface UseFollowMutationParams {
@@ -98,11 +99,14 @@ export function useFollowMutation({
       // Callback
       onFollowChange?.(data.isFollowing);
 
-      // Analytics tracking (optional - can be implemented later in Phase 6)
-      // trackFollowEvent(newFollowState ? 'follow_user' : 'unfollow_user', {
-      //   target_user_id: targetUserId,
-      //   source,
-      // });
+      // Analytics tracking
+      trackEvent(
+        data.isFollowing ? AnalyticsEvent.FOLLOW_USER : AnalyticsEvent.UNFOLLOW_USER,
+        {
+          target_user_id: targetUserId,
+          source,
+        }
+      );
 
     } catch (error) {
       console.error('Error toggling follow:', error);

@@ -77,6 +77,17 @@ export enum AnalyticsEvent {
   ONBOARDING_COMPLETED = 'onboarding_completed',
   TUTORIAL_VIEWED = 'tutorial_viewed',
 
+  // Social Features
+  FOLLOW_USER = 'follow_user',
+  UNFOLLOW_USER = 'unfollow_user',
+  PUBLIC_PROFILE_VIEWED = 'public_profile_viewed',
+  ITEM_PINNED = 'item_pinned',
+  ITEM_UNPINNED = 'item_unpinned',
+  EXPLORE_PAGE_VIEWED = 'explore_page_viewed',
+  EXPLORE_USER_CARD_CLICKED = 'explore_user_card_clicked',
+  FOLLOWERS_MODAL_OPENED = 'followers_modal_opened',
+  FOLLOWING_MODAL_OPENED = 'following_modal_opened',
+
   // Error Tracking
   ERROR_OCCURRED = 'error_occurred',
   CIRCUIT_BREAKER_OPENED = 'circuit_breaker_opened',
@@ -220,6 +231,7 @@ class Analytics {
     if (event.startsWith('photo_')) return 'photos'
     if (event.startsWith('price_') || event.startsWith('product_')) return 'wishlist'
     if (event.startsWith('quiz_')) return 'purchase_prevention'
+    if (event.startsWith('follow_') || event.startsWith('unfollow_') || event.startsWith('explore_') || event.includes('_profile_') || event.includes('_modal_')) return 'social'
     if (event.endsWith('_viewed') || event.includes('dashboard')) return 'navigation'
     if (event.startsWith('filter_') || event.includes('search') || event.includes('sort')) return 'search'
     if (event.includes('sign_') || event.includes('logged_')) return 'authentication'

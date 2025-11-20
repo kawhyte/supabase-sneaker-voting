@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
 import { WardrobeItem } from "@/components/types/WardrobeItem";
 import { ProfileHeader } from "./ProfileHeader";
 import { ProfileStats } from "./ProfileStats";
 import { WishlistSection } from "./WishlistSection";
 import { EmptyWishlist } from "./EmptyWishlist";
 import { FollowButton } from "@/components/social/FollowButton";
+import { trackEvent, AnalyticsEvent } from "@/lib/analytics";
 
 interface PublicProfileData {
   profile: {
@@ -28,6 +30,18 @@ interface PublicProfileViewProps {
 
 export function PublicProfileView({ data }: PublicProfileViewProps) {
   const { profile, items, canView, reason, isFollowing, isOwnProfile } = data;
+
+  // Track profile view on mount
+  useEffect(() => {
+    if (!isOwnProfile) {
+      trackEvent(AnalyticsEvent.PUBLIC_PROFILE_VIEWED, {
+        profile_user_id: profile.id,
+        can_view: canView,
+        privacy_reason: reason,
+        item_count: items.length,
+      });
+    }
+  }, [profile.id, canView, reason, items.length, isOwnProfile]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

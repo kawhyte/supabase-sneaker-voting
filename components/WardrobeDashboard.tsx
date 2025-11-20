@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Search, RefreshCw } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
+import { trackEvent, AnalyticsEvent } from "@/lib/analytics";
 import { DashboardGrid } from "./DashboardGrid";
 import { EditItemModal } from "./EditItemModal";
 import { WardrobeFilters } from "./WardrobeFilters";
@@ -765,6 +766,16 @@ export function WardrobeDashboard({
 				description: `${item.brand} ${item.model}`,
 				duration: 3000,
 			});
+
+			// Analytics tracking
+			trackEvent(
+				newPinnedStatus ? AnalyticsEvent.ITEM_PINNED : AnalyticsEvent.ITEM_UNPINNED,
+				{
+					item_id: item.id,
+					brand: item.brand,
+					category: item.category,
+				}
+			);
 		} catch (error) {
 			console.error('Error toggling pin status:', error);
 			// Revert optimistic update

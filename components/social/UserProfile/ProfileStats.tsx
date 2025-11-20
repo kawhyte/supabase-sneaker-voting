@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FollowersDrawer } from "@/components/social/FollowersDrawer";
 import type { DrawerMode } from "@/components/social/FollowersDrawer";
+import { trackEvent, AnalyticsEvent } from "@/lib/analytics";
 
 interface ProfileStatsProps {
   userId: string;
@@ -23,11 +24,19 @@ export function ProfileStats({
   const openFollowersDrawer = () => {
     setDrawerMode("followers");
     setDrawerOpen(true);
+    trackEvent(AnalyticsEvent.FOLLOWERS_MODAL_OPENED, {
+      profile_user_id: userId,
+      follower_count: followerCount,
+    });
   };
 
   const openFollowingDrawer = () => {
     setDrawerMode("following");
     setDrawerOpen(true);
+    trackEvent(AnalyticsEvent.FOLLOWING_MODAL_OPENED, {
+      profile_user_id: userId,
+      following_count: followingCount,
+    });
   };
 
   const stats = [

@@ -5,6 +5,7 @@ import { UserPreviewCard } from './UserPreviewCard';
 import { EmptyExplore } from './EmptyExplore';
 import { ExploreUser, ExploreResponse } from './types';
 import { Loader2 } from 'lucide-react';
+import { trackEvent, AnalyticsEvent } from '@/lib/analytics';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -59,6 +60,15 @@ export function ExploreGrid() {
   useEffect(() => {
     fetchUsers(0, false);
   }, [fetchUsers]);
+
+  // Track explore page view when users are loaded
+  useEffect(() => {
+    if (!loading && users.length > 0) {
+      trackEvent(AnalyticsEvent.EXPLORE_PAGE_VIEWED, {
+        user_count_shown: users.length,
+      });
+    }
+  }, [loading, users.length]);
 
   // Infinite scroll - load more when last user is visible
   useEffect(() => {
