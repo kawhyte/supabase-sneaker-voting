@@ -41,6 +41,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
 
       {/* Profile Stats */}
       <ProfileStats
+        userId={profile.id}
         followerCount={profile.follower_count || 0}
         followingCount={profile.following_count || 0}
         wishlistCount={items.length}
