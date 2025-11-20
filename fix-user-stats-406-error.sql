@@ -120,7 +120,7 @@ BEGIN
       last_notification_at = NOW(),
       updated_at = NOW();
     RETURN NEW;
-  END IF
+  END IF;
 
   -- Decrement on UPDATE (marked as read)
   IF TG_OP = 'UPDATE' AND OLD.is_read = FALSE AND NEW.is_read = TRUE THEN
