@@ -245,12 +245,13 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
             // DEFENSE LAYER 3: Gracefully handle 409 Conflict (duplicate key)
             // This is expected behavior when multiple tabs/sessions unlock simultaneously
             if (insertError.code === '23505') {
-              // Duplicate key constraint - silently update state and continue
+              console.log(`Achievement already unlocked: ${achievement.name}`)
+              // Duplicate key constraint - update state and continue
               setUnlockedIds((prev) => new Set(prev).add(achievement.id))
               continue
             }
 
-            // Log unexpected errors
+            // Log other errors for debugging
             console.error('Error unlocking achievement:', {
               achievementId: achievement.id,
               achievementName: achievement.name,
