@@ -46,15 +46,15 @@ export async function GET(request: NextRequest) {
     const { data: following, error: followingError } = await supabase
       .from('followers')
       .select(`
-        following_id,
+        following_user_id,
         created_at,
-        following_profile:profiles!followers_following_id_fkey (
+        following_profile:profiles!followers_following_user_id_fkey (
           id,
           display_name,
           avatar_url
         )
       `)
-      .eq('follower_id', targetUserId)
+      .eq('follower_user_id', targetUserId)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
@@ -69,15 +69,15 @@ export async function GET(request: NextRequest) {
     // For each followed user, check if current user is following them
     const followingWithStatus = await Promise.all(
       (following || []).map(async (followed: any) => {
-        const followedId = followed.following_id
+        const followedId = followed.following_user_id
         const profile = followed.following_profile
 
         // Check if current user is following this user
         const { data: followStatus } = await supabase
           .from('followers')
           .select('id')
-          .eq('follower_id', user.id)
-          .eq('following_id', followedId)
+          .eq('follower_user_id', user.id)
+          .eq('following_user_id', followedId)
           .maybeSingle()
 
         return {
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
     const { count, error: countError } = await supabase
       .from('followers')
       .select('*', { count: 'exact', head: true })
-      .eq('follower_id', targetUserId)
+      .eq('follower_user_id', targetUserId)
 
     if (countError) {
       console.error('Error counting following:', countError)
