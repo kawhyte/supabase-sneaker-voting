@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     // Step 1: Get users with public wishlists
     const { data: publicProfiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id, display_name, username, avatar_url, follower_count, following_count')
+      .select('id, display_name, avatar_url, follower_count, following_count')
       .eq('wishlist_privacy', 'public')
       .neq('id', user.id) // Exclude current user
       .order('follower_count', { ascending: false }) // Sort by popularity
@@ -99,7 +99,6 @@ export async function GET(request: NextRequest) {
       .eq('status', 'wishlisted')
       .eq('is_archived', false)
       .in('user_id', userIds)
-      .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false });
 
     if (itemsError) {
@@ -131,7 +130,7 @@ export async function GET(request: NextRequest) {
       return {
         user_id: profile.id,
         display_name: profile.display_name,
-        username: profile.username,
+        username: null, // Username column not yet added to profiles table
         avatar_url: profile.avatar_url,
         follower_count: profile.follower_count || 0,
         following_count: profile.following_count || 0,
