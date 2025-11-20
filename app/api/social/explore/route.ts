@@ -81,16 +81,16 @@ export async function GET(request: NextRequest) {
 
     const { data: followData, error: followError } = await supabase
       .from('followers')
-      .select('following_id')
-      .eq('follower_id', user.id)
-      .in('following_id', userIds);
+      .select('following_user_id')
+      .eq('follower_user_id', user.id)
+      .in('following_user_id', userIds);
 
     if (followError) {
       console.error('Error fetching follow status:', followError);
       // Continue even if follow status fails
     }
 
-    const followingIds = new Set(followData?.map((f) => f.following_id) || []);
+    const followingIds = new Set(followData?.map((f) => f.following_user_id) || []);
 
     // Step 4: Get preview items for each user (4 items per user)
     const { data: previewItems, error: itemsError } = await supabase
