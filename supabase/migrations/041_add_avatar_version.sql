@@ -10,12 +10,22 @@
 
 BEGIN;
 
--- Step 1: Add avatar_version column with default value
-ALTER TABLE public.profiles
-  ADD COLUMN avatar_version integer DEFAULT 1 NOT NULL;
+-- Step 1: Add avatar_version column with default value (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'profiles'
+    AND column_name = 'avatar_version'
+  ) THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN avatar_version integer DEFAULT 1 NOT NULL;
+  END IF;
+END $$;
 
--- Step 2: Create index for faster lookups (optional, but good practice)
-CREATE INDEX idx_profiles_avatar_version
+-- Step 2: Create index for faster lookups (idempotent)
+CREATE INDEX IF NOT EXISTS idx_profiles_avatar_version
   ON public.profiles(avatar_version);
 
 -- Step 3: Create function to auto-increment version on avatar change
