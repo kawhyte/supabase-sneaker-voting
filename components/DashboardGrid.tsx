@@ -24,6 +24,7 @@ interface DashboardGridProps {
 	onCreateOutfit?: (entry: WardrobeItem) => void;
 	onRefreshPrice?: (itemId: string) => Promise<void>;
 	onManualEntrySuccess?: () => void;
+	onTogglePinned?: (entry: WardrobeItem) => void;
 	emptyState?: ReactNode;
 	viewMode?: "journal" | "collection" | "archive" | "wishlist";
 	isArchivePage?: boolean;
@@ -42,6 +43,7 @@ export function DashboardGrid({
 	onCreateOutfit,
 	onRefreshPrice,
 	onManualEntrySuccess,
+	onTogglePinned,
 	emptyState,
 	viewMode = "journal",
 	isArchivePage = false,
@@ -75,6 +77,7 @@ export function DashboardGrid({
 					onCreateOutfit={onCreateOutfit}
 					onRefreshPrice={onRefreshPrice}
 					onManualEntrySuccess={onManualEntrySuccess}
+					onTogglePinned={onTogglePinned}
 					isArchivePage={isArchivePage}
 					userWardrobe={userWardrobe}
 				/>

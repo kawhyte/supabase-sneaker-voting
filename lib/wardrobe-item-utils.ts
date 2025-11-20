@@ -326,6 +326,15 @@ export function sortJournalEntries(
 	sortBy: string
 ): WardrobeItem[] {
 	return [...entries].sort((a, b) => {
+		// Always sort pinned items first
+		const aPinned = a.is_pinned ? 1 : 0;
+		const bPinned = b.is_pinned ? 1 : 0;
+
+		if (aPinned !== bPinned) {
+			return bPinned - aPinned; // Pinned items first
+		}
+
+		// Then apply the requested sort order
 		switch (sortBy) {
 			case 'date-desc':
 				return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()

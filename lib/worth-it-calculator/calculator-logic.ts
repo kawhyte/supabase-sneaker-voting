@@ -299,7 +299,7 @@ export function getSeasonalContext(category: ItemCategory): { message: string | 
     };
   }
 
-  if ((category === 'sneakers' || category === 'shoes') && isWinter && month === 11) {
+  if (category === 'shoes' && isWinter && month === 11) {
     return {
       message: "❄️ Tip: Winter weather may limit wear frequency. Consider if this is weather-appropriate for the season ahead.",
     };

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from "@/components/ui/button";
 import { WardrobeDashboard } from '@/components/WardrobeDashboard'
 import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
-import { Footprints, Shirt, Heart, Sparkles, Archive, Plus, Users } from 'lucide-react'
+import { Footprints, Shirt, Heart, Sparkles, Archive, Plus } from 'lucide-react'
 import { ItemStatus } from '@/types/ItemStatus'
 import { DashboardHeader } from '@/components/DashboardHeader'
 import Link from 'next/link'
@@ -120,14 +120,6 @@ function DashboardContent() {
             <Button variant="outline" className='flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:shadow-sm motion-safe:hover:scale-105 will-change-transform'>
               <Archive className='h-4 w-4' />
               Archive
-            </Button>
-          </Link>
-
-          {/* Privacy Settings Button - Secondary Action */}
-          <Link href="/profile#privacy">
-            <Button variant="outline" className='flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:shadow-sm motion-safe:hover:scale-105 will-change-transform'>
-              <Users className='h-4 w-4' />
-              Privacy
             </Button>
           </Link>
 

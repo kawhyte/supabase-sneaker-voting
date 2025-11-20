@@ -726,6 +726,53 @@ export function WardrobeDashboard({
 		}
 	};
 
+	const handleTogglePinned = async (item: WardrobeItem) => {
+		try {
+			// Optimistic update
+			const newPinnedStatus = !item.is_pinned;
+			setJournalEntries((prev) =>
+				prev.map((entry) =>
+					entry.id === item.id
+						? { ...entry, is_pinned: newPinnedStatus }
+						: entry
+				)
+			);
+
+			const response = await fetch(`/api/items/${item.id}/toggle-pin`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+			});
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				// Revert optimistic update on error
+				setJournalEntries((prev) =>
+					prev.map((entry) =>
+						entry.id === item.id
+							? { ...entry, is_pinned: !newPinnedStatus }
+							: entry
+					)
+				);
+
+				toast.error(data.error || 'Failed to update pin status', {
+					duration: 4000,
+				});
+				return;
+			}
+
+			toast.success(data.message, {
+				description: `${item.brand} ${item.model}`,
+				duration: 3000,
+			});
+		} catch (error) {
+			console.error('Error toggling pin status:', error);
+			// Revert optimistic update
+			loadJournalEntries();
+			toast.error('Failed to update pin status');
+		}
+	};
+
 	// Computed values
 	const filteredAndSortedEntries = sortJournalEntries(
 		filterJournalEntries(
@@ -821,6 +868,7 @@ export function WardrobeDashboard({
 				onCreateOutfit={() => setIsOutfitStudioOpen(true)}
 				onRefreshPrice={handleRefreshPrice}
 				onManualEntrySuccess={loadJournalEntries}
+				onTogglePinned={handleTogglePinned}
 				userWardrobe={journalEntries.filter(
 					(e) => e.status === ItemStatus.OWNED
 				)}
