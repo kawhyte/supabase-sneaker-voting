@@ -52,6 +52,11 @@ async function fetchProfileData(targetUserId: string) {
           image_url,
           image_order,
           is_main_image
+        ),
+        brands (
+          id,
+          name,
+          brand_logo
         )
       `)
       .eq("user_id", targetUserId)
@@ -100,6 +105,11 @@ async function fetchProfileData(targetUserId: string) {
           image_url,
           image_order,
           is_main_image
+        ),
+        brands (
+          id,
+          name,
+          brand_logo
         )
       `)
       .eq("user_id", targetUserId)
@@ -166,6 +176,11 @@ async function fetchProfileData(targetUserId: string) {
           image_url,
           image_order,
           is_main_image
+        ),
+        brands (
+          id,
+          name,
+          brand_logo
         )
       `)
       .eq("user_id", targetUserId)
