@@ -92,8 +92,8 @@ function WardrobeItemCardComponent({
 	// Public view: Hide personal info (dates, notes, store, size, wears)
 	const isPublicView = isReadOnly && viewMode === 'wishlist';
 	const showDates = density === 'detailed' && !isPublicView;
-	const showNotes = density !== 'compact' && !isPublicView && viewMode !== 'wishlist'; // Hide notes on wishlist cards (shown in drawer)
-	const showStore = density !== 'compact' && !isPublicView;
+	const showNotes = density !== 'list' && !isPublicView && viewMode !== 'wishlist'; // Hide notes on wishlist cards (shown in drawer); list view shows in expansion
+	const showStore = density !== 'list' && !isPublicView;
 	const showSizeAndWears = !isPublicView && viewMode !== 'wishlist'; // Hide on wishlist cards (shown in drawer)
 
 	return (

@@ -1,15 +1,20 @@
 /**
- * View Density Context - Manages grid density preference
+ * View Density Context - Manages grid/list density preference
  *
  * Persists to localStorage for cross-session consistency
  * Provides global access via useDensity() hook
+ *
+ * View Modes:
+ * - comfortable: 3-4 cards per row (grid) - DEFAULT
+ * - detailed: 2-3 cards per row (grid)
+ * - list: Horizontal rows (list/table view)
  */
 
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-export type ViewDensity = "compact" | "comfortable" | "detailed";
+export type ViewDensity = "comfortable" | "detailed" | "list";
 
 interface ViewDensityContextType {
 	density: ViewDensity;
@@ -36,9 +41,13 @@ export function ViewDensityProvider({
 	// Load from localStorage on mount
 	useEffect(() => {
 		try {
-			const stored = localStorage.getItem(STORAGE_KEY) as ViewDensity | null;
-			if (stored && ["compact", "comfortable", "detailed"].includes(stored)) {
-				setDensityState(stored);
+			const stored = localStorage.getItem(STORAGE_KEY);
+			if (stored && ["comfortable", "detailed", "list"].includes(stored)) {
+				setDensityState(stored as ViewDensity);
+			} else if (stored === "compact") {
+				// Migrate old "compact" preference to "comfortable"
+				setDensityState("comfortable");
+				localStorage.setItem(STORAGE_KEY, "comfortable");
 			}
 		} catch (error) {
 			console.warn("Failed to read density from localStorage:", error);
@@ -76,15 +85,16 @@ export function useDensity(): ViewDensityContextType {
 
 /**
  * Get grid classes based on density
+ * Note: "list" density doesn't use grid - it returns empty string
  */
 export function getDensityGridClasses(density: ViewDensity): string {
 	switch (density) {
-		case "compact":
-			return "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-3";
 		case "comfortable":
 			return "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4";
 		case "detailed":
 			return "grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6";
+		case "list":
+			return ""; // List view doesn't use grid layout
 	}
 }
 
@@ -95,11 +105,11 @@ export function getDensityImageAspect(
 	density: ViewDensity
 ): "square" | "portrait" | "landscape" {
 	switch (density) {
-		case "compact":
-			return "square"; // 1:1
 		case "comfortable":
 			return "portrait"; // 3:4
 		case "detailed":
 			return "landscape"; // 4:3
+		case "list":
+			return "square"; // 1:1 for list thumbnails
 	}
 }
