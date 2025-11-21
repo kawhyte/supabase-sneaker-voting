@@ -112,7 +112,7 @@ export function ItemPricingDisplay({
 			{!isPublicView && (
 				useDrawer ? (
 					// COMPACT MODE: Show badge + View Details button
-					<div className='flex flex-col gap-2'>
+					<div className='flex flex-col gap-3 gap-y-4'>
 						<PriceStatusBadge
 							lastPriceCheckAt={item.last_price_check_at || null}
 							isAutoTrackingEnabled={item.auto_price_tracking_enabled !== false}

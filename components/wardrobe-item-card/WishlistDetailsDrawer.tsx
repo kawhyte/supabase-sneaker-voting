@@ -11,7 +11,7 @@
 "use client";
 
 import { useState } from "react";
-import { RefreshCw, Edit3, ShoppingBag, Archive, AlertCircle } from "lucide-react";
+import { RefreshCw, Edit3, ShoppingBag, Archive, AlertCircle, XCircle, CheckCircle2 } from "lucide-react";
 import {
 	Sheet,
 	SheetContent,
@@ -63,45 +63,50 @@ export function WishlistDetailsDrawer({
 	const getStatusInfo = () => {
 		if (isTrackingDisabled) {
 			return {
+				Icon: XCircle,
 				text: 'Tracking disabled',
 				description: 'Price tracking has been disabled due to repeated check failures.',
 				color: 'text-red-700',
+				iconColor: 'text-red-600',
 				bgColor: 'bg-red-50',
 				borderColor: 'border-red-200',
-				icon: '🔴',
 			};
 		}
 		if (!item.last_price_check_at) {
 			return {
+				Icon: AlertCircle,
 				text: 'Price not checked',
 				description: 'Price has never been checked. Click "Check Price" to get the latest price.',
 				color: 'text-amber-700',
+				iconColor: 'text-amber-600',
 				bgColor: 'bg-amber-50',
 				borderColor: 'border-amber-200',
-				icon: '🟡',
 			};
 		}
 		if (isStale) {
 			return {
+				Icon: AlertCircle,
 				text: `Last checked ${daysSince} ${daysSince === 1 ? 'day' : 'days'} ago`,
 				description: `Price data is ${daysSince} days old and may not reflect current prices.`,
 				color: 'text-amber-700',
+				iconColor: 'text-amber-600',
 				bgColor: 'bg-amber-50',
 				borderColor: 'border-amber-200',
-				icon: '🟡',
 			};
 		}
 		return {
+			Icon: CheckCircle2,
 			text: `Checked ${daysSince === 0 ? 'today' : daysSince === 1 ? 'yesterday' : `${daysSince} days ago`}`,
 			description: 'Price is up to date. Prices are checked automatically every Sunday.',
 			color: 'text-meadow-700',
+			iconColor: 'text-meadow-600',
 			bgColor: 'bg-meadow-50',
 			borderColor: 'border-meadow-200',
-			icon: '🟢',
 		};
 	};
 
 	const statusInfo = getStatusInfo();
+	const { Icon: StatusIcon } = statusInfo;
 
 	const handleRefresh = async () => {
 		if (!onRefreshPrice) {
@@ -157,7 +162,7 @@ export function WishlistDetailsDrawer({
 								{/* Status Display */}
 								<div className={`p-4 rounded-lg border ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
 									<div className="flex items-start gap-3">
-										<span className="text-2xl">{statusInfo.icon}</span>
+										<StatusIcon className={`h-6 w-6 ${statusInfo.iconColor} flex-shrink-0 mt-0.5`} />
 										<div className="flex-1">
 											<p className={`text-sm font-medium ${statusInfo.color}`}>
 												{statusInfo.text}
