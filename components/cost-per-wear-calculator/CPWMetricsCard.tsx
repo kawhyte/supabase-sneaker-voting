@@ -1,12 +1,8 @@
-/**
- * CPW Metrics Card - Shows cost per wear breakdown and progress
- */
-
 'use client';
 
 import { CalculatorMetrics, CalculatorInput } from '@/lib/worth-it-calculator/calculator-logic';
 import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { ArrowRight, DollarSign, Repeat, TrendingDown } from 'lucide-react';
 
 interface CPWMetricsCardProps {
   metrics: CalculatorMetrics;
@@ -14,124 +10,100 @@ interface CPWMetricsCardProps {
 }
 
 export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
-  const isWorthItAt1Year = metrics.cpwAt1Year <= metrics.targetCPW;
-  const isWorthItAt2Years = metrics.cpwAt2Years <= metrics.targetCPW;
-
-  const getProgressColor = (): string => {
-    if (metrics.progressAt1Year >= 100) return '#62a663'; // meadow-500
-    if (metrics.progressAt1Year >= 75) return '#81b682'; // meadow-400
-    if (metrics.progressAt1Year >= 50) return '#FFC700'; // sun-400
-    if (metrics.progressAt1Year >= 25) return '#FFD966';
-    return '#FFC700';
-  };
-
   return (
     <Card className="p-6 sm:p-8 bg-card border-border shadow-lg">
       <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-        <span>💰</span>
-        <span>Cost Per Wear Breakdown</span>
+        <span className="bg-blue-100 text-blue-600 p-2 rounded-lg"><DollarSign className="w-5 h-5" /></span>
+        <span>Financial Breakdown</span>
       </h3>
 
-      <div className="space-y-6">
-        {/* Target CPW */}
-        <div className="p-4 bg-stone-100 rounded-lg border border-stone-300">
-          <div className="text-sm text-muted-foreground mb-1">Target Cost Per Wear</div>
-          <div className="text-3xl font-bold text-foreground">
-            ${metrics.targetCPW.toFixed(2)}/wear
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* 1. The Sticker Price vs Net Cost */}
+        <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 flex flex-col justify-between">
+          <div>
+            <div className="text-sm text-stone-500 font-medium mb-1">Net Cost</div>
+            <div className="text-2xl font-bold text-stone-900">
+              ${metrics.netCost.toFixed(0)}
+            </div>
+            <div className="text-xs text-stone-400 mt-1">
+              What you actually pay
+            </div>
           </div>
-          <div className="text-sm text-muted-foreground mt-1">
-            Industry standard for {input.category} at this price point
+          
+          {metrics.estimatedResaleValue > 0 && (
+            <div className="mt-4 pt-4 border-t border-stone-200">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-stone-500">Retail Price</span>
+                <span className="font-medium strike-through text-stone-400">${input.price}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm mt-1">
+                <span className="text-green-600 font-medium">Est. Resale</span>
+                <span className="text-green-600 font-bold">-${metrics.estimatedResaleValue}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 2. Lifetime Wears */}
+        <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 flex flex-col justify-between">
+          <div>
+            <div className="text-sm text-stone-500 font-medium mb-1">Estimated Lifespan</div>
+            <div className="text-2xl font-bold text-stone-900">
+              {metrics.estimatedLifespanYears} Years
+            </div>
+            <div className="text-xs text-stone-400 mt-1">
+              Based on quality rating
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-stone-200 flex items-center gap-2 text-stone-600">
+            <Repeat className="w-4 h-4" />
+            <span className="text-sm font-medium">{metrics.totalLifetimeWears} total wears</span>
           </div>
         </div>
 
-        {/* Year 1 & Year 2 Comparison */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Year 1 */}
-          <div
-            className={cn(
-              'p-4 rounded-lg border-2',
-              isWorthItAt1Year
-                ? 'bg-green-50 border-green-500'
-                : 'bg-stone-50 border-stone-300'
-            )}
-          >
-            <div className="text-sm text-muted-foreground mb-1">At 1 Year</div>
-            <div className="text-2xl font-bold text-foreground">
-              ${metrics.cpwAt1Year.toFixed(2)}/wear
+        {/* 3. Real CPW (The Hero Metric) */}
+        <div className="p-4 bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl border border-slate-700 text-white flex flex-col justify-between shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-3 opacity-10">
+            <TrendingDown className="w-16 h-16" />
+          </div>
+          
+          <div>
+            <div className="text-sm text-slate-300 font-medium mb-1">Real Cost Per Wear</div>
+            <div className="text-3xl font-bold text-white">
+              ${metrics.realCPW.toFixed(2)}
             </div>
-            <div className="text-sm text-muted-foreground mt-1">
-              {metrics.expectedWearsYear1} wears
-            </div>
-            {isWorthItAt1Year && (
-              <div className="text-sm text-green-700 font-semibold mt-2">✓ Worth It!</div>
-            )}
           </div>
 
-          {/* Year 2 */}
-          <div
-            className={cn(
-              'p-4 rounded-lg border-2',
-              isWorthItAt2Years
-                ? 'bg-green-50 border-green-500'
-                : 'bg-stone-50 border-stone-300'
-            )}
-          >
-            <div className="text-sm text-muted-foreground mb-1">At 2 Years</div>
-            <div className="text-2xl font-bold text-foreground">
-              ${metrics.cpwAt2Years.toFixed(2)}/wear
+          <div className="mt-4">
+            <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+              Target to beat:
             </div>
-            <div className="text-sm text-muted-foreground mt-1">
-              {metrics.expectedWearsYear2} wears
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 bg-slate-600 rounded-full flex-1">
+                <div 
+                  className={`h-full rounded-full ${metrics.realCPW <= metrics.targetCPW ? 'bg-green-400' : 'bg-red-400'}`} 
+                  style={{ width: `${Math.min(100, (metrics.targetCPW / metrics.realCPW) * 100)}%` }}
+                />
+              </div>
+              <span className="text-sm font-medium">${metrics.targetCPW}</span>
             </div>
-            {isWorthItAt2Years && (
-              <div className="text-sm text-green-700 font-semibold mt-2">✓ Worth It!</div>
-            )}
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Progress to Target</span>
-            <span className="font-semibold text-foreground">
-              {metrics.progressAt1Year.toFixed(0)}%
-            </span>
-          </div>
-          <div className="w-full bg-stone-200 rounded-full h-3 overflow-hidden border border-stone-300">
-            <div
-              className="h-full rounded-full transition-all duration-500 ease-out"
-              style={{
-                width: `${Math.min(Math.max(metrics.progressAt1Year, 0), 100)}%`,
-                backgroundColor: getProgressColor(),
-              }}
-              role="progressbar"
-              aria-valuenow={Math.round(metrics.progressAt1Year)}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            />
-          </div>
-          <div className="text-sm text-muted-foreground">
-            {metrics.progressAt1Year >= 100 ? (
-              <span className="text-green-700 font-semibold">
-                ✨ You'll reach "worth it" status within the first year!
-              </span>
-            ) : (
-              <span>
-                You'll need to wear this {metrics.targetWears} times total to reach the target
-              </span>
-            )}
-          </div>
-        </div>
+      </div>
 
-        {/* Calculation Formula */}
-        <div className="p-4 bg-stone-50 rounded-lg border border-stone-200">
-          <div className="text-xs text-muted-foreground font-semibold mb-2">
-            HOW WE CALCULATED THIS
-          </div>
-          <div className="font-mono text-sm text-foreground">
-            ${input.price.toFixed(2)} ÷ {metrics.expectedWearsYear1} wears = $
-            {metrics.cpwAt1Year.toFixed(2)}/wear
-          </div>
+      {/* Break Even Explanation */}
+      <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-start gap-3">
+        <div className="bg-blue-100 p-2 rounded-full">
+          <ArrowRight className="w-4 h-4 text-blue-600" />
+        </div>
+        <div>
+          <h4 className="font-semibold text-blue-900 text-sm">The Break-Even Point</h4>
+          <p className="text-blue-800 text-sm mt-1">
+            To get your money's worth (hitting the ${metrics.targetCPW}/wear target), you need to wear this item <strong>{metrics.breakEvenWears} times</strong>.
+            Based on your usage, that will take about <strong>{Math.ceil(metrics.breakEvenWears / (metrics.totalLifetimeWears / metrics.estimatedLifespanYears) * 12)} months</strong>.
+          </p>
         </div>
       </div>
     </Card>
