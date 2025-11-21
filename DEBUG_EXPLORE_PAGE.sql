@@ -10,7 +10,6 @@
 SELECT
   id,
   display_name,
-  email,
   wishlist_privacy,
   follower_count,
   following_count,
@@ -110,7 +109,6 @@ ORDER BY i.created_at DESC;
 SELECT
   p.id,
   p.display_name,
-  p.email,
   p.wishlist_privacy,
   p.follower_count,
   p.following_count
