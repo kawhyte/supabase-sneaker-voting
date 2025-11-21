@@ -70,8 +70,8 @@ export function WardrobeListItem({
 	const permissions = useItemPermissions(item.category);
 	const purchasedDate = item.purchase_date || purchaseDate;
 
-	// Get main image
-	const mainImage = itemPhotos[0]?.image_url || "/placeholder-sneaker.png";
+	// Get main image with fallback to placeholder
+	const mainImage = itemPhotos[0]?.image_url || "/images/placeholder.svg";
 
 	// Get category config for icon (fallback to accessories if category not found)
 	const categoryConfig = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS] || CATEGORY_CONFIGS.accessories;
@@ -138,8 +138,21 @@ export function WardrobeListItem({
 							src={mainImage}
 							alt={`${item.brand} ${item.model}`}
 							className="w-full h-full object-cover"
+							onError={(e) => {
+								e.currentTarget.src = '/images/placeholder.svg';
+							}}
 						/>
-						{/* Photo count indicator */}
+						{/* Pinned indicator - left side */}
+						{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
+							<div
+								className="absolute top-1 left-1 bg-sun-400 text-sun-900 rounded-full p-1 shadow-sm"
+								title="Pinned"
+								aria-label="This item is pinned"
+							>
+								<Pin className="h-3 w-3" />
+							</div>
+						)}
+						{/* Photo count indicator - right side */}
 						{itemPhotos.length > 1 && (
 							<div className="absolute top-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
 								{itemPhotos.length}
@@ -149,7 +162,7 @@ export function WardrobeListItem({
 				</div>
 
 				{/* Brand + Model - Fixed width with truncation */}
-				<div className="flex-1 min-w-0 max-w-[450px]">
+				<div className="flex-1 min-w-0 max-w-[550px]">
 					<div className="flex items-center gap-2">
 						{item.brands?.brand_logo && (
 							<div className="relative w-5 h-5 flex-shrink-0">
@@ -179,28 +192,26 @@ export function WardrobeListItem({
 				</div>
 
 				{/* Price - Fixed width, right-aligned */}
-				<div className="hidden sm:flex flex-shrink-0 w-24 flex-col ">
+				<div className="hidden sm:flex flex-shrink-0 w-48 flex-col text-right gap-1">
 					<span className="text-base font-semibold">{getPriceDisplay()}</span>
+					{/* Horizontal layout: strikethrough + Sale badge */}
 					{displayLogic.isOnSale && item.retail_price && (
-						<span className="text-xs text-muted-foreground line-through">
-							${item.retail_price}
-						</span>
+						<div className="flex items-center justify-end gap-2">
+							<span className="text-xs text-muted-foreground line-through">
+								${item.retail_price}
+							</span>
+							<Badge
+								variant="outline"
+								className="text-xs px-2 py-0.5 rounded-md border-meadow-400 bg-meadow-50 text-meadow-600"
+							>
+								Sale
+							</Badge>
+						</div>
 					)}
 				</div>
 
 				{/* Status Badges - Fixed width */}
-				<div className="hidden lg:flex items-center gap-2 flex-shrink-0 w-[200px] ">
-					{/* Pinned Badge */}
-					{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
-						<Badge
-							variant="outline"
-							className="text-xs px-2 py-0.5 rounded-md border-sun-400 bg-sun-50 text-sun-700"
-						>
-							<Pin className="h-3 w-3 mr-1" />
-							Pinned
-						</Badge>
-					)}
-
+				<div className="hidden lg:flex items-center gap-2 flex-shrink-0 w-[300px] ml-12">
 					{/* Archived Badge */}
 					{item.is_archived && viewMode !== "archive" && (
 						<Badge
@@ -220,24 +231,15 @@ export function WardrobeListItem({
 							priceCheckFailures={item.price_check_failures ?? 0}
 						/>
 					)}
-
-					{/* On Sale Badge */}
-					{displayLogic.isOnSale && (
-						<Badge
-							variant="outline"
-							className="text-xs px-2 py-0.5 rounded-md border-meadow-400 bg-meadow-50 text-meadow-600"
-						>
-							Sale
-						</Badge>
-					)}
 				</div>
 
 				{/* Actions Menu - Click won't trigger expansion */}
-				<div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+				<div className="flex-shrink-0 w-8 ml-8 flex justify-end" onClick={(e) => e.stopPropagation()}>
 					<ItemCardActions
 						item={item}
 						isArchivePage={isArchivePage}
 						isReadOnly={isReadOnly}
+						variant="list"
 						onEdit={actions.onEdit}
 						onDelete={actions.onDelete}
 						onUnarchive={actions.onUnarchive}

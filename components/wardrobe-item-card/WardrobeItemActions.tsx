@@ -33,6 +33,7 @@ interface ItemCardActionsProps {
 	item: WardrobeItem;
 	isArchivePage: boolean;
 	isReadOnly?: boolean; // If true, hide destructive/edit actions
+	variant?: "card" | "list"; // Layout variant: card (absolute positioning) or list (static positioning)
 	onEdit: (item: WardrobeItem) => void;
 	onDelete: (item: WardrobeItem) => void;
 	onUnarchive?: (item: WardrobeItem) => void;
@@ -46,6 +47,7 @@ export function ItemCardActions({
 	item,
 	isArchivePage,
 	isReadOnly = false,
+	variant = "card",
 	onEdit,
 	onDelete,
 	onUnarchive,
@@ -57,8 +59,13 @@ export function ItemCardActions({
 	const isWishlisted = item.status === ItemStatus.WISHLISTED;
 	const isOwned = item.status === ItemStatus.OWNED;
 
+	// Conditional wrapper class: absolute for cards, static for list view
+	const wrapperClass = variant === "card"
+		? 'absolute right-3 top-3 z-40 flex items-center gap-1'
+		: 'flex items-center gap-1';
+
 	return (
-		<div className='absolute right-3 top-3 z-40 flex items-center gap-1'>
+		<div className={wrapperClass}>
 			<DropdownMenu modal={false}>
 				<DropdownMenuTrigger asChild>
 					<button

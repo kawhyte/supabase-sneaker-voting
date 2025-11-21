@@ -70,12 +70,12 @@ export function WardrobeListView({
 			{/* List Header - Matches row column widths exactly */}
 			<div className="hidden lg:flex items-center gap-3 px-4 py-3 bg-stone-100 border-b border-stone-200 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
 				<div className="flex-shrink-0 w-5"></div> {/* Spacer for expand icon */}
-				<div className="flex-shrink-0 w-20">Image</div>
-				<div className="flex-1 min-w-0 max-w-[400px]">Item</div>
-				<div className="flex-shrink-0 w-20 text-center">Size</div>
-				<div className="flex-shrink-0 w-24 text-right">Price</div>
-				<div className="flex-shrink-0 w-[200px] text-right">Status</div>
-				<div className="flex-shrink-0 w-10">Actions</div>
+				<div className="flex-shrink-0 w-16 lg:w-20">Image</div>
+				<div className="flex-1 min-w-0 max-w-[550px]">Item</div>
+				<div className="flex-shrink-0 w-20">Size</div>
+				<div className="flex-shrink-0 w-48 text-right">Price</div>
+				<div className="flex-shrink-0 w-[300px] ml-12">Status</div>
+				<div className="flex-shrink-0 w-8 ml-4 text-right">Actions</div>
 			</div>
 
 			{/* List Items */}
