@@ -198,7 +198,7 @@ export function OutfitStudio({
 
       if (error) throw error
 
-      toast.success('Added to wishlist! Time to style some outfits 🎉')
+      toast.success('Added to wishlist! Time to style some outfits')
       setShowQuiz(false)
     } catch (error) {
       toast.error((error as Error).message || 'Failed to add to wishlist')

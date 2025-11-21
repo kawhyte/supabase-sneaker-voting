@@ -270,7 +270,7 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
 
           // Show toast notification
           toast({
-            title: `🎉 Achievement Unlocked!`,
+            title: `Achievement Unlocked!`,
             description: (
               <div className="mt-2">
                 <p className="font-bold text-primary">{achievement.name}</p>
