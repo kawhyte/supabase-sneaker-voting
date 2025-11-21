@@ -16,7 +16,7 @@ import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { calculateWorthItMetrics } from "@/lib/wardrobe-item-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, TrendingDown, AlertCircle, Zap } from "lucide-react";
+import { Sparkles, TrendingDown, AlertCircle, Trophy, TrendingUp } from "lucide-react";
 
 interface WorthItSummaryProps {
 	items: WardrobeItem[];
@@ -82,7 +82,7 @@ export function WorthItSummary({ items }: WorthItSummaryProps) {
 					<div className='flex items-center gap-2'>
 						<Sparkles className='h-5 w-5 text-sun-600' />
 						<CardTitle className='text-lg font-heading'>
-							💎 Value Tracker
+							Value Tracker
 						</CardTitle>
 					</div>
 					<Badge className='bg-sun-100 text-sun-700 border-sun-300'>
@@ -130,9 +130,9 @@ export function WorthItSummary({ items }: WorthItSummaryProps) {
 					<div className='p-4 rounded-lg bg-meadow-50 border border-meadow-300'>
 						<div className='flex items-start justify-between mb-2'>
 							<div className='flex items-center gap-2'>
-								<TrendingDown className='h-4 w-4 text-meadow-700' />
+								<Trophy className='h-4 w-4 text-meadow-700' />
 								<span className='text-sm font-semibold text-meadow-900'>
-									🏆 Best Value
+									Best Value
 								</span>
 							</div>
 						</div>
@@ -151,9 +151,9 @@ export function WorthItSummary({ items }: WorthItSummaryProps) {
 					<div className='p-4 rounded-lg bg-sun-50 border border-sun-300'>
 						<div className='flex items-start justify-between mb-2'>
 							<div className='flex items-center gap-2'>
-								<Zap className='h-4 w-4 text-sun-700' />
+								<TrendingUp className='h-4 w-4 text-sun-700' />
 								<span className='text-sm font-semibold text-sun-900'>
-									📈 Almost Worth It
+									Almost Worth It
 								</span>
 							</div>
 						</div>
@@ -187,7 +187,7 @@ export function WorthItSummary({ items }: WorthItSummaryProps) {
 								<div className='flex items-center gap-2'>
 									<AlertCircle className='h-4 w-4 text-ember-700' />
 									<span className='text-sm font-semibold text-ember-900'>
-										⚠️ Needs Attention
+										Needs Attention
 									</span>
 								</div>
 							</div>

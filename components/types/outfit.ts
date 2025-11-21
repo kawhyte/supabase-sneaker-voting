@@ -287,55 +287,55 @@ export const OCCASION_CONFIG: Record<OutfitOccasion, {
 }> = {
   casual: {
     label: 'Casual',
-    icon: '👕',
+    icon: 'Shirt',
     color: 'blue',
     description: 'Everyday comfort wear',
   },
   work: {
     label: 'Work',
-    icon: '💼',
+    icon: 'Briefcase',
     color: 'slate',
     description: 'Professional office attire',
   },
   date: {
     label: 'Date',
-    icon: '💕',
+    icon: 'Heart',
     color: 'pink',
     description: 'Going out for a special occasion',
   },
   gym: {
     label: 'Gym',
-    icon: '💪',
+    icon: 'Dumbbell',
     color: 'green',
     description: 'Athletic and active wear',
   },
   formal: {
     label: 'Formal',
-    icon: '🎩',
+    icon: 'Crown',
     color: 'purple',
     description: 'Black tie and formal events',
   },
   travel: {
     label: 'Travel',
-    icon: '✈️',
+    icon: 'Plane',
     color: 'sky',
     description: 'Comfortable travel clothing',
   },
   weekend: {
     label: 'Weekend',
-    icon: '🌞',
+    icon: 'Sun',
     color: 'amber',
     description: 'Relaxed weekend plans',
   },
   night_out: {
     label: 'Night Out',
-    icon: '🌙',
+    icon: 'Moon',
     color: 'indigo',
     description: 'Evening and social activities',
   },
   other: {
     label: 'Other',
-    icon: '✨',
+    icon: 'Sparkles',
     color: 'stone',
     description: 'Special or unique occasion',
   },
@@ -346,32 +346,32 @@ export const OCCASION_CONFIG: Record<OutfitOccasion, {
  */
 export const SEASON_CONFIG: Record<OutfitSeason, {
   label: string
-  icon: string
+  icon: string // Lucide icon name
   months: number[] // Month numbers (1-12)
 }> = {
   spring: {
     label: 'Spring',
-    icon: '🌱',
+    icon: 'Sprout',
     months: [3, 4, 5],
   },
   summer: {
     label: 'Summer',
-    icon: '☀️',
+    icon: 'Sun',
     months: [6, 7, 8],
   },
   fall: {
     label: 'Fall',
-    icon: '🍂',
+    icon: 'Leaf',
     months: [9, 10, 11],
   },
   winter: {
     label: 'Winter',
-    icon: '❄️',
+    icon: 'Snowflake',
     months: [12, 1, 2],
   },
   all_year: {
     label: 'All Year',
-    icon: '🌍',
+    icon: 'Globe',
     months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   },
 }

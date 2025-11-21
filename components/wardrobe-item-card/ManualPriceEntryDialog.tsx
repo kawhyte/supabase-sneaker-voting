@@ -114,7 +114,7 @@ export function ManualPriceEntryDialog({
         source: 'manual_entry',
       });
 
-      toast.success('Price updated! 💰', {
+      toast.success('Price updated!', {
         description: `${itemName} is now $${price}`,
       });
 

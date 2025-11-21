@@ -1,6 +1,6 @@
 'use client'
 
-import { LucideIcon } from 'lucide-react'
+import { LucideIcon, Cat, Heart, Lightbulb, Palette, Sparkles, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 /**
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 export function WardrobeEmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
-      <div className="text-6xl mb-6">😺</div>
+      <Cat className="h-16 w-16 mb-6 text-muted-foreground" />
       <h2 className="text-2xl font-semibold text-foreground mb-2 text-center">
         Your wardrobe is sleeping
       </h2>
@@ -31,7 +31,7 @@ export function WardrobeEmptyState() {
 export function WishlistEmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
-      <div className="text-6xl mb-6">😻</div>
+      <Heart className="h-16 w-16 mb-6 text-muted-foreground" />
       <h2 className="text-2xl font-semibold text-foreground mb-2 text-center">
         Nothing on your wishlist yet
       </h2>
@@ -39,8 +39,8 @@ export function WishlistEmptyState() {
         Found something you love? Add it here and take time to think about it. Our smart
         cooling-off period will help you make thoughtful purchases.
       </p>
-      <p className="text-sm text-muted-foreground text-center max-w-sm">
-        💡 Pro tip: Create outfits with your owned items first to discover what you
+      <p className="text-sm text-muted-foreground text-center max-w-sm flex items-center justify-center gap-2">
+        <Lightbulb className="h-4 w-4" /> Pro tip: Create outfits with your owned items first to discover what you
         really need!
       </p>
     </div>
@@ -53,7 +53,7 @@ export function WishlistEmptyState() {
 export function OutfitsEmptyState({ onCreateOutfit }: { onCreateOutfit: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
-      <div className="text-6xl mb-6">🎨</div>
+      <Palette className="h-16 w-16 mb-6 text-muted-foreground" />
       <h2 className="text-2xl font-semibold text-foreground mb-2 text-center">
         No outfits yet
       </h2>
@@ -77,7 +77,7 @@ export function OutfitsEmptyState({ onCreateOutfit }: { onCreateOutfit: () => vo
 export function ArchiveEmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
-      <div className="text-6xl mb-6">✨</div>
+      <Sparkles className="h-16 w-16 mb-6 text-muted-foreground" />
       <h2 className="text-2xl font-semibold text-foreground mb-2 text-center">
         Archive is empty
       </h2>
@@ -95,7 +95,7 @@ export function ArchiveEmptyState() {
 export function SearchEmptyState({ query }: { query: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
-      <div className="text-6xl mb-6">🔍</div>
+      <Search className="h-16 w-16 mb-6 text-muted-foreground" />
       <h2 className="text-2xl font-semibold text-foreground mb-2 text-center">
         No results found
       </h2>

@@ -199,19 +199,19 @@ export function calculateWorthItMetrics(item: WardrobeItem): WorthItMetrics {
 
 	if (wears === 0) {
 		milestoneMessage = 'Start wearing! Track to see value';
-		milestoneEmoji = '🚀';
+		milestoneEmoji = null;
 	} else if (progress >= 100) {
 		milestoneMessage = 'Worth it! Great value';
-		milestoneEmoji = '✨';
+		milestoneEmoji = null;
 	} else if (progress >= 75) {
 		milestoneMessage = 'Almost there!';
-		milestoneEmoji = '🚀';
+		milestoneEmoji = null;
 	} else if (progress >= 50) {
 		milestoneMessage = 'Halfway there!';
-		milestoneEmoji = '💪';
+		milestoneEmoji = null;
 	} else if (progress >= 25) {
 		milestoneMessage = 'Great start!';
-		milestoneEmoji = '🎯';
+		milestoneEmoji = null;
 	}
 
 	return {

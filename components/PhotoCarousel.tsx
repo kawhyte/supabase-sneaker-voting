@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
-import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Maximize2, Camera } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -98,7 +98,7 @@ export function PhotoCarousel({
       <Card className={`bg-slate-50 ${className}`}>
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center text-slate-500">
-            <div className="text-4xl mb-2">📸</div>
+            <Camera className="h-12 w-12 mb-2 mx-auto" />
             <p>No photos available</p>
           </div>
         </CardContent>
