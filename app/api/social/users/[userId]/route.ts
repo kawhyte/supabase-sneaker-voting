@@ -55,14 +55,17 @@ export async function GET(
           item_photos (
             id,
             image_url,
-            image_order
+            image_order,
+            is_main_image
           )
         `)
         .eq("user_id", targetUserId)
         .eq("status", "wishlisted")
         .eq("is_archived", false)
         .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .order("is_main_image", { foreignTable: "item_photos", ascending: false })
+        .order("image_order", { foreignTable: "item_photos", ascending: true });
 
       if (itemsError) {
         console.error("Error fetching own items:", itemsError);
@@ -103,14 +106,17 @@ export async function GET(
           item_photos (
             id,
             image_url,
-            image_order
+            image_order,
+            is_main_image
           )
         `)
         .eq("user_id", targetUserId)
         .eq("status", "wishlisted")
         .eq("is_archived", false)
         .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .order("is_main_image", { foreignTable: "item_photos", ascending: false })
+        .order("image_order", { foreignTable: "item_photos", ascending: true });
 
       if (itemsError) {
         console.error("Error fetching public items:", itemsError);
@@ -169,14 +175,17 @@ export async function GET(
           item_photos (
             id,
             image_url,
-            image_order
+            image_order,
+            is_main_image
           )
         `)
         .eq("user_id", targetUserId)
         .eq("status", "wishlisted")
         .eq("is_archived", false)
         .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .order("is_main_image", { foreignTable: "item_photos", ascending: false })
+        .order("image_order", { foreignTable: "item_photos", ascending: true });
 
       if (itemsError) {
         console.error("Error fetching followers-only items:", itemsError);

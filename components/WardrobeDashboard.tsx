@@ -95,6 +95,7 @@ export function WardrobeDashboard({
 				)
 				.eq("is_archived", isArchivePage)
 				.in("status", status)
+				.order("is_main_image", { foreignTable: "item_photos", ascending: false })
 				.order("image_order", { foreignTable: "item_photos", ascending: true });
 
 			// Apply category filter if provided (for shoe-first tabs)
