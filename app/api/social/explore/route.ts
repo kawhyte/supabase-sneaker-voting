@@ -7,7 +7,6 @@ const PREVIEW_ITEMS_COUNT = 4;
 interface ExploreUser {
   user_id: string;
   display_name: string | null;
-  username: string | null;
   avatar_url: string | null;
   follower_count: number;
   following_count: number;
@@ -45,7 +44,7 @@ export async function GET(request: NextRequest) {
     // Step 1: Get users with public wishlists
     const { data: publicProfiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id, display_name, username, avatar_url, follower_count, following_count')
+      .select('id, display_name, avatar_url, follower_count, following_count, wishlist_privacy')
       .eq('wishlist_privacy', 'public')
       .neq('id', user.id) // Exclude current user
       .order('follower_count', { ascending: false }) // Sort by popularity
@@ -131,7 +130,6 @@ export async function GET(request: NextRequest) {
       return {
         user_id: profile.id,
         display_name: profile.display_name,
-        username: profile.username,
         avatar_url: profile.avatar_url,
         follower_count: profile.follower_count || 0,
         following_count: profile.following_count || 0,
