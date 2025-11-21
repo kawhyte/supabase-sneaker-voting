@@ -94,12 +94,14 @@ export async function GET(request: NextRequest) {
     // Step 4: Get preview items for each user (4 items per user)
     const { data: previewItems, error: itemsError } = await supabase
       .from('items')
-      .select('id, user_id, brand, model, item_photos(photo_url)')
+      .select('id, user_id, brand, model, item_photos(id, image_url, image_order, is_main_image)')
       .eq('status', 'wishlisted')
       .eq('is_archived', false)
       .in('user_id', userIds)
       .order('is_pinned', { ascending: false })
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .order('is_main_image', { foreignTable: 'item_photos', ascending: false })
+      .order('image_order', { foreignTable: 'item_photos', ascending: true });
 
     if (itemsError) {
       console.error('Error fetching preview items:', itemsError);
@@ -137,7 +139,7 @@ export async function GET(request: NextRequest) {
         preview_items: items.map((item) => ({
           id: item.id,
           photo_url: Array.isArray(item.item_photos) && item.item_photos.length > 0
-            ? item.item_photos[0].photo_url
+            ? item.item_photos[0].image_url
             : null,
           brand: item.brand,
           model: item.model,
