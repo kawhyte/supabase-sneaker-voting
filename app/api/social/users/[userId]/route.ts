@@ -54,8 +54,8 @@ export async function GET(
           *,
           item_photos (
             id,
-            photo_url,
-            display_order
+            image_url,
+            image_order
           )
         `)
         .eq("user_id", targetUserId)
@@ -102,8 +102,8 @@ export async function GET(
           *,
           item_photos (
             id,
-            photo_url,
-            display_order
+            image_url,
+            image_order
           )
         `)
         .eq("user_id", targetUserId)
@@ -168,8 +168,8 @@ export async function GET(
           *,
           item_photos (
             id,
-            photo_url,
-            display_order
+            image_url,
+            image_order
           )
         `)
         .eq("user_id", targetUserId)

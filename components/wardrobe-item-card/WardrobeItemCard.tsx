@@ -84,10 +84,13 @@ function WardrobeItemCardComponent({
 	const hasBeenTriedOn = item.has_been_tried;
 	const purchasedDate = item.purchase_date || purchaseDate;
 
-	// Show metadata based on density
-	const showDates = density === 'detailed';
-	const showNotes = density !== 'compact';
-	const showStore = density !== 'compact';
+	// Show metadata based on density and privacy
+	// Public view: Hide personal info (dates, notes, store, size, wears)
+	const isPublicView = isReadOnly && viewMode === 'wishlist';
+	const showDates = density === 'detailed' && !isPublicView;
+	const showNotes = density !== 'compact' && !isPublicView;
+	const showStore = density !== 'compact' && !isPublicView;
+	const showSizeAndWears = !isPublicView;
 
 	return (
 		<TooltipProvider delayDuration={300}>
@@ -180,7 +183,7 @@ function WardrobeItemCardComponent({
 
 						{/* Metadata Grid */}
 						<div className='flex flex-col gap-2.5 mt-1'>
-							{/* Date Display - Only show in detailed mode */}
+							{/* Date Display - Only show in detailed mode and not in public view */}
 							{showDates && (
 								<div className='text-sm text-muted-foreground flex items-center gap-1'>
 									{displayLogic.isOwned && purchasedDate ? (
@@ -191,7 +194,7 @@ function WardrobeItemCardComponent({
 								</div>
 							)}
 
-							{/* Pricing */}
+							{/* Pricing - Always show (public information) */}
 							<ItemPricingDisplay
 								item={item}
 								isOwned={displayLogic.isOwned}
@@ -200,16 +203,18 @@ function WardrobeItemCardComponent({
 								onManualEntrySuccess={actions.onManualEntrySuccess}
 							/>
 
-							{/* Size, Comfort, Wears */}
-							<ItemSizeComfortWears
-								item={item}
-								viewMode={viewMode}
-								canTrackWears={permissions.canTrackWearCount}
-								onIncrementWear={actions.onIncrementWear}
-								onDecrementWear={actions.onDecrementWear}
-							/>
+							{/* Size, Comfort, Wears - Hide in public view */}
+							{showSizeAndWears && (
+								<ItemSizeComfortWears
+									item={item}
+									viewMode={viewMode}
+									canTrackWears={permissions.canTrackWearCount}
+									onIncrementWear={actions.onIncrementWear}
+									onDecrementWear={actions.onDecrementWear}
+								/>
+							)}
 
-							{/* Store and Last Worn - Only show if not compact */}
+							{/* Store and Last Worn - Hide in public view and compact mode */}
 							{showStore && (
 								<ItemStoreAndDate
 									storeName={item.store_name}
