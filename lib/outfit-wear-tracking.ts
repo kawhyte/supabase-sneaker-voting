@@ -204,7 +204,6 @@ export function generateWearingNotifications(
 				outfitId: outfit.id,
 				outfitName: outfit.name,
 				message: `You haven't worn "${outfit.name}" in ${daysSince} days. Time to bring it back?`,
-				emoji: "👀",
 			};
 		}
 	}
@@ -220,7 +219,6 @@ export function generateWearingNotifications(
 			}" is your favorite! You wear it ${analytics.timesPerWeek.toFixed(
 				1
 			)}x per week.`,
-			emoji: "❤️",
 		};
 	}
 
@@ -231,39 +229,33 @@ export function generateWearingNotifications(
  * Format outfit wearing celebration message
  */
 export function getWearingCelebration(totalWears: number): {
-	emoji: string;
 	message: string;
 } {
 	if (totalWears === 1) {
 		return {
-			emoji: "✨",
 			message: "First wear! Enjoy your new outfit!",
 		};
 	}
 
 	if (totalWears === 5) {
 		return {
-			emoji: "🎉",
 			message: "You love this outfit! 5 wears!",
 		};
 	}
 
 	if (totalWears === 10) {
 		return {
-			emoji: "🔥",
 			message: "This is a favorite! 10 wears!",
 		};
 	}
 
 	if (totalWears % 10 === 0) {
 		return {
-			emoji: "👑",
 			message: `${totalWears} wears! You really love this outfit!`,
 		};
 	}
 
 	return {
-		emoji: "👕",
 		message: `${totalWears} wears`,
 	};
 }
