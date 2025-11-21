@@ -74,6 +74,27 @@ export type Database = {
         }
         Relationships: []
       }
+      followers: {
+        Row: {
+          created_at: string | null
+          follower_user_id: string
+          following_user_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          follower_user_id: string
+          following_user_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          follower_user_id?: string
+          following_user_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       item_photos: {
         Row: {
           cloudinary_id: string | null
@@ -115,6 +136,44 @@ export type Database = {
           },
         ]
       }
+      item_shares: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_id: string
+          owner_id: string
+          permission_level: string | null
+          shared_with_user_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_id: string
+          owner_id: string
+          permission_level?: string | null
+          shared_with_user_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          owner_id?: string
+          permission_level?: string | null
+          shared_with_user_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_shares_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       items: {
         Row: {
           archive_reason: string | null
@@ -133,6 +192,8 @@ export type Database = {
           image_url: string | null
           is_archived: boolean | null
           is_main_image: boolean | null
+          is_pinned: boolean | null
+          is_shared: boolean | null
           last_price_check_at: string | null
           last_worn_date: string | null
           lowest_price_seen: number | null
@@ -172,6 +233,8 @@ export type Database = {
           image_url?: string | null
           is_archived?: boolean | null
           is_main_image?: boolean | null
+          is_pinned?: boolean | null
+          is_shared?: boolean | null
           last_price_check_at?: string | null
           last_worn_date?: string | null
           lowest_price_seen?: number | null
@@ -211,6 +274,8 @@ export type Database = {
           image_url?: string | null
           is_archived?: boolean | null
           is_main_image?: boolean | null
+          is_pinned?: boolean | null
+          is_shared?: boolean | null
           last_price_check_at?: string | null
           last_worn_date?: string | null
           lowest_price_seen?: number | null
@@ -802,9 +867,12 @@ export type Database = {
           display_name: string | null
           enable_duplication_warnings: boolean | null
           enable_similar_item_warnings: boolean | null
+          follower_count: number | null
+          following_count: number | null
           id: string
           preset_avatar_id: string | null
           updated_at: string | null
+          wishlist_privacy: string | null
         }
         Insert: {
           avatar_type?: Database["public"]["Enums"]["avatar_type"] | null
@@ -814,9 +882,12 @@ export type Database = {
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
           enable_similar_item_warnings?: boolean | null
+          follower_count?: number | null
+          following_count?: number | null
           id: string
           preset_avatar_id?: string | null
           updated_at?: string | null
+          wishlist_privacy?: string | null
         }
         Update: {
           avatar_type?: Database["public"]["Enums"]["avatar_type"] | null
@@ -826,9 +897,12 @@ export type Database = {
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
           enable_similar_item_warnings?: boolean | null
+          follower_count?: number | null
+          following_count?: number | null
           id?: string
           preset_avatar_id?: string | null
           updated_at?: string | null
+          wishlist_privacy?: string | null
         }
         Relationships: []
       }
@@ -975,6 +1049,39 @@ export type Database = {
           },
         ]
       }
+      user_connections: {
+        Row: {
+          connected_user_id: string
+          connection_type: string | null
+          created_at: string | null
+          id: string
+          share_all_items: boolean | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          connected_user_id: string
+          connection_type?: string | null
+          created_at?: string | null
+          id?: string
+          share_all_items?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          connected_user_id?: string
+          connection_type?: string | null
+          created_at?: string | null
+          id?: string
+          share_all_items?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_dismissed_seasonal_alerts: {
         Row: {
           dismissed_at: string | null
@@ -1064,6 +1171,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_edit_item: {
+        Args: { item_id: string; user_id: string }
+        Returns: boolean
+      }
       get_lowest_price: {
         Args: { product_uuid: string; size_param?: string }
         Returns: {
@@ -1083,6 +1194,22 @@ export type Database = {
           store_name: string
         }[]
       }
+      get_public_wishlist: {
+        Args: { target_user_id: string }
+        Returns: {
+          brand: string
+          category: string
+          color: string
+          created_at: string
+          image_url: string
+          is_pinned: boolean
+          item_id: string
+          model: string
+          retail_price: number
+          target_price: number
+        }[]
+      }
+      is_following: { Args: { target_user_id: string }; Returns: boolean }
       recalculate_user_stats: {
         Args: { target_user_id: string }
         Returns: undefined

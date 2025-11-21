@@ -45,8 +45,8 @@ export async function POST(request: Request) {
     // Verify target user exists
     const { data: targetProfile, error: profileError } = await supabase
       .from('profiles')
-      .select('user_id, follower_count')
-      .eq('user_id', targetUserId)
+      .select('id, follower_count')
+      .eq('id', targetUserId)
       .single()
 
     if (profileError || !targetProfile) {
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
     const { data: updatedProfile } = await supabase
       .from('profiles')
       .select('follower_count, following_count')
-      .eq('user_id', targetUserId)
+      .eq('id', targetUserId)
       .single()
 
     return NextResponse.json({

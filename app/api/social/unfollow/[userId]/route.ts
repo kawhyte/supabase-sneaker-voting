@@ -69,7 +69,7 @@ export async function DELETE(
     const { data: updatedProfile } = await supabase
       .from('profiles')
       .select('follower_count, following_count')
-      .eq('user_id', targetUserId)
+      .eq('id', targetUserId)
       .single()
 
     return NextResponse.json({
