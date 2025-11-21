@@ -54,9 +54,19 @@ export function OutfitsDashboard() {
         try {
           const { createClient } = await import('@/utils/supabase/client')
           const supabase = createClient()
+
+          // CRITICAL: Get current user to filter by user_id
+          const { data: { user } } = await supabase.auth.getUser()
+          if (!user) {
+            console.error('No authenticated user')
+            toast.error('Please log in to view your wardrobe')
+            return
+          }
+
           const { data: items, error } = await supabase
             .from('items')
             .select('*, item_photos(*)')
+            .eq('user_id', user.id) // SECURITY FIX: Only show current user's items
             .eq('status', 'owned')
             .eq('is_archived', false)
             .order('created_at', { ascending: false })
