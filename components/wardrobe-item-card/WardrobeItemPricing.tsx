@@ -5,13 +5,17 @@
  * - Owned items: Purchase price + cost per wear
  * - Wishlist items: Retail, sale (if on sale), and target prices
  * - Shows stale price warning for wishlist items
+ * - Supports compact mode with drawer button
  */
 
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Info } from "lucide-react";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { StalePriceWarning } from "./StalePriceWarning";
+import { PriceStatusBadge } from "./PriceStatusBadge";
 
 interface ItemPricingDisplayProps {
 	item: WardrobeItem;
@@ -20,6 +24,8 @@ interface ItemPricingDisplayProps {
 	onRefreshPrice?: (itemId: string) => Promise<void>;
 	onManualEntrySuccess?: () => void;
 	isPublicView?: boolean; // Hide target price and price tracking in public view
+	useDrawer?: boolean; // If true, show compact badge + button instead of full controls
+	onOpenDrawer?: () => void; // Callback to open the drawer
 }
 
 export function ItemPricingDisplay({
@@ -29,6 +35,8 @@ export function ItemPricingDisplay({
 	onRefreshPrice,
 	onManualEntrySuccess,
 	isPublicView = false,
+	useDrawer = false,
+	onOpenDrawer,
 }: ItemPricingDisplayProps) {
 	if (isOwned) {
 		// OWNED ITEMS: Show purchase price
@@ -100,19 +108,40 @@ export function ItemPricingDisplay({
 				</div>
 			)}
 
-			{/* Stale price warning for wishlist items - Hide in public view */}
+			{/* Price tracking controls - Hide in public view */}
 			{!isPublicView && (
-				<StalePriceWarning
-					itemId={item.id}
-					itemName={`${item.brand} ${item.model}`}
-					lastPriceCheckAt={item.last_price_check_at || null}
-					isAutoTrackingEnabled={item.auto_price_tracking_enabled !== false}
-					priceCheckFailures={item.price_check_failures || 0}
-					onRefreshPrice={onRefreshPrice}
-					retailPrice={item.retail_price}
-					currentPrice={item.sale_price}
-					onManualEntrySuccess={onManualEntrySuccess}
-				/>
+				useDrawer ? (
+					// COMPACT MODE: Show badge + View Details button
+					<div className='flex flex-col gap-2'>
+						<PriceStatusBadge
+							lastPriceCheckAt={item.last_price_check_at || null}
+							isAutoTrackingEnabled={item.auto_price_tracking_enabled !== false}
+							priceCheckFailures={item.price_check_failures || 0}
+						/>
+						<Button
+							onClick={onOpenDrawer}
+							variant='outline'
+							size='sm'
+							className='w-full justify-center gap-2 h-9 bg-white hover:bg-stone-50 border-stone-300 text-foreground'
+						>
+							<Info className='h-4 w-4' />
+							View Details
+						</Button>
+					</div>
+				) : (
+					// FULL MODE: Show complete price warning with action buttons
+					<StalePriceWarning
+						itemId={item.id}
+						itemName={`${item.brand} ${item.model}`}
+						lastPriceCheckAt={item.last_price_check_at || null}
+						isAutoTrackingEnabled={item.auto_price_tracking_enabled !== false}
+						priceCheckFailures={item.price_check_failures || 0}
+						onRefreshPrice={onRefreshPrice}
+						retailPrice={item.retail_price}
+						currentPrice={item.sale_price}
+						onManualEntrySuccess={onManualEntrySuccess}
+					/>
+				)
 			)}
 		</div>
 	);
