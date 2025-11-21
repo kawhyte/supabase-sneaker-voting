@@ -194,13 +194,14 @@ function WardrobeItemCardComponent({
 								</div>
 							)}
 
-							{/* Pricing - Always show (public information) */}
+							{/* Pricing - Always show, but hide target price and tracking in public view */}
 							<ItemPricingDisplay
 								item={item}
 								isOwned={displayLogic.isOwned}
 								isOnSale={displayLogic.isOnSale}
 								onRefreshPrice={actions.onRefreshPrice}
 								onManualEntrySuccess={actions.onManualEntrySuccess}
+								isPublicView={isPublicView}
 							/>
 
 							{/* Size, Comfort, Wears - Hide in public view */}

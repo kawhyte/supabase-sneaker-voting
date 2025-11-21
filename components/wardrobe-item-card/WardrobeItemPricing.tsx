@@ -19,6 +19,7 @@ interface ItemPricingDisplayProps {
 	isOnSale: boolean;
 	onRefreshPrice?: (itemId: string) => Promise<void>;
 	onManualEntrySuccess?: () => void;
+	isPublicView?: boolean; // Hide target price and price tracking in public view
 }
 
 export function ItemPricingDisplay({
@@ -27,6 +28,7 @@ export function ItemPricingDisplay({
 	isOnSale,
 	onRefreshPrice,
 	onManualEntrySuccess,
+	isPublicView = false,
 }: ItemPricingDisplayProps) {
 	if (isOwned) {
 		// OWNED ITEMS: Show purchase price
@@ -88,7 +90,8 @@ export function ItemPricingDisplay({
 				</div>
 			)}
 
-			{item.target_price && (
+			{/* Target price - Hide in public view */}
+			{!isPublicView && item.target_price && (
 				<div className='flex items-center gap-1.5 px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
 					<span className='text-sm text-muted-foreground'>Target:</span>
 					<span className='text-base font-semibold text-foreground'>
@@ -97,18 +100,20 @@ export function ItemPricingDisplay({
 				</div>
 			)}
 
-			{/* Stale price warning for wishlist items */}
-			<StalePriceWarning
-				itemId={item.id}
-				itemName={`${item.brand} ${item.model}`}
-				lastPriceCheckAt={item.last_price_check_at || null}
-				isAutoTrackingEnabled={item.auto_price_tracking_enabled !== false}
-				priceCheckFailures={item.price_check_failures || 0}
-				onRefreshPrice={onRefreshPrice}
-				retailPrice={item.retail_price}
-				currentPrice={item.sale_price}
-				onManualEntrySuccess={onManualEntrySuccess}
-			/>
+			{/* Stale price warning for wishlist items - Hide in public view */}
+			{!isPublicView && (
+				<StalePriceWarning
+					itemId={item.id}
+					itemName={`${item.brand} ${item.model}`}
+					lastPriceCheckAt={item.last_price_check_at || null}
+					isAutoTrackingEnabled={item.auto_price_tracking_enabled !== false}
+					priceCheckFailures={item.price_check_failures || 0}
+					onRefreshPrice={onRefreshPrice}
+					retailPrice={item.retail_price}
+					currentPrice={item.sale_price}
+					onManualEntrySuccess={onManualEntrySuccess}
+				/>
+			)}
 		</div>
 	);
 }
