@@ -42,7 +42,7 @@ interface WardrobeDashboardProps {
 	onAddNew?: () => void;
 	status: ItemStatus[];
 	isArchivePage?: boolean;
-	categoryFilter?: ItemCategory[]; // NEW: Filter by specific categories (e.g., ['shoes'] for The Rotation)
+	categoryFilter?: ItemCategory[]; // NEW: Filter by specific categories (e.g., ['shoes'] for Sneakers)
 }
 
 export function WardrobeDashboard({

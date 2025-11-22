@@ -189,7 +189,7 @@ function DashboardContent() {
 						</div>
 
 						{/* --- Tab Content --- */}
-						{/* Tab 1: The Rotation - Shoes Only (Owned) */}
+						{/* Tab 1: Sneakers - Shoes Only (Owned) */}
 						<TabsContent value='rotation'>
 							<motion.div
 								initial={{ opacity: 0, y: 8 }}
