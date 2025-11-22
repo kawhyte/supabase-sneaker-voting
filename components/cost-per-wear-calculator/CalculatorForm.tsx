@@ -14,9 +14,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from '@/components/ui/separator';
 // NEW IMPORTS: Puzzle, Palette, Copy
-import { 
-  Sparkles, ArrowRight, TrendingDown, Shield, Gem, 
-  XCircle, Banknote, Flame, Coins, Puzzle, Palette, Copy 
+import {
+  Sparkles, ArrowRight, TrendingDown, Shield, Gem,
+  XCircle, Banknote, Flame, Coins, Puzzle, Palette, Copy,
+  Footprints, Shirt, Scissors, Wind, ShoppingBag
 } from 'lucide-react'; 
 import { ResultsDisplay } from './ResultsDisplay';
 import { cn } from '@/lib/utils';
@@ -101,11 +102,31 @@ export function CalculatorForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="shoes">👟 Shoes / Sneakers</SelectItem>
-                            <SelectItem value="tops">👕 Tops / Shirts</SelectItem>
-                            <SelectItem value="bottoms">👖 Bottoms / Pants</SelectItem>
-                            <SelectItem value="outerwear">🧥 Outerwear</SelectItem>
-                            <SelectItem value="accessories">👜 Accessories</SelectItem>
+                            <SelectItem value="shoes">
+                              <div className="flex items-center gap-2">
+                                <Footprints className="h-4 w-4" /> Shoes / Sneakers
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="tops">
+                              <div className="flex items-center gap-2">
+                                <Shirt className="h-4 w-4" /> Tops / Shirts
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="bottoms">
+                              <div className="flex items-center gap-2">
+                                <Scissors className="h-4 w-4" /> Bottoms / Pants
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="outerwear">
+                              <div className="flex items-center gap-2">
+                                <Wind className="h-4 w-4" /> Outerwear
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="accessories">
+                              <div className="flex items-center gap-2">
+                                <ShoppingBag className="h-4 w-4" /> Accessories
+                              </div>
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

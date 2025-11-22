@@ -3,7 +3,7 @@
 
 import { CalculatorMetrics, CalculatorInput, getFrequencyLabel, getWearsFromFrequency } from '@/lib/worth-it-calculator/calculator-logic';
 import { Card } from '@/components/ui/card';
-import { Calendar, Clock, CheckCircle2 } from 'lucide-react';
+import { Calendar, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface TimelineProjectionProps {
   metrics: CalculatorMetrics;
@@ -103,10 +103,10 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
         <div className="flex gap-3 text-sm text-stone-600 bg-stone-50 p-4 rounded-md">
           <Calendar className="w-5 h-5 text-stone-400 flex-shrink-0" />
           <p>
-            At your <strong>{input.wearFrequency}</strong> wear rate, this item breaks even in <strong>{yearsToBreakEven.toFixed(1)} years</strong>. 
-            {metrics.estimatedLifespanYears > yearsToBreakEven 
-              ? " Since this is well within the item's estimated lifespan, it's a safe investment. ✅"
-              : " ⚠️ This is longer than the item might last. Consider a higher quality alternative."}
+            At your <strong>{input.wearFrequency}</strong> wear rate, this item breaks even in <strong>{yearsToBreakEven.toFixed(1)} years</strong>.
+            {metrics.estimatedLifespanYears > yearsToBreakEven
+              ? <span className="inline-flex items-center gap-1"> Since this is well within the item's estimated lifespan, it's a safe investment. <CheckCircle2 className="h-4 w-4 text-green-600 inline" /></span>
+              : <span className="inline-flex items-center gap-1"><AlertTriangle className="h-4 w-4 text-orange-600 inline" /> This is longer than the item might last. Consider a higher quality alternative.</span>}
           </p>
         </div>
       </div>

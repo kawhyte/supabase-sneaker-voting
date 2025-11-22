@@ -5,7 +5,7 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import { Calculator, Gem, RefreshCw, PiggyBank } from 'lucide-react';
+import { Calculator, Gem, RefreshCw, PiggyBank, Footprints, Shirt } from 'lucide-react';
 
 export function HowItWorksSection() {
   return (
@@ -116,8 +116,8 @@ export function HowItWorksSection() {
               </thead>
               <tbody className="divide-y divide-stone-100">
                 <tr className="hover:bg-stone-50/50 transition-colors">
-                  <td className="px-6 py-4 font-medium">
-                    <span className="mr-2">👟</span> Limited Jordans
+                  <td className="px-6 py-4 font-medium flex items-center gap-2">
+                    <Footprints className="h-4 w-4 text-muted-foreground" /> Limited Jordans
                   </td>
                   <td className="px-6 py-4">$220</td>
                   <td className="px-6 py-4 text-green-600">High (~$150)</td>
@@ -127,8 +127,8 @@ export function HowItWorksSection() {
                   </td>
                 </tr>
                 <tr className="hover:bg-stone-50/50 transition-colors">
-                  <td className="px-6 py-4 font-medium">
-                    <span className="mr-2">👕</span> Fast Fashion Tee
+                  <td className="px-6 py-4 font-medium flex items-center gap-2">
+                    <Shirt className="h-4 w-4 text-muted-foreground" /> Fast Fashion Tee
                   </td>
                   <td className="px-6 py-4">$25</td>
                   <td className="px-6 py-4 text-stone-400">$0</td>
