@@ -26,7 +26,7 @@ function LottieAnimationWrapper() {
   const [animationData, setAnimationData] = useState(null)
 
   useEffect(() => {
-    fetch('/animations/cat-wardrobe.json') // Make sure this path matches your public folder
+    fetch('/animations/cat-laughing.json') // Make sure this path matches your public folder
       .then(res => res.json())
       .then(setAnimationData)
       .catch(err => console.error('Failed to load Lottie:', err))
