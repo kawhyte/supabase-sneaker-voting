@@ -157,28 +157,28 @@ function DashboardContent() {
 									<TabsTrigger
 										value='rotation'
 										data-variant='underline'
-										className='relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2'>
+										className='relative py-2 px-4 rounded-xl pb-4 bg-transparent flex items-center gap-2'>
 										<Footprints className='h-4 w-4' />
 										Sneakers
 									</TabsTrigger>
 									<TabsTrigger
 										value='closet'
 										data-variant='underline'
-										className='relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2'>
+										className='relative py-2 px-4 rounded-xl  pb-4 bg-transparent flex items-center gap-2'>
 										<Shirt className='h-4 w-4' />
 										Apparel
 									</TabsTrigger>
 									<TabsTrigger
 										value='wishlist'
 										data-variant='underline'
-										className='relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2'>
+										className='relative py-2 px-4 rounded-xl  pb-4 bg-transparent flex items-center gap-2'>
 										<Heart className='h-4 w-4' />
 										Wishlist
 									</TabsTrigger>
 									<TabsTrigger
 										value='fits'
 										data-variant='underline'
-										className='relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2'>
+										className='relative py-2 px-4 rounded-xl  pb-4 bg-transparent flex items-center gap-2'>
 										<Sparkles className='h-4 w-4' />
 										Fits
 									</TabsTrigger>
