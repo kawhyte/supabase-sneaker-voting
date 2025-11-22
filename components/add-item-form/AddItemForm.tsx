@@ -127,6 +127,23 @@ export default function AddItemForm({
 		}
 	}, [smartDefaults, mode, form])
 
+	// PHASE 1 FIX: Smart default formMode in edit mode
+	// If editing an item that has advanced fields filled (SKU, notes, or wears),
+	// ensure formMode is set to 'advanced' so users can see and edit those fields
+	// This prevents confusion when user's localStorage has formMode='quick'
+	useEffect(() => {
+		if (mode === 'edit' && initialData) {
+			const hasAdvancedFields = !!(
+				initialData.sku ||
+				initialData.notes ||
+				(initialData.wears && initialData.wears > 0)
+			)
+			if (hasAdvancedFields && formMode === 'quick') {
+				setFormMode('advanced')
+			}
+		}
+	}, [mode, initialData, formMode, setFormMode])
+
 	// Real-time URL validation when price tracking is enabled
 	useEffect(() => {
 		const productUrl = form.watch('productUrl')

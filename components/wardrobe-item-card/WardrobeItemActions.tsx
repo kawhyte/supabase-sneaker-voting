@@ -119,14 +119,14 @@ export function ItemCardActions({
 								</DropdownMenuItem>
 							)}
 
-							{!isReadOnly && isWishlisted && onMarkAsPurchased && (
+							{/* {!isReadOnly && isWishlisted && onMarkAsPurchased && (
 								<DropdownMenuItem
 									onSelect={() => onMarkAsPurchased(item)}
 									className='cursor-pointer'>
 									<ShoppingBag className='h-3 w-3 mr-2' />
 									Purchased...
 								</DropdownMenuItem>
-							)}
+							)} */}
 
 							{!isReadOnly && isOwned && onMoveToWatchlist && (
 								<DropdownMenuItem
@@ -146,14 +146,14 @@ export function ItemCardActions({
 								</DropdownMenuItem>
 							)}
 
-							{!isReadOnly && onArchive && (
+							{/* {!isReadOnly && onArchive && (
 								<DropdownMenuItem
 									onSelect={() => onArchive(item)}
 									className='cursor-pointer'>
 									<Archive className='h-3 w-3 mr-2' />
 									Archive...
 								</DropdownMenuItem>
-							)}
+							)} */}
 
 							{!isReadOnly && (
 								<DropdownMenuItem

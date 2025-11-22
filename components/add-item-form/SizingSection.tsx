@@ -56,8 +56,10 @@ export function SizingSection({
 	const watchedTriedOn = watch("triedOn");
 	const watchedCategory = watch("category");
 
-	// Only render in advanced mode
-	if (formMode !== "advanced") return null;
+	// PHASE 1 FIX: In edit mode, always show all fields regardless of formMode
+	// This ensures users can edit SKU, Notes, and Wears that were previously added
+	// In create mode, respect the Quick/Advanced mode toggle
+	if (mode !== 'edit' && formMode !== 'advanced') return null;
 
 	return (
 		<div className="space-y-6">
