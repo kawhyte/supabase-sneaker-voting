@@ -292,7 +292,7 @@ export async function createCostPerWearMilestone(
     const result = await createNotification({
       userId,
       type: 'cost_per_wear_milestone',
-      title: 'Cost-Per-Wear Goal Achieved! 🎉',
+      title: 'Cost-Per-Wear Goal Achieved!',
       message: `Your ${item.brand} ${item.model} is earning its keep! Now at $${item.cost_per_wear.toFixed(
         2
       )}/wear (${item.wears} wears).`,
@@ -361,7 +361,7 @@ export async function createDuplicationFollowUp(
     const result = await createNotification({
       userId,
       type: 'outfit_suggestion',
-      title: 'Can You Style This? 🤔',
+      title: 'Can You Style This?',
       message: `You already own ${dismissedWarning.similar_items.length} similar items. Try styling them in new ways before adding more!`,
       severity: 'low',
       linkUrl: '/dashboard?tab=outfits&action=create',

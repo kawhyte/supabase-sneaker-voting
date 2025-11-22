@@ -6,7 +6,7 @@
 
 import { AdvancedInsights } from '@/lib/worth-it-calculator/calculator-logic';
 import { Card } from '@/components/ui/card';
-import { AlertTriangle, CheckCircle, Info, TrendingDown } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, TrendingDown, PartyPopper } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AdvancedInsightsDisplayProps {
@@ -36,8 +36,8 @@ export function AdvancedInsightsDisplay({ insights }: AdvancedInsightsDisplayPro
             <div className="flex items-start gap-3">
               <TrendingDown className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
               <div className="space-y-2 flex-1">
-                <div className="font-semibold text-green-900 text-base">
-                  🎉 Great Sale Find!
+                <div className="font-semibold text-green-900 text-base flex items-center gap-2">
+                  <PartyPopper className="h-5 w-5" /> Great Sale Find!
                 </div>
                 <p className="text-sm text-green-800 leading-relaxed">
                   {insights.saleValueAnalysis.message}

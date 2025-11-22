@@ -15,7 +15,7 @@ import {
 import { Outfit, OutfitWithItems } from '@/components/types/outfit'
 import { OutfitCanvas } from './OutfitCanvas'
 import { OutfitStudio } from './OutfitStudio'
-import { Trash2, Edit2, Share2, Check } from 'lucide-react'
+import { Trash2, Edit2, Share2, Check, Lightbulb } from 'lucide-react'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 
 interface OutfitListViewProps {
@@ -327,7 +327,7 @@ export function OutfitListView({
                 readOnly={false}
               />
               <p className="text-xs text-slate-600 mt-3">
-                💡 Drag items to reposition, or click the X to remove items. Changes are auto-saved.
+                <Lightbulb className="h-4 w-4 inline" /> Drag items to reposition, or click the X to remove items. Changes are auto-saved.
               </p>
             </div>
 

@@ -1,12 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Package, Search, Moon, type LucideIcon } from 'lucide-react'
 
 export type CatLoadingType = 'organizing' | 'searching' | 'napping'
 
-const CAT_ANIMATIONS = {
+const CAT_ANIMATIONS: Record<CatLoadingType, {
+  icon: LucideIcon
+  text: string
+  messages: string[]
+}> = {
   organizing: {
-    emoji: '🧹',
+    icon: Package,
     text: 'Organizing your closet...',
     messages: [
       'Hanging up those tops...',
@@ -15,7 +20,7 @@ const CAT_ANIMATIONS = {
     ],
   },
   searching: {
-    emoji: '🔍',
+    icon: Search,
     text: 'Finding the perfect outfit...',
     messages: [
       'Searching wardrobe...',
@@ -24,7 +29,7 @@ const CAT_ANIMATIONS = {
     ],
   },
   napping: {
-    emoji: '😴',
+    icon: Moon,
     text: 'PurrView is loading...',
     messages: [
       'Waking up the cat...',
@@ -51,8 +56,8 @@ export function CatLoadingAnimation({ type = 'organizing' }: { type?: CatLoading
 
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
-      {/* Animated cat emoji */}
-      <div className="text-6xl mb-4 animate-bounce">{animation.emoji}</div>
+      {/* Animated icon */}
+      <animation.icon className="h-16 w-16 mb-4 animate-bounce text-sun-400" />
 
       {/* Loading text */}
       <p className="text-lg font-medium text-foreground mb-4">{animation.text}</p>

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { Calculator } from 'lucide-react';
+import { Calculator, Check } from 'lucide-react';
 
 export function CalculatorHero() {
   return (
@@ -31,15 +31,15 @@ export function CalculatorHero() {
         {/* Value Props */}
         <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-600 pt-4">
           <div className="flex items-center gap-2">
-            <span className="text-green-600">✓</span>
+            <Check className="h-4 w-4 text-green-600" />
             <span>No signup required</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-green-600">✓</span>
+            <Check className="h-4 w-4 text-green-600" />
             <span>Category-aware targets</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-green-600">✓</span>
+            <Check className="h-4 w-4 text-green-600" />
             <span>Instant results</span>
           </div>
         </div>

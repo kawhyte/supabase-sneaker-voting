@@ -358,11 +358,65 @@ Removed three unnecessary notification features to simplify the notification sys
 5. `outfit_suggestion` - Outfit composition suggestions
 6. `cost_per_wear_milestone` - Cost-per-wear goal celebrations
 
+### Codebase Cleanup - Unused Code Removal (November 2025) ✅ COMPLETED
+Comprehensive audit and removal of unused components, utilities, and debug endpoints to reduce codebase complexity and improve maintainability.
+
+**Status**: ✅ All unused files identified and removed, no breaking changes
+
+**Files Removed (8 total):**
+
+**Components (4 files):**
+1. **`components/AddItemForm.tsx`** (1,414 lines) - Old monolithic form component
+   - Superseded by modular architecture in `components/add-item-form/AddItemForm.tsx` (492 lines)
+   - New version uses separated section components (BasicInfoSection, PricingSection, SizingSection, etc.)
+   - Improved maintainability and testability
+
+2. **`components/AddProductFormWrapper.tsx`** (64 lines) - Thin wrapper component
+   - Only imported the old AddItemForm.tsx
+   - No longer needed with modular form architecture
+
+3. **`components/CollectionGrid.tsx`** (66 lines) - Grid layout component
+   - Not imported anywhere in the codebase
+   - Functionality replaced by WardrobeDashboard's built-in grid layout
+
+4. **`components/ProductUrlParser.tsx`** (355 lines) - Standalone URL parser
+   - Product parsing functionality integrated into AddItemForm's ProductURLSection
+   - Duplicate functionality, not referenced
+
+**Utilities (1 file):**
+5. **`lib/wardrobe-duplication-detector.ts`** (176 lines) - Basic duplicate detection
+   - Superseded by `lib/smart-duplicate-detector.ts` with advanced fuzzy matching
+   - New version uses weighted scoring (Category 40%, Color 30%, Brand 20%, Model 10%)
+   - New version has <200ms performance for 1000+ items
+
+**API Debug Endpoints (3 routes):**
+6. **`app/api/notifications-debug/route.ts`** (55 lines) - Debug endpoint for notification count
+7. **`app/api/notifications-full-debug/route.ts`** (111 lines) - Full debug with query logs
+8. **`app/api/notifications-direct/route.ts`** (52 lines) - Direct notification creation for testing
+
+**Impact:**
+- **Total lines removed**: ~2,293 lines of unused code
+- **Components cleaned up**: 4 unused components removed
+- **API surface reduced**: 3 debug endpoints removed (cleaner production API)
+- **Improved maintainability**: Single source of truth for duplicate detection and form management
+- **No functionality lost**: All features preserved in newer implementations
+
+**Verification:**
+- Comprehensive import analysis across entire codebase
+- No references found to removed files (except self-references)
+- TypeScript compilation verified (no new errors introduced)
+
+**Current Active Components:**
+- Add/Edit Form: `components/add-item-form/` (modular architecture with 9 files)
+- Duplicate Detection: `lib/smart-duplicate-detector.ts` (fuzzy matching with fastest-levenshtein)
+- Main Notification API: `app/api/notifications/route.ts` (production endpoint)
+
 **Latest Status:**
 - ✅ Phase 1-6 refactoring complete (foundation cleanup, outfit studio, component modularization, type system)
 - ✅ Smart duplicate detection with fuzzy matching
 - ✅ Icon system update with Lucide icons
 - ✅ Notification system simplified (3 types removed)
+- ✅ Codebase cleanup complete (8 unused files removed, ~2,293 lines of code removed)
 - ✅ Add/Edit form UX improvements (color required, smart target price, sale price in Quick mode)
 - ✅ Database: `items` table (renamed from `sneakers`)
 - ✅ Status types: `owned` | `wishlisted` (removed `journaled`)

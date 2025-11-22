@@ -11,7 +11,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Shuffle, ThumbsUp, ThumbsDown, RotateCw } from 'lucide-react'
+import { Shuffle, ThumbsUp, ThumbsDown, RotateCw, Lightbulb } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -295,7 +295,7 @@ export function OutfitShuffle({
         {/* Help Text */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 sm:p-3">
           <p className="text-xs text-blue-800">
-            💡 <strong>Tip:</strong> Shuffle generates random combinations. Like it? Save it! Don't like it? Skip.
+            <Lightbulb className="h-4 w-4 inline" /> <strong>Tip:</strong> Shuffle generates random combinations. Like it? Save it! Don't like it? Skip.
           </p>
         </div>
       </CardContent>

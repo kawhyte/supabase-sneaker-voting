@@ -395,7 +395,7 @@ export function WardrobeDashboard({
 		});
 
 		if (itemsToCheck.length === 0) {
-			toast.info('All prices are up to date! ✅', {
+			toast.info('All prices are up to date!', {
 				description: 'No items need checking. All wishlist items were checked today or have no product URL.',
 				duration: 5000
 			});
@@ -506,7 +506,7 @@ export function WardrobeDashboard({
 		let description = '';
 
 		if (successResults.length > 0) {
-			description += '✅ Updated:\n';
+			description += 'Updated:\n';
 			successResults.forEach(r => {
 				description += `• ${r.item.brand} ${r.item.model}: $${r.price}\n`;
 			});
@@ -514,7 +514,7 @@ export function WardrobeDashboard({
 
 		if (failResults.length > 0) {
 			if (description) description += '\n';
-			description += '❌ Failed:\n';
+			description += 'Failed:\n';
 			failResults.forEach(r => {
 				const reason = r.error?.includes('403') ? 'Bot blocked' :
 				               r.error?.includes('Could not find') ? 'Price not found' :
