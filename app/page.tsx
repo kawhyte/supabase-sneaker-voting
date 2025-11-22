@@ -4,22 +4,18 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import { ArrowRight, PawPrint } from 'lucide-react'
+import { ArrowRight, Calculator, TrendingDown, Shirt, Sparkles, MoveRight } from 'lucide-react'
 
 // Dynamically import Lottie component for code splitting
 const Lottie = dynamic(() => import('react-lottie-player'), {
   ssr: false,
 })
 
-/**
- * Lottie Animation Wrapper with error boundary
- */
 function LottieAnimationWrapper() {
   const [hasError, setHasError] = useState(false)
   const [animationData, setAnimationData] = useState(null)
 
   useEffect(() => {
-    // Load animation data from public folder
     fetch('/animations/cat-wardrobe.json')
       .then(res => res.json())
       .then(data => setAnimationData(data))
@@ -29,208 +25,202 @@ function LottieAnimationWrapper() {
       })
   }, [])
 
-  if (hasError || !animationData) {
-    return null
-  }
+  if (hasError || !animationData) return null
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{
-        duration: 0.6,
-        delay: 0.4,
-        ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
-      }}
-      className="w-full flex justify-center"
-    >
-      <div className="w-full max-w-[90%] sm:max-w-[70%] md:max-w-[500px] aspect-square">
-        <Lottie
-          loop
-          play
-          animationData={animationData}
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          rendererSettings={{
-            preserveAspectRatio: 'xMidYMid slice',
-          }}
-        />
-      </div>
-    </motion.div>
+    <div className="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[400px] aspect-square relative">
+      {/* Restored the subtle glow from Design 1 */}
+      <div className="absolute inset-0 bg-sun-200/20 blur-[60px] rounded-full transform scale-75" />
+      <Lottie
+        loop
+        play
+        animationData={animationData}
+        style={{ width: '100%', height: '100%' }}
+        rendererSettings={{ preserveAspectRatio: 'xMidYMid slice' }}
+      />
+    </div>
   )
 }
 
-/**
- * Main Hero Section Component
- * Phantom-inspired centered layout with cat-themed animation
- */
-export default function HomePage() {
-
+const BentoCard = ({ 
+  children, 
+  className = "", 
+  href, 
+  delay = 0 
+}: { 
+  children: React.ReactNode; 
+  className?: string; 
+  href: string;
+  delay?: number;
+}) => {
   return (
-    <main className="relative bg-background flex flex-col items-center justify-center">
-      {/* Gradient background accent (subtle) */}
-      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sun-100 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-terracotta-100 rounded-full blur-3xl opacity-20" />
-      </div> */}
+    <Link href={href} className={`block h-full ${className}`}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay, ease: [0.34, 1.56, 0.64, 1] }}
+        whileHover={{ scale: 1.02, y: -5 }}
+        whileTap={{ scale: 0.98 }}
+        // KEPT: rounded-[2rem] for the Phantom look
+        // ADDED: overflow-hidden to prevent corners from "cutting off" incorrectly
+        className="h-full w-full relative overflow-hidden rounded-[2rem] transition-shadow duration-300 hover:shadow-xl"
+      >
+        {children}
+      </motion.div>
+    </Link>
+  )
+}
 
-      {/* Main Hero Content */}
-      <div className="relative z-10 w-full px-4 py-12 md:py-0">
-        <div className="max-w-7xl mx-auto text-center space-y-4 md:space-y-4">
-          {/* Subtitle with fade-in */}
+export default function HomePage() {
+  return (
+    // RESTORED: bg-stone-50 (instead of white)
+    // ADJUSTED: pt-6 sm:pt-10 (Less space than Design 1, but more breathing room than Design 2)
+    <main className="min-h-screen bg-stone-50 flex flex-col items-center pt-6 sm:pt-10 md:pt-1 pb-20 px-4 sm:px-6">
+      
+      {/* --- HERO SECTION --- */}
+      <div className="max-w-5xl mx-auto text-center space-y-6 mb-12 md:mb-16 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex justify-center mb-2 md:mb-6"
+        >
+          <LottieAnimationWrapper />
+        </motion.div>
+
+        <div className="space-y-4 max-w-3xl mx-auto">
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            // UPDATE: Switched to text-slate-950 for higher contrast
+            className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-slate-950 leading-[1.1]"
+          >
+            Your Wardrobe. <span className="text-slate-400">Curated.</span>
+          </motion.h1>
+          
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.5,
-              delay: 0.1,
-              ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
-            }}
-            className="text-sm md:text-lg font-medium text-slate-900"
+            transition={{ delay: 0.3 }}
+            // UPDATE: Slightly darker subtext
+            className="text-lg sm:text-xl text-slate-600 font-medium max-w-lg mx-auto"
           >
-            A watchlist for your wardrobe
+            Import styles. Track wears. Watch prices.
           </motion.p>
-
-          {/* Main Headline with staggered text animation */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.6,
-              delay: 0.2,
-              ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
-            }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-slate-900 leading-tight"
-          >
-            <div className="flex flex-row items-center justify-center gap-2 sm:gap-3">
-              <span>Your</span>
-              <PawPrint className="text-sun-200 h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14" />
-              <span>trusted</span>
-            </div>
-
-            <div className="mt-2">
-              PurrView Wardrobe
-            </div>
-          </motion.h1>
-
-          {/* Description */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.6,
-              delay: 0.3,
-              ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
-            }}
-            className="text-lg sm:text-xl md:text-2xl text-slate-600 max-w-7xl mx-auto leading-relaxed font-light"
-          >
-            Curate your wardrobe with feline precision. Keep a watchful eye on your wishlist and pounce on the purrfect price when it drops.
-          </motion.p>
-
-          {/* Lottie Animation */}
-          <div className="mt-2 md:mt-4">
-            <LottieAnimationWrapper />
-          </div>
-
-          {/* CTA Button with hover effect */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.6,
-              delay: 0.5,
-              ease: [0.34, 1.56, 0.64, 1] // spring-smooth easing
-            }}
-            className="pt-4 md:pt-4"
-          >
-            <Link href="/login" prefetch={true}>
-              <motion.button
-                whileHover={{
-                  scale: 1.02,
-                  boxShadow:
-                    '0 20px 25px -5px rgba(255, 199, 0, 0.2), 0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                }}
-                whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-4 md:py-5 text-base md:text-lg font-semibold rounded-full bg-sun-200 text-slate-900 hover:bg-sun-300 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-sun-300 focus:ring-offset-2 min-h-[44px]"
-                aria-label="Start tracking your wardrobe"
-              >
-                Start Tracking
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
-            </Link>
-          </motion.div>
-
-          {/* Scroll Hint (subtle) */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.7 }}
-            transition={{ delay: 1, duration: 0.5 }}
-            className="pt-12 md:pt-16"
-          >
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-              className="flex justify-center"
-            >
-              <div className="text-slate-600 text-xs tracking-widest uppercase font-medium">
-                Scroll to explore
-              </div>
-            </motion.div>
-          </motion.div>
         </div>
       </div>
 
-      {/* Cost Per Wear Calculator CTA Section */}
-      <section className="w-full py-16 px-6 bg-gradient-to-b from-white to-stone-50 border-t border-stone-200">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-3xl sm:text-4xl font-bold text-foreground"
+      {/* --- THE BENTO GRID --- */}
+      <div className="w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[minmax(200px,auto)]">
+        
+        {/* CARD 1: The Collection (Restored Design 1 Layout) */}
+        <div className="col-span-1 md:col-span-2 row-span-2">
+          <BentoCard 
+            href="/login" 
+            className="h-full"
+            delay={0.4}
           >
-            Before You Buy, Know If It's Worth It
-          </motion.h2>
+            <div className="bg-white border border-stone-200 p-8 md:p-10 h-full flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 bg-stone-100 rounded-2xl text-slate-900">
+                    <Shirt className="w-6 h-6" />
+                  </div>
+                  <span className="text-sm font-bold uppercase tracking-wider text-stone-500">The Collection</span>
+                </div>
+                {/* UPDATE: Darker text (slate-950) + Font Extrabold */}
+                <h2 className="text-3xl md:text-5xl font-extrabold text-slate-950 mb-4 group-hover:text-sun-500 transition-colors">
+                  Organize your rotation.
+                </h2>
+                <p className="text-lg text-slate-600 max-w-md font-medium">
+                  Keep a watchful eye on your wishlist and track every wear. Your digital closet, reimagined.
+                </p>
+              </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto"
-          >
-            Use our free calculator to see if that clothing item is really worth the investment.
-            Calculate cost-per-wear in seconds—no signup required.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="pt-2"
-          >
-            <Link href="/cost-per-wear-calculator" prefetch={true}>
-              <motion.button
-                whileHover={{
-                  scale: 1.02,
-                  boxShadow:
-                    '0 20px 25px -5px rgba(255, 199, 0, 0.2), 0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                }}
-                whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold rounded-full bg-sun-400 text-slate-900 hover:bg-sun-500 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-sun-300 focus:ring-offset-2 min-h-[44px]"
-                aria-label="Calculate cost per wear"
-              >
-                Calculate Now
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
-            </Link>
-          </motion.div>
+              <div className="mt-8 pt-8 border-t border-stone-100 flex items-center justify-between">
+                <div className="flex -space-x-4">
+                  {[1,2,3].map((i) => (
+                    <div key={i} className="w-12 h-12 rounded-full bg-stone-100 border-4 border-white flex items-center justify-center shadow-sm">
+                       <Sparkles className="w-4 h-4 text-stone-300" />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-slate-950 font-bold group-hover:gap-4 transition-all">
+                  Open Wardrobe <ArrowRight className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+          </BentoCard>
         </div>
-      </section>
+
+        {/* CARD 2: Calculator (Restored Design 1 Colors + Darker Text) */}
+        <div className="col-span-1 row-span-1 min-h-[240px]">
+          <BentoCard 
+            href="/cost-per-wear-calculator" 
+            className="h-full"
+            delay={0.5}
+          >
+            <div className="bg-terracotta-50 border border-terracotta-100 p-6 md:p-8 h-full flex flex-col justify-between hover:bg-terracotta-100 transition-colors">
+              <div className="space-y-4">
+                <div className="p-3 bg-white rounded-2xl w-fit text-terracotta-500 shadow-sm">
+                  <Calculator className="w-6 h-6" />
+                </div>
+                {/* UPDATE: Increased weight and darkness */}
+                <h3 className="text-2xl font-extrabold text-slate-950 leading-tight">
+                  Is it worth it?
+                </h3>
+              </div>
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-sm text-terracotta-700 font-bold">CPW Calculator</p>
+                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                  <MoveRight className="w-4 h-4 text-terracotta-500" />
+                </div>
+              </div>
+            </div>
+          </BentoCard>
+        </div>
+
+        {/* CARD 3: Price Tracker (Restored Design 1 Colors + Darker Text) */}
+        <div className="col-span-1 row-span-1 min-h-[240px]">
+          <BentoCard 
+            href="/login" 
+            className="h-full"
+            delay={0.6}
+          >
+            <div className="bg-sun-50 border border-sun-100 p-6 md:p-8 h-full flex flex-col justify-between hover:bg-sun-100 transition-colors">
+               <div className="space-y-4">
+                <div className="p-3 bg-white rounded-2xl w-fit text-sun-500 shadow-sm">
+                  <TrendingDown className="w-6 h-6" />
+                </div>
+                {/* UPDATE: Increased weight and darkness */}
+                <h3 className="text-2xl font-extrabold text-slate-950 leading-tight">
+                  Never overpay.
+                </h3>
+              </div>
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-sm text-sun-700 font-bold">Price Alerts</p>
+                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                  <MoveRight className="w-4 h-4 text-sun-500" />
+                </div>
+              </div>
+            </div>
+          </BentoCard>
+        </div>
+      </div>
+
+      {/* --- SCROLL HINT --- */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.6 }}
+        transition={{ delay: 1, duration: 1 }}
+        className="mt-12 md:mt-16 text-center"
+      >
+        {/* UPDATE: Darker grey for better visibility */}
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-bold">
+          Curate with feline precision
+        </p>
+      </motion.div>
     </main>
   )
 }

@@ -139,7 +139,7 @@ export default function RootLayout({
 
 									{/* Main content inherits bg-background from body, no need to repeat */}
 									{/* Add responsive horizontal padding so content doesn't touch screen edges on small devices */}
-									<main className='flex-1 py-8 sm:py-12 lg:py-16 px-8 sm:px-8 lg:px-8 container mx-auto w-full'>
+									<main className='flex-1 py-4 sm:py-4 lg:py-0 px-8 sm:px-8 lg:px-8 container mx-auto w-full'>
 										{children}
 									</main>
 
