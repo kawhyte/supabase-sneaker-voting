@@ -39,8 +39,8 @@ export function CalculatorForm() {
   const form = useForm<FormData>({
     resolver: zodResolver(smartCalculatorSchema),
     defaultValues: {
-      category: undefined, 
-      wearFrequency: 'weekly',
+      category: undefined,
+      wearFrequency: 'monthly',
       resalePotential: 'none',
       wardrobeRole: 'variety',
       qualityRating: 'average',

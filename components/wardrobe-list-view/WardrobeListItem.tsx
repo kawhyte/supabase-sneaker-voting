@@ -234,7 +234,7 @@ export function WardrobeListItem({
 				</div>
 
 				{/* Actions Menu - Click won't trigger expansion */}
-				<div className="flex-shrink-0 w-8 ml-8 flex justify-end" onClick={(e) => e.stopPropagation()}>
+				<div className="flex-shrink-0 w-8 ml-4 flex justify-end" onClick={(e) => e.stopPropagation()}>
 					<ItemCardActions
 						item={item}
 						isArchivePage={isArchivePage}

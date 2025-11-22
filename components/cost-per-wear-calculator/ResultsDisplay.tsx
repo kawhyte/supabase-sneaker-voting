@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/card';
 import { RecommendationCard } from './RecommendationCard';
 import { CPWMetricsCard } from './CPWMetricsCard';
 import { TimelineProjection } from './TimelineProjection';
-import { AdvancedInsightsDisplay } from './AdvancedInsightsDisplay';
+// import { AdvancedInsightsDisplay } from './AdvancedInsightsDisplay'; // Commented out - incomplete feature
 
 interface ResultsDisplayProps {
   results: CalculatorResults;
@@ -27,10 +27,10 @@ export function ResultsDisplay({ results }: ResultsDisplayProps) {
       {/* Timeline Projection */}
       <TimelineProjection metrics={results.metrics} input={results.input} />
 
-      {/* Advanced Insights (if provided) */}
-      {results.advancedInsights && (
+      {/* Advanced Insights (if provided) - Commented out - incomplete feature */}
+      {/* {results.advancedInsights && (
         <AdvancedInsightsDisplay insights={results.advancedInsights} />
-      )}
+      )} */}
     </div>
   );
 }
