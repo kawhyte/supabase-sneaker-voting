@@ -176,7 +176,6 @@ export function generateWearingNotifications(
 			outfitId: outfit.id,
 			outfitName: outfit.name,
 			message: `You wore "${outfit.name}" for the first time!`,
-			emoji: "✨",
 		};
 	}
 
@@ -187,7 +186,6 @@ export function generateWearingNotifications(
 			outfitId: outfit.id,
 			outfitName: outfit.name,
 			message: `"${outfit.name}" has been worn 10 times! You love this outfit!`,
-			emoji: "🔥",
 		};
 	}
 
