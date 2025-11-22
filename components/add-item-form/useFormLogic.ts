@@ -359,7 +359,101 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 				)
 
 				if (deletedPhotoIds.length > 0) {
-					await supabase.from('item_photos').delete().in('id', deletedPhotoIds)
+					console.log(`[Photo Cleanup] Found ${deletedPhotoIds.length} photos to delete during edit`)
+
+					// CRITICAL: Fetch cloudinary_id values BEFORE deleting database records
+					// This ensures we can delete from Cloudinary storage
+					const { data: photosToDelete, error: fetchError } = await supabase
+						.from('item_photos')
+						.select('id, cloudinary_id')
+						.in('id', deletedPhotoIds)
+
+					if (fetchError) {
+						console.error('[Photo Cleanup] Failed to fetch photos for deletion:', fetchError)
+						throw new Error('Failed to prepare photo deletion')
+					}
+
+					// Delete from Cloudinary first (batch processing with retry logic)
+					if (photosToDelete && photosToDelete.length > 0) {
+						const cloudinaryIds = photosToDelete
+							.map(p => p.cloudinary_id)
+							.filter(Boolean)
+
+						if (cloudinaryIds.length > 0) {
+							console.log(`[Photo Cleanup] Deleting ${cloudinaryIds.length} images from Cloudinary...`)
+
+							// Process in batches of 5 for parallel deletion
+							const BATCH_SIZE = 5
+							const errors: string[] = []
+
+							for (let i = 0; i < cloudinaryIds.length; i += BATCH_SIZE) {
+								const batch = cloudinaryIds.slice(i, i + BATCH_SIZE)
+
+								const results = await Promise.allSettled(
+									batch.map(async (cloudinaryId) => {
+										// Retry logic: 3 attempts with exponential backoff
+										for (let attempt = 0; attempt < 3; attempt++) {
+											try {
+												const response = await fetch('/api/delete-image', {
+													method: 'POST',
+													headers: { 'Content-Type': 'application/json' },
+													body: JSON.stringify({ publicId: cloudinaryId }),
+												})
+
+												if (response.ok) {
+													console.log(`[Photo Cleanup] ✓ Deleted from Cloudinary: ${cloudinaryId}`)
+													return { success: true }
+												}
+
+												// Retry on 5xx errors
+												if (response.status >= 500 && attempt < 2) {
+													const delay = Math.pow(2, attempt) * 1000
+													console.warn(`[Photo Cleanup] Retry ${attempt + 1}/3 for ${cloudinaryId} after ${delay}ms`)
+													await new Promise(resolve => setTimeout(resolve, delay))
+													continue
+												}
+
+												throw new Error(`HTTP ${response.status}`)
+											} catch (error) {
+												if (attempt === 2) {
+													throw error
+												}
+											}
+										}
+									})
+								)
+
+								// Collect errors but continue processing
+								results.forEach((result, idx) => {
+									if (result.status === 'rejected') {
+										const cloudinaryId = batch[idx]
+										console.warn(`[Photo Cleanup] ✗ Failed to delete from Cloudinary: ${cloudinaryId}`, result.reason)
+										errors.push(`${cloudinaryId}: ${result.reason}`)
+									}
+								})
+							}
+
+							if (errors.length > 0) {
+								console.warn(`[Photo Cleanup] ${errors.length}/${cloudinaryIds.length} Cloudinary deletions failed, but continuing with database cleanup`)
+								// Log errors but don't throw - database cleanup is still important
+							} else {
+								console.log(`[Photo Cleanup] ✓ All ${cloudinaryIds.length} images deleted from Cloudinary successfully`)
+							}
+						}
+					}
+
+					// Delete from database (this removes the tracking records)
+					const { error: deleteError } = await supabase
+						.from('item_photos')
+						.delete()
+						.in('id', deletedPhotoIds)
+
+					if (deleteError) {
+						console.error('[Photo Cleanup] CRITICAL: Failed to delete photos from database after Cloudinary cleanup:', deleteError)
+						throw new Error(`Failed to delete photos: ${deleteError.message}`)
+					}
+
+					console.log(`[Photo Cleanup] ✓ Database records deleted successfully`)
 				}
 
 				// Update existing photo metadata (order, isMain)
