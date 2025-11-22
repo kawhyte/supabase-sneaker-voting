@@ -119,7 +119,7 @@ export function WearStatsDrawer({
 						{/* Cost Per Wear Section */}
 						{hasWearPrice && (
 							<div className="flex flex-col gap-3">
-								<h3 className="text-sm font-semibold text-foreground">Cost Per Wear</h3>
+								<h3 className="text-sm font-semibold text-foreground">Actual Cost Per Wear</h3>
 
 								{/* CPW Value Display */}
 								<div className="bg-gradient-to-br from-sun-50 to-meadow-50 p-4 rounded-lg border border-sun-200">

@@ -20,7 +20,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { DollarSign, Sparkles } from 'lucide-react';
+import { DollarSign, Sparkles, Info } from 'lucide-react';
 
 interface CostPerWearProgressProps {
 	item: WardrobeItem;
@@ -53,7 +53,7 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 	const tooltipContent = (
 		<div className='space-y-2 text-xs'>
 			<div className='font-semibold text-white'>
-				Cost Per Wear Breakdown
+				Actual Cost Per Wear Breakdown
 			</div>
 			<div className='space-y-1 text-white/90'>
 				<div>Purchase Price: ${item.purchase_price?.toFixed(2)}</div>
@@ -81,8 +81,18 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 						<div className='flex items-center gap-2'>
 							<DollarSign className='h-4 w-4 text-slate-900' />
 							<span className='text-sm font-semibold text-slate-900'>
-								Cost Per Wear
+								Actual Cost Per Wear
 							</span>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Info className='h-3.5 w-3.5 text-stone-400 hover:text-stone-600 cursor-help transition-colors' />
+								</TooltipTrigger>
+								<TooltipContent side='top' className='max-w-xs'>
+									<p className='text-xs'>
+										Based on your <strong>actual wears</strong>. This tracks real performance, not predictions.
+									</p>
+								</TooltipContent>
+							</Tooltip>
 						</div>
 						{isWorthIt && (
 							<span className='text-xs font-bold px-2 py-1 rounded-full bg-meadow-500 text-white flex items-center gap-1'>
@@ -149,7 +159,7 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 
 					{/* Hidden accessibility label for screen readers */}
 					<span className='sr-only'>
-						Cost per wear progress: {progressPercentage.toFixed(0)}% complete.
+						Actual cost per wear progress: {progressPercentage.toFixed(0)}% complete.
 						{currentCPW && (
 							<>
 								Current cost per wear is ${currentCPW.toFixed(2)}, target is $

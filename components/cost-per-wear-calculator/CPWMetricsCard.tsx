@@ -2,7 +2,12 @@
 
 import { CalculatorMetrics, CalculatorInput } from '@/lib/worth-it-calculator/calculator-logic';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, DollarSign, Repeat, TrendingDown } from 'lucide-react';
+import { ArrowRight, DollarSign, Repeat, TrendingDown, Info } from 'lucide-react';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface CPWMetricsCardProps {
   metrics: CalculatorMetrics;
@@ -69,7 +74,19 @@ export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
           </div>
           
           <div>
-            <div className="text-sm text-slate-300 font-medium mb-1">Real Cost Per Wear</div>
+            <div className="text-sm text-slate-300 font-medium mb-1 flex items-center gap-2">
+              <span>Predicted Cost Per Wear</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-3.5 w-3.5 text-slate-400 hover:text-slate-300 cursor-help transition-colors" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs">
+                  <p className="text-xs">
+                    This is an <strong>estimate</strong> based on your inputs (quality, wear frequency, resale value). Actual cost per wear will depend on real usage.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="text-3xl font-bold text-white">
               ${metrics.realCPW.toFixed(2)}
             </div>
