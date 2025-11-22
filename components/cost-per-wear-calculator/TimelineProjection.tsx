@@ -6,7 +6,7 @@
 
 import { CalculatorMetrics, CalculatorInput, getFrequencyLabel } from '@/lib/worth-it-calculator/calculator-logic';
 import { Card } from '@/components/ui/card';
-import { Calendar } from 'lucide-react';
+import { Calendar, ShoppingBag, Sparkles, Lightbulb } from 'lucide-react';
 
 interface TimelineProjectionProps {
   metrics: CalculatorMetrics;
@@ -41,8 +41,8 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
           <div className="relative flex items-start justify-between">
             {/* Today */}
             <div className="flex flex-col items-center gap-2 z-10">
-              <div className="h-16 w-16 rounded-full bg-sun-400 flex items-center justify-center text-2xl shadow-lg">
-                🛍️
+              <div className="h-16 w-16 rounded-full bg-sun-400 flex items-center justify-center shadow-lg">
+                <ShoppingBag className="h-8 w-8 text-slate-900" />
               </div>
               <div className="text-center">
                 <div className="font-semibold text-sm">Today</div>
@@ -55,8 +55,8 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
 
             {/* Target Date */}
             <div className="flex flex-col items-center gap-2 z-10">
-              <div className="h-16 w-16 rounded-full bg-green-500 flex items-center justify-center text-2xl shadow-lg">
-                ✨
+              <div className="h-16 w-16 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
+                <Sparkles className="h-8 w-8 text-white" />
               </div>
               <div className="text-center">
                 <div className="font-semibold text-sm">Target Reached</div>
@@ -92,9 +92,10 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
         </div>
 
         {/* Message */}
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-2">
+          <Lightbulb className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-blue-900 leading-relaxed">
-            💡 <strong>Pro Tip:</strong> At your{' '}
+            <strong>Pro Tip:</strong> At your{' '}
             <span className="font-semibold">{input.wearFrequency}</span> wear rate, you'll reach
             "worth it" status by <span className="font-semibold">{formatDate(targetDate)}</span>.
             If you wear it more often, you'll justify the purchase faster!

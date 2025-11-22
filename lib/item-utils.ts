@@ -228,16 +228,16 @@ export function formatCategoryPlural(category: ItemCategory): string {
 }
 
 /**
- * Get category emoji icon
+ * Get category icon name for Lucide icons
+ * @deprecated Use CATEGORY_CONFIGS from types instead
  */
-export function getCategoryEmoji(category: ItemCategory): string {
-	const emojis: Record<ItemCategory, string> = {
-		shoes: "👟",
-		tops: "👕",
-		bottoms: "👖",
-		outerwear: "🧥",
-		accessories: "🎒",
-	
+export function getCategoryIcon(category: ItemCategory): string {
+	const icons: Record<ItemCategory, string> = {
+		shoes: "Shirt",
+		tops: "Shirt",
+		bottoms: "Package",
+		outerwear: "Coat",
+		accessories: "Backpack",
 	};
-	return emojis[category] || "📦";
+	return icons[category] || "Package";
 }

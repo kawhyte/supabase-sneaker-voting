@@ -20,6 +20,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DollarSign, Sparkles } from 'lucide-react';
 
 interface CostPerWearProgressProps {
 	item: WardrobeItem;
@@ -78,13 +79,14 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 					{/* Header */}
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
+							<DollarSign className='h-4 w-4 text-slate-900' />
 							<span className='text-sm font-semibold text-slate-900'>
-								💰 Cost Per Wear
+								Cost Per Wear
 							</span>
 						</div>
 						{isWorthIt && (
-							<span className='text-xs font-bold px-2 py-1 rounded-full bg-meadow-500 text-white'>
-								✨ Worth It!
+							<span className='text-xs font-bold px-2 py-1 rounded-full bg-meadow-500 text-white flex items-center gap-1'>
+								<Sparkles className='h-3 w-3' /> Worth It!
 							</span>
 						)}
 					</div>
@@ -132,17 +134,16 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 					<div className='text-xs text-slate-700 font-medium'>
 						{isWorthIt ? (
 							<span className='text-meadow-700 font-semibold'>
-								{metrics.milestoneEmoji} {metrics.milestoneMessage}
+								{metrics.milestoneMessage}
 							</span>
 						) : metrics.wearsRemaining > 0 ? (
 							<span>
-								{metrics.milestoneEmoji}{' '}
 								{metrics.milestoneMessage} Wear{' '}
 								{metrics.wearsRemaining === 1 ? 'one' : metrics.wearsRemaining}{' '}
 								more time{metrics.wearsRemaining !== 1 ? 's' : ''}!
 							</span>
 						) : (
-							<span>{metrics.milestoneEmoji} {metrics.milestoneMessage}</span>
+							<span>{metrics.milestoneMessage}</span>
 						)}
 					</div>
 

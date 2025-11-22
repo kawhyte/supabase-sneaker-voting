@@ -5,7 +5,7 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import { BookOpen, Target, TrendingUp, Heart } from 'lucide-react';
+import { BookOpen, Target, TrendingUp, Heart, Check, Shirt, Coat, ShirtIcon, AlertTriangle } from 'lucide-react';
 
 export function HowItWorksSection() {
   return (
@@ -82,19 +82,19 @@ export function HowItWorksSection() {
                 <h3 className="text-xl font-bold text-foreground">Make Better Decisions</h3>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold flex-shrink-0">✓</span>
+                    <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
                     <span>Avoid impulse purchases that won't get worn</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold flex-shrink-0">✓</span>
+                    <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
                     <span>Justify quality investments that last</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold flex-shrink-0">✓</span>
+                    <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
                     <span>Reduce wardrobe clutter and save money</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold flex-shrink-0">✓</span>
+                    <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
                     <span>Build a sustainable, intentional wardrobe</span>
                   </li>
                 </ul>
@@ -127,12 +127,14 @@ export function HowItWorksSection() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Scenario 1 */}
             <div className="space-y-3">
-              <div className="text-4xl">👟</div>
+              <Shirt className="h-10 w-10 text-muted-foreground" />
               <div className="font-semibold text-foreground">Daily Sneakers</div>
               <div className="text-sm text-muted-foreground space-y-1">
                 <div>Price: $120</div>
                 <div>Wears: 200/year</div>
-                <div className="font-semibold text-green-600">CPW: $0.60/wear ✨</div>
+                <div className="font-semibold text-green-600 flex items-center gap-1">
+                  CPW: $0.60/wear
+                </div>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Excellent value! Regular use makes even premium sneakers worthwhile.
@@ -141,12 +143,14 @@ export function HowItWorksSection() {
 
             {/* Scenario 2 */}
             <div className="space-y-3">
-              <div className="text-4xl">🧥</div>
+              <Coat className="h-10 w-10 text-muted-foreground" />
               <div className="font-semibold text-foreground">Winter Coat</div>
               <div className="text-sm text-muted-foreground space-y-1">
                 <div>Price: $300</div>
                 <div>Wears: 40/year</div>
-                <div className="font-semibold text-green-600">CPW: $7.50/wear 👍</div>
+                <div className="font-semibold text-green-600 flex items-center gap-1">
+                  CPW: $7.50/wear <Check className="h-3 w-3" />
+                </div>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Good investment. Quality outerwear that lasts multiple seasons pays off.
@@ -155,12 +159,14 @@ export function HowItWorksSection() {
 
             {/* Scenario 3 */}
             <div className="space-y-3">
-              <div className="text-4xl">👗</div>
+              <ShirtIcon className="h-10 w-10 text-muted-foreground" />
               <div className="font-semibold text-foreground">Trendy Dress</div>
               <div className="text-sm text-muted-foreground space-y-1">
                 <div>Price: $80</div>
                 <div>Wears: 3/year</div>
-                <div className="font-semibold text-red-600">CPW: $26.67/wear ⚠️</div>
+                <div className="font-semibold text-red-600 flex items-center gap-1">
+                  CPW: $26.67/wear <AlertTriangle className="h-3 w-3" />
+                </div>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Think twice. High cost per wear suggests this might not be worth it.

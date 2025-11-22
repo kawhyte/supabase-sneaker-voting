@@ -7,6 +7,7 @@
 import { CalculatorMetrics, CalculatorInput } from '@/lib/worth-it-calculator/calculator-logic';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { DollarSign, Check, Sparkles } from 'lucide-react';
 
 interface CPWMetricsCardProps {
   metrics: CalculatorMetrics;
@@ -28,7 +29,7 @@ export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
   return (
     <Card className="p-6 sm:p-8 bg-card border-border shadow-lg">
       <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-        <span>💰</span>
+        <DollarSign className="h-5 w-5" />
         <span>Cost Per Wear Breakdown</span>
       </h3>
 
@@ -63,7 +64,9 @@ export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
               {metrics.expectedWearsYear1} wears
             </div>
             {isWorthItAt1Year && (
-              <div className="text-sm text-green-700 font-semibold mt-2">✓ Worth It!</div>
+              <div className="text-sm text-green-700 font-semibold mt-2 flex items-center gap-1">
+                <Check className="h-4 w-4" /> Worth It!
+              </div>
             )}
           </div>
 
@@ -84,7 +87,9 @@ export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
               {metrics.expectedWearsYear2} wears
             </div>
             {isWorthItAt2Years && (
-              <div className="text-sm text-green-700 font-semibold mt-2">✓ Worth It!</div>
+              <div className="text-sm text-green-700 font-semibold mt-2 flex items-center gap-1">
+                <Check className="h-4 w-4" /> Worth It!
+              </div>
             )}
           </div>
         </div>
@@ -112,8 +117,8 @@ export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
           </div>
           <div className="text-sm text-muted-foreground">
             {metrics.progressAt1Year >= 100 ? (
-              <span className="text-green-700 font-semibold">
-                ✨ You'll reach "worth it" status within the first year!
+              <span className="text-green-700 font-semibold flex items-center gap-1">
+                <Sparkles className="h-4 w-4" /> You'll reach "worth it" status within the first year!
               </span>
             ) : (
               <span>

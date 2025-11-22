@@ -5,6 +5,20 @@ import confetti from 'canvas-confetti'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import {
+  Palette,
+  Sparkles,
+  Crown,
+  Shirt,
+  DollarSign,
+  ShoppingBag,
+  Trophy,
+  Rocket,
+  Cat,
+  Heart,
+  Gem,
+  type LucideIcon
+} from 'lucide-react'
 
 export interface MilestoneCelebration {
   type:
@@ -17,59 +31,59 @@ export interface MilestoneCelebration {
     | 'wardrobe_goal'
   title: string
   description: string
-  emoji: string
+  icon: LucideIcon
   catMessage: string
 }
 
 const MILESTONES: Record<string, MilestoneCelebration> = {
   outfit_created: {
     type: 'outfit_created',
-    title: 'First Outfit Created! 🎉',
+    title: 'First Outfit Created!',
     description: 'You\'re already creating magic! Your first outfit is ready to wear.',
-    emoji: '🎨',
-    catMessage: 'Meow! I\'m so proud of you! 😻',
+    icon: Palette,
+    catMessage: 'Meow! I\'m so proud of you!',
   },
   five_outfits: {
     type: 'five_outfits',
-    title: 'Outfit Creator! 🌟',
+    title: 'Outfit Creator!',
     description: 'You\'ve created 5 outfits! You\'re becoming a styling expert.',
-    emoji: '✨',
-    catMessage: 'Five outfits?! You\'re incredible! 🐾',
+    icon: Sparkles,
+    catMessage: 'Five outfits?! You\'re incredible!',
   },
   ten_outfits: {
     type: 'ten_outfits',
-    title: 'Fashion Visionary! 👑',
+    title: 'Fashion Visionary!',
     description: 'Ten outfits created! You\'re a true wardrobe curator.',
-    emoji: '👑',
-    catMessage: 'You\'re a fashion genius! Bow down! 😻',
+    icon: Crown,
+    catMessage: 'You\'re a fashion genius! Bow down!',
   },
   outfit_worn: {
     type: 'outfit_worn',
-    title: 'Outfit Worn! 👟',
+    title: 'Outfit Worn!',
     description: 'Great job wearing an outfit you created! You\'re making conscious choices.',
-    emoji: '👟',
-    catMessage: 'I hope you looked amazing! 🐱',
+    icon: Shirt,
+    catMessage: 'I hope you looked amazing!',
   },
   cost_per_wear_achieved: {
     type: 'cost_per_wear_achieved',
-    title: 'Cost-Per-Wear Goal Achieved! 💰',
+    title: 'Cost-Per-Wear Goal Achieved!',
     description: 'This item is earning its keep in your wardrobe!',
-    emoji: '💰',
-    catMessage: 'That\'s what I call value for money! 💎',
+    icon: DollarSign,
+    catMessage: 'That\'s what I call value for money!',
   },
   wish_item_purchased: {
     type: 'wish_item_purchased',
-    title: 'New Purchase! 🛍️',
+    title: 'New Purchase!',
     description: 'Welcome your new piece to the wardrobe! Let\'s find outfits for it.',
-    emoji: '🛍️',
-    catMessage: 'Time to create outfits with your new find! 🎉',
+    icon: ShoppingBag,
+    catMessage: 'Time to create outfits with your new find!',
   },
   wardrobe_goal: {
     type: 'wardrobe_goal',
-    title: 'Wardrobe Goal Achieved! 🏆',
+    title: 'Wardrobe Goal Achieved!',
     description: 'You\'ve reached a major milestone in your wardrobe journey!',
-    emoji: '🏆',
-    catMessage: 'You\'re unstoppable! 🚀',
+    icon: Trophy,
+    catMessage: 'You\'re unstoppable!',
   },
 }
 
@@ -142,8 +156,8 @@ export function MilestoneCelebrationModal({
         />
 
         <div className="flex flex-col items-center justify-center py-8 px-4">
-          {/* Emoji */}
-          <div className="text-7xl mb-6 animate-bounce">{milestone.emoji}</div>
+          {/* Icon */}
+          <milestone.icon className="h-20 w-20 mb-6 animate-bounce text-sun-400" />
 
           {/* Title */}
           <h2 className="text-2xl font-bold text-center text-foreground mb-3">
@@ -156,9 +170,10 @@ export function MilestoneCelebrationModal({
           </p>
 
           {/* Cat Message */}
-          <div className="bg-sun-200 rounded-lg p-4 mb-6 w-full">
+          <div className="bg-sun-200 rounded-lg p-4 mb-6 w-full flex items-center justify-center gap-2">
+            <Cat className="h-4 w-4" />
             <p className="text-center text-sm font-medium text-foreground">
-              🐾 {milestone.catMessage}
+              {milestone.catMessage}
             </p>
           </div>
 

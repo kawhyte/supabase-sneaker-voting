@@ -82,10 +82,10 @@ export function StalePriceWarning({
 
   // Display messages based on staleness
   const displayText = !lastPriceCheckAt
-    ? '⚠️ Price not checked'
+    ? 'Price not checked'
     : isStale
-    ? `⚠️ ${daysSince} ${daysSince === 1 ? 'day' : 'days'} old`
-    : `✅ Checked ${daysSince === 0 ? 'today' : daysSince === 1 ? 'yesterday' : `${daysSince} days ago`}`;
+    ? `${daysSince} ${daysSince === 1 ? 'day' : 'days'} old`
+    : `Checked ${daysSince === 0 ? 'today' : daysSince === 1 ? 'yesterday' : `${daysSince} days ago`}`;
 
   const tooltipText = !lastPriceCheckAt
     ? 'Price has never been checked. Click "Check now" to get the latest price.'

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Package, Footprints, Calendar } from 'lucide-react'
+import { Package, Footprints, Calendar, BookOpen } from 'lucide-react'
 import { WardrobeStats } from '@/lib/achievements-stats'
 
 interface HeroSectionProps {
@@ -18,8 +18,8 @@ export function HeroSection({ stats }: HeroSectionProps) {
         transition={{ duration: 0.4 }}
         className="text-center mb-8"
       >
-        <h1 id="hero-title" className="text-4xl md:text-5xl font-bold text-foreground mb-3">
-          Your Wardrobe Story 📖
+        <h1 id="hero-title" className="text-4xl md:text-5xl font-bold text-foreground mb-3 flex items-center justify-center gap-3">
+          Your Wardrobe Story <BookOpen className="h-10 w-10" />
         </h1>
         <p className="text-lg text-muted-foreground">
           A journey through your style, spending, and sustainable choices
