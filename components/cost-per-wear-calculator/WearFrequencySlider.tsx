@@ -15,7 +15,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { getFrequencyLabel } from '@/lib/worth-it-calculator/calculator-logic';
-import { ShirtIcon, Shirt, Coat, type LucideIcon } from 'lucide-react';
+import { ShirtIcon, Shirt, Calendar, type LucideIcon } from 'lucide-react';
 
 interface WearFrequencySliderProps {
   form: UseFormReturn<any>;
@@ -46,7 +46,7 @@ const frequencyOptions: ReadonlyArray<{
     value: 'weekly',
     label: 'Weekly',
     sublabel: 'Regular rotation',
-    icon: Coat,
+    icon: Calendar,
     wears: '~52 times/year',
   },
   {

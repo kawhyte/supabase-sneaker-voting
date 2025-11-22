@@ -14,10 +14,10 @@ interface UserPreviewCardProps {
 }
 
 export function UserPreviewCard({ user }: UserPreviewCardProps) {
-  const displayName = user.display_name || user.username || 'Anonymous';
+  const displayName = user.display_name || 'Anonymous';
   const initials = displayName
     .split(' ')
-    .map((n) => n[0])
+    .map((n: string) => n[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);

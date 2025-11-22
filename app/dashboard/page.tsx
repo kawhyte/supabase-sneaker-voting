@@ -1,17 +1,24 @@
-'use client'
+"use client";
 
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import { ViewDensityToggle } from '@/components/ViewDensityToggle'
 import { Button } from "@/components/ui/button";
-import { WardrobeDashboard } from '@/components/WardrobeDashboard'
-import { OutfitsDashboard } from '@/components/outfit-studio/OutfitsDashboard'
-import { Footprints, Shirt, Heart, Sparkles, Archive, Plus } from 'lucide-react'
-import { ItemStatus } from '@/types/ItemStatus'
-import { DashboardHeader } from '@/components/DashboardHeader'
-import Link from 'next/link'
+import { WardrobeDashboard } from "@/components/WardrobeDashboard";
+import { OutfitsDashboard } from "@/components/outfit-studio/OutfitsDashboard";
+import {
+	Footprints,
+	Shirt,
+	Heart,
+	Sparkles,
+	Archive,
+	Plus,
+} from "lucide-react";
+import { ItemStatus } from "@/types/ItemStatus";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import Link from "next/link";
 
 /*
   ✅ DASHBOARD DESIGN SYSTEM v2.0 IMPLEMENTATION
@@ -94,181 +101,178 @@ import Link from 'next/link'
   📚 Related: globals.css (lines 97-315 spacing, 404-476 colors, 493-496 layout)
 */
 
-	// const displayStatus = status.includes(ItemStatus.WISHLISTED)
-	// 	? ItemStatus.WISHLISTED
-	// 	: status[0];
-    
+// const displayStatus = status.includes(ItemStatus.WISHLISTED)
+// 	? ItemStatus.WISHLISTED
+// 	: status[0];
+
 function DashboardContent() {
-  const searchParams = useSearchParams()
-  // Default to 'rotation' (shoe-first) if no tab is specified in the URL
-  const defaultTab = searchParams.get('tab') || 'rotation'
+	const searchParams = useSearchParams();
+	// Default to 'rotation' (shoe-first) if no tab is specified in the URL
+	const defaultTab = searchParams.get("tab") || "rotation";
 
-  return (
-    <div className="w-full min-h-screen">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+	return (
+		<div className='w-full min-h-screen'>
+			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5 }}>
+				<div className='flex justify-between items-center'>
+					<h3 className='text-3xl font-bold font-heading -mb-2'>My Wardrobe</h3>
 
-<div className='flex justify-between items-center'>
-        <h3 className='text-3xl font-bold font-heading -mb-2'>My Wardrobe</h3>
+					<div className='flex items-center gap-3'>
+						{/* View Archive Button - Secondary Action */}
+						<Link href='/dashboard?tab=archive'>
+							<Button
+								variant='outline'
+								className='flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:shadow-sm motion-safe:hover:scale-105 will-change-transform'>
+								<Archive className='h-4 w-4' />
+								Archive
+							</Button>
+						</Link>
 
-        <div className="flex items-center gap-3">
-          {/* View Archive Button - Secondary Action */}
-          <Link href="/dashboard?tab=archive">
-            <Button variant="outline" className='flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:shadow-sm motion-safe:hover:scale-105 will-change-transform'>
-              <Archive className='h-4 w-4' />
-              Archive
-            </Button>
-          </Link>
+						{/* Add Item Button - Primary CTA */}
+						<Link href='/add-new-item'>
+							<Button className='flex items-center gap-2 bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-sm font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
+								<Plus className='h-4 w-4' />
+								Add Item
+							</Button>
+						</Link>
+					</div>
+				</div>
 
-          {/* Add Item Button - Primary CTA */}
-          <Link href='/add-new-item'>
-            <Button className='flex items-center gap-2 bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-sm font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
-              <Plus className='h-4 w-4' />
-              Add Item
-            </Button>
-          </Link>
-        </div>
-      </div>
-        
-        {/* <DashboardHeader status={"displayStatus"} /> */}
-        {/* Section spacing between dashboard sections (48px) - Optimized for all screen sizes */}
-        <div className="mt-12 mb-6">
-          {/* Tabs Container with ultra-wide optimization */}
-          <Tabs defaultValue={defaultTab} className="w-full max-w-[1920px] mx-auto rounded-lg ">
-          {/* Header with Tabs and Density Toggle */}
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 ">
-            {/* Tabs */}
-            <div className="flex-1">
-              <TabsList
-                data-variant="underline"
-                className="w-full justify-start border-b border-stone-200 bg-transparent p-0 gap-8 mb-8"
-              >
-                <TabsTrigger
-                  value="rotation"
-                  data-variant="underline"
-                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2"
-                >
-                  <Footprints className="h-4 w-4" />
-                  The Rotation
-                </TabsTrigger>
-                <TabsTrigger
-                  value="closet"
-                  data-variant="underline"
-                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2"
-                >
-                  <Shirt className="h-4 w-4" />
-                  The Closet
-                </TabsTrigger>
-                <TabsTrigger
-                  value="wishlist"
-                  data-variant="underline"
-                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2"
-                >
-                  <Heart className="h-4 w-4" />
-                  Wishlist
-                </TabsTrigger>
-                <TabsTrigger
-                  value="fits"
-                  data-variant="underline"
-                  className="relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Fits
-                </TabsTrigger>
-              </TabsList>
-            </div>
-            {/* Density Toggle */}
-            {/* <ViewDensityToggle /> */}
-          </div>
+				{/* <DashboardHeader status={"displayStatus"} /> */}
+				{/* Section spacing between dashboard sections (48px) - Optimized for all screen sizes */}
+				<div className='mt-12 mb-6'>
+					{/* Tabs Container with ultra-wide optimization */}
+					<Tabs
+						defaultValue={defaultTab}
+						className='w-full max-w-[1920px] mx-auto rounded-lg '>
+						{/* Header with Tabs and Density Toggle */}
+						<div className='flex flex-col sm:flex-row justify-between sm:items-center gap-4 '>
+							{/* Tabs */}
+							<div className='flex-1'>
+								<TabsList
+									data-variant='underline'
+									className='w-full justify-start border-b border-stone-200 bg-transparent p-0 gap-8 mb-8'>
+									<TabsTrigger
+										value='rotation'
+										data-variant='underline'
+										className='relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2'>
+										<Footprints className='h-4 w-4' />
+										Sneakers
+									</TabsTrigger>
+									<TabsTrigger
+										value='closet'
+										data-variant='underline'
+										className='relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2'>
+										<Shirt className='h-4 w-4' />
+										Apparel
+									</TabsTrigger>
+									<TabsTrigger
+										value='wishlist'
+										data-variant='underline'
+										className='relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2'>
+										<Heart className='h-4 w-4' />
+										Wishlist
+									</TabsTrigger>
+									<TabsTrigger
+										value='fits'
+										data-variant='underline'
+										className='relative px-0 py-3 pb-4 bg-transparent flex items-center gap-2'>
+										<Sparkles className='h-4 w-4' />
+										Fits
+									</TabsTrigger>
+								</TabsList>
+							</div>
+							{/* Density Toggle */}
+							{/* <ViewDensityToggle /> */}
+						</div>
 
-          {/* --- Tab Content --- */}
-            {/* Tab 1: The Rotation - Shoes Only (Owned) */}
-            <TabsContent value="rotation">
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.3 }}
-              >
-                <WardrobeDashboard
-                  status={[ItemStatus.OWNED]}
-                  categoryFilter={['shoes']}
-                />
-              </motion.div>
-            </TabsContent>
+						{/* --- Tab Content --- */}
+						{/* Tab 1: The Rotation - Shoes Only (Owned) */}
+						<TabsContent value='rotation'>
+							<motion.div
+								initial={{ opacity: 0, y: 8 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 8 }}
+								transition={{ duration: 0.3 }}>
+								<WardrobeDashboard
+									status={[ItemStatus.OWNED]}
+									categoryFilter={["shoes"]}
+								/>
+							</motion.div>
+						</TabsContent>
 
-            {/* Tab 2: The Closet - Everything Except Shoes (Owned) */}
-            <TabsContent value="closet">
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.3 }}
-              >
-                <WardrobeDashboard
-                  status={[ItemStatus.OWNED]}
-                  categoryFilter={['tops', 'bottoms', 'outerwear', 'accessories']}
-                />
-              </motion.div>
-            </TabsContent>
+						{/* Tab 2: Apparel - Everything Except Shoes (Owned) */}
+						<TabsContent value='closet'>
+							<motion.div
+								initial={{ opacity: 0, y: 8 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 8 }}
+								transition={{ duration: 0.3 }}>
+								<WardrobeDashboard
+									status={[ItemStatus.OWNED]}
+									categoryFilter={[
+										"tops",
+										"bottoms",
+										"outerwear",
+										"accessories",
+									]}
+								/>
+							</motion.div>
+						</TabsContent>
 
-            {/* Tab 3: Wishlist - All Wishlisted Items */}
-            <TabsContent value="wishlist">
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.3 }}
-              >
-                <WardrobeDashboard status={[ItemStatus.WISHLISTED]} />
-              </motion.div>
-            </TabsContent>
+						{/* Tab 3: Wishlist - All Wishlisted Items */}
+						<TabsContent value='wishlist'>
+							<motion.div
+								initial={{ opacity: 0, y: 8 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 8 }}
+								transition={{ duration: 0.3 }}>
+								<WardrobeDashboard status={[ItemStatus.WISHLISTED]} />
+							</motion.div>
+						</TabsContent>
 
-            {/* Tab 4: Fits - Outfits */}
-            <TabsContent value="fits">
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.3 }}
-              >
-                <OutfitsDashboard />
-              </motion.div>
-            </TabsContent>
+						{/* Tab 4: Fits - Outfits */}
+						<TabsContent value='fits'>
+							<motion.div
+								initial={{ opacity: 0, y: 8 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 8 }}
+								transition={{ duration: 0.3 }}>
+								<OutfitsDashboard />
+							</motion.div>
+						</TabsContent>
 
-            {/* Archive Tab - Accessible via header button */}
-            <TabsContent value="archive">
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.3 }}
-              >
-                <WardrobeDashboard
-                  status={[ItemStatus.OWNED, ItemStatus.WISHLISTED]}
-                  isArchivePage={true}
-                />
-              </motion.div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </motion.div>
-
-    </div>
-  )
+						{/* Archive Tab - Accessible via header button */}
+						<TabsContent value='archive'>
+							<motion.div
+								initial={{ opacity: 0, y: 8 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 8 }}
+								transition={{ duration: 0.3 }}>
+								<WardrobeDashboard
+									status={[ItemStatus.OWNED, ItemStatus.WISHLISTED]}
+									isArchivePage={true}
+								/>
+							</motion.div>
+						</TabsContent>
+					</Tabs>
+				</div>
+			</motion.div>
+		</div>
+	);
 }
 
 export default function DashboardPage() {
-  return (
-    <Suspense fallback={
-      <div className="w-full py-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    }>
-      <DashboardContent />
-    </Suspense>
-  )
+	return (
+		<Suspense
+			fallback={
+				<div className='w-full py-8 flex items-center justify-center'>
+					<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
+				</div>
+			}>
+			<DashboardContent />
+		</Suspense>
+	);
 }

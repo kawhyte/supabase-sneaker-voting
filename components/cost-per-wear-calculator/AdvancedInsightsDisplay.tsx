@@ -1,10 +1,12 @@
 /**
  * Advanced Insights Display - Shows advanced analysis if provided
+ * NOTE: This is an incomplete feature - AdvancedInsights type not implemented yet
  */
 
 'use client';
 
-import { AdvancedInsights } from '@/lib/worth-it-calculator/calculator-logic';
+// import { AdvancedInsights } from '@/lib/worth-it-calculator/calculator-logic'; // Commented out - type not implemented yet
+type AdvancedInsights = any; // Placeholder until feature is complete
 import { Card } from '@/components/ui/card';
 import { AlertTriangle, CheckCircle, Info, TrendingDown, PartyPopper } from 'lucide-react';
 import { cn } from '@/lib/utils';

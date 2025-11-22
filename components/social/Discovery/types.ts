@@ -1,7 +1,6 @@
 export interface ExploreUser {
   user_id: string;
   display_name: string | null;
-  username: string | null;
   avatar_url: string | null;
   follower_count: number;
   following_count: number;

@@ -1,15 +1,15 @@
 /**
- * ViewDensityToggle - User control for card grid density
+ * ViewDensityToggle - User control for card grid and list density
  *
  * Provides 3 view modes:
- * - Compact: 4-5 cards, 1:1 images, minimal metadata
  * - Comfortable: 3-4 cards (default), 3:4 images, balanced
  * - Detailed: 2-3 cards, 4:3 images, full metadata
+ * - List: Horizontal rows, inline expansion, high density
  */
 
 "use client";
 
-import { LayoutGrid, LayoutList, LayoutDashboard } from "lucide-react";
+import { LayoutList, LayoutDashboard, List } from "lucide-react";
 import {
 	Tooltip,
 	TooltipContent,
@@ -22,22 +22,22 @@ export function ViewDensityToggle() {
 
 	const modes = [
 		{
-			id: "compact" as const,
-			label: "Compact",
-			description: "See more items",
-			icon: LayoutGrid,
-		},
-		{
 			id: "comfortable" as const,
 			label: "Comfortable",
-			description: "Balanced view",
+			description: "Balanced card view",
 			icon: LayoutList,
 		},
 		{
 			id: "detailed" as const,
 			label: "Detailed",
-			description: "Full information",
+			description: "Large cards with full info",
 			icon: LayoutDashboard,
+		},
+		{
+			id: "list" as const,
+			label: "List",
+			description: "Compact rows with expansion",
+			icon: List,
 		},
 	];
 

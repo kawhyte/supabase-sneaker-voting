@@ -31,6 +31,30 @@ interface PublicProfileViewProps {
 export function PublicProfileView({ data }: PublicProfileViewProps) {
   const { profile, items, canView, reason, isFollowing, isOwnProfile } = data;
 
+  // Debug logging
+  console.log("[PublicProfileView] Received data:", {
+    profileId: profile.id,
+    profileName: profile.name,
+    itemCount: items.length,
+    canView,
+    reason,
+    isOwnProfile,
+    hasItems: items && items.length > 0,
+  });
+
+  // Debug first item's photo structure
+  if (items && items.length > 0) {
+    console.log("[PublicProfileView] First item sample:", {
+      id: items[0].id,
+      brand: items[0].brand,
+      model: items[0].model,
+      hasItemPhotos: !!items[0].item_photos,
+      itemPhotosLength: items[0].item_photos?.length || 0,
+      itemPhotos: items[0].item_photos,
+      hasImageUrl: !!items[0].image_url,
+    });
+  }
+
   // Track profile view on mount
   useEffect(() => {
     if (!isOwnProfile) {

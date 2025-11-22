@@ -7,7 +7,6 @@ const PREVIEW_ITEMS_COUNT = 4;
 interface ExploreUser {
   user_id: string;
   display_name: string | null;
-  username: string | null;
   avatar_url: string | null;
   follower_count: number;
   following_count: number;
@@ -45,7 +44,7 @@ export async function GET(request: NextRequest) {
     // Step 1: Get users with public wishlists
     const { data: publicProfiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id, display_name, avatar_url, follower_count, following_count')
+      .select('id, display_name, avatar_url, follower_count, following_count, wishlist_privacy')
       .eq('wishlist_privacy', 'public')
       .neq('id', user.id) // Exclude current user
       .order('follower_count', { ascending: false }) // Sort by popularity
@@ -95,11 +94,14 @@ export async function GET(request: NextRequest) {
     // Step 4: Get preview items for each user (4 items per user)
     const { data: previewItems, error: itemsError } = await supabase
       .from('items')
-      .select('id, user_id, brand, model, item_photos(image_url)')
+      .select('id, user_id, brand, model, item_photos(id, image_url, image_order, is_main_image)')
       .eq('status', 'wishlisted')
       .eq('is_archived', false)
       .in('user_id', userIds)
-      .order('created_at', { ascending: false });
+      .order('is_pinned', { ascending: false })
+      .order('created_at', { ascending: false })
+      .order('is_main_image', { foreignTable: 'item_photos', ascending: false })
+      .order('image_order', { foreignTable: 'item_photos', ascending: true });
 
     if (itemsError) {
       console.error('Error fetching preview items:', itemsError);
@@ -130,7 +132,6 @@ export async function GET(request: NextRequest) {
       return {
         user_id: profile.id,
         display_name: profile.display_name,
-        username: null, // Username column not yet added to profiles table
         avatar_url: profile.avatar_url,
         follower_count: profile.follower_count || 0,
         following_count: profile.following_count || 0,

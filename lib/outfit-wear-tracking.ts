@@ -158,7 +158,7 @@ export interface WearingNotification {
 	outfitId: string;
 	outfitName: string;
 	message: string;
-	emoji: string;
+	// emoji removed - using Lucide icons instead
 }
 
 /**

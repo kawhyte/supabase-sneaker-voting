@@ -14,17 +14,17 @@ export function WardrobeSkeleton({ viewMode = 'collection', count = 6 }: Wardrob
 
   // Compute display logic based on density
   const showDates = density === 'detailed'
-  const showNotes = density !== 'compact'
-  const showStore = density !== 'compact'
+  const showNotes = density !== 'list' // List view shows notes in expansion
+  const showStore = density !== 'list' // List view shows store in expansion
 
   // Get dynamic aspect ratio based on density
   const aspectRatio = getDensityImageAspect(density)
   const aspectRatioValue = aspectRatio === 'square' ? '1/1' : aspectRatio === 'portrait' ? '3/4' : '4/3'
   return (
     <div className={`grid ${
-      density === 'compact' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3' :
       density === 'comfortable' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4' :
-      'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6'
+      density === 'detailed' ? 'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6' :
+      '' // List view doesn't use skeleton (renders list items)
     }`}>
       {[...Array(count)].map((_, i) => (
         <Card

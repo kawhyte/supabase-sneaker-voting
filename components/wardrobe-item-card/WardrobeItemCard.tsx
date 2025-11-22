@@ -20,7 +20,7 @@ import { prepareItemPhotos, isItemOnSale, formatDate } from "@/lib/wardrobe-item
 import { useItemDisplayLogic } from "@/hooks/useItemDisplayLogic";
 import { useItemPermissions } from "@/hooks/useItemPermissions";
 import { useDensity } from "@/lib/view-density-context";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { ItemCardActions } from "./WardrobeItemActions";
 import { ItemCardImage } from "./WardrobeItemImage";
 import { ItemPricingDisplay } from "./WardrobeItemPricing";
@@ -28,6 +28,7 @@ import { ItemSizeComfortWears } from "./WardrobeItemMetadata";
 import { ItemStoreAndDate } from "./WardrobeItemPurchaseInfo";
 import { ItemFooterBadges } from "./WardrobeItemFooter";
 import { CostPerWearProgress } from "./CostPerWearProgress";
+import { WishlistDetailsDrawer } from "./WishlistDetailsDrawer";
 
 /**
  * Props for WardrobeItemCard component
@@ -74,6 +75,9 @@ function WardrobeItemCardComponent({
 	purchaseDate,
 	userWardrobe = [],
 }: WardrobeItemCardProps) {
+	// Drawer state for wishlist items
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
 	// Prepare data
 	const itemPhotos = prepareItemPhotos(item);
 	const displayLogic = useItemDisplayLogic(item);
@@ -84,10 +88,13 @@ function WardrobeItemCardComponent({
 	const hasBeenTriedOn = item.has_been_tried;
 	const purchasedDate = item.purchase_date || purchaseDate;
 
-	// Show metadata based on density
-	const showDates = density === 'detailed';
-	const showNotes = density !== 'compact';
-	const showStore = density !== 'compact';
+	// Show metadata based on density and privacy
+	// Public view: Hide personal info (dates, notes, store, size, wears)
+	const isPublicView = isReadOnly && viewMode === 'wishlist';
+	const showDates = density === 'detailed' && !isPublicView;
+	const showNotes = density !== 'list' && !isPublicView && viewMode !== 'wishlist'; // Hide notes on wishlist cards (shown in drawer); list view shows in expansion
+	const showStore = density !== 'list' && !isPublicView;
+	const showSizeAndWears = !isPublicView && viewMode !== 'wishlist'; // Hide on wishlist cards (shown in drawer)
 
 	return (
 		<TooltipProvider delayDuration={300}>
@@ -180,7 +187,7 @@ function WardrobeItemCardComponent({
 
 						{/* Metadata Grid */}
 						<div className='flex flex-col gap-2.5 mt-1'>
-							{/* Date Display - Only show in detailed mode */}
+							{/* Date Display - Only show in detailed mode and not in public view */}
 							{showDates && (
 								<div className='text-sm text-muted-foreground flex items-center gap-1'>
 									{displayLogic.isOwned && purchasedDate ? (
@@ -191,25 +198,30 @@ function WardrobeItemCardComponent({
 								</div>
 							)}
 
-							{/* Pricing */}
+							{/* Pricing - Always show, but hide target price and tracking in public view */}
 							<ItemPricingDisplay
 								item={item}
 								isOwned={displayLogic.isOwned}
 								isOnSale={displayLogic.isOnSale}
 								onRefreshPrice={actions.onRefreshPrice}
 								onManualEntrySuccess={actions.onManualEntrySuccess}
+								isPublicView={isPublicView}
+								useDrawer={viewMode === 'wishlist' && !isPublicView}
+								onOpenDrawer={() => setIsDrawerOpen(true)}
 							/>
 
-							{/* Size, Comfort, Wears */}
-							<ItemSizeComfortWears
-								item={item}
-								viewMode={viewMode}
-								canTrackWears={permissions.canTrackWearCount}
-								onIncrementWear={actions.onIncrementWear}
-								onDecrementWear={actions.onDecrementWear}
-							/>
+							{/* Size, Comfort, Wears - Hide in public view */}
+							{showSizeAndWears && (
+								<ItemSizeComfortWears
+									item={item}
+									viewMode={viewMode}
+									canTrackWears={permissions.canTrackWearCount}
+									onIncrementWear={actions.onIncrementWear}
+									onDecrementWear={actions.onDecrementWear}
+								/>
+							)}
 
-							{/* Store and Last Worn - Only show if not compact */}
+							{/* Store and Last Worn - Hide in public view and compact mode */}
 							{showStore && (
 								<ItemStoreAndDate
 									storeName={item.store_name}
@@ -292,6 +304,19 @@ function WardrobeItemCardComponent({
 					</CardContent>
 				</div>
 			</Card>
+
+			{/* Wishlist Details Drawer - Only for wishlist view */}
+			{viewMode === 'wishlist' && !isPublicView && (
+				<WishlistDetailsDrawer
+					item={item}
+					isOpen={isDrawerOpen}
+					onOpenChange={setIsDrawerOpen}
+					onRefreshPrice={actions.onRefreshPrice}
+					onManualEntrySuccess={actions.onManualEntrySuccess}
+					onMarkAsPurchased={actions.onMarkAsPurchased}
+					onArchive={actions.onArchive}
+				/>
+			)}
 		</TooltipProvider>
 	);
 }

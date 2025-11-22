@@ -23,7 +23,7 @@ export async function GET(
     // Fetch target user's profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("id, name, avatar_url, wishlist_privacy, follower_count, following_count")
+      .select("id, display_name, avatar_url, wishlist_privacy, follower_count, following_count")
       .eq("id", targetUserId)
       .single();
 
@@ -33,6 +33,15 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    // Transform profile to match expected interface (display_name → name)
+    const transformedProfile = {
+      id: profile.id,
+      name: profile.display_name || 'Anonymous',
+      avatar_url: profile.avatar_url,
+      follower_count: profile.follower_count || 0,
+      following_count: profile.following_count || 0,
+    };
 
     // Check if current user is viewing their own profile
     const isOwnProfile = currentUser?.id === targetUserId;
@@ -45,15 +54,18 @@ export async function GET(
           *,
           item_photos (
             id,
-            photo_url,
-            display_order
+            image_url,
+            image_order,
+            is_main_image
           )
         `)
         .eq("user_id", targetUserId)
         .eq("status", "wishlisted")
         .eq("is_archived", false)
         .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .order("is_main_image", { foreignTable: "item_photos", ascending: false })
+        .order("image_order", { foreignTable: "item_photos", ascending: true });
 
       if (itemsError) {
         console.error("Error fetching own items:", itemsError);
@@ -64,7 +76,7 @@ export async function GET(
       }
 
       return NextResponse.json({
-        profile,
+        profile: transformedProfile,
         items: items || [],
         canView: true,
         isOwnProfile: true,
@@ -77,7 +89,7 @@ export async function GET(
     // Private wishlist - no one can view
     if (privacy === "private") {
       return NextResponse.json({
-        profile,
+        profile: transformedProfile,
         items: [],
         canView: false,
         reason: "private",
@@ -93,15 +105,18 @@ export async function GET(
           *,
           item_photos (
             id,
-            photo_url,
-            display_order
+            image_url,
+            image_order,
+            is_main_image
           )
         `)
         .eq("user_id", targetUserId)
         .eq("status", "wishlisted")
         .eq("is_archived", false)
         .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .order("is_main_image", { foreignTable: "item_photos", ascending: false })
+        .order("image_order", { foreignTable: "item_photos", ascending: true });
 
       if (itemsError) {
         console.error("Error fetching public items:", itemsError);
@@ -112,7 +127,7 @@ export async function GET(
       }
 
       return NextResponse.json({
-        profile,
+        profile: transformedProfile,
         items: items || [],
         canView: true,
         reason: "public",
@@ -125,7 +140,7 @@ export async function GET(
       if (!currentUser) {
         // Not authenticated - can't view followers-only
         return NextResponse.json({
-          profile,
+          profile: transformedProfile,
           items: [],
           canView: false,
           reason: "followers_only",
@@ -143,7 +158,7 @@ export async function GET(
       if (!isFollowing) {
         // Not following - can't view
         return NextResponse.json({
-          profile,
+          profile: transformedProfile,
           items: [],
           canView: false,
           reason: "followers_only",
@@ -159,15 +174,18 @@ export async function GET(
           *,
           item_photos (
             id,
-            photo_url,
-            display_order
+            image_url,
+            image_order,
+            is_main_image
           )
         `)
         .eq("user_id", targetUserId)
         .eq("status", "wishlisted")
         .eq("is_archived", false)
         .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .order("is_main_image", { foreignTable: "item_photos", ascending: false })
+        .order("image_order", { foreignTable: "item_photos", ascending: true });
 
       if (itemsError) {
         console.error("Error fetching followers-only items:", itemsError);
@@ -178,7 +196,7 @@ export async function GET(
       }
 
       return NextResponse.json({
-        profile,
+        profile: transformedProfile,
         items: items || [],
         canView: true,
         reason: "followers_only",
@@ -189,7 +207,7 @@ export async function GET(
 
     // Fallback - treat as private
     return NextResponse.json({
-      profile,
+      profile: transformedProfile,
       items: [],
       canView: false,
       reason: "private",

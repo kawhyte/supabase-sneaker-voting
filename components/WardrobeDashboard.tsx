@@ -88,13 +88,26 @@ export function WardrobeDashboard({
 	const loadJournalEntries = async () => {
 		try {
 			setIsLoading(true);
+
+			// CRITICAL: Get current user to filter by user_id
+			// This prevents showing other users' items in the personal dashboard
+			const { data: { user } } = await supabase.auth.getUser();
+			if (!user) {
+				console.error("No authenticated user");
+				toast.error("Please log in to view your wardrobe");
+				setIsLoading(false);
+				return;
+			}
+
 			let query = supabase
 				.from("items")
 				.select(
 					`*, item_photos (id, image_url, image_order, is_main_image), brands (id, name, brand_logo)`
 				)
+				.eq("user_id", user.id) // SECURITY FIX: Only show current user's items
 				.eq("is_archived", isArchivePage)
 				.in("status", status)
+				.order("is_main_image", { foreignTable: "item_photos", ascending: false })
 				.order("image_order", { foreignTable: "item_photos", ascending: true });
 
 			// Apply category filter if provided (for shoe-first tabs)
@@ -110,6 +123,7 @@ export function WardrobeDashboard({
 				let basicQuery = supabase
 					.from("items")
 					.select(`*, brands (id, name, brand_logo)`)
+					.eq("user_id", user.id) // SECURITY FIX: Only show current user's items
 					.eq("is_archived", isArchivePage)
 					.in("status", status);
 

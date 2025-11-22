@@ -1,309 +1,194 @@
-/**
- * Cost Per Wear Calculator Logic
- *
- * Reuses core logic from wardrobe-item-utils.ts but adapted for anonymous calculator
- * No database, no authentication required - pure calculation engine
- */
-
 import { getTargetCostPerWear } from '@/lib/wardrobe-item-utils';
 import type { ItemCategory } from '@/components/types/item-category';
 
+/**
+ * CORE TYPES
+ */
 export type WearFrequency = 'rarely' | 'monthly' | 'weekly' | 'daily';
+export type ResalePotential = 'none' | 'low' | 'medium' | 'high';
+export type WardrobeRole = 'gap_fill' | 'upgrade' | 'variety' | 'duplicate';
+export type QualityRating = 'low' | 'average' | 'high';
 
 export interface CalculatorInput {
   category: ItemCategory;
   price: number;
   wearFrequency: WearFrequency;
-
-  // Advanced options (optional)
-  brand?: string;
-  isOnSale?: boolean;
-  originalPrice?: number;
-  similarItemsCount?: number;
-  hasSameColor?: boolean;
-  fillsGap?: boolean;
+  resalePotential: ResalePotential;
+  wardrobeRole: WardrobeRole;
+  qualityRating: QualityRating;
 }
 
 export interface CalculatorMetrics {
-  targetCPW: number;           // Target cost per wear for this category/price
-  targetWears: number;         // Number of wears needed to hit target
-  expectedWearsYear1: number;  // Expected wears in year 1
-  expectedWearsYear2: number;  // Expected wears in year 2
-  cpwAt1Year: number;         // Cost per wear after 1 year
-  cpwAt2Years: number;        // Cost per wear after 2 years
-  monthsToTarget: number;     // Months to reach target CPW
-  dateAtTarget: Date;         // Date when target will be reached
-  progressAt1Year: number;    // Progress percentage at 1 year (0-100)
+  targetCPW: number;
+  estimatedLifespanYears: number;
+  totalLifetimeWears: number;
+  netCost: number; // Price - Estimated Resale
+  estimatedResaleValue: number;
+  realCPW: number; // Net Cost / Lifetime Wears
+  breakEvenWears: number; // Wears needed to hit target CPW
+  targetBuyPrice: number; // The price you SHOULD pay to make this a "Good" deal
 }
 
-export interface AdvancedInsights {
-  saleValueAnalysis?: {
-    savingsAmount: number;
-    savingsPercent: number;
-    adjustedTargetWears: number;
-    message: string;
-  };
-
-  saturationWarning?: {
-    level: 'low' | 'medium' | 'high';
-    message: string;
-    suggestion: string;
-  };
-
-  colorOverlapWarning?: {
-    message: string;
-    severity: 'info' | 'warning';
-  };
-
-  gapFillBonus?: {
-    priority: 'essential' | 'nice-to-have' | 'redundant';
-    message: string;
-  };
-}
-
-export type Verdict = 'EXCELLENT' | 'GOOD' | 'CAUTION' | 'SKIP';
+export type Verdict = 'BUY_NOW' | 'WAIT_FOR_SALE' | 'PASS';
 
 export interface Recommendation {
   verdict: Verdict;
+  score: number; // 0-100
   emoji: string;
-  title: string;
-  message: string;
-  color: string;
+  headline: string;
+  description: string;
+  actionPrompt?: string; // e.g., "Wait for a price under $120"
+  color: string; // For UI styling
 }
 
 export interface CalculatorResults {
   metrics: CalculatorMetrics;
   recommendation: Recommendation;
-  advancedInsights?: AdvancedInsights;
   input: CalculatorInput;
 }
 
 /**
- * Convert wear frequency to expected wears per year
+ * HELPER: Get annual wears from frequency label
  */
 export function getWearsFromFrequency(frequency: WearFrequency): number {
   const frequencyMap: Record<WearFrequency, number> = {
-    rarely: 6,      // Special occasions - ~6 times/year
-    monthly: 12,    // Once a month - 12 times/year
-    weekly: 52,     // Once a week - 52 times/year
-    daily: 200,     // Daily rotation (not literally every day) - ~200 times/year
+    rarely: 6,      // ~6 times/year (Special occasions)
+    monthly: 12,    // 12 times/year
+    weekly: 52,     // 52 times/year
+    daily: 180,     // ~Every other day / heavy rotation
   };
-
   return frequencyMap[frequency];
 }
 
 /**
- * Get human-readable label for wear frequency
+ * HELPER: Get readable label
  */
 export function getFrequencyLabel(frequency: WearFrequency): string {
   const labels: Record<WearFrequency, string> = {
     rarely: 'Rarely (Special Occasions)',
     monthly: 'Monthly (Occasional)',
     weekly: 'Weekly (Regular)',
-    daily: 'Daily (Everyday)',
+    daily: 'Daily (Heavy Rotation)',
   };
-
   return labels[frequency];
 }
 
 /**
- * Calculate comprehensive metrics for the calculator
+ * MAIN LOGIC: Calculate Smart Metrics
+ * Incorporates Resale Value, Quality (Lifespan), and Category Targets
  */
-export function calculateCalculatorMetrics(
-  price: number,
-  category: ItemCategory,
-  wearFrequency: WearFrequency
-): CalculatorMetrics {
-  const expectedWearsPerYear = getWearsFromFrequency(wearFrequency);
+export function calculateSmartMetrics(input: CalculatorInput): CalculatorMetrics {
+  const { price, category, wearFrequency, resalePotential, qualityRating } = input;
+
+  // 1. Calculate Lifespan based on Quality & Category
+  // Shoes generally last less time than jackets. High quality extends life.
+  const baseLifespanYears = category === 'shoes' ? 2 : category === 'outerwear' ? 5 : 3; 
+  const qualityMultiplier = qualityRating === 'high' ? 1.5 : qualityRating === 'low' ? 0.6 : 1.0;
+  const estimatedLifespanYears = Math.max(1, parseFloat((baseLifespanYears * qualityMultiplier).toFixed(1)));
+  
+  // 2. Calculate Total Lifetime Wears
+  const baseWearsPerYear = getWearsFromFrequency(wearFrequency);
+  const totalLifetimeWears = Math.floor(baseWearsPerYear * estimatedLifespanYears);
+
+  // 3. Calculate Resale Value (Net Cost)
+  const resaleMap: Record<ResalePotential, number> = {
+    none: 0,
+    low: 0.10,    // 10% back
+    medium: 0.25, // 25% back
+    high: 0.50    // 50% back (hype items)
+  };
+  const resalePercent = resaleMap[resalePotential];
+  const estimatedResaleValue = Math.floor(price * resalePercent);
+  const netCost = price - estimatedResaleValue;
+
+  // 4. Calculate Real Cost Per Wear
+  const realCPW = netCost / Math.max(1, totalLifetimeWears);
+
+  // 5. Targets & Break-even
   const targetCPW = getTargetCostPerWear(price, category);
-  const targetWears = Math.ceil(price / targetCPW);
+  const breakEvenWears = Math.ceil(netCost / targetCPW);
 
-  const expectedWearsYear1 = expectedWearsPerYear;
-  const expectedWearsYear2 = expectedWearsPerYear * 2;
-
-  const cpwAt1Year = price / expectedWearsYear1;
-  const cpwAt2Years = price / expectedWearsYear2;
-
-  const monthsToTarget = (targetWears / expectedWearsPerYear) * 12;
-
-  const dateAtTarget = new Date();
-  dateAtTarget.setMonth(dateAtTarget.getMonth() + Math.ceil(monthsToTarget));
-
-  const progressAt1Year = Math.min((expectedWearsYear1 / targetWears) * 100, 100);
+  // 6. Target Buy Price (Reverse Engineering)
+  // "What price makes Real CPW <= Target CPW?"
+  // Formula derived from: (TargetPrice * (1 - Resale%)) / TotalWears = TargetCPW
+  const targetBuyPrice = Math.floor((targetCPW * totalLifetimeWears) / (1 - resalePercent));
 
   return {
     targetCPW: parseFloat(targetCPW.toFixed(2)),
-    targetWears,
-    expectedWearsYear1,
-    expectedWearsYear2,
-    cpwAt1Year: parseFloat(cpwAt1Year.toFixed(2)),
-    cpwAt2Years: parseFloat(cpwAt2Years.toFixed(2)),
-    monthsToTarget: Math.ceil(monthsToTarget),
-    dateAtTarget,
-    progressAt1Year: parseFloat(progressAt1Year.toFixed(1)),
+    estimatedLifespanYears,
+    totalLifetimeWears,
+    netCost,
+    estimatedResaleValue,
+    realCPW: parseFloat(realCPW.toFixed(2)),
+    breakEvenWears,
+    targetBuyPrice
   };
 }
 
 /**
- * Generate recommendation based on metrics
+ * RECOMMENDATION ENGINE
+ * Generates a Score (0-100) and Verdict based on value & utility
  */
-export function getRecommendation(
-  metrics: CalculatorMetrics,
+export function generateSmartRecommendation(
+  metrics: CalculatorMetrics, 
   input: CalculatorInput
 ): Recommendation {
-  const ratio = metrics.cpwAt1Year / metrics.targetCPW;
-  const categoryLabel = getCategoryLabel(input.category);
+  const { realCPW, targetCPW, targetBuyPrice } = metrics;
+  const { wardrobeRole } = input;
 
-  if (ratio <= 0.5) {
+  // --- Scoring Logic ---
+  
+  // Base Score: Ratio of Real CPW to Target CPW
+  // 1.0 (on target) = 75 pts
+  // 0.5 (great value) = 90 pts
+  // 2.0 (bad value) = 40 pts
+  const cpwRatio = realCPW / targetCPW;
+  let score = 100 - (cpwRatio * 25); 
+
+  // Wardrobe Role Adjustments
+  if (wardrobeRole === 'duplicate') score -= 20; // Heavy penalty for clutter
+  if (wardrobeRole === 'gap_fill') score += 10;  // Bonus for utility
+  if (wardrobeRole === 'upgrade') score += 5;    // Small bonus for quality upgrade
+  // 'variety' is neutral
+
+  // Clamp Score
+  score = Math.min(100, Math.max(0, Math.round(score)));
+
+  // --- Verdict Logic ---
+
+  if (score >= 80) {
     return {
-      verdict: 'EXCELLENT',
-      emoji: '✨',
-      title: 'Excellent Value! Worth It',
-      message: `This will cost $${metrics.cpwAt1Year.toFixed(2)}/wear at your usage rate — well below the $${metrics.targetCPW}/wear target for ${categoryLabel}. This is a smart purchase that will pay for itself quickly.`,
-      color: 'meadow-500',
+      verdict: 'BUY_NOW',
+      score,
+      emoji: '🔥',
+      headline: 'Cop It. It\'s a Steal.',
+      description: `At an effective $${realCPW.toFixed(2)}/wear, this item provides exceptional value. It pays for itself in just ${metrics.breakEvenWears} wears.`,
+      color: 'green-500'
     };
-  } else if (ratio <= 1.0) {
+  } else if (score >= 50) {
     return {
-      verdict: 'GOOD',
-      emoji: '👍',
-      title: 'Good Purchase',
-      message: `You'll reach the target cost-per-wear of $${metrics.targetCPW} in approximately ${metrics.monthsToTarget} months at your wear rate. This is a reasonable investment for ${categoryLabel}.`,
-      color: 'sun-400',
-    };
-  } else if (ratio <= 1.5) {
-    return {
-      verdict: 'CAUTION',
-      emoji: '⚠️',
-      title: 'Think Twice',
-      message: `At $${metrics.cpwAt1Year.toFixed(2)}/wear, this is above the healthy target of $${metrics.targetCPW}/wear. Ask yourself: Will you really wear this ${getFrequencyLabel(input.wearFrequency).toLowerCase()}? Consider waiting for a sale or looking for alternatives under $${Math.floor(metrics.targetCPW * metrics.expectedWearsYear1)}.`,
-      color: 'orange-500',
+      verdict: 'WAIT_FOR_SALE',
+      score,
+      emoji: '👀',
+      headline: 'Wait for a Sale.',
+      description: `It's a decent item, but overpriced right now relative to its utility. Buying it at full price pushes your cost-per-wear too high.`,
+      actionPrompt: `Set a price alert for $${targetBuyPrice}. If it drops below that, it becomes a smart buy.`,
+      color: 'sun-500' // yellow/orange
     };
   } else {
     return {
-      verdict: 'SKIP',
+      verdict: 'PASS',
+      score,
       emoji: '🛑',
-      title: 'Not Worth It',
-      message: `This significantly exceeds healthy cost-per-wear thresholds. At $${metrics.cpwAt1Year.toFixed(2)}/wear, you'd need to wear it ${metrics.targetWears} times just to justify the cost. Save your money or look for similar items under $${Math.floor(metrics.targetCPW * metrics.expectedWearsYear1)}.`,
-      color: 'destructive',
+      headline: 'Hard Pass.',
+      description: `This is an impulse buy that doesn't make financial sense. The cost-per-wear ($${realCPW.toFixed(2)}) is way above industry standards for this category.`,
+      actionPrompt: `Look for alternatives under $${targetBuyPrice} or invest in a higher quality version that lasts longer.`,
+      color: 'red-500'
     };
   }
 }
 
-/**
- * Calculate advanced insights if advanced options provided
- */
-export function calculateAdvancedInsights(
-  metrics: CalculatorMetrics,
-  input: CalculatorInput
-): AdvancedInsights {
-  const insights: AdvancedInsights = {};
-
-  // Sale value analysis
-  if (input.isOnSale && input.originalPrice && input.originalPrice > input.price) {
-    const savingsAmount = input.originalPrice - input.price;
-    const savingsPercent = (savingsAmount / input.originalPrice) * 100;
-    const adjustedTargetWears = Math.ceil(input.price / metrics.targetCPW);
-    const originalTargetWears = Math.ceil(input.originalPrice / metrics.targetCPW);
-    const wearsSaved = originalTargetWears - adjustedTargetWears;
-
-    insights.saleValueAnalysis = {
-      savingsAmount,
-      savingsPercent: parseFloat(savingsPercent.toFixed(1)),
-      adjustedTargetWears,
-      message: `You're saving $${savingsAmount.toFixed(2)} (${savingsPercent.toFixed(0)}% off)! This reduces your target wears by ${wearsSaved} — you'll reach "worth it" status ${wearsSaved} wears sooner than at full price.`,
-    };
-  }
-
-  // Wardrobe saturation warning
-  if (input.similarItemsCount !== undefined && input.similarItemsCount > 0) {
-    const count = input.similarItemsCount;
-
-    if (count >= 4) {
-      insights.saturationWarning = {
-        level: 'high',
-        message: `⚠️ Wardrobe Saturation Alert: You already own ${count} similar items.`,
-        suggestion: `Adding another means each piece gets worn less frequently, increasing overall cost-per-wear across your collection. Consider selling or donating one existing item if you buy this.`,
-      };
-    } else if (count >= 2) {
-      insights.saturationWarning = {
-        level: 'medium',
-        message: `You already own ${count} similar items in this category.`,
-        suggestion: `Make sure this offers something unique (different color, occasion, style) to justify the addition to your wardrobe.`,
-      };
-    } else {
-      insights.saturationWarning = {
-        level: 'low',
-        message: `You own ${count} similar item. This could complement your existing wardrobe.`,
-        suggestion: `Consider how often you'll reach for this compared to what you already own.`,
-      };
-    }
-  }
-
-  // Color overlap warning
-  if (input.hasSameColor) {
-    insights.colorOverlapWarning = {
-      message: `You already own this color in this category. Consider if this offers enough variety to justify the purchase.`,
-      severity: 'warning',
-    };
-  }
-
-  // Gap fill analysis
-  if (input.fillsGap !== undefined) {
-    if (input.fillsGap) {
-      insights.gapFillBonus = {
-        priority: 'essential',
-        message: `✅ This fills a missing need in your wardrobe! Essential items that fill gaps tend to get worn more frequently and offer better value.`,
-      };
-    } else if (input.similarItemsCount !== undefined && input.similarItemsCount === 0) {
-      insights.gapFillBonus = {
-        priority: 'nice-to-have',
-        message: `This adds variety to your wardrobe but isn't filling a critical gap. Make sure you love it enough to justify the purchase.`,
-      };
-    } else if (input.similarItemsCount !== undefined && input.similarItemsCount >= 2) {
-      insights.gapFillBonus = {
-        priority: 'redundant',
-        message: `⚠️ This doesn't fill a wardrobe gap and you already own similar items. This is likely a redundant purchase driven by want rather than need.`,
-      };
-    }
-  }
-
-  return insights;
-}
-
-/**
- * Get human-readable category label
- */
-function getCategoryLabel(category: ItemCategory): string {
-  const labels: Record<ItemCategory, string> = {
-    shoes: 'shoes',
-    tops: 'tops',
-    bottoms: 'bottoms',
-    outerwear: 'outerwear',
-    accessories: 'accessories',
-  };
-
-  return labels[category] || category;
-}
-
-/**
- * Get seasonal context (future enhancement)
- */
-export function getSeasonalContext(category: ItemCategory): { message: string | null } {
-  const month = new Date().getMonth();
-  const isSummer = month >= 5 && month <= 8;
-  const isWinter = month <= 2 || month >= 11;
-
-  if (category === 'outerwear' && isSummer) {
-    return {
-      message: "🌞 Note: It's summer! Outerwear won't get much wear until fall. Factor seasonal timing into your decision.",
-    };
-  }
-
-  if (category === 'shoes' && isWinter && month === 11) {
-    return {
-      message: "❄️ Tip: Winter weather may limit wear frequency. Consider if this is weather-appropriate for the season ahead.",
-    };
-  }
-
-  return { message: null };
+// Legacy support wrapper (if needed during transition)
+export function getRecommendation(metrics: CalculatorMetrics, input: CalculatorInput): Recommendation {
+  return generateSmartRecommendation(metrics, input);
 }

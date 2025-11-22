@@ -1,12 +1,9 @@
-/**
- * Timeline Projection - Visual timeline showing when target will be reached
- */
-
+// components/cost-per-wear-calculator/TimelineProjection.tsx
 'use client';
 
-import { CalculatorMetrics, CalculatorInput, getFrequencyLabel } from '@/lib/worth-it-calculator/calculator-logic';
+import { CalculatorMetrics, CalculatorInput, getFrequencyLabel, getWearsFromFrequency } from '@/lib/worth-it-calculator/calculator-logic';
 import { Card } from '@/components/ui/card';
-import { Calendar, ShoppingBag, Sparkles, Lightbulb } from 'lucide-react';
+import { Calendar, Clock, CheckCircle2 } from 'lucide-react';
 
 interface TimelineProjectionProps {
   metrics: CalculatorMetrics;
@@ -14,10 +11,24 @@ interface TimelineProjectionProps {
 }
 
 export function TimelineProjection({ metrics, input }: TimelineProjectionProps) {
+  // 1. Calculate dates dynamically based on the new "breakEvenWears" metric
+  const wearsPerYear = getWearsFromFrequency(input.wearFrequency);
+  
+  // Safety check to avoid division by zero
+  const safeWearsPerYear = wearsPerYear > 0 ? wearsPerYear : 1;
+  
+  const yearsToBreakEven = metrics.breakEvenWears / safeWearsPerYear;
+  const monthsToBreakEven = Math.ceil(yearsToBreakEven * 12);
+  
   const today = new Date();
-  const targetDate = metrics.dateAtTarget;
+  const targetDate = new Date();
+  targetDate.setMonth(today.getMonth() + monthsToBreakEven);
 
-  const formatDate = (date: Date): string => {
+  // 2. Robust Date Formatter with safety guard
+  const formatDate = (date: Date | undefined): string => {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return 'N/A';
+    }
     return date.toLocaleDateString('en-US', {
       month: 'short',
       year: 'numeric',
@@ -27,78 +38,75 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
   return (
     <Card className="p-6 sm:p-8 bg-card border-border shadow-lg">
       <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-        <Calendar className="h-6 w-6 text-sun-400" />
-        <span>Timeline to "Worth It" Status</span>
+        <Clock className="h-6 w-6 text-sun-400" />
+        <span>Time to Value</span>
       </h3>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Timeline Visual */}
-        <div className="relative">
+        <div className="relative pt-2 pb-6 px-2">
           {/* Line */}
-          <div className="absolute left-0 right-0 top-8 h-1 bg-gradient-to-r from-sun-400 to-green-500 rounded-full" />
+          <div className="absolute left-4 right-4 top-6 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+             <div className="h-full bg-gradient-to-r from-stone-300 to-green-400 w-full origin-left" />
+          </div>
 
-          {/* Points */}
-          <div className="relative flex items-start justify-between">
-            {/* Today */}
-            <div className="flex flex-col items-center gap-2 z-10">
-              <div className="h-16 w-16 rounded-full bg-sun-400 flex items-center justify-center shadow-lg">
-                <ShoppingBag className="h-8 w-8 text-slate-900" />
-              </div>
+          {/* Points Container */}
+          <div className="relative flex justify-between">
+            
+            {/* Start Point */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-4 h-4 rounded-full bg-stone-400 ring-4 ring-white z-10" />
               <div className="text-center">
-                <div className="font-semibold text-sm">Today</div>
-                <div className="text-xs text-muted-foreground">{formatDate(today)}</div>
-                <div className="text-xs text-foreground font-mono mt-1">
-                  ${input.price.toFixed(0)}
-                </div>
+                <div className="font-bold text-sm text-stone-500">Today</div>
+                <div className="text-xs text-stone-400">{formatDate(today)}</div>
               </div>
             </div>
 
-            {/* Target Date */}
-            <div className="flex flex-col items-center gap-2 z-10">
-              <div className="h-16 w-16 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
-                <Sparkles className="h-8 w-8 text-white" />
+            {/* End Point (Break Even) */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center ring-4 ring-white shadow-md z-10">
+                <CheckCircle2 className="w-5 h-5" />
               </div>
               <div className="text-center">
-                <div className="font-semibold text-sm">Target Reached</div>
-                <div className="text-xs text-muted-foreground">{formatDate(targetDate)}</div>
-                <div className="text-xs text-foreground font-mono mt-1">
-                  ${metrics.targetCPW.toFixed(2)}/wear
-                </div>
+                <div className="font-bold text-sm text-green-700">Pays for Itself</div>
+                <div className="text-xs text-green-600 font-medium">{formatDate(targetDate)}</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Details */}
-        <div className="p-4 bg-stone-50 rounded-lg border border-stone-200 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Time to Target</span>
-            <span className="text-base font-semibold text-foreground">
-              {metrics.monthsToTarget} months
-            </span>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="p-4 bg-stone-50 rounded-lg border border-stone-200 text-center">
+            <div className="text-xs uppercase tracking-wide text-stone-500 font-semibold mb-1">Time to ROI</div>
+            <div className="text-lg font-bold text-stone-900">
+              {monthsToBreakEven < 1 ? '< 1 Month' : `${monthsToBreakEven} Months`}
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Total Wears Needed</span>
-            <span className="text-base font-semibold text-foreground">
-              {metrics.targetWears} times
-            </span>
+          
+          <div className="p-4 bg-stone-50 rounded-lg border border-stone-200 text-center">
+            <div className="text-xs uppercase tracking-wide text-stone-500 font-semibold mb-1">Wears Needed</div>
+            <div className="text-lg font-bold text-stone-900">
+              {metrics.breakEvenWears}
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Your Wear Frequency</span>
-            <span className="text-base font-semibold text-foreground">
-              {getFrequencyLabel(input.wearFrequency)}
-            </span>
+
+          <div className="p-4 bg-stone-50 rounded-lg border border-stone-200 text-center">
+            <div className="text-xs uppercase tracking-wide text-stone-500 font-semibold mb-1">Usage Rate</div>
+            <div className="text-lg font-bold text-stone-900">
+              {getFrequencyLabel(input.wearFrequency).split(' ')[0]}
+            </div>
           </div>
         </div>
 
-        {/* Message */}
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-2">
-          <Lightbulb className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-blue-900 leading-relaxed">
-            <strong>Pro Tip:</strong> At your{' '}
-            <span className="font-semibold">{input.wearFrequency}</span> wear rate, you'll reach
-            "worth it" status by <span className="font-semibold">{formatDate(targetDate)}</span>.
-            If you wear it more often, you'll justify the purchase faster!
+        {/* Contextual Tip */}
+        <div className="flex gap-3 text-sm text-stone-600 bg-stone-50 p-4 rounded-md">
+          <Calendar className="w-5 h-5 text-stone-400 flex-shrink-0" />
+          <p>
+            At your <strong>{input.wearFrequency}</strong> wear rate, this item breaks even in <strong>{yearsToBreakEven.toFixed(1)} years</strong>. 
+            {metrics.estimatedLifespanYears > yearsToBreakEven 
+              ? " Since this is well within the item's estimated lifespan, it's a safe investment. ✅"
+              : " ⚠️ This is longer than the item might last. Consider a higher quality alternative."}
           </p>
         </div>
       </div>
