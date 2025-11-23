@@ -107,22 +107,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // Old Navy - requires JS (Gap Inc. brand)
-  {
-    domain: 'oldnavy.gap.com',
-    name: 'Old Navy',
-    selectors: {
-      price: [
-        '[data-test="product-price"]',
-        '.product-price',
-        '[class*="ProductPrice"]',
-        '[data-price]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: true
-  },
-
   // Shoe Palace
   {
     domain: 'shoepalace.com',

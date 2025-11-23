@@ -513,25 +513,6 @@ export async function POST(request: NextRequest) {
             customExtractor: (html, u) => extractGapFamilyData(html, u, 'Banana Republic')
           }
         ), 35000)
-      } else if (hostname.includes('oldnavy.gap.com')) {
-        // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
-        // that blocks automation. Both /unblock and /content endpoints are blocked.
-        // Current implementation attempts scraping but success rate is very low (~0-10%).
-        // RECOMMENDATION: Use manual entry or alternative sources (SoleRetriever) for these sites.
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(
-          url,
-          (u) => scrapeGapFamily(u, 'Old Navy'),
-          'Old Navy',
-          {
-            skipCheerio: true, // Skip cheerio, go straight to Browserless
-            browserlessConfig: {
-              endpoint: 'content', // Use /content for better JS rendering
-              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 15000 },
-              timeout: 30000
-            },
-            customExtractor: (html, u) => extractGapFamilyData(html, u, 'Old Navy')
-          }
-        ), 35000)
       } else if (hostname.includes('gap.com')) {
         // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
         // that blocks automation. Both /unblock and /content endpoints are blocked.
