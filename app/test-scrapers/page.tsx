@@ -24,35 +24,80 @@ export default function TestScrapersPage() {
 
   // Pre-filled test URLs for quick testing
   const testUrls = [
+    // NEW RETAILERS
     {
-      name: 'Gymshark (Shopify JSON)',
+      name: 'Gymshark (New)',
       url: 'https://www.gymshark.com/products/gymshark-twist-front-bralette-white-aw24',
-      tier: 'Tier 1',
+      tier: 'New',
       color: 'bg-green-500'
     },
     {
-      name: 'Sole Retriever (Standard)',
+      name: 'Sole Retriever (New)',
       url: 'https://www.soleretriever.com/sneaker-release-dates/nike/kobe-9/nike-kobe-9-em-protro-china-ih1400-600',
-      tier: 'Tier 2',
-      color: 'bg-blue-500'
+      tier: 'New',
+      color: 'bg-green-500'
     },
     {
-      name: 'GOAT (Anti-Bot)',
+      name: 'GOAT (New)',
       url: 'https://www.goat.com/sneakers/air-jordan-11-retro-rare-air-ih0296-400',
-      tier: 'Tier 4',
-      color: 'bg-orange-500'
+      tier: 'New',
+      color: 'bg-green-500'
     },
+    // EXISTING RETAILERS - HIGH PRIORITY
     {
       name: 'Nike (Existing)',
       url: 'https://www.nike.com/t/air-max-90-mens-shoes-6n8Nd/CN8490-002',
-      tier: 'Verify',
-      color: 'bg-gray-500'
+      tier: 'Existing',
+      color: 'bg-blue-600'
+    },
+    {
+      name: 'Adidas (Existing)',
+      url: 'https://www.adidas.com/us/stan-smith-shoes/FX5501.html',
+      tier: 'Existing',
+      color: 'bg-blue-600'
+    },
+    {
+      name: 'Foot Locker (Existing)',
+      url: 'https://www.footlocker.com/product/jordan-retro-11-mens/378037.html',
+      tier: 'Existing',
+      color: 'bg-blue-600'
     },
     {
       name: 'Shoe Palace (Existing)',
       url: 'https://www.shoepalace.com/products/asics-mens-gel-kayano-14-1201a019-020-black-pure-silver',
-      tier: 'Verify',
-      color: 'bg-gray-500'
+      tier: 'Existing',
+      color: 'bg-blue-600'
+    },
+    {
+      name: 'Finish Line (Existing)',
+      url: 'https://www.finishline.com/store/product/mens-nike-air-max-90-casual-shoes/prod2794444',
+      tier: 'Existing',
+      color: 'bg-blue-600'
+    },
+    // EXISTING RETAILERS - MEDIUM PRIORITY
+    {
+      name: 'Champs Sports (Existing)',
+      url: 'https://www.champssports.com/product/jordan-retro-11-mens/378037.html',
+      tier: 'Existing',
+      color: 'bg-purple-600'
+    },
+    {
+      name: 'JD Sports (Existing)',
+      url: 'https://www.jdsports.com/product/black-nike-air-max-90/16462825',
+      tier: 'Existing',
+      color: 'bg-purple-600'
+    },
+    {
+      name: 'Eastbay (Existing)',
+      url: 'https://www.eastbay.com/product/nike-air-force-1-low-mens/DD8959100.html',
+      tier: 'Existing',
+      color: 'bg-purple-600'
+    },
+    {
+      name: "Dick's Sporting Goods (Existing)",
+      url: 'https://www.dickssportinggoods.com/p/nike-mens-air-max-90-shoes-20nikmairmx90xxxmsho/20nikmairmx90xxxmsho',
+      tier: 'Existing',
+      color: 'bg-purple-600'
     }
   ]
 
