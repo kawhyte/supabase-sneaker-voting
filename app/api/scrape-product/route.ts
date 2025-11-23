@@ -2204,17 +2204,17 @@ async function scrapeHollister(url: string): Promise<ProductData> {
   }
 
   try {
-    // Use /content endpoint for JS rendering
-    // NOTE: Hollister has aggressive anti-bot, so we don't wait for specific selectors
-    // We just wait for the page to load, then let Gemini AI extract the data
+    // Use /unblock endpoint - Hollister has very aggressive anti-bot protection
+    // /content endpoint gets blocked with "Bad Request" error
+    // /unblock uses residential proxies to bypass anti-bot detection
     const browserResult = await fetchWithBrowserCached(url, {
-      endpoint: 'content', // Standard JS rendering
-      timeout: 30000,
+      endpoint: 'unblock', // Residential proxy for anti-bot bypass
+      timeout: 35000,
       // Don't wait for specific selectors - Hollister structure changes frequently
       // Just wait for page to be interactive, then use Gemini AI fallback
       waitFor: {
         selector: 'body', // Wait for body to load (very lenient)
-        timeout: 10000
+        timeout: 15000
       }
     })
 
