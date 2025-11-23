@@ -536,9 +536,6 @@ export async function POST(request: NextRequest) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNordstrom, 'Nordstrom'))
       } else if (hostname.includes('stance.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeStance, 'Stance'))
-      } else if (hostname.includes('bathandbodyworks.com')) {
-        // Bath & Body Works - definitely needs Browserless
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Bath & Body Works'), 20000)
       } else {
         // Generic fallback - use 45s timeout to accommodate slow /unblock residential proxies
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Generic'), 45000)

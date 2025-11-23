@@ -139,22 +139,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // Bath & Body Works
-  {
-    domain: 'bathandbodyworks.com',
-    name: 'Bath & Body Works',
-    selectors: {
-      price: [
-        '.product-price',
-        '[data-price]',
-        '[itemprop="price"]',
-        'meta[property="og:price:amount"]',
-        '[class*="price"]'
-      ]
-    },
-    requiresJS: false
-  },
-
   // House of Heat (shoe retailer/marketplace)
   {
     domain: 'houseofheat.co',
