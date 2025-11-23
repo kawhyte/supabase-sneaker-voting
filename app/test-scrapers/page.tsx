@@ -71,7 +71,7 @@ export default function TestScrapersPage() {
     },
     {
       name: "Dick's Sporting Goods (Existing)",
-      url: 'https://www.dickssportinggoods.com/p/nike-mens-air-max-90-shoes-20nikmairmx90xxxmsho/20nikmairmx90xxxmsho',
+      url: 'https://www.dickssportinggoods.com/p/patagonia-mens-capilene-cool-daily-shirt-19ptgmmcpcldlysstapt/19ptgmmcpcldlysstapt?color=Pumice%2FDyno%20White%20X-Dye',
       tier: 'Existing',
       color: 'bg-purple-600'
     }
