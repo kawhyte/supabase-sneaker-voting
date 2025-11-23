@@ -52,7 +52,7 @@ export default function TestScrapersPage() {
     },
     {
       name: 'Foot Locker (Existing)',
-      url: 'https://www.footlocker.com/product/jordan-retro-11-mens/378037.html',
+      url: 'https://www.footlocker.com/product/nike-zoom-vomero-5-womens/D0884025.html',
       tier: 'Existing',
       color: 'bg-blue-600'
     },
