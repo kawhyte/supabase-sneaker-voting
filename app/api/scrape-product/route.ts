@@ -323,8 +323,13 @@ function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: stri
       }
 
       console.log(`💰 Price text found: "${priceText}"`)
-      retailPrice = extractPrice(priceText)
+      const extractedPrices = extractPrices(priceText)
+      retailPrice = extractedPrices.retailPrice
+      salePrice = extractedPrices.salePrice
       console.log(`💰 Extracted retail price: $${retailPrice}`)
+      if (salePrice) {
+        console.log(`💰 Extracted sale price: $${salePrice}`)
+      }
     }
 
     // Extract images
@@ -2052,6 +2057,65 @@ function extractPrice(priceText: string): number | undefined {
   }
 
   return undefined
+}
+
+/**
+ * Enhanced price extraction that detects both retail and sale prices
+ * Handles strings like:
+ * - "This item is on sale. Price dropped from $170.00 to $127.50"
+ * - "Was $170.00, Now $127.50"
+ * - "$127.50 $170.00 25% off"
+ */
+function extractPrices(priceText: string): { retailPrice?: number; salePrice?: number } {
+  if (!priceText) return {}
+
+  // Remove percentage values (e.g., "25% off") to avoid matching them as prices
+  const cleanedText = priceText.replace(/\d+%/g, '')
+
+  // Match complete dollar amounts (e.g., "170.00", "127.50", "1,299.99")
+  // This regex matches patterns like: 123.45 or 1,234.56
+  const priceMatches = cleanedText.match(/\$?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g)
+
+  if (!priceMatches || priceMatches.length === 0) {
+    return {}
+  }
+
+  // Parse all prices found
+  const prices = priceMatches
+    .map(match => {
+      const cleanedMatch = match.replace(/[$,\s]/g, '')
+      return parseFloat(cleanedMatch)
+    })
+    .filter(price => !isNaN(price) && price > 0)
+    .filter((price, index, self) => self.indexOf(price) === index) // Remove duplicates
+
+  if (prices.length === 0) {
+    return {}
+  }
+
+  // Detect if this is a sale price scenario
+  const lowerText = priceText.toLowerCase()
+  const isSale = /\b(sale|was|now|dropped|save|off)\b/.test(lowerText)
+
+  if (prices.length === 1) {
+    // Single price found
+    return { retailPrice: prices[0] }
+  }
+
+  if (isSale && prices.length >= 2) {
+    // Sale detected with multiple prices
+    // Sort prices: highest first
+    const sortedPrices = [...prices].sort((a, b) => b - a)
+
+    // Higher price = retail/original, lower price = sale/current
+    return {
+      retailPrice: sortedPrices[0],  // Original price
+      salePrice: sortedPrices[sortedPrices.length - 1]  // Sale price (lowest)
+    }
+  }
+
+  // Multiple prices but no sale indicators - return first as retail
+  return { retailPrice: prices[0] }
 }
 
 // ========== NEW RETAILER SCRAPERS (Smart Hybrid Architecture) ==========
