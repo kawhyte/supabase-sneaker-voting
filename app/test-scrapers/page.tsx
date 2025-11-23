@@ -43,12 +43,6 @@ export default function TestScrapersPage() {
       color: 'bg-orange-500'
     },
     {
-      name: 'Lululemon (Anti-Bot)',
-      url: 'https://shop.lululemon.com/p/skirts-and-dresses-skirts/Pleated-High-Rise-Knee-Length-Tennis-Skirt/_/prod20002755?color=68578',
-      tier: 'Tier 4',
-      color: 'bg-orange-500'
-    },
-    {
       name: 'Nike (Existing)',
       url: 'https://www.nike.com/t/air-max-90-mens-shoes-6n8Nd/CN8490-002',
       tier: 'Verify',

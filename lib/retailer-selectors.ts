@@ -300,24 +300,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     testUrl: 'https://www.goat.com/sneakers/air-jordan-11-retro-rare-air-ih0296-400'
   },
 
-  // Lululemon - Aggressive anti-bot (Cloudflare), needs residential proxies
-  {
-    domain: 'lululemon.com',
-    name: 'Lululemon',
-    selectors: {
-      price: [
-        '[data-lulu-price]',
-        '.product-price',
-        '[class*="price"]',
-        'meta[property="og:price:amount"]',
-        '[itemprop="price"]'
-      ]
-    },
-    requiresJS: true,
-    useUnblock: true,  // Use Browserless /unblock with residential proxy
-    testUrl: 'https://shop.lululemon.com/p/skirts-and-dresses-skirts/Pleated-High-Rise-Knee-Length-Tennis-Skirt/_/prod20002755?color=68578'
-  },
-
   // Sole Retriever - Static HTML friendly, standard fetch works
   {
     domain: 'soleretriever.com',

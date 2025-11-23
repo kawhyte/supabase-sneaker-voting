@@ -436,12 +436,9 @@ export async function POST(request: NextRequest) {
           productData = await scrapeWithTimeout(() => scrapeGeneric(url))
         }
       }
-      // TIER 2: Anti-Bot Sites (GOAT, Lululemon) - Use Browserless /unblock
+      // TIER 2: Anti-Bot Sites (GOAT) - Use Browserless /unblock
       else if (hostname.includes('goat.com')) {
         productData = await scrapeWithTimeout(() => scrapeGOAT(url), 25000)
-      }
-      else if (hostname.includes('lululemon.com')) {
-        productData = await scrapeWithTimeout(() => scrapeLululemon(url), 25000)
       }
       // TIER 4: Sole Retriever - Standard fetch works
       else if (hostname.includes('soleretriever.com')) {
@@ -2096,118 +2093,6 @@ async function scrapeGOAT(url: string): Promise<ProductData> {
     return {
       success: false,
       error: `GOAT scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-    }
-  }
-}
-
-/**
- * Lululemon Scraper - Athletic apparel with Cloudflare bot protection
- * Strategy: Use Browserless /unblock with residential proxies
- */
-async function scrapeLululemon(url: string): Promise<ProductData> {
-  console.log('🧘 Lululemon: Using Browserless /unblock endpoint...')
-
-  if (!isBrowserlessAvailable()) {
-    return {
-      success: false,
-      error: 'Lululemon requires Browserless with residential proxies. Add BROWSERLESS_API_KEY to .env.local'
-    }
-  }
-
-  try {
-    // Use /unblock endpoint with residential proxy
-    const browserResult = await fetchWithBrowserCached(url, {
-      endpoint: 'unblock', // Residential proxy for Cloudflare bypass
-      timeout: 35000,
-      waitFor: {
-        selector: 'h1, [data-lulu-price], [class*="price"]',
-        timeout: 20000
-      }
-    })
-
-    if (!browserResult.success || !browserResult.html) {
-      return {
-        success: false,
-        error: `Lululemon scraping failed: ${browserResult.error || 'Browserless returned no HTML'}`
-      }
-    }
-
-    // Parse HTML with cheerio
-    const $ = cheerio.load(browserResult.html)
-
-    // Extract brand (always Lululemon)
-    const brand = 'Lululemon'
-
-    // Extract title
-    const title = cleanText(
-      $('h1').first().text() ||
-      $('[data-testid="product-title"]').text() ||
-      $('meta[property="og:title"]').attr('content') ||
-      ''
-    )
-
-    // Extract prices
-    let retailPrice: number | undefined
-    let salePrice: number | undefined
-
-    const priceText = cleanText(
-      $('[data-lulu-price]').first().text() ||
-      $('[class*="price"]').first().text() ||
-      $('meta[property="og:price:amount"]').attr('content') ||
-      ''
-    )
-    retailPrice = extractPrice(priceText)
-
-    // Extract images
-    const images: string[] = []
-    const ogImage = $('meta[property="og:image"]').attr('content')
-    if (ogImage) images.push(ogImage)
-
-    $('img[src*="lululemon"], picture img').each((_, el) => {
-      if (images.length >= 5) return false
-      const src = $(el).attr('src') || $(el).attr('data-src')
-      if (src && !src.includes('logo') && !images.includes(src)) {
-        const fullUrl = src.startsWith('http') ? src : `https://shop.lululemon.com${src}`
-        images.push(fullUrl)
-      }
-    })
-
-    // Detect category
-    const category = detectCategory(url, title, '')
-
-    const productData: ProductData = {
-      brand,
-      model: title || undefined,
-      retailPrice,
-      salePrice,
-      images: images.length > 0 ? images : undefined,
-      category,
-      success: true
-    }
-
-    const validation = validateProductData(productData, 'Lululemon')
-    if (!validation.isValid) {
-      console.warn('⚠️ Lululemon validation issues:', validation.issues)
-
-      // If critical fields are missing (price or images), mark as failure to trigger Gemini fallback
-      const hasCriticalIssues = !productData.retailPrice || !productData.images || productData.images.length === 0
-      if (hasCriticalIssues) {
-        productData.success = false
-        productData.error = `Incomplete data: ${validation.issues.join(', ')}`
-      } else {
-        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
-      }
-    }
-
-    // Include raw HTML for Gemini AI fallback (in case CSS selectors fail)
-    productData.rawHtml = browserResult.html
-
-    return productData
-
-  } catch (error) {
-    return {
-      success: false,
-      error: `Lululemon scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     }
   }
 }
