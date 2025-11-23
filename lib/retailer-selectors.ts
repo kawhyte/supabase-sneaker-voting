@@ -124,21 +124,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // House of Heat (shoe retailer/marketplace)
-  {
-    domain: 'houseofheat.co',
-    name: 'House of Heat',
-    selectors: {
-      price: [
-        '.product-price',
-        '[data-product-price]',
-        '[itemprop="price"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: false
-  },
-
   // ========== NEW RETAILERS (Smart Hybrid Architecture) ==========
 
   // Gymshark - Shopify store (JSON endpoint blocked, uses HTML scraping)
