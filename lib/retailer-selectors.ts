@@ -138,21 +138,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: true
   },
 
-  // Eastbay
-  {
-    domain: 'eastbay.com',
-    name: 'Eastbay',
-    selectors: {
-      price: [
-        '[data-test="product-price"]',
-        '.ProductPrice',
-        '[class*="price"]',
-        '[itemprop="price"]'
-      ]
-    },
-    requiresJS: false
-  },
-
   // Hibbett Sports
   {
     domain: 'hibbett.com',

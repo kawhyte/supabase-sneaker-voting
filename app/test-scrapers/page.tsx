@@ -88,12 +88,6 @@ export default function TestScrapersPage() {
       color: 'bg-purple-600'
     },
     {
-      name: 'Eastbay (Existing)',
-      url: 'https://www.eastbay.com/product/nike-air-force-1-low-mens/DD8959100.html',
-      tier: 'Existing',
-      color: 'bg-purple-600'
-    },
-    {
       name: "Dick's Sporting Goods (Existing)",
       url: 'https://www.dickssportinggoods.com/p/nike-mens-air-max-90-shoes-20nikmairmx90xxxmsho/20nikmairmx90xxxmsho',
       tier: 'Existing',
