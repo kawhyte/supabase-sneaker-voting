@@ -85,6 +85,24 @@ export const itemFormSchema = z
 			.or(z.literal('')),
 		wears: z.coerce.number().min(0).max(10000).optional().default(0),
 		notes: z.string().max(120).trim().optional().or(z.literal('')),
+
+		// PHASE 2: Store & Purchase Fields (Optional)
+		storeName: z.string().max(100).trim().optional().or(z.literal('')),
+		storeUrl: z
+			.string()
+			.url('Please enter a valid store URL')
+			.max(500)
+			.optional()
+			.or(z.literal('')),
+		purchaseDate: z
+			.string()
+			.refine((val) => {
+				if (!val) return true // Optional field
+				const date = new Date(val)
+				return !isNaN(date.getTime()) && date <= new Date()
+			}, 'Purchase date cannot be in the future')
+			.optional()
+			.or(z.literal('')),
 	})
 	.refine(
 		(data) => {
@@ -180,6 +198,11 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 						wears: initialData.wears || 0,
 						notes: initialData.notes || '',
 						productUrl: initialData.product_url || '',
+
+						// PHASE 2: Store & Purchase Fields
+						storeName: initialData.store_name || '',
+						storeUrl: initialData.store_url || '',
+						purchaseDate: initialData.purchase_date || '',
 				  }
 				: {
 						triedOn: false,
@@ -329,6 +352,12 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 				product_url: data.productUrl || null,
 				auto_price_tracking_enabled: data.auto_price_tracking_enabled || false,
 				notes: data.notes && data.notes.trim() ? data.notes : '',
+
+				// PHASE 2: Store & Purchase Fields
+				store_name: data.storeName && data.storeName.trim() ? data.storeName : null,
+				store_url: data.storeUrl && data.storeUrl.trim() ? data.storeUrl : null,
+				purchase_date: data.purchaseDate || null,
+
 				wears: data.wears || 0,
 				status: (mode === 'add' || mode === 'create' ? ItemStatus.WISHLISTED : initialData?.status) as ItemStatus,
 				has_been_tried: data.triedOn,
