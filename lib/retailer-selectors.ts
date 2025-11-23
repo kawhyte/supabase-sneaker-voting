@@ -215,21 +215,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // Hollister - requires JS (Abercrombie brand)
-  {
-    domain: 'hollister.com',
-    name: 'Hollister',
-    selectors: {
-      price: [
-        '[data-test="product-price"]',
-        '.product-price',
-        '[class*="ProductPrice"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: true
-  },
-
   // Stance (socks/apparel)
   {
     domain: 'stance.com',
@@ -331,23 +316,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: true,
     useUnblock: true,  // Use Browserless /unblock with residential proxy
     testUrl: 'https://shop.lululemon.com/p/skirts-and-dresses-skirts/Pleated-High-Rise-Knee-Length-Tennis-Skirt/_/prod20002755?color=68578'
-  },
-
-  // Hollister - Updated domain (hollisterco.com), heavily JS-rendered React app
-  {
-    domain: 'hollisterco.com',
-    name: 'Hollister',
-    selectors: {
-      price: [
-        '[data-test="product-price"]',
-        '.product-price',
-        '[class*="ProductPrice"]',
-        'meta[property="og:price:amount"]',
-        '[itemprop="price"]'
-      ]
-    },
-    requiresJS: true,  // Use Browserless /content endpoint
-    testUrl: 'https://www.hollisterco.com/shop/us/p/baggy-sweatpants-60471370'
   },
 
   // Sole Retriever - Static HTML friendly, standard fetch works
