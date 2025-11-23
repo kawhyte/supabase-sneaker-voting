@@ -13,7 +13,7 @@
  * 2. Get free key from: https://aistudio.google.com/app/apikey
  * 3. Free tier: 15 requests/minute, 1500/day
  *
- * Model: gemini-pro (stable v1beta)
+ * Model: gemini-2.5-flash (Gemini 1.x deprecated as of 2025)
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -92,8 +92,8 @@ export async function extractWithGemini(
 
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(apiKey)
-    // Use gemini-pro (stable v1beta model)
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
+    // Use gemini-2.5-flash (Gemini 1.x models deprecated as of 2025)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
     // Strip HTML to reduce tokens
     const cleanedHtml = stripHtmlForAI(html)
@@ -211,7 +211,7 @@ JSON Response:`
 export function getGeminiStats() {
   return {
     isConfigured: isGeminiAvailable(),
-    model: 'gemini-pro',
+    model: 'gemini-2.5-flash',
     rateLimit: '15 requests/minute, 1500/day (free tier)',
     tokenLimit: '~30,000 characters per request (conservative)',
     pricing: 'Free tier available at https://aistudio.google.com'
