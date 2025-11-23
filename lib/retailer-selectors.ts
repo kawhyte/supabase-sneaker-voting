@@ -92,23 +92,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // JD Sports - requires JS + residential proxies (bot protection)
-  {
-    domain: 'jdsports.com',
-    name: 'JD Sports',
-    selectors: {
-      price: [
-        '[data-e2e="product-price"]',
-        '.price',
-        '[itemprop="price"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: true,
-    useUnblock: true,  // Use Browserless /unblock with residential proxy (access denied bypass)
-    testUrl: 'https://www.jdsports.com/pdp/mens-nike-v5-rnr-casual-shoes/prod2874039/HJ5228/004'
-  },
-
   // Hibbett Sports
   {
     domain: 'hibbett.com',

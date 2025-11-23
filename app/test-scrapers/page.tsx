@@ -70,12 +70,6 @@ export default function TestScrapersPage() {
       color: 'bg-purple-600'
     },
     {
-      name: 'JD Sports (Existing)',
-      url: 'https://www.jdsports.com/pdp/mens-nike-v5-rnr-casual-shoes/prod2874039/HJ5228/004',
-      tier: 'Existing',
-      color: 'bg-purple-600'
-    },
-    {
       name: "Dick's Sporting Goods (Existing)",
       url: 'https://www.dickssportinggoods.com/p/nike-mens-air-max-90-shoes-20nikmairmx90xxxmsho/20nikmairmx90xxxmsho',
       tier: 'Existing',
