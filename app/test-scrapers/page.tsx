@@ -62,12 +62,6 @@ export default function TestScrapersPage() {
       tier: 'Existing',
       color: 'bg-blue-600'
     },
-    {
-      name: 'Finish Line (Existing)',
-      url: 'https://www.finishline.com/pdp/womens-adidas-originals-handball-spezial-casual-shoes/prod2866206/JP9236/250',
-      tier: 'Existing',
-      color: 'bg-blue-600'
-    },
     // EXISTING RETAILERS - MEDIUM PRIORITY
     {
       name: 'Champs Sports (Existing)',
