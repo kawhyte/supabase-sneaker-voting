@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import * as cheerio from 'cheerio'
 import { ItemCategory } from '@/components/types/item-category'
 import { fetchWithBrowserCached, isBrowserlessAvailable } from '@/lib/browserless'
+import { extractWithGemini, isGeminiAvailable } from '@/lib/gemini-fallback'
+import { fetchShopifyProduct, isShopifyUrl } from '@/lib/shopify-json-fetcher'
+import { getRetailerConfig } from '@/lib/retailer-selectors'
 
 interface ProductData {
   brand?: string
@@ -401,8 +404,41 @@ export async function POST(request: NextRequest) {
     }
 
     try {
+      // ========== SMART HYBRID ARCHITECTURE ==========
+
+      // TIER 1: Shopify JSON Backdoor (100% reliable)
+      if (hostname.includes('gymshark.com') || isShopifyUrl(url)) {
+        console.log(`🛍️ Detected Shopify store: ${hostname}`)
+        const shopifyData = await scrapeWithTimeout(() => fetchShopifyProduct(url))
+        if (shopifyData.success) {
+          // Convert ShopifyProductData to ProductData format
+          productData = {
+            ...shopifyData,
+            success: true
+          }
+        } else {
+          // Fallback to standard scraping if JSON fetch fails
+          console.warn(`⚠️ Shopify JSON failed, falling back to HTML scraping...`)
+          productData = await scrapeWithTimeout(() => scrapeGeneric(url))
+        }
+      }
+      // TIER 2: Anti-Bot Sites (GOAT, Lululemon) - Use Browserless /unblock
+      else if (hostname.includes('goat.com')) {
+        productData = await scrapeWithTimeout(() => scrapeGOAT(url), 25000)
+      }
+      else if (hostname.includes('lululemon.com')) {
+        productData = await scrapeWithTimeout(() => scrapeLululemon(url), 25000)
+      }
+      // TIER 3: Hollister - Use Browserless /content (updated domain)
+      else if (hostname.includes('hollisterco.com')) {
+        productData = await scrapeWithTimeout(() => scrapeHollister(url), 20000)
+      }
+      // TIER 4: Sole Retriever - Standard fetch works
+      else if (hostname.includes('soleretriever.com')) {
+        productData = await scrapeWithTimeout(() => scrapeSoleRetriever(url))
+      }
       // Sites that work well with cheerio (no fallback needed)
-      if (hostname.includes('shoepalace.com') || hostname.includes('beistravel.com')) {
+      else if (hostname.includes('shoepalace.com') || hostname.includes('beistravel.com')) {
         if (hostname.includes('shoepalace.com')) {
           productData = await scrapeWithTimeout(() => scrapeShoePalace(url))
         } else {
@@ -410,9 +446,7 @@ export async function POST(request: NextRequest) {
         }
       }
       // Sites that likely need Browserless fallback
-      else if (hostname.includes('soleretriever.com')) {
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeSoleRetriever, 'SoleRetriever'))
-      } else if (hostname.includes('nike.com')) {
+      else if (hostname.includes('nike.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNike, 'Nike'), 20000)
       } else if (hostname.includes('adidas.com')) {
         // Adidas has strong bot protection - skip scraping
@@ -495,6 +529,55 @@ export async function POST(request: NextRequest) {
         { success: false, error: errorMessage },
         { status: 408 }
       )
+    }
+
+    // ========== GEMINI AI FALLBACK (Tier 5: 10/10 Resilience) ==========
+    // If scraping failed or returned partial data, try Gemini AI as last resort
+    if (productData && !productData.success && isGeminiAvailable()) {
+      console.log(`🤖 Attempting Gemini AI fallback for ${hostname}...`)
+
+      // Only use Gemini if we have HTML but selectors failed
+      // (Don't waste tokens on network errors)
+      const isParseError = productData.error?.includes('extract') ||
+                           productData.error?.includes('selector') ||
+                           productData.error?.includes('validation') ||
+                           productData.error?.includes('incomplete')
+
+      if (isParseError) {
+        try {
+          // Fetch HTML again (or use cached version if available)
+          const htmlResponse = await fetch(url, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+          })
+
+          if (htmlResponse.ok) {
+            const html = await htmlResponse.text()
+            const geminiData = await extractWithGemini(html, url, hostname)
+
+            if (geminiData.success) {
+              console.log(`✅ Gemini AI fallback succeeded!`)
+              // Merge Gemini data with original attempt
+              productData = {
+                brand: geminiData.brand || productData.brand,
+                model: geminiData.model || geminiData.title || productData.model,
+                retailPrice: geminiData.retailPrice || productData.retailPrice,
+                salePrice: geminiData.salePrice || productData.salePrice,
+                images: geminiData.imageUrl ? [geminiData.imageUrl] : productData.images,
+                category: productData.category || 'accessories',
+                success: true,
+                error: 'Data extracted via Gemini AI fallback (CSS selectors failed)'
+              }
+            } else {
+              console.warn(`⚠️ Gemini AI fallback also failed:`, geminiData.error)
+            }
+          }
+        } catch (geminiError) {
+          console.error(`❌ Gemini AI fallback error:`, geminiError)
+          // Continue with original productData (don't make things worse)
+        }
+      }
     }
 
     return NextResponse.json(productData)
@@ -1931,6 +2014,201 @@ function extractPrice(priceText: string): number | undefined {
   }
 
   return undefined
+}
+
+// ========== NEW RETAILER SCRAPERS (Smart Hybrid Architecture) ==========
+
+/**
+ * GOAT Scraper - Sneaker marketplace with Akamai bot protection
+ * Strategy: Use Browserless /unblock with residential proxies
+ */
+async function scrapeGOAT(url: string): Promise<ProductData> {
+  console.log('🐐 GOAT: Using Browserless /unblock endpoint...')
+
+  if (!isBrowserlessAvailable()) {
+    return {
+      success: false,
+      error: 'GOAT requires Browserless with residential proxies. Add BROWSERLESS_API_KEY to .env.local'
+    }
+  }
+
+  try {
+    // Use /unblock endpoint with residential proxy
+    const browserResult = await fetchWithBrowserCached(url, {
+      endpoint: 'unblock', // Residential proxy for Akamai bypass
+      timeout: 35000,
+      waitFor: {
+        selector: 'h1, [class*="product"], [class*="title"]',
+        timeout: 20000
+      }
+    })
+
+    if (!browserResult.success || !browserResult.html) {
+      return {
+        success: false,
+        error: `GOAT scraping failed: ${browserResult.error || 'Browserless returned no HTML'}`
+      }
+    }
+
+    // Parse HTML with cheerio
+    const $ = cheerio.load(browserResult.html)
+
+    // Extract product data using extractProductDataFromHtml helper
+    return extractProductDataFromHtml($, url, 'GOAT')
+
+  } catch (error) {
+    return {
+      success: false,
+      error: `GOAT scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }
+  }
+}
+
+/**
+ * Lululemon Scraper - Athletic apparel with Cloudflare bot protection
+ * Strategy: Use Browserless /unblock with residential proxies
+ */
+async function scrapeLululemon(url: string): Promise<ProductData> {
+  console.log('🧘 Lululemon: Using Browserless /unblock endpoint...')
+
+  if (!isBrowserlessAvailable()) {
+    return {
+      success: false,
+      error: 'Lululemon requires Browserless with residential proxies. Add BROWSERLESS_API_KEY to .env.local'
+    }
+  }
+
+  try {
+    // Use /unblock endpoint with residential proxy
+    const browserResult = await fetchWithBrowserCached(url, {
+      endpoint: 'unblock', // Residential proxy for Cloudflare bypass
+      timeout: 35000,
+      waitFor: {
+        selector: 'h1, [data-lulu-price], [class*="price"]',
+        timeout: 20000
+      }
+    })
+
+    if (!browserResult.success || !browserResult.html) {
+      return {
+        success: false,
+        error: `Lululemon scraping failed: ${browserResult.error || 'Browserless returned no HTML'}`
+      }
+    }
+
+    // Parse HTML with cheerio
+    const $ = cheerio.load(browserResult.html)
+
+    // Extract brand (always Lululemon)
+    const brand = 'Lululemon'
+
+    // Extract title
+    const title = cleanText(
+      $('h1').first().text() ||
+      $('[data-testid="product-title"]').text() ||
+      $('meta[property="og:title"]').attr('content') ||
+      ''
+    )
+
+    // Extract prices
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    const priceText = cleanText(
+      $('[data-lulu-price]').first().text() ||
+      $('[class*="price"]').first().text() ||
+      $('meta[property="og:price:amount"]').attr('content') ||
+      ''
+    )
+    retailPrice = extractPrice(priceText)
+
+    // Extract images
+    const images: string[] = []
+    const ogImage = $('meta[property="og:image"]').attr('content')
+    if (ogImage) images.push(ogImage)
+
+    $('img[src*="lululemon"], picture img').each((_, el) => {
+      if (images.length >= 5) return false
+      const src = $(el).attr('src') || $(el).attr('data-src')
+      if (src && !src.includes('logo') && !images.includes(src)) {
+        const fullUrl = src.startsWith('http') ? src : `https://shop.lululemon.com${src}`
+        images.push(fullUrl)
+      }
+    })
+
+    // Detect category
+    const category = detectCategory(url, title, '')
+
+    const productData: ProductData = {
+      brand,
+      model: title || undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      category,
+      success: true
+    }
+
+    const validation = validateProductData(productData, 'Lululemon')
+    if (!validation.isValid) {
+      console.warn('⚠️ Lululemon validation issues:', validation.issues)
+      productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+    }
+
+    return productData
+
+  } catch (error) {
+    return {
+      success: false,
+      error: `Lululemon scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }
+  }
+}
+
+/**
+ * Hollister Scraper - Abercrombie brand with updated domain (hollisterco.com)
+ * Strategy: Use Browserless /content for React JS rendering
+ */
+async function scrapeHollister(url: string): Promise<ProductData> {
+  console.log('👕 Hollister: Using Browserless /content endpoint...')
+
+  if (!isBrowserlessAvailable()) {
+    return {
+      success: false,
+      error: 'Hollister requires Browserless for JS rendering. Add BROWSERLESS_API_KEY to .env.local'
+    }
+  }
+
+  try {
+    // Use /content endpoint for JS rendering
+    const browserResult = await fetchWithBrowserCached(url, {
+      endpoint: 'content', // Standard JS rendering
+      timeout: 30000,
+      waitFor: {
+        selector: 'h1, [data-test="product-price"]',
+        timeout: 15000
+      }
+    })
+
+    if (!browserResult.success || !browserResult.html) {
+      return {
+        success: false,
+        error: `Hollister scraping failed: ${browserResult.error || 'Browserless returned no HTML'}`
+      }
+    }
+
+    // Parse HTML with cheerio
+    const $ = cheerio.load(browserResult.html)
+
+    // Extract product data using extractProductDataFromHtml helper
+    return extractProductDataFromHtml($, url, 'Hollister')
+
+  } catch (error) {
+    return {
+      success: false,
+      error: `Hollister scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }
+  }
 }
 
 // Helper function to validate scraped product data

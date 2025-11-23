@@ -4,10 +4,12 @@
  * Retailer configuration for price scraping
  * Each retailer has multiple fallback selectors to maximize success rate
  *
- * Architecture:
- * - Tier 1: Simple fetch with rotating user agents (70-80% success)
- * - Tier 2: Browserless for JS-heavy sites (15-20% more)
- * - requiresJS: true = needs Browserless, false = simple fetch works
+ * Smart Hybrid Architecture:
+ * - Tier 1: Shopify JSON backdoor (100% reliable, no HTML parsing)
+ * - Tier 2: Standard fetch with rotating user agents (70-80% success)
+ * - Tier 3: Browserless /content for JS rendering (15-20% more)
+ * - Tier 4: Browserless /unblock for anti-bot sites (residential proxies)
+ * - Tier 5: Gemini AI fallback when selectors fail but HTML is fetched
  */
 
 export interface RetailerConfig {
@@ -19,6 +21,8 @@ export interface RetailerConfig {
     availability?: string[]    // In stock indicators
   }
   requiresJS: boolean          // True if site needs JavaScript rendering
+  useUnblock?: boolean         // True if site needs residential proxies (Akamai/Cloudflare bypass)
+  isShopify?: boolean          // True if Shopify store (use JSON endpoint instead of HTML)
   userAgent?: string           // Custom user agent if needed
   testUrl?: string             // Test product URL for manual verification
 }
@@ -271,6 +275,95 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
       ]
     },
     requiresJS: false
+  },
+
+  // ========== NEW RETAILERS (Smart Hybrid Architecture) ==========
+
+  // Gymshark - Shopify store (use JSON backdoor)
+  {
+    domain: 'gymshark.com',
+    name: 'Gymshark',
+    selectors: {
+      price: [
+        '.product-price',
+        '[data-product-price]',
+        '[itemprop="price"]',
+        'meta[property="og:price:amount"]'
+      ]
+    },
+    requiresJS: false,
+    isShopify: true,  // Use .json endpoint instead of HTML scraping
+    testUrl: 'https://www.gymshark.com/products/gymshark-twist-front-bralette-white-aw24'
+  },
+
+  // GOAT - Aggressive anti-bot (Akamai), needs residential proxies
+  {
+    domain: 'goat.com',
+    name: 'GOAT',
+    selectors: {
+      price: [
+        '[data-testid="product-price"]',
+        '.product-price',
+        '[class*="price"]',
+        'meta[property="og:price:amount"]',
+        '[itemprop="price"]'
+      ]
+    },
+    requiresJS: true,
+    useUnblock: true,  // Use Browserless /unblock with residential proxy
+    testUrl: 'https://www.goat.com/sneakers/air-jordan-11-retro-rare-air-ih0296-400'
+  },
+
+  // Lululemon - Aggressive anti-bot (Cloudflare), needs residential proxies
+  {
+    domain: 'lululemon.com',
+    name: 'Lululemon',
+    selectors: {
+      price: [
+        '[data-lulu-price]',
+        '.product-price',
+        '[class*="price"]',
+        'meta[property="og:price:amount"]',
+        '[itemprop="price"]'
+      ]
+    },
+    requiresJS: true,
+    useUnblock: true,  // Use Browserless /unblock with residential proxy
+    testUrl: 'https://shop.lululemon.com/p/skirts-and-dresses-skirts/Pleated-High-Rise-Knee-Length-Tennis-Skirt/_/prod20002755?color=68578'
+  },
+
+  // Hollister - Updated domain (hollisterco.com), heavily JS-rendered React app
+  {
+    domain: 'hollisterco.com',
+    name: 'Hollister',
+    selectors: {
+      price: [
+        '[data-test="product-price"]',
+        '.product-price',
+        '[class*="ProductPrice"]',
+        'meta[property="og:price:amount"]',
+        '[itemprop="price"]'
+      ]
+    },
+    requiresJS: true,  // Use Browserless /content endpoint
+    testUrl: 'https://www.hollisterco.com/shop/us/p/baggy-sweatpants-60471370'
+  },
+
+  // Sole Retriever - Static HTML friendly, standard fetch works
+  {
+    domain: 'soleretriever.com',
+    name: 'Sole Retriever',
+    selectors: {
+      price: [
+        '.price',
+        '[class*="price"]',
+        '[data-price]',
+        'meta[property="og:price:amount"]',
+        '[itemprop="price"]'
+      ]
+    },
+    requiresJS: false,  // Simple cheerio scraping works
+    testUrl: 'https://www.soleretriever.com/sneaker-release-dates/nike/kobe-9/nike-kobe-9-em-protro-china-ih1400-600'
   }
 ]
 
