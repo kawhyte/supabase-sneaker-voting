@@ -2205,12 +2205,16 @@ async function scrapeHollister(url: string): Promise<ProductData> {
 
   try {
     // Use /content endpoint for JS rendering
+    // NOTE: Hollister has aggressive anti-bot, so we don't wait for specific selectors
+    // We just wait for the page to load, then let Gemini AI extract the data
     const browserResult = await fetchWithBrowserCached(url, {
       endpoint: 'content', // Standard JS rendering
       timeout: 30000,
+      // Don't wait for specific selectors - Hollister structure changes frequently
+      // Just wait for page to be interactive, then use Gemini AI fallback
       waitFor: {
-        selector: 'h1, [data-test="product-price"]',
-        timeout: 15000
+        selector: 'body', // Wait for body to load (very lenient)
+        timeout: 10000
       }
     })
 
