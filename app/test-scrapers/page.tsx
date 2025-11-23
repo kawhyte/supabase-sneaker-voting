@@ -37,12 +37,6 @@ export default function TestScrapersPage() {
       color: 'bg-blue-500'
     },
     {
-      name: 'Hollister (Browserless)',
-      url: 'https://www.hollisterco.com/shop/us/p/baggy-sweatpants-60471370',
-      tier: 'Tier 3',
-      color: 'bg-purple-500'
-    },
-    {
       name: 'GOAT (Anti-Bot)',
       url: 'https://www.goat.com/sneakers/air-jordan-11-retro-rare-air-ih0296-400',
       tier: 'Tier 4',

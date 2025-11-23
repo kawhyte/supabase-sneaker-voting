@@ -434,10 +434,6 @@ export async function POST(request: NextRequest) {
       else if (hostname.includes('lululemon.com')) {
         productData = await scrapeWithTimeout(() => scrapeLululemon(url), 25000)
       }
-      // TIER 3: Hollister - Use Browserless /content (updated domain)
-      else if (hostname.includes('hollisterco.com')) {
-        productData = await scrapeWithTimeout(() => scrapeHollister(url), 20000)
-      }
       // TIER 4: Sole Retriever - Standard fetch works
       else if (hostname.includes('soleretriever.com')) {
         productData = await scrapeWithTimeout(() => scrapeSoleRetriever(url))
@@ -2185,61 +2181,6 @@ async function scrapeLululemon(url: string): Promise<ProductData> {
     return {
       success: false,
       error: `Lululemon scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-    }
-  }
-}
-
-/**
- * Hollister Scraper - Abercrombie brand with updated domain (hollisterco.com)
- * Strategy: Use Browserless /content for React JS rendering
- */
-async function scrapeHollister(url: string): Promise<ProductData> {
-  console.log('👕 Hollister: Using Browserless /content endpoint...')
-
-  if (!isBrowserlessAvailable()) {
-    return {
-      success: false,
-      error: 'Hollister requires Browserless for JS rendering. Add BROWSERLESS_API_KEY to .env.local'
-    }
-  }
-
-  try {
-    // Use /unblock endpoint - Hollister has very aggressive anti-bot protection
-    // /content endpoint gets blocked with "Bad Request" error
-    // /unblock uses residential proxies to bypass anti-bot detection
-    const browserResult = await fetchWithBrowserCached(url, {
-      endpoint: 'unblock', // Residential proxy for anti-bot bypass
-      timeout: 35000,
-      // Don't wait for specific selectors - Hollister structure changes frequently
-      // Just wait for page to be interactive, then use Gemini AI fallback
-      waitFor: {
-        selector: 'body', // Wait for body to load (very lenient)
-        timeout: 15000
-      }
-    })
-
-    if (!browserResult.success || !browserResult.html) {
-      return {
-        success: false,
-        error: `Hollister scraping failed: ${browserResult.error || 'Browserless returned no HTML'}`
-      }
-    }
-
-    // Parse HTML with cheerio
-    const $ = cheerio.load(browserResult.html)
-
-    // Extract product data using extractProductDataFromHtml helper
-    const productData = extractProductDataFromHtml($, url, 'Hollister')
-
-    // Include raw HTML for Gemini AI fallback (in case CSS selectors fail)
-    productData.rawHtml = browserResult.html
-
-    return productData
-
-  } catch (error) {
-    return {
-      success: false,
-      error: `Hollister scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     }
   }
 }
