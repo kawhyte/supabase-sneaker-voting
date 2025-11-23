@@ -92,21 +92,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // Hibbett Sports
-  {
-    domain: 'hibbett.com',
-    name: 'Hibbett Sports',
-    selectors: {
-      price: [
-        '.product-price',
-        '[data-price]',
-        '[itemprop="price"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: false
-  },
-
   // Shoe Palace
   {
     domain: 'shoepalace.com',
