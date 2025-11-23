@@ -77,7 +77,7 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // Finish Line
+  // Finish Line - requires residential proxies (bot protection)
   {
     domain: 'finishline.com',
     name: 'Finish Line',
@@ -89,7 +89,9 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
         'meta[property="og:price:amount"]'
       ]
     },
-    requiresJS: false
+    requiresJS: true,  // Skip cheerio, go straight to Browserless
+    useUnblock: true,  // Use residential proxy to bypass bot protection
+    testUrl: 'https://www.finishline.com/pdp/womens-adidas-originals-handball-spezial-casual-shoes/prod2866206/JP9236/250'
   },
 
   // Champs Sports
