@@ -161,6 +161,7 @@ async function scrapeWithFallback(
     skipCheerio?: boolean, // Skip cheerio attempt and go straight to Browserless
     browserlessConfig?: {
       endpoint?: 'unblock' | 'content' // Which Browserless endpoint to use
+      useResidentialProxy?: boolean // Force residential proxy
       waitFor?: { selector: string; timeout?: number }
       timeout?: number
     },
@@ -478,9 +479,54 @@ export async function POST(request: NextRequest) {
           productData = await scrapeWithTimeout(() => scrapeGeneric(url))
         }
       }
-      // TIER 2: Anti-Bot Sites (GOAT) - Use Browserless /unblock
-      else if (hostname.includes('goat.com')) {
-        productData = await scrapeWithTimeout(() => scrapeGOAT(url), 25000)
+      // TIER 2: Anti-Bot Sites (GOAT, Lululemon, & Gap Family)
+      // Sites protected by Akamai (Goat, Lululemon, Gap, Old Navy, etc.)
+      // MUST use the stealth configuration: Residential Proxy via 'unblock' OR 'content' with waitFor
+      else if (
+        hostname.includes('goat.com') || 
+        hostname.includes('lululemon.com') ||
+        hostname.includes('gap.com') ||       // Covers gap.com, oldnavy.gap.com, bananarepublic.gap.com
+        hostname.includes('oldnavy') ||
+        hostname.includes('bananarepublic') ||
+        hostname.includes('athleta')
+      ) {
+        // Determine site name for logging
+        let siteName = 'Generic Stealth';
+        if (hostname.includes('goat.com')) siteName = 'GOAT';
+        else if (hostname.includes('lululemon.com')) siteName = 'Lululemon';
+        else if (hostname.includes('oldnavy')) siteName = 'Old Navy';
+        else if (hostname.includes('gap')) siteName = 'Gap';
+        else if (hostname.includes('banana')) siteName = 'Banana Republic';
+
+        // Determine which extractor to use
+        // Gap family sites share a specific React structure
+        const isGapFamily = hostname.includes('gap.com') || hostname.includes('oldnavy') || hostname.includes('banana') || hostname.includes('athleta');
+        
+        // Determine specific selector to wait for (Critical for React apps like Old Navy)
+        const waitSelector = isGapFamily ? '.product-price, #priceText, span[data-test="product-price"]' : 'h1';
+
+        const customExtractor = isGapFamily 
+          ? (html: string, u: string) => extractGapFamilyData(html, u, siteName)
+          : undefined; // Default to cheerio extraction for Goat/Lulu
+
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(
+          url,
+          scrapeGeneric, // Use generic scraper as base since we skip cheerio
+          siteName,
+          {
+            skipCheerio: true, // ALWAYS skip standard fetch for these sites (instantly blocked)
+            browserlessConfig: {
+              endpoint: 'content',        // Use /content to enable waitForSelector
+              useResidentialProxy: true,  // FORCE residential proxy to bypass Akamai (Updated in lib/browserless.ts)
+              timeout: 60000,             // Proxies take longer to connect
+              waitFor: { 
+                selector: waitSelector, 
+                timeout: 25000            // Wait up to 25s for the price to appear
+              }
+            },
+            customExtractor
+          }
+        ), 80000) // High timeout for the whole operation (80s)
       }
       // TIER 4: Sole Retriever - Standard fetch works
       else if (hostname.includes('soleretriever.com')) {
@@ -499,50 +545,15 @@ export async function POST(request: NextRequest) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNike, 'Nike'), 20000)
       } else if (hostname.includes('stockx.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeStockX, 'StockX'))
-      } else if (hostname.includes('bananarepublic.gap.com')) {
-        // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
-        // that blocks automation. Both /unblock and /content endpoints are blocked.
-        // Current implementation attempts scraping but success rate is very low (~0-10%).
-        // RECOMMENDATION: Use manual entry or alternative sources (SoleRetriever) for these sites.
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(
-          url,
-          (u) => scrapeGapFamily(u, 'Banana Republic'),
-          'Banana Republic',
-          {
-            skipCheerio: true, // Skip cheerio, go straight to Browserless
-            browserlessConfig: {
-              endpoint: 'content', // Use /content for better JS rendering
-              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 15000 },
-              timeout: 30000
-            },
-            customExtractor: (html, u) => extractGapFamilyData(html, u, 'Banana Republic')
-          }
-        ), 35000)
-      } else if (hostname.includes('gap.com')) {
-        // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
-        // that blocks automation. Both /unblock and /content endpoints are blocked.
-        // Current implementation attempts scraping but success rate is very low (~0-10%).
-        // RECOMMENDATION: Use manual entry or alternative sources (SoleRetriever) for these sites.
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(
-          url,
-          (u) => scrapeGapFamily(u, 'Gap'),
-          'Gap',
-          {
-            skipCheerio: true, // Skip cheerio, go straight to Browserless
-            browserlessConfig: {
-              endpoint: 'content', // Use /content for better JS rendering
-              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 15000 },
-              timeout: 30000
-            },
-            customExtractor: (html, u) => extractGapFamilyData(html, u, 'Gap')
-          }
-        ), 35000)
       } else if (hostname.includes('nordstrom.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNordstrom, 'Nordstrom'))
       } else if (hostname.includes('stance.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeStance, 'Stance'))
+      } else if (hostname.includes('bathandbodyworks.com')) {
+        // Bath & Body Works - definitely needs Browserless
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Bath & Body Works'), 20000)
       } else {
-        // Generic fallback - use 45s timeout to accommodate slow /unblock residential proxies
+        // Generic fallback - use 45s timeout to accommodate slow /unblock residential proxies if they are used
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Generic'), 45000)
       }
     } catch (timeoutError) {
@@ -935,8 +946,8 @@ async function scrapeStockX(url: string): Promise<ProductData> {
     const model = fullTitle.replace(brand, '').trim()
 
     const colorway = cleanText($('.product-details .colorway').text() ||
-                     $('[class*="colorway"]').text() ||
-                     'Standard')
+                      $('[class*="colorway"]').text() ||
+                      'Standard')
 
     // SKU extraction
     const sku = cleanText($('[class*="sku"]').text() ||
