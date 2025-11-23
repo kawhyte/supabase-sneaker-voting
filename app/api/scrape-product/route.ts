@@ -167,8 +167,21 @@ async function scrapeWithFallback(
     customExtractor?: (html: string, url: string) => ProductData // Custom HTML extractor
   }
 ): Promise<ProductData> {
+  // Auto-detect config from RETAILER_CONFIGS if not provided
+  const retailerConfig = getRetailerConfig(url)
+
+  // Merge options with auto-detected config
+  const effectiveOptions = {
+    ...options,
+    skipCheerio: options?.skipCheerio ?? retailerConfig?.requiresJS ?? false,
+    browserlessConfig: {
+      ...options?.browserlessConfig,
+      endpoint: options?.browserlessConfig?.endpoint ?? (retailerConfig?.useUnblock ? 'unblock' : 'content')
+    }
+  }
+
   // Option to skip cheerio and go straight to Browserless (for known JS-heavy sites)
-  if (!options?.skipCheerio) {
+  if (!effectiveOptions.skipCheerio) {
     // First attempt: Regular fetch + cheerio
     console.log(`📡 Attempting cheerio scrape for ${siteName}...`)
     const firstAttempt = await scraperFn(url)
@@ -196,12 +209,13 @@ async function scrapeWithFallback(
   console.log(`🌐 Fetching ${siteName} with Browserless automation...`)
 
   try {
-    const browserResult = await fetchWithBrowserCached(url, options?.browserlessConfig)
+    const browserResult = await fetchWithBrowserCached(url, effectiveOptions.browserlessConfig)
 
     if (!browserResult.success || !browserResult.html) {
       return {
         success: false,
-        error: `Browserless failed: ${browserResult.error || 'Unknown error'}`
+        error: `Browserless failed: ${browserResult.error || 'Unknown error'}`,
+        rawHtml: browserResult.html // Preserve HTML for Gemini fallback
       }
     }
 
@@ -209,8 +223,8 @@ async function scrapeWithFallback(
 
     // Use custom extractor if provided, otherwise use generic one
     let productData: ProductData
-    if (options?.customExtractor) {
-      productData = options.customExtractor(browserResult.html, url)
+    if (effectiveOptions.customExtractor) {
+      productData = effectiveOptions.customExtractor(browserResult.html, url)
     } else {
       const $ = cheerio.load(browserResult.html)
       productData = extractProductDataFromHtml($, url, siteName)
@@ -218,6 +232,9 @@ async function scrapeWithFallback(
 
     if (productData.success) {
       console.log(`✅ Browserless scrape successful for ${siteName}`)
+    } else {
+      // Preserve HTML for Gemini AI fallback
+      productData.rawHtml = browserResult.html
     }
 
     return productData
@@ -279,12 +296,32 @@ function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: stri
       }
     }
 
-    // Fallback to HTML selectors
+    // Fallback to HTML selectors (try retailer-specific first, then generic)
     if (!retailPrice) {
-      const priceText = cleanText(
-        $('.price, [class*="price"], [class*="Price"]').first().text() ||
-        $('meta[property="product:price:amount"]').attr('content')
-      )
+      const retailerConfig = getRetailerConfig(url)
+      let priceText = ''
+
+      // Try retailer-specific selectors first
+      if (retailerConfig?.selectors?.price) {
+        console.log(`🔍 Trying ${retailerConfig.selectors.price.length} retailer-specific price selectors...`)
+        for (const selector of retailerConfig.selectors.price) {
+          const text = cleanText($(selector).first().text() || $(selector).first().attr('content') || '')
+          if (text) {
+            priceText = text
+            console.log(`✅ Found price with selector "${selector}": "${priceText}"`)
+            break
+          }
+        }
+      }
+
+      // Fallback to generic selectors
+      if (!priceText) {
+        priceText = cleanText(
+          $('.price, [class*="price"], [class*="Price"]').first().text() ||
+          $('meta[property="product:price:amount"]').attr('content')
+        )
+      }
+
       console.log(`💰 Price text found: "${priceText}"`)
       retailPrice = extractPrice(priceText)
       console.log(`💰 Extracted retail price: $${retailPrice}`)
