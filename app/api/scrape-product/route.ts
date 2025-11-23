@@ -559,7 +559,8 @@ export async function POST(request: NextRequest) {
         // Bath & Body Works - definitely needs Browserless
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Bath & Body Works'), 20000)
       } else {
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Generic'))
+        // Generic fallback - use 30s timeout to accommodate /unblock residential proxies
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Generic'), 30000)
       }
     } catch (timeoutError) {
       const errorMessage = timeoutError instanceof Error ? timeoutError.message : 'Request timeout'
