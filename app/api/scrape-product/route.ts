@@ -17,6 +17,7 @@ interface ProductData {
   category?: ItemCategory
   success: boolean
   error?: string
+  rawHtml?: string // For Gemini AI fallback (when CSS selectors fail)
 }
 
 // Helper function to clean text
@@ -549,15 +550,24 @@ export async function POST(request: NextRequest) {
 
       if (isParseError) {
         try {
-          // Fetch HTML again (or use cached version if available)
-          const htmlResponse = await fetch(url, {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
-          })
+          // Use raw HTML from scraper if available (prevents re-fetching and anti-bot issues)
+          let html = productData.rawHtml
 
-          if (htmlResponse.ok) {
-            const html = await htmlResponse.text()
+          // If no raw HTML stored, try fetching (fallback for simple sites)
+          if (!html) {
+            console.log(`🤖 No raw HTML cached, attempting fetch...`)
+            const htmlResponse = await fetch(url, {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+              }
+            })
+
+            if (htmlResponse.ok) {
+              html = await htmlResponse.text()
+            }
+          }
+
+          if (html) {
             const geminiData = await extractWithGemini(html, url, hostname)
 
             if (geminiData.success) {
@@ -584,7 +594,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(productData)
+    // Remove raw HTML before sending response (save bandwidth)
+    const { rawHtml, ...responseData } = productData
+    return NextResponse.json(responseData)
 
   } catch (error) {
     console.error('Scraping error:', error)
@@ -2058,7 +2070,12 @@ async function scrapeGOAT(url: string): Promise<ProductData> {
     const $ = cheerio.load(browserResult.html)
 
     // Extract product data using extractProductDataFromHtml helper
-    return extractProductDataFromHtml($, url, 'GOAT')
+    const productData = extractProductDataFromHtml($, url, 'GOAT')
+
+    // Include raw HTML for Gemini AI fallback (in case CSS selectors fail)
+    productData.rawHtml = browserResult.html
+
+    return productData
 
   } catch (error) {
     return {
@@ -2159,6 +2176,9 @@ async function scrapeLululemon(url: string): Promise<ProductData> {
       productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
     }
 
+    // Include raw HTML for Gemini AI fallback (in case CSS selectors fail)
+    productData.rawHtml = browserResult.html
+
     return productData
 
   } catch (error) {
@@ -2205,7 +2225,12 @@ async function scrapeHollister(url: string): Promise<ProductData> {
     const $ = cheerio.load(browserResult.html)
 
     // Extract product data using extractProductDataFromHtml helper
-    return extractProductDataFromHtml($, url, 'Hollister')
+    const productData = extractProductDataFromHtml($, url, 'Hollister')
+
+    // Include raw HTML for Gemini AI fallback (in case CSS selectors fail)
+    productData.rawHtml = browserResult.html
+
+    return productData
 
   } catch (error) {
     return {
