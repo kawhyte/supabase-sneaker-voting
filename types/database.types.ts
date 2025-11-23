@@ -210,6 +210,7 @@ export type Database = {
           sku: string | null
           status: Database["public"]["Enums"]["item_status"]
           store_name: string | null
+          store_url: string | null
           target_price: number | null
           try_on_date: string | null
           updated_at: string
@@ -251,6 +252,7 @@ export type Database = {
           sku?: string | null
           status?: Database["public"]["Enums"]["item_status"]
           store_name?: string | null
+          store_url?: string | null
           target_price?: number | null
           try_on_date?: string | null
           updated_at?: string
@@ -292,6 +294,7 @@ export type Database = {
           sku?: string | null
           status?: Database["public"]["Enums"]["item_status"]
           store_name?: string | null
+          store_url?: string | null
           target_price?: number | null
           try_on_date?: string | null
           updated_at?: string
