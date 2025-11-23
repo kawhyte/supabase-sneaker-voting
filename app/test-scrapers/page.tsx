@@ -65,7 +65,7 @@ export default function TestScrapersPage() {
     // EXISTING RETAILERS - MEDIUM PRIORITY
     {
       name: 'Champs Sports (Existing)',
-      url: 'https://www.champssports.com/product/jordan-retro-11-mens/378037.html',
+      url: 'https://www.champssports.com/product/nike-vomero-5-boys-grade-school/B4698411.html',
       tier: 'Existing',
       color: 'bg-purple-600'
     },
