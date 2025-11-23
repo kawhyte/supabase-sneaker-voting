@@ -279,20 +279,21 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
 
   // ========== NEW RETAILERS (Smart Hybrid Architecture) ==========
 
-  // Gymshark - Shopify store (use JSON backdoor)
+  // Gymshark - Shopify store (JSON endpoint blocked, uses HTML scraping)
   {
     domain: 'gymshark.com',
     name: 'Gymshark',
     selectors: {
       price: [
-        '.product-price',
+        '.product-price__item',
+        '.price',
         '[data-product-price]',
-        '[itemprop="price"]',
-        'meta[property="og:price:amount"]'
+        'meta[property="og:price:amount"]',
+        '[itemprop="price"]'
       ]
     },
-    requiresJS: false,
-    isShopify: true,  // Use .json endpoint instead of HTML scraping
+    requiresJS: false,  // Standard fetch works, but JSON endpoint is blocked
+    isShopify: false,  // Can't use .json backdoor (Gymshark blocks it)
     testUrl: 'https://www.gymshark.com/products/gymshark-twist-front-bralette-white-aw24'
   },
 
