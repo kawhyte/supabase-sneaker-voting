@@ -225,6 +225,7 @@ function WardrobeItemCardComponent({
 							{showStore && (
 								<ItemStoreAndDate
 									storeName={item.store_name}
+									storeUrl={item.store_url}
 									lastWornDate={item.last_worn_date}
 									viewMode={viewMode}
 									canTrackWears={permissions.canTrackWearCount}

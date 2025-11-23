@@ -31,6 +31,7 @@ export interface WardrobeItem {
   size_tried: string | null
   comfort_rating?: number
   store_name?: string
+  store_url?: string | null
   try_on_date: string
   notes?: string
   retail_price?: number
