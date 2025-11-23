@@ -68,12 +68,6 @@ export default function TestScrapersPage() {
       url: 'https://www.champssports.com/product/nike-vomero-5-boys-grade-school/B4698411.html',
       tier: 'Existing',
       color: 'bg-purple-600'
-    },
-    {
-      name: "Dick's Sporting Goods (Existing)",
-      url: 'https://www.dickssportinggoods.com/p/patagonia-mens-capilene-cool-daily-shirt-19ptgmmcpcldlysstapt/19ptgmmcpcldlysstapt?color=Pumice%2FDyno%20White%20X-Dye',
-      tier: 'Existing',
-      color: 'bg-purple-600'
     }
   ]
 

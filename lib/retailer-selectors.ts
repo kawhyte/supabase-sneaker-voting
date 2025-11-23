@@ -107,23 +107,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // Dick's Sporting Goods - requires JS + residential proxies (HTTP/2 protocol error bypass)
-  {
-    domain: 'dickssportinggoods.com',
-    name: "Dick's Sporting Goods",
-    selectors: {
-      price: [
-        '[data-testid="product-price"]',
-        '.dsg-price',
-        '[class*="price"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: true,
-    useUnblock: true,  // Use Browserless /unblock to bypass ERR_HTTP2_PROTOCOL_ERROR
-    testUrl: 'https://www.dickssportinggoods.com/p/patagonia-mens-capilene-cool-daily-shirt-19ptgmmcpcldlysstapt/19ptgmmcpcldlysstapt?color=Pumice%2FDyno%20White%20X-Dye'
-  },
-
   // Old Navy - requires JS (Gap Inc. brand)
   {
     domain: 'oldnavy.gap.com',
