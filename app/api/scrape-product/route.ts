@@ -331,13 +331,22 @@ function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: stri
     const validation = validateProductData(productData, siteName)
     if (!validation.isValid) {
       console.warn(`⚠️ ${siteName} Browserless extraction validation issues:`, validation.issues)
-      if (productData.brand || productData.model) {
-        productData.error = `Partial data extracted via browser automation. Issues: ${validation.issues.join(', ')}`
-      } else {
+
+      // If no brand or model, return complete failure
+      if (!productData.brand && !productData.model) {
         return {
           success: false,
           error: `Browser automation failed to extract sufficient data. Issues: ${validation.issues.join(', ')}`
         }
+      }
+
+      // If critical fields are missing (price or images), mark as failure to trigger Gemini fallback
+      const hasCriticalIssues = !productData.retailPrice || !productData.images || productData.images.length === 0
+      if (hasCriticalIssues) {
+        productData.success = false
+        productData.error = `Incomplete data: ${validation.issues.join(', ')}`
+      } else {
+        productData.error = `Partial data extracted via browser automation. Issues: ${validation.issues.join(', ')}`
       }
     }
 
@@ -2169,7 +2178,15 @@ async function scrapeLululemon(url: string): Promise<ProductData> {
     const validation = validateProductData(productData, 'Lululemon')
     if (!validation.isValid) {
       console.warn('⚠️ Lululemon validation issues:', validation.issues)
-      productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+
+      // If critical fields are missing (price or images), mark as failure to trigger Gemini fallback
+      const hasCriticalIssues = !productData.retailPrice || !productData.images || productData.images.length === 0
+      if (hasCriticalIssues) {
+        productData.success = false
+        productData.error = `Incomplete data: ${validation.issues.join(', ')}`
+      } else {
+        productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+      }
     }
 
     // Include raw HTML for Gemini AI fallback (in case CSS selectors fail)
