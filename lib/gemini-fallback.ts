@@ -4,16 +4,16 @@
  * Gemini AI Fallback Parser
  *
  * When CSS selectors fail but we successfully fetch HTML (200 OK),
- * use Google's Gemini Pro to extract product data from HTML.
+ * use Google's Gemini 1.5 Pro to extract product data from HTML.
  *
  * This is the "10/10 Resilience Layer" that adapts to layout changes.
  *
  * Usage:
  * 1. Add GEMINI_API_KEY to .env.local
  * 2. Get free key from: https://aistudio.google.com/app/apikey
- * 3. Free tier: 60 requests/minute
+ * 3. Free tier: 15 requests/minute, 1500/day
  *
- * Model: gemini-pro (stable, widely supported)
+ * Model: gemini-1.5-pro-latest (v1beta compatible)
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -92,8 +92,8 @@ export async function extractWithGemini(
 
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(apiKey)
-    // Use gemini-pro (stable model that works with all API versions)
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
+    // Use gemini-1.5-pro-latest (works with v1beta free tier API)
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro-latest' })
 
     // Strip HTML to reduce tokens
     const cleanedHtml = stripHtmlForAI(html)
@@ -211,8 +211,8 @@ JSON Response:`
 export function getGeminiStats() {
   return {
     isConfigured: isGeminiAvailable(),
-    model: 'gemini-pro',
-    rateLimit: '60 requests/minute (free tier)',
+    model: 'gemini-1.5-pro-latest',
+    rateLimit: '15 requests/minute, 1500/day (free tier)',
     tokenLimit: '~30,000 characters per request (conservative)',
     pricing: 'Free tier available at https://aistudio.google.com'
   }
