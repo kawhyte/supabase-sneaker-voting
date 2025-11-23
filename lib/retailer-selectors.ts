@@ -46,24 +46,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
   },
 
-  // Adidas - requires JS rendering + residential proxies (bot protection)
-  {
-    domain: 'adidas.com',
-    name: 'Adidas',
-    selectors: {
-      price: [
-        '[data-auto-id="product-price"]',
-        '.gl-price',
-        '[class*="price"]',
-        'meta[property="og:price:amount"]',
-        'meta[property="product:price:amount"]'
-      ]
-    },
-    requiresJS: true,
-    useUnblock: true,  // Use Browserless /unblock with residential proxy (Akamai bypass)
-    testUrl: 'https://www.adidas.com/us/samba-og-shoes/B75806.html'
-  },
-
   // Foot Locker - works without JS
   {
     domain: 'footlocker.com',

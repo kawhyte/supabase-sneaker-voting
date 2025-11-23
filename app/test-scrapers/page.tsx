@@ -51,12 +51,6 @@ export default function TestScrapersPage() {
       color: 'bg-blue-600'
     },
     {
-      name: 'Adidas (Existing)',
-      url: 'https://www.adidas.com/us/stan-smith-shoes/FX5501.html',
-      tier: 'Existing',
-      color: 'bg-blue-600'
-    },
-    {
       name: 'Foot Locker (Existing)',
       url: 'https://www.footlocker.com/product/jordan-retro-11-mens/378037.html',
       tier: 'Existing',
