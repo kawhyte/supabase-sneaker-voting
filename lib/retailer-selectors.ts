@@ -4,10 +4,12 @@
  * Retailer configuration for price scraping
  * Each retailer has multiple fallback selectors to maximize success rate
  *
- * Architecture:
- * - Tier 1: Simple fetch with rotating user agents (70-80% success)
- * - Tier 2: Browserless for JS-heavy sites (15-20% more)
- * - requiresJS: true = needs Browserless, false = simple fetch works
+ * Smart Hybrid Architecture:
+ * - Tier 1: Shopify JSON backdoor (100% reliable, no HTML parsing)
+ * - Tier 2: Standard fetch with rotating user agents (70-80% success)
+ * - Tier 3: Browserless /content for JS rendering (15-20% more)
+ * - Tier 4: Browserless /unblock for anti-bot sites (residential proxies)
+ * - Tier 5: Gemini AI fallback when selectors fail but HTML is fetched
  */
 
 export interface RetailerConfig {
@@ -19,6 +21,8 @@ export interface RetailerConfig {
     availability?: string[]    // In stock indicators
   }
   requiresJS: boolean          // True if site needs JavaScript rendering
+  useUnblock?: boolean         // True if site needs residential proxies (Akamai/Cloudflare bypass)
+  isShopify?: boolean          // True if Shopify store (use JSON endpoint instead of HTML)
   userAgent?: string           // Custom user agent if needed
   testUrl?: string             // Test product URL for manual verification
 }
@@ -40,22 +44,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     },
     requiresJS: true,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-  },
-
-  // Adidas - requires JS rendering
-  {
-    domain: 'adidas.com',
-    name: 'Adidas',
-    selectors: {
-      price: [
-        '[data-auto-id="product-price"]',
-        '.gl-price',
-        '[class*="price"]',
-        'meta[property="og:price:amount"]',
-        'meta[property="product:price:amount"]'
-      ]
-    },
-    requiresJS: true
   },
 
   // Foot Locker - works without JS
@@ -89,21 +77,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // Finish Line
-  {
-    domain: 'finishline.com',
-    name: 'Finish Line',
-    selectors: {
-      price: [
-        '[data-test="product-price"]',
-        '.ProductPrice-price',
-        '[itemprop="price"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: false
-  },
-
   // Champs Sports
   {
     domain: 'champssports.com',
@@ -117,82 +90,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
       ]
     },
     requiresJS: false
-  },
-
-  // JD Sports - requires JS
-  {
-    domain: 'jdsports.com',
-    name: 'JD Sports',
-    selectors: {
-      price: [
-        '[data-e2e="product-price"]',
-        '.price',
-        '[itemprop="price"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: true
-  },
-
-  // Eastbay
-  {
-    domain: 'eastbay.com',
-    name: 'Eastbay',
-    selectors: {
-      price: [
-        '[data-test="product-price"]',
-        '.ProductPrice',
-        '[class*="price"]',
-        '[itemprop="price"]'
-      ]
-    },
-    requiresJS: false
-  },
-
-  // Hibbett Sports
-  {
-    domain: 'hibbett.com',
-    name: 'Hibbett Sports',
-    selectors: {
-      price: [
-        '.product-price',
-        '[data-price]',
-        '[itemprop="price"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: false
-  },
-
-  // Dick's Sporting Goods - requires JS
-  {
-    domain: 'dickssportinggoods.com',
-    name: "Dick's Sporting Goods",
-    selectors: {
-      price: [
-        '[data-testid="product-price"]',
-        '.dsg-price',
-        '[class*="price"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: true
-  },
-
-  // Old Navy - requires JS (Gap Inc. brand)
-  {
-    domain: 'oldnavy.gap.com',
-    name: 'Old Navy',
-    selectors: {
-      price: [
-        '[data-test="product-price"]',
-        '.product-price',
-        '[class*="ProductPrice"]',
-        '[data-price]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: true
   },
 
   // Shoe Palace
@@ -211,21 +108,6 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // Hollister - requires JS (Abercrombie brand)
-  {
-    domain: 'hollister.com',
-    name: 'Hollister',
-    selectors: {
-      price: [
-        '[data-test="product-price"]',
-        '.product-price',
-        '[class*="ProductPrice"]',
-        'meta[property="og:price:amount"]'
-      ]
-    },
-    requiresJS: true
-  },
-
   // Stance (socks/apparel)
   {
     domain: 'stance.com',
@@ -242,35 +124,59 @@ export const RETAILER_CONFIGS: RetailerConfig[] = [
     requiresJS: false
   },
 
-  // Bath & Body Works
+  // ========== NEW RETAILERS (Smart Hybrid Architecture) ==========
+
+  // Gymshark - Shopify store (JSON endpoint blocked, uses HTML scraping)
   {
-    domain: 'bathandbodyworks.com',
-    name: 'Bath & Body Works',
+    domain: 'gymshark.com',
+    name: 'Gymshark',
     selectors: {
       price: [
-        '.product-price',
-        '[data-price]',
-        '[itemprop="price"]',
+        '.product-price__item',
+        '.price',
+        '[data-product-price]',
         'meta[property="og:price:amount"]',
-        '[class*="price"]'
+        '[itemprop="price"]'
       ]
     },
-    requiresJS: false
+    requiresJS: false,  // Standard fetch works, but JSON endpoint is blocked
+    isShopify: false,  // Can't use .json backdoor (Gymshark blocks it)
+    testUrl: 'https://www.gymshark.com/products/gymshark-twist-front-bralette-white-aw24'
   },
 
-  // House of Heat (shoe retailer/marketplace)
+  // GOAT - Aggressive anti-bot (Akamai), needs residential proxies
   {
-    domain: 'houseofheat.co',
-    name: 'House of Heat',
+    domain: 'goat.com',
+    name: 'GOAT',
     selectors: {
       price: [
+        '[data-testid="product-price"]',
         '.product-price',
-        '[data-product-price]',
-        '[itemprop="price"]',
-        'meta[property="og:price:amount"]'
+        '[class*="price"]',
+        'meta[property="og:price:amount"]',
+        '[itemprop="price"]'
       ]
     },
-    requiresJS: false
+    requiresJS: true,
+    useUnblock: true,  // Use Browserless /unblock with residential proxy
+    testUrl: 'https://www.goat.com/sneakers/air-jordan-11-retro-rare-air-ih0296-400'
+  },
+
+  // Sole Retriever - Static HTML friendly, standard fetch works
+  {
+    domain: 'soleretriever.com',
+    name: 'Sole Retriever',
+    selectors: {
+      price: [
+        '.price',
+        '[class*="price"]',
+        '[data-price]',
+        'meta[property="og:price:amount"]',
+        '[itemprop="price"]'
+      ]
+    },
+    requiresJS: false,  // Simple cheerio scraping works
+    testUrl: 'https://www.soleretriever.com/sneaker-release-dates/nike/kobe-9/nike-kobe-9-em-protro-china-ih1400-600'
   }
 ]
 

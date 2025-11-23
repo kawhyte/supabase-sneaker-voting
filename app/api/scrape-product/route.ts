@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import * as cheerio from 'cheerio'
 import { ItemCategory } from '@/components/types/item-category'
 import { fetchWithBrowserCached, isBrowserlessAvailable } from '@/lib/browserless'
+import { extractWithGemini, isGeminiAvailable } from '@/lib/gemini-fallback'
+import { fetchShopifyProduct, isShopifyUrl } from '@/lib/shopify-json-fetcher'
+import { getRetailerConfig } from '@/lib/retailer-selectors'
 
 interface ProductData {
   brand?: string
@@ -14,6 +17,7 @@ interface ProductData {
   category?: ItemCategory
   success: boolean
   error?: string
+  rawHtml?: string // For Gemini AI fallback (when CSS selectors fail)
 }
 
 // Helper function to clean text
@@ -157,14 +161,28 @@ async function scrapeWithFallback(
     skipCheerio?: boolean, // Skip cheerio attempt and go straight to Browserless
     browserlessConfig?: {
       endpoint?: 'unblock' | 'content' // Which Browserless endpoint to use
+      useResidentialProxy?: boolean // Force residential proxy
       waitFor?: { selector: string; timeout?: number }
       timeout?: number
     },
     customExtractor?: (html: string, url: string) => ProductData // Custom HTML extractor
   }
 ): Promise<ProductData> {
+  // Auto-detect config from RETAILER_CONFIGS if not provided
+  const retailerConfig = getRetailerConfig(url)
+
+  // Merge options with auto-detected config
+  const effectiveOptions = {
+    ...options,
+    skipCheerio: options?.skipCheerio ?? retailerConfig?.requiresJS ?? false,
+    browserlessConfig: {
+      ...options?.browserlessConfig,
+      endpoint: options?.browserlessConfig?.endpoint ?? (retailerConfig?.useUnblock ? 'unblock' : 'content')
+    }
+  }
+
   // Option to skip cheerio and go straight to Browserless (for known JS-heavy sites)
-  if (!options?.skipCheerio) {
+  if (!effectiveOptions.skipCheerio) {
     // First attempt: Regular fetch + cheerio
     console.log(`📡 Attempting cheerio scrape for ${siteName}...`)
     const firstAttempt = await scraperFn(url)
@@ -192,12 +210,13 @@ async function scrapeWithFallback(
   console.log(`🌐 Fetching ${siteName} with Browserless automation...`)
 
   try {
-    const browserResult = await fetchWithBrowserCached(url, options?.browserlessConfig)
+    const browserResult = await fetchWithBrowserCached(url, effectiveOptions.browserlessConfig)
 
     if (!browserResult.success || !browserResult.html) {
       return {
         success: false,
-        error: `Browserless failed: ${browserResult.error || 'Unknown error'}`
+        error: `Browserless failed: ${browserResult.error || 'Unknown error'}`,
+        rawHtml: browserResult.html // Preserve HTML for Gemini fallback
       }
     }
 
@@ -205,8 +224,8 @@ async function scrapeWithFallback(
 
     // Use custom extractor if provided, otherwise use generic one
     let productData: ProductData
-    if (options?.customExtractor) {
-      productData = options.customExtractor(browserResult.html, url)
+    if (effectiveOptions.customExtractor) {
+      productData = effectiveOptions.customExtractor(browserResult.html, url)
     } else {
       const $ = cheerio.load(browserResult.html)
       productData = extractProductDataFromHtml($, url, siteName)
@@ -214,6 +233,9 @@ async function scrapeWithFallback(
 
     if (productData.success) {
       console.log(`✅ Browserless scrape successful for ${siteName}`)
+    } else {
+      // Preserve HTML for Gemini AI fallback
+      productData.rawHtml = browserResult.html
     }
 
     return productData
@@ -275,15 +297,40 @@ function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: stri
       }
     }
 
-    // Fallback to HTML selectors
+    // Fallback to HTML selectors (try retailer-specific first, then generic)
     if (!retailPrice) {
-      const priceText = cleanText(
-        $('.price, [class*="price"], [class*="Price"]').first().text() ||
-        $('meta[property="product:price:amount"]').attr('content')
-      )
+      const retailerConfig = getRetailerConfig(url)
+      let priceText = ''
+
+      // Try retailer-specific selectors first
+      if (retailerConfig?.selectors?.price) {
+        console.log(`🔍 Trying ${retailerConfig.selectors.price.length} retailer-specific price selectors...`)
+        for (const selector of retailerConfig.selectors.price) {
+          const text = cleanText($(selector).first().text() || $(selector).first().attr('content') || '')
+          if (text) {
+            priceText = text
+            console.log(`✅ Found price with selector "${selector}": "${priceText}"`)
+            break
+          }
+        }
+      }
+
+      // Fallback to generic selectors
+      if (!priceText) {
+        priceText = cleanText(
+          $('.price, [class*="price"], [class*="Price"]').first().text() ||
+          $('meta[property="product:price:amount"]').attr('content')
+        )
+      }
+
       console.log(`💰 Price text found: "${priceText}"`)
-      retailPrice = extractPrice(priceText)
+      const extractedPrices = extractPrices(priceText)
+      retailPrice = extractedPrices.retailPrice
+      salePrice = extractedPrices.salePrice
       console.log(`💰 Extracted retail price: $${retailPrice}`)
+      if (salePrice) {
+        console.log(`💰 Extracted sale price: $${salePrice}`)
+      }
     }
 
     // Extract images
@@ -327,13 +374,22 @@ function extractProductDataFromHtml($: cheerio.Root, url: string, siteName: stri
     const validation = validateProductData(productData, siteName)
     if (!validation.isValid) {
       console.warn(`⚠️ ${siteName} Browserless extraction validation issues:`, validation.issues)
-      if (productData.brand || productData.model) {
-        productData.error = `Partial data extracted via browser automation. Issues: ${validation.issues.join(', ')}`
-      } else {
+
+      // If no brand or model, return complete failure
+      if (!productData.brand && !productData.model) {
         return {
           success: false,
           error: `Browser automation failed to extract sufficient data. Issues: ${validation.issues.join(', ')}`
         }
+      }
+
+      // If critical fields are missing (price or images), mark as failure to trigger Gemini fallback
+      const hasCriticalIssues = !productData.retailPrice || !productData.images || productData.images.length === 0
+      if (hasCriticalIssues) {
+        productData.success = false
+        productData.error = `Incomplete data: ${validation.issues.join(', ')}`
+      } else {
+        productData.error = `Partial data extracted via browser automation. Issues: ${validation.issues.join(', ')}`
       }
     }
 
@@ -401,8 +457,83 @@ export async function POST(request: NextRequest) {
     }
 
     try {
+      // ========== SMART HYBRID ARCHITECTURE ==========
+
+      // TIER 1: Gymshark - Shopify store with blocked JSON endpoint
+      if (hostname.includes('gymshark.com')) {
+        productData = await scrapeWithTimeout(() => scrapeGymshark(url), 20000)
+      }
+      // TIER 1.5: Other Shopify stores (JSON backdoor works for most)
+      else if (isShopifyUrl(url)) {
+        console.log(`🛍️ Detected Shopify store: ${hostname}`)
+        const shopifyData = await scrapeWithTimeout(() => fetchShopifyProduct(url))
+        if (shopifyData.success) {
+          // Convert ShopifyProductData to ProductData format
+          productData = {
+            ...shopifyData,
+            success: true
+          }
+        } else {
+          // Fallback to standard scraping if JSON fetch fails
+          console.warn(`⚠️ Shopify JSON failed, falling back to HTML scraping...`)
+          productData = await scrapeWithTimeout(() => scrapeGeneric(url))
+        }
+      }
+      // TIER 2: Anti-Bot Sites (GOAT, Lululemon, & Gap Family)
+      // Sites protected by Akamai (Goat, Lululemon, Gap, Old Navy, etc.)
+      // MUST use the stealth configuration: Residential Proxy via 'unblock' OR 'content' with waitFor
+      else if (
+        hostname.includes('goat.com') || 
+        hostname.includes('lululemon.com') ||
+        hostname.includes('gap.com') ||       // Covers gap.com, oldnavy.gap.com, bananarepublic.gap.com
+        hostname.includes('oldnavy') ||
+        hostname.includes('bananarepublic') ||
+        hostname.includes('athleta')
+      ) {
+        // Determine site name for logging
+        let siteName = 'Generic Stealth';
+        if (hostname.includes('goat.com')) siteName = 'GOAT';
+        else if (hostname.includes('lululemon.com')) siteName = 'Lululemon';
+        else if (hostname.includes('oldnavy')) siteName = 'Old Navy';
+        else if (hostname.includes('gap')) siteName = 'Gap';
+        else if (hostname.includes('banana')) siteName = 'Banana Republic';
+
+        // Determine which extractor to use
+        // Gap family sites share a specific React structure
+        const isGapFamily = hostname.includes('gap.com') || hostname.includes('oldnavy') || hostname.includes('banana') || hostname.includes('athleta');
+        
+        // Determine specific selector to wait for (Critical for React apps like Old Navy)
+        const waitSelector = isGapFamily ? '.product-price, #priceText, span[data-test="product-price"]' : 'h1';
+
+        const customExtractor = isGapFamily 
+          ? (html: string, u: string) => extractGapFamilyData(html, u, siteName)
+          : undefined; // Default to cheerio extraction for Goat/Lulu
+
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(
+          url,
+          scrapeGeneric, // Use generic scraper as base since we skip cheerio
+          siteName,
+          {
+            skipCheerio: true, // ALWAYS skip standard fetch for these sites (instantly blocked)
+            browserlessConfig: {
+              endpoint: 'content',        // Use /content to enable waitForSelector
+              useResidentialProxy: true,  // FORCE residential proxy to bypass Akamai (Updated in lib/browserless.ts)
+              timeout: 60000,             // Proxies take longer to connect
+              waitFor: { 
+                selector: waitSelector, 
+                timeout: 25000            // Wait up to 25s for the price to appear
+              }
+            },
+            customExtractor
+          }
+        ), 80000) // High timeout for the whole operation (80s)
+      }
+      // TIER 4: Sole Retriever - Standard fetch works
+      else if (hostname.includes('soleretriever.com')) {
+        productData = await scrapeWithTimeout(() => scrapeSoleRetriever(url))
+      }
       // Sites that work well with cheerio (no fallback needed)
-      if (hostname.includes('shoepalace.com') || hostname.includes('beistravel.com')) {
+      else if (hostname.includes('shoepalace.com') || hostname.includes('beistravel.com')) {
         if (hostname.includes('shoepalace.com')) {
           productData = await scrapeWithTimeout(() => scrapeShoePalace(url))
         } else {
@@ -410,75 +541,10 @@ export async function POST(request: NextRequest) {
         }
       }
       // Sites that likely need Browserless fallback
-      else if (hostname.includes('soleretriever.com')) {
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeSoleRetriever, 'SoleRetriever'))
-      } else if (hostname.includes('nike.com')) {
+      else if (hostname.includes('nike.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNike, 'Nike'), 20000)
-      } else if (hostname.includes('adidas.com')) {
-        // Adidas has strong bot protection - skip scraping
-        return NextResponse.json({
-          success: false,
-          error: 'Adidas auto-import is currently unavailable due to bot protection. Please enter product details manually or use an alternative source like SoleRetriever.com or ShoePalace.com'
-        })
       } else if (hostname.includes('stockx.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeStockX, 'StockX'))
-      } else if (hostname.includes('bananarepublic.gap.com')) {
-        // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
-        // that blocks automation. Both /unblock and /content endpoints are blocked.
-        // Current implementation attempts scraping but success rate is very low (~0-10%).
-        // RECOMMENDATION: Use manual entry or alternative sources (SoleRetriever) for these sites.
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(
-          url,
-          (u) => scrapeGapFamily(u, 'Banana Republic'),
-          'Banana Republic',
-          {
-            skipCheerio: true, // Skip cheerio, go straight to Browserless
-            browserlessConfig: {
-              endpoint: 'content', // Use /content for better JS rendering
-              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 15000 },
-              timeout: 30000
-            },
-            customExtractor: (html, u) => extractGapFamilyData(html, u, 'Banana Republic')
-          }
-        ), 35000)
-      } else if (hostname.includes('oldnavy.gap.com')) {
-        // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
-        // that blocks automation. Both /unblock and /content endpoints are blocked.
-        // Current implementation attempts scraping but success rate is very low (~0-10%).
-        // RECOMMENDATION: Use manual entry or alternative sources (SoleRetriever) for these sites.
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(
-          url,
-          (u) => scrapeGapFamily(u, 'Old Navy'),
-          'Old Navy',
-          {
-            skipCheerio: true, // Skip cheerio, go straight to Browserless
-            browserlessConfig: {
-              endpoint: 'content', // Use /content for better JS rendering
-              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 15000 },
-              timeout: 30000
-            },
-            customExtractor: (html, u) => extractGapFamilyData(html, u, 'Old Navy')
-          }
-        ), 35000)
-      } else if (hostname.includes('gap.com')) {
-        // NOTE: Gap family sites (Old Navy, Gap, Banana Republic) have aggressive bot detection
-        // that blocks automation. Both /unblock and /content endpoints are blocked.
-        // Current implementation attempts scraping but success rate is very low (~0-10%).
-        // RECOMMENDATION: Use manual entry or alternative sources (SoleRetriever) for these sites.
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(
-          url,
-          (u) => scrapeGapFamily(u, 'Gap'),
-          'Gap',
-          {
-            skipCheerio: true, // Skip cheerio, go straight to Browserless
-            browserlessConfig: {
-              endpoint: 'content', // Use /content for better JS rendering
-              waitFor: { selector: 'h1, [data-testid="product-title"]', timeout: 15000 },
-              timeout: 30000
-            },
-            customExtractor: (html, u) => extractGapFamilyData(html, u, 'Gap')
-          }
-        ), 35000)
       } else if (hostname.includes('nordstrom.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNordstrom, 'Nordstrom'))
       } else if (hostname.includes('stance.com')) {
@@ -487,7 +553,8 @@ export async function POST(request: NextRequest) {
         // Bath & Body Works - definitely needs Browserless
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Bath & Body Works'), 20000)
       } else {
-        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Generic'))
+        // Generic fallback - use 45s timeout to accommodate slow /unblock residential proxies if they are used
+        productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeGeneric, 'Generic'), 45000)
       }
     } catch (timeoutError) {
       const errorMessage = timeoutError instanceof Error ? timeoutError.message : 'Request timeout'
@@ -497,7 +564,77 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(productData)
+    // ========== GEMINI AI FALLBACK (Tier 5: 10/10 Resilience) ==========
+    // If scraping failed or returned partial data, try Gemini AI as last resort
+    if (productData && !productData.success && isGeminiAvailable()) {
+      console.log(`🤖 Attempting Gemini AI fallback for ${hostname}...`)
+      console.log(`🤖 Product data error: "${productData.error}"`)
+      console.log(`🤖 Has rawHtml: ${!!productData.rawHtml}, length: ${productData.rawHtml?.length || 0}`)
+
+      // Only use Gemini if we have HTML but selectors failed
+      // (Don't waste tokens on network errors)
+      const isParseError = productData.error?.includes('extract') ||
+                           productData.error?.includes('selector') ||
+                           productData.error?.includes('validation') ||
+                           productData.error?.includes('incomplete') ||
+                           productData.error?.includes('Incomplete')  // Capital I variant
+
+      console.log(`🤖 Is parse error: ${isParseError}`)
+
+      if (isParseError) {
+        try {
+          // Use raw HTML from scraper if available (prevents re-fetching and anti-bot issues)
+          let html = productData.rawHtml
+
+          // If no raw HTML stored, try fetching (fallback for simple sites)
+          if (!html) {
+            console.log(`🤖 No raw HTML cached, attempting fetch...`)
+            const htmlResponse = await fetch(url, {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+              }
+            })
+
+            if (htmlResponse.ok) {
+              html = await htmlResponse.text()
+            }
+          } else {
+            console.log(`🤖 Using cached rawHtml (${html.length} characters)`)
+          }
+
+          if (html) {
+            console.log(`🤖 Calling extractWithGemini...`)
+            const geminiData = await extractWithGemini(html, url, hostname)
+
+            if (geminiData.success) {
+              console.log(`✅ Gemini AI fallback succeeded!`)
+              // Merge Gemini data with original attempt
+              productData = {
+                brand: geminiData.brand || productData.brand,
+                model: geminiData.model || geminiData.title || productData.model,
+                retailPrice: geminiData.retailPrice || productData.retailPrice,
+                salePrice: geminiData.salePrice || productData.salePrice,
+                images: geminiData.imageUrl ? [geminiData.imageUrl] : productData.images,
+                category: productData.category || 'accessories',
+                success: true,
+                error: 'Data extracted via Gemini AI fallback (CSS selectors failed)'
+              }
+            } else {
+              console.warn(`⚠️ Gemini AI fallback also failed:`, geminiData.error)
+            }
+          } else {
+            console.error(`❌ No HTML available for Gemini AI fallback`)
+          }
+        } catch (geminiError) {
+          console.error(`❌ Gemini AI fallback error:`, geminiError)
+          // Continue with original productData (don't make things worse)
+        }
+      }
+    }
+
+    // Remove raw HTML before sending response (save bandwidth)
+    const { rawHtml, ...responseData } = productData
+    return NextResponse.json(responseData)
 
   } catch (error) {
     console.error('Scraping error:', error)
@@ -809,8 +946,8 @@ async function scrapeStockX(url: string): Promise<ProductData> {
     const model = fullTitle.replace(brand, '').trim()
 
     const colorway = cleanText($('.product-details .colorway').text() ||
-                     $('[class*="colorway"]').text() ||
-                     'Standard')
+                      $('[class*="colorway"]').text() ||
+                      'Standard')
 
     // SKU extraction
     const sku = cleanText($('[class*="sku"]').text() ||
@@ -1931,6 +2068,231 @@ function extractPrice(priceText: string): number | undefined {
   }
 
   return undefined
+}
+
+/**
+ * Enhanced price extraction that detects both retail and sale prices
+ * Handles strings like:
+ * - "This item is on sale. Price dropped from $170.00 to $127.50"
+ * - "Was $170.00, Now $127.50"
+ * - "$127.50 $170.00 25% off"
+ */
+function extractPrices(priceText: string): { retailPrice?: number; salePrice?: number } {
+  if (!priceText) return {}
+
+  // Remove percentage values (e.g., "25% off") to avoid matching them as prices
+  const cleanedText = priceText.replace(/\d+%/g, '')
+
+  // Match complete dollar amounts (e.g., "170.00", "127.50", "1,299.99")
+  // This regex matches patterns like: 123.45 or 1,234.56
+  const priceMatches = cleanedText.match(/\$?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g)
+
+  if (!priceMatches || priceMatches.length === 0) {
+    return {}
+  }
+
+  // Parse all prices found
+  const prices = priceMatches
+    .map(match => {
+      const cleanedMatch = match.replace(/[$,\s]/g, '')
+      return parseFloat(cleanedMatch)
+    })
+    .filter(price => !isNaN(price) && price > 0)
+    .filter((price, index, self) => self.indexOf(price) === index) // Remove duplicates
+
+  if (prices.length === 0) {
+    return {}
+  }
+
+  // Detect if this is a sale price scenario
+  const lowerText = priceText.toLowerCase()
+  const isSale = /\b(sale|was|now|dropped|save|off)\b/.test(lowerText)
+
+  if (prices.length === 1) {
+    // Single price found
+    return { retailPrice: prices[0] }
+  }
+
+  if (isSale && prices.length >= 2) {
+    // Sale detected with multiple prices
+    // Sort prices: highest first
+    const sortedPrices = [...prices].sort((a, b) => b - a)
+
+    // Higher price = retail/original, lower price = sale/current
+    return {
+      retailPrice: sortedPrices[0],  // Original price
+      salePrice: sortedPrices[sortedPrices.length - 1]  // Sale price (lowest)
+    }
+  }
+
+  // Multiple prices but no sale indicators - return first as retail
+  return { retailPrice: prices[0] }
+}
+
+// ========== NEW RETAILER SCRAPERS (Smart Hybrid Architecture) ==========
+
+/**
+ * GOAT Scraper - Sneaker marketplace with Akamai bot protection
+ * Strategy: Use Browserless /unblock with residential proxies
+ */
+async function scrapeGOAT(url: string): Promise<ProductData> {
+  console.log('🐐 GOAT: Using Browserless /unblock endpoint...')
+
+  if (!isBrowserlessAvailable()) {
+    return {
+      success: false,
+      error: 'GOAT requires Browserless with residential proxies. Add BROWSERLESS_API_KEY to .env.local'
+    }
+  }
+
+  try {
+    // Use /unblock endpoint with residential proxy
+    const browserResult = await fetchWithBrowserCached(url, {
+      endpoint: 'unblock', // Residential proxy for Akamai bypass
+      timeout: 35000,
+      waitFor: {
+        selector: 'h1, [class*="product"], [class*="title"]',
+        timeout: 20000
+      }
+    })
+
+    if (!browserResult.success || !browserResult.html) {
+      return {
+        success: false,
+        error: `GOAT scraping failed: ${browserResult.error || 'Browserless returned no HTML'}`
+      }
+    }
+
+    // Parse HTML with cheerio
+    const $ = cheerio.load(browserResult.html)
+
+    // Extract product data using extractProductDataFromHtml helper
+    const productData = extractProductDataFromHtml($, url, 'GOAT')
+
+    // Include raw HTML for Gemini AI fallback (in case CSS selectors fail)
+    productData.rawHtml = browserResult.html
+
+    return productData
+
+  } catch (error) {
+    return {
+      success: false,
+      error: `GOAT scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }
+  }
+}
+
+/**
+ * Gymshark Scraper - Shopify store with blocked JSON endpoint
+ * Strategy: Standard HTML scraping with Shopify-specific selectors
+ * Note: Gymshark blocks the .json endpoint, so we can't use the Shopify backdoor
+ */
+async function scrapeGymshark(url: string): Promise<ProductData> {
+  console.log('🦈 Gymshark: Using HTML scraping (JSON endpoint blocked)...')
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const html = await response.text()
+    const $ = cheerio.load(html)
+
+    const brand = 'Gymshark'
+
+    // Extract title from Shopify meta tags and h1
+    const title = cleanText(
+      $('h1.product-title').text() ||
+      $('h1[data-testid="product-title"]').text() ||
+      $('h1').first().text() ||
+      $('meta[property="og:title"]').attr('content') ||
+      $('.product-single__title').text()
+    )
+
+    // Extract prices using Shopify patterns
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    // Try JSON-LD first (most reliable for Shopify)
+    const jsonLdScript = $('script[type="application/ld+json"]').html()
+    if (jsonLdScript) {
+      try {
+        const jsonLd = JSON.parse(jsonLdScript)
+        if (jsonLd.offers) {
+          const offers = Array.isArray(jsonLd.offers) ? jsonLd.offers[0] : jsonLd.offers
+          retailPrice = parseFloat(offers.price || offers.highPrice)
+          salePrice = offers.lowPrice ? parseFloat(offers.lowPrice) : undefined
+        }
+      } catch (e) {
+        // JSON-LD parsing failed, continue with HTML
+      }
+    }
+
+    // Fallback to HTML selectors (Shopify patterns)
+    if (!retailPrice) {
+      const priceText = cleanText(
+        $('.product-price__item').first().text() ||
+        $('.price').first().text() ||
+        $('[data-product-price]').first().text() ||
+        $('meta[property="product:price:amount"]').attr('content') ||
+        $('meta[property="og:price:amount"]').attr('content')
+      )
+      retailPrice = extractPrice(priceText)
+    }
+
+    // Extract images from Shopify
+    const images: string[] = []
+
+    // Try og:image first
+    const ogImage = $('meta[property="og:image"]').attr('content')
+    if (ogImage) images.push(ogImage)
+
+    // Try Shopify product images
+    $('.product-single__media img, .product__media img, [data-product-image]').each((_, el) => {
+      if (images.length >= 5) return false
+      const src = $(el).attr('src') || $(el).attr('data-src')
+      if (src && !src.includes('logo') && !images.includes(src)) {
+        // Gymshark images are usually on CDN
+        const fullUrl = src.startsWith('http') ? src : `https:${src}`
+        images.push(fullUrl)
+      }
+    })
+
+    // Detect category
+    const category = detectCategory(url, title, '')
+
+    const productData: ProductData = {
+      brand,
+      model: title || undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      category,
+      success: true
+    }
+
+    const validation = validateProductData(productData, 'Gymshark')
+    if (!validation.isValid) {
+      console.warn('⚠️ Gymshark validation issues:', validation.issues)
+      productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+    }
+
+    return productData
+
+  } catch (error) {
+    return {
+      success: false,
+      error: `Gymshark scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }
+  }
 }
 
 // Helper function to validate scraped product data
