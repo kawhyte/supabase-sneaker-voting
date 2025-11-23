@@ -545,13 +545,18 @@ export async function POST(request: NextRequest) {
     // If scraping failed or returned partial data, try Gemini AI as last resort
     if (productData && !productData.success && isGeminiAvailable()) {
       console.log(`🤖 Attempting Gemini AI fallback for ${hostname}...`)
+      console.log(`🤖 Product data error: "${productData.error}"`)
+      console.log(`🤖 Has rawHtml: ${!!productData.rawHtml}, length: ${productData.rawHtml?.length || 0}`)
 
       // Only use Gemini if we have HTML but selectors failed
       // (Don't waste tokens on network errors)
       const isParseError = productData.error?.includes('extract') ||
                            productData.error?.includes('selector') ||
                            productData.error?.includes('validation') ||
-                           productData.error?.includes('incomplete')
+                           productData.error?.includes('incomplete') ||
+                           productData.error?.includes('Incomplete')  // Capital I variant
+
+      console.log(`🤖 Is parse error: ${isParseError}`)
 
       if (isParseError) {
         try {
@@ -570,9 +575,12 @@ export async function POST(request: NextRequest) {
             if (htmlResponse.ok) {
               html = await htmlResponse.text()
             }
+          } else {
+            console.log(`🤖 Using cached rawHtml (${html.length} characters)`)
           }
 
           if (html) {
+            console.log(`🤖 Calling extractWithGemini...`)
             const geminiData = await extractWithGemini(html, url, hostname)
 
             if (geminiData.success) {
@@ -591,6 +599,8 @@ export async function POST(request: NextRequest) {
             } else {
               console.warn(`⚠️ Gemini AI fallback also failed:`, geminiData.error)
             }
+          } else {
+            console.error(`❌ No HTML available for Gemini AI fallback`)
           }
         } catch (geminiError) {
           console.error(`❌ Gemini AI fallback error:`, geminiError)
