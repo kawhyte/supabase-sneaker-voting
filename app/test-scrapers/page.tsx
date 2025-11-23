@@ -71,7 +71,7 @@ export default function TestScrapersPage() {
     },
     {
       name: 'JD Sports (Existing)',
-      url: 'https://www.jdsports.com/product/black-nike-air-max-90/16462825',
+      url: 'https://www.jdsports.com/pdp/mens-nike-v5-rnr-casual-shoes/prod2874039/HJ5228/004',
       tier: 'Existing',
       color: 'bg-purple-600'
     },
