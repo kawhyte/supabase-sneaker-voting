@@ -406,8 +406,12 @@ export async function POST(request: NextRequest) {
     try {
       // ========== SMART HYBRID ARCHITECTURE ==========
 
-      // TIER 1: Shopify JSON Backdoor (100% reliable)
-      if (hostname.includes('gymshark.com') || isShopifyUrl(url)) {
+      // TIER 1: Gymshark - Shopify store with blocked JSON endpoint
+      if (hostname.includes('gymshark.com')) {
+        productData = await scrapeWithTimeout(() => scrapeGymshark(url), 20000)
+      }
+      // TIER 1.5: Other Shopify stores (JSON backdoor works for most)
+      else if (isShopifyUrl(url)) {
         console.log(`🛍️ Detected Shopify store: ${hostname}`)
         const shopifyData = await scrapeWithTimeout(() => fetchShopifyProduct(url))
         if (shopifyData.success) {
@@ -2207,6 +2211,119 @@ async function scrapeHollister(url: string): Promise<ProductData> {
     return {
       success: false,
       error: `Hollister scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }
+  }
+}
+
+/**
+ * Gymshark Scraper - Shopify store with blocked JSON endpoint
+ * Strategy: Standard HTML scraping with Shopify-specific selectors
+ * Note: Gymshark blocks the .json endpoint, so we can't use the Shopify backdoor
+ */
+async function scrapeGymshark(url: string): Promise<ProductData> {
+  console.log('🦈 Gymshark: Using HTML scraping (JSON endpoint blocked)...')
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const html = await response.text()
+    const $ = cheerio.load(html)
+
+    const brand = 'Gymshark'
+
+    // Extract title from Shopify meta tags and h1
+    const title = cleanText(
+      $('h1.product-title').text() ||
+      $('h1[data-testid="product-title"]').text() ||
+      $('h1').first().text() ||
+      $('meta[property="og:title"]').attr('content') ||
+      $('.product-single__title').text()
+    )
+
+    // Extract prices using Shopify patterns
+    let retailPrice: number | undefined
+    let salePrice: number | undefined
+
+    // Try JSON-LD first (most reliable for Shopify)
+    const jsonLdScript = $('script[type="application/ld+json"]').html()
+    if (jsonLdScript) {
+      try {
+        const jsonLd = JSON.parse(jsonLdScript)
+        if (jsonLd.offers) {
+          const offers = Array.isArray(jsonLd.offers) ? jsonLd.offers[0] : jsonLd.offers
+          retailPrice = parseFloat(offers.price || offers.highPrice)
+          salePrice = offers.lowPrice ? parseFloat(offers.lowPrice) : undefined
+        }
+      } catch (e) {
+        // JSON-LD parsing failed, continue with HTML
+      }
+    }
+
+    // Fallback to HTML selectors (Shopify patterns)
+    if (!retailPrice) {
+      const priceText = cleanText(
+        $('.product-price__item').first().text() ||
+        $('.price').first().text() ||
+        $('[data-product-price]').first().text() ||
+        $('meta[property="product:price:amount"]').attr('content') ||
+        $('meta[property="og:price:amount"]').attr('content')
+      )
+      retailPrice = extractPrice(priceText)
+    }
+
+    // Extract images from Shopify
+    const images: string[] = []
+
+    // Try og:image first
+    const ogImage = $('meta[property="og:image"]').attr('content')
+    if (ogImage) images.push(ogImage)
+
+    // Try Shopify product images
+    $('.product-single__media img, .product__media img, [data-product-image]').each((_, el) => {
+      if (images.length >= 5) return false
+      const src = $(el).attr('src') || $(el).attr('data-src')
+      if (src && !src.includes('logo') && !images.includes(src)) {
+        // Gymshark images are usually on CDN
+        const fullUrl = src.startsWith('http') ? src : `https:${src}`
+        images.push(fullUrl)
+      }
+    })
+
+    // Detect category
+    const category = detectCategory(url, title, '')
+
+    const productData: ProductData = {
+      brand,
+      model: title || undefined,
+      retailPrice,
+      salePrice,
+      images: images.length > 0 ? images : undefined,
+      category,
+      success: true
+    }
+
+    const validation = validateProductData(productData, 'Gymshark')
+    if (!validation.isValid) {
+      console.warn('⚠️ Gymshark validation issues:', validation.issues)
+      productData.error = `Partial data extracted. Issues: ${validation.issues.join(', ')}`
+    }
+
+    return productData
+
+  } catch (error) {
+    return {
+      success: false,
+      error: `Gymshark scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     }
   }
 }
