@@ -455,12 +455,6 @@ export async function POST(request: NextRequest) {
       // Sites that likely need Browserless fallback
       else if (hostname.includes('nike.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeNike, 'Nike'), 20000)
-      } else if (hostname.includes('adidas.com')) {
-        // Adidas has strong bot protection - skip scraping
-        return NextResponse.json({
-          success: false,
-          error: 'Adidas auto-import is currently unavailable due to bot protection. Please enter product details manually or use an alternative source like SoleRetriever.com or ShoePalace.com'
-        })
       } else if (hostname.includes('stockx.com')) {
         productData = await scrapeWithTimeout(() => scrapeWithFallback(url, scrapeStockX, 'StockX'))
       } else if (hostname.includes('bananarepublic.gap.com')) {
