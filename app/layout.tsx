@@ -15,14 +15,44 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
 	metadataBase: new URL(defaultUrl),
-	title: "PurrView: Wardrobe Watchlist",
+	title: {
+		default: "PurrView: Smart Wardrobe Management & Price Tracking",
+		template: "%s | PurrView",
+	},
 	description:
-		"Track your wardrobe items and add items to a watchlist and get notified when prices drop",
+		"Track your wardrobe with feline precision. Manage clothing items, calculate cost-per-wear, monitor wishlist prices, and get alerts when items go on sale. Free wardrobe management app.",
+	keywords: [
+		"wardrobe tracker",
+		"clothing management",
+		"price tracking",
+		"cost per wear calculator",
+		"fashion app",
+		"wardrobe organization",
+		"closet manager",
+		"price drop alerts",
+		"wishlist tracker",
+		"sustainable fashion",
+	],
+	authors: [{ name: "PurrView" }],
+	creator: "PurrView",
+	publisher: "PurrView",
+	robots: {
+		index: true,
+		follow: true,
+		googleBot: {
+			index: true,
+			follow: true,
+			"max-video-preview": -1,
+			"max-image-preview": "large",
+			"max-snippet": -1,
+		},
+	},
 	icons: {
 		icon: "/icon-192x192.png",
 		shortcut: "/icon-192x192.png",
 		apple: "/icon-192x192.png",
 	},
+	manifest: "/manifest.json",
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "default",
@@ -31,6 +61,41 @@ export const metadata = {
 	formatDetection: {
 		telephone: false,
 	},
+	openGraph: {
+		type: "website",
+		locale: "en_US",
+		url: defaultUrl,
+		title: "PurrView: Smart Wardrobe Management & Price Tracking",
+		description:
+			"Track your wardrobe with feline precision. Manage clothing items, calculate cost-per-wear, and monitor prices. Free wardrobe management app.",
+		siteName: "PurrView",
+		images: [
+			{
+				url: "/icon-512x512.png",
+				width: 512,
+				height: 512,
+				alt: "PurrView - Wardrobe Management App",
+			},
+		],
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "PurrView: Smart Wardrobe Management & Price Tracking",
+		description:
+			"Track your wardrobe with feline precision. Manage clothing items, calculate cost-per-wear, and monitor prices.",
+		images: ["/icon-512x512.png"],
+		creator: "@purrview",
+	},
+	verification: {
+		// Add your verification codes here when ready
+		// google: "your-google-verification-code",
+		// yandex: "your-yandex-verification-code",
+		// bing: "your-bing-verification-code",
+	},
+	alternates: {
+		canonical: defaultUrl,
+	},
+	category: "lifestyle",
 };
 
 export const viewport = {
