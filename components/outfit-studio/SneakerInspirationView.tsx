@@ -5,9 +5,9 @@ import { createClient } from '@/utils/supabase/client'
 import { SneakerPaletteCard } from '@/components/outfit-studio/SneakerPaletteCard'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Button } from '@/components/ui/button'
-import { migrateAllSneakers } from '@/app/actions/color-analysis'
+import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'
 import { toast } from '@/components/ui/use-toast'
-import { Palette, Loader2, AlertCircle } from 'lucide-react'
+import { Palette, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
 
 interface SneakerInspirationViewProps {
   showHeader?: boolean
@@ -27,6 +27,7 @@ export function SneakerInspirationView({
   const [items, setItems] = useState<WardrobeItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isMigrating, setIsMigrating] = useState(false)
+  const [isMigratingLegacy, setIsMigratingLegacy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -111,21 +112,74 @@ export function SneakerInspirationView({
     }
   }
 
-  const handlePaletteGenerated = (itemId: string, colors: string[]) => {
+  const handleMigrateLegacy = async () => {
+    setIsMigratingLegacy(true)
+
+    try {
+      const result = await migrateLegacyPalettes()
+
+      if (result.success) {
+        toast({
+          title: 'Legacy Palettes Upgraded',
+          description: result.message
+        })
+
+        // Reload items to show upgraded palettes with toggle
+        await loadSneakers()
+      } else {
+        toast({
+          title: 'Upgrade Failed',
+          description: result.message,
+          variant: 'destructive'
+        })
+      }
+    } catch (error) {
+      console.error('Legacy migration error:', error)
+      toast({
+        title: 'Upgrade Error',
+        description: 'An unexpected error occurred during upgrade.',
+        variant: 'destructive'
+      })
+    } finally {
+      setIsMigratingLegacy(false)
+    }
+  }
+
+  const handlePaletteGenerated = (itemId: string, palette: { bold: string[]; muted: string[] }) => {
     // Update local state with the newly generated palette
     setItems(prevItems =>
       prevItems.map(item =>
         item.id === itemId
-          ? { ...item, color_palette: colors, primary_color: colors[0] }
+          ? { ...item, color_palette: palette, primary_color: palette.bold[0] }
           : item
       )
     )
   }
 
+  // Helper: Check if item has a valid palette (either format)
+  const hasPalette = (item: WardrobeItem): boolean => {
+    if (!item.color_palette) return false
+
+    // Check if it's the new object format
+    if (typeof item.color_palette === 'object' && 'bold' in item.color_palette) {
+      return item.color_palette.bold.length > 0 && item.color_palette.muted.length > 0
+    }
+
+    // Check if it's the legacy array format
+    return Array.isArray(item.color_palette) && item.color_palette.length > 0
+  }
+
+  // Helper: Check if item has legacy palette format (array instead of object)
+  const hasLegacyPalette = (item: WardrobeItem): boolean => {
+    if (!item.color_palette) return false
+    return Array.isArray(item.color_palette)
+  }
+
   // Count items without palettes
-  const itemsWithoutPalettes = items.filter(
-    item => !item.color_palette || item.color_palette.length === 0
-  ).length
+  const itemsWithoutPalettes = items.filter(item => !hasPalette(item)).length
+
+  // Count items with legacy palette format that need upgrade
+  const itemsWithLegacyPalettes = items.filter(item => hasLegacyPalette(item)).length
 
   if (isLoading) {
     return (
@@ -161,49 +215,99 @@ export function SneakerInspirationView({
             </p>
           </div>
 
-          {/* Batch Migration Button */}
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Upgrade Legacy Palettes Button */}
+            {itemsWithLegacyPalettes > 0 && (
+              <Button
+                onClick={handleMigrateLegacy}
+                disabled={isMigratingLegacy}
+                size="lg"
+                variant="outline"
+              >
+                {isMigratingLegacy ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Upgrading...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Upgrade to Dual-Vibe ({itemsWithLegacyPalettes})
+                  </>
+                )}
+              </Button>
+            )}
+
+            {/* Batch Migration Button */}
+            {itemsWithoutPalettes > 0 && (
+              <Button
+                onClick={handleMigrateAll}
+                disabled={isMigrating}
+                size="lg"
+              >
+                {isMigrating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Palette className="h-4 w-4 mr-2" />
+                    Generate All ({itemsWithoutPalettes})
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Compact header for dashboard tab */}
+      {!showHeader && (itemsWithoutPalettes > 0 || itemsWithLegacyPalettes > 0) && (
+        <div className="flex items-center justify-end gap-2 mb-6">
+          {/* Upgrade Legacy Palettes Button */}
+          {itemsWithLegacyPalettes > 0 && (
+            <Button
+              onClick={handleMigrateLegacy}
+              disabled={isMigratingLegacy}
+              size="sm"
+              variant="outline"
+            >
+              {isMigratingLegacy ? (
+                <>
+                  <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                  Upgrading...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-3 w-3 mr-2" />
+                  Upgrade ({itemsWithLegacyPalettes})
+                </>
+              )}
+            </Button>
+          )}
+
+          {/* Generate All Button */}
           {itemsWithoutPalettes > 0 && (
             <Button
               onClick={handleMigrateAll}
               disabled={isMigrating}
-              size="lg"
+              size="sm"
             >
               {isMigrating ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-3 w-3 mr-2 animate-spin" />
                   Generating...
                 </>
               ) : (
                 <>
-                  <Palette className="h-4 w-4 mr-2" />
+                  <Palette className="h-3 w-3 mr-2" />
                   Generate All ({itemsWithoutPalettes})
                 </>
               )}
             </Button>
           )}
-        </div>
-      )}
-
-      {/* Compact header for dashboard tab */}
-      {!showHeader && itemsWithoutPalettes > 0 && (
-        <div className="flex items-center justify-end mb-6">
-          <Button
-            onClick={handleMigrateAll}
-            disabled={isMigrating}
-            size="sm"
-          >
-            {isMigrating ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Palette className="h-4 w-4 mr-2" />
-                Generate All ({itemsWithoutPalettes})
-              </>
-            )}
-          </Button>
         </div>
       )}
 
@@ -239,11 +343,18 @@ export function SneakerInspirationView({
                 <p>
                   Showing {items.length} {items.length === 1 ? 'sneaker' : 'sneakers'}
                 </p>
-                {itemsWithoutPalettes > 0 && (
-                  <p>
-                    {itemsWithoutPalettes} {itemsWithoutPalettes === 1 ? 'sneaker needs' : 'sneakers need'} color palette generation
-                  </p>
-                )}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  {itemsWithLegacyPalettes > 0 && (
+                    <p>
+                      {itemsWithLegacyPalettes} {itemsWithLegacyPalettes === 1 ? 'palette can' : 'palettes can'} be upgraded to dual-vibe
+                    </p>
+                  )}
+                  {itemsWithoutPalettes > 0 && (
+                    <p>
+                      {itemsWithoutPalettes} {itemsWithoutPalettes === 1 ? 'sneaker needs' : 'sneakers need'} color palette generation
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           )}

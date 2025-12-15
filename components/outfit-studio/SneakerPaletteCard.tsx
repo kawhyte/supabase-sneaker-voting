@@ -4,16 +4,21 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from '@/components/ui/use-toast'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { analyzeAndSaveColors } from '@/app/actions/color-analysis'
 import { cn } from '@/lib/utils'
-import { Loader2, Palette } from 'lucide-react'
+import { Loader2, Palette, Zap, Coffee } from 'lucide-react'
 
 interface SneakerPaletteCardProps {
   item: WardrobeItem
-  onPaletteGenerated?: (itemId: string, colors: string[]) => void
+  onPaletteGenerated?: (itemId: string, palette: { bold: string[]; muted: string[] }) => void
 }
+
+type PaletteMode = 'bold' | 'muted'
+
+type ColorPaletteData = string[] | { bold: string[]; muted: string[] }
 
 /**
  * SneakerPaletteCard - Displays a sneaker with its harmonious 5-color palette
@@ -21,6 +26,8 @@ interface SneakerPaletteCardProps {
  * Features:
  * - Shows sneaker image in 4:3 aspect ratio
  * - Displays 5 color circles below image
+ * - Toggle between Bold (streetwear) and Muted (office) vibes
+ * - Backward compatible with legacy single-palette format
  * - Click color circle to copy hex code
  * - Generate Palette button if no palette exists
  * - Loading state during palette generation
@@ -28,9 +35,31 @@ interface SneakerPaletteCardProps {
  */
 export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteCardProps) {
   const [isGenerating, setIsGenerating] = useState(false)
-  const [localPalette, setLocalPalette] = useState<string[] | null>(
+  const [mode, setMode] = useState<PaletteMode>('bold')
+  const [localPalette, setLocalPalette] = useState<ColorPaletteData | null>(
     item.color_palette || null
   )
+
+  // Helper: Check if palette is new format (object) or legacy format (array)
+  const isNewFormat = (palette: ColorPaletteData): palette is { bold: string[]; muted: string[] } => {
+    return palette !== null && typeof palette === 'object' && 'bold' in palette && 'muted' in palette
+  }
+
+  // Helper: Get the colors to display based on format and mode
+  const getDisplayColors = (): string[] | null => {
+    if (!localPalette) return null
+
+    if (isNewFormat(localPalette)) {
+      // New format: return bold or muted based on mode
+      return localPalette[mode]
+    } else {
+      // Legacy format: just return the array
+      return localPalette
+    }
+  }
+
+  const displayColors = getDisplayColors()
+  const showToggle = localPalette && isNewFormat(localPalette)
 
   // Get image URL (priority: main photo > legacy > first photo)
   const mainPhoto = item.item_photos?.find(photo => photo.is_main_image)
@@ -51,13 +80,13 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
     try {
       const result = await analyzeAndSaveColors(item.id, imageUrl)
 
-      if (result.success && result.colors) {
-        setLocalPalette(result.colors)
-        onPaletteGenerated?.(item.id, result.colors)
+      if (result.success && result.palette) {
+        setLocalPalette(result.palette)
+        onPaletteGenerated?.(item.id, result.palette)
 
         toast({
-          title: 'Palette Generated',
-          description: 'Color palette created successfully!'
+          title: 'Dual Palette Generated',
+          description: 'Bold and Muted color palettes created successfully!'
         })
       } else {
         toast({
@@ -137,28 +166,52 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
           </div>
 
           {/* Color Palette or Generate Button */}
-          {localPalette && localPalette.length === 5 ? (
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground font-medium">
-                Color Palette
-              </p>
-              <div className="flex gap-2 justify-between">
-                {localPalette.map((color, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleColorClick(color)}
-                    className={cn(
-                      'h-10 w-10 rounded-full border-2 border-border',
-                      'transition-transform duration-150',
-                      'hover:scale-110 hover:border-sun-400',
-                      'active:scale-95',
-                      'focus:outline-none focus:ring-2 focus:ring-sun-400 focus:ring-offset-2'
-                    )}
-                    style={{ backgroundColor: color }}
-                    title={`Click to copy ${color}`}
-                    aria-label={`Copy color ${color}`}
-                  />
-                ))}
+          {displayColors && displayColors.length === 5 ? (
+            <div className="space-y-3">
+              {/* Toggle between Bold and Muted (only for new format) */}
+              {showToggle && (
+                <Tabs value={mode} onValueChange={(value) => setMode(value as PaletteMode)} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 h-8">
+                    <TabsTrigger value="bold" className="text-xs flex items-center gap-1">
+                      <Zap className="h-3 w-3" />
+                      Bold
+                    </TabsTrigger>
+                    <TabsTrigger value="muted" className="text-xs flex items-center gap-1">
+                      <Coffee className="h-3 w-3" />
+                      Muted
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              )}
+
+              {/* Color circles */}
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-medium">
+                  {showToggle
+                    ? mode === 'bold'
+                      ? 'Bold Palette (Streetwear)'
+                      : 'Muted Palette (Office)'
+                    : 'Color Palette'
+                  }
+                </p>
+                <div className="flex gap-2 justify-between">
+                  {displayColors.map((color, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleColorClick(color)}
+                      className={cn(
+                        'h-10 w-10 rounded-full border-2 border-border',
+                        'transition-transform duration-150',
+                        'hover:scale-110 hover:border-sun-400',
+                        'active:scale-95',
+                        'focus:outline-none focus:ring-2 focus:ring-sun-400 focus:ring-offset-2'
+                      )}
+                      style={{ backgroundColor: color }}
+                      title={`Click to copy ${color}`}
+                      aria-label={`Copy color ${color}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           ) : (

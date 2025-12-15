@@ -8,7 +8,7 @@ export interface ColorAnalysisResult {
   success: boolean
   message: string
   itemId?: string
-  colors?: string[]
+  palette?: { bold: string[]; muted: string[] }
   primaryColor?: string
 }
 
@@ -57,14 +57,14 @@ export async function analyzeAndSaveColors(
       }
     }
 
-    // Generate color palette
+    // Generate color palette (both bold and muted)
     const palette = await generateSneakerPalette(imageUrl)
 
-    // Save to database
+    // Save to database (save as object with bold/muted arrays)
     const { error: updateError } = await supabase
       .from('items')
       .update({
-        color_palette: palette.colors,
+        color_palette: { bold: palette.bold, muted: palette.muted },
         primary_color: palette.primaryColor,
         updated_at: new Date().toISOString()
       })
@@ -86,7 +86,7 @@ export async function analyzeAndSaveColors(
       success: true,
       message: 'Color palette generated successfully',
       itemId,
-      colors: palette.colors,
+      palette: { bold: palette.bold, muted: palette.muted },
       primaryColor: palette.primaryColor
     }
 
@@ -172,14 +172,14 @@ export async function migrateAllSneakers(): Promise<MigrationResult> {
       try {
         if (!item.image_url) continue
 
-        // Generate palette
+        // Generate palette (both bold and muted)
         const palette = await generateSneakerPalette(item.image_url)
 
-        // Update database
+        // Update database with new object structure
         const { error: updateError } = await supabase
           .from('items')
           .update({
-            color_palette: palette.colors,
+            color_palette: { bold: palette.bold, muted: palette.muted },
             primary_color: palette.primaryColor,
             updated_at: new Date().toISOString()
           })
@@ -260,5 +260,155 @@ export async function getItemColorPalette(itemId: string): Promise<{
   } catch (error) {
     console.error('Error fetching color palette:', error)
     return { colors: null, primaryColor: null }
+  }
+}
+
+/**
+ * Migrates all legacy palettes (array format) to the new dual-vibe format (object with bold/muted).
+ * Re-generates both Bold and Muted palettes from the original images.
+ *
+ * @returns Result object with migration statistics
+ */
+export async function migrateLegacyPalettes(): Promise<MigrationResult> {
+  try {
+    const supabase = await createClient()
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return {
+        success: false,
+        message: 'Authentication required',
+        processed: 0,
+        succeeded: 0,
+        failed: 0,
+        errors: []
+      }
+    }
+
+    // Fetch all items with legacy palette format (JSONB array instead of object)
+    // We need to fetch items where color_palette is not null but doesn't have 'bold' key
+    const { data: items, error: fetchError } = await supabase
+      .from('items')
+      .select('id, image_url, color_palette, category, item_photos(image_url, is_main_image)')
+      .eq('user_id', user.id)
+      .not('color_palette', 'is', null)
+
+    if (fetchError) {
+      console.error('Error fetching items:', fetchError)
+      return {
+        success: false,
+        message: 'Failed to fetch items',
+        processed: 0,
+        succeeded: 0,
+        failed: 0,
+        errors: []
+      }
+    }
+
+    if (!items || items.length === 0) {
+      return {
+        success: true,
+        message: 'No items found with color palettes',
+        processed: 0,
+        succeeded: 0,
+        failed: 0,
+        errors: []
+      }
+    }
+
+    // Filter items that have legacy format (array instead of object with bold/muted)
+    const legacyItems = items.filter(item => {
+      if (!item.color_palette) return false
+      // Check if it's an array (legacy) or object with bold/muted (new)
+      return Array.isArray(item.color_palette)
+    })
+
+    if (legacyItems.length === 0) {
+      return {
+        success: true,
+        message: 'No legacy palettes found - all items already use the new format',
+        processed: 0,
+        succeeded: 0,
+        failed: 0,
+        errors: []
+      }
+    }
+
+    let succeeded = 0
+    let failed = 0
+    const errors: Array<{ itemId: string; error: string }> = []
+
+    // Process each legacy item
+    for (const item of legacyItems) {
+      try {
+        // Get image URL (priority: main photo > legacy > first photo)
+        const mainPhoto = item.item_photos?.find((photo: any) => photo.is_main_image)
+        const imageUrl = mainPhoto?.image_url || item.image_url || item.item_photos?.[0]?.image_url
+
+        if (!imageUrl) {
+          failed++
+          errors.push({
+            itemId: item.id,
+            error: 'No image URL found'
+          })
+          continue
+        }
+
+        // Re-generate palette from original image (will create both bold and muted)
+        const palette = await generateSneakerPalette(imageUrl)
+
+        // Update database with new object structure
+        const { error: updateError } = await supabase
+          .from('items')
+          .update({
+            color_palette: { bold: palette.bold, muted: palette.muted },
+            primary_color: palette.primaryColor,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', item.id)
+
+        if (updateError) {
+          failed++
+          errors.push({
+            itemId: item.id,
+            error: updateError.message
+          })
+        } else {
+          succeeded++
+        }
+
+      } catch (error) {
+        failed++
+        errors.push({
+          itemId: item.id,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })
+      }
+    }
+
+    // Revalidate pages after migration
+    revalidatePath('/outfits')
+    revalidatePath('/dashboard')
+
+    return {
+      success: true,
+      message: `Migration complete: ${succeeded} succeeded, ${failed} failed out of ${legacyItems.length} legacy palettes`,
+      processed: legacyItems.length,
+      succeeded,
+      failed,
+      errors
+    }
+
+  } catch (error) {
+    console.error('Error in migrateLegacyPalettes:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Unknown error occurred',
+      processed: 0,
+      succeeded: 0,
+      failed: 0,
+      errors: []
+    }
   }
 }

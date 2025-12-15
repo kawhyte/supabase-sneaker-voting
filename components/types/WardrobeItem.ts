@@ -66,6 +66,7 @@ export interface WardrobeItem {
   is_pinned?: boolean // Featured items on user's public profile
 
   // Color Palette (Sneaker Inspiration)
-  color_palette?: string[] | null // Array of 5 harmonious hex colors
+  // Supports both legacy format (string[]) and new dual-vibe format ({ bold: string[], muted: string[] })
+  color_palette?: string[] | { bold: string[]; muted: string[] } | null // 5 harmonious hex colors
   primary_color?: string | null // Dominant color from image
 }

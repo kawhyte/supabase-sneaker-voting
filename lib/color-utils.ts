@@ -9,22 +9,30 @@ import { Vibrant } from 'node-vibrant/node';
 import tinycolor from 'tinycolor2';
 
 export interface ColorPalette {
-  colors: string[];
+  bold: string[];
+  muted: string[];
   primaryColor: string;
 }
 
 /**
- * Generates a harmonious 5-color palette from a sneaker image URL
+ * Generates two harmonious 5-color palettes (Bold & Muted) from a sneaker image URL
  *
- * Palette Structure (Staff Engineer Hybrid Logic):
- * - Slot 1 (Dominant): Most vibrant color from image
- * - Slot 2 (Grounding): Muted/dark tone for pants
- * - Slot 3 (Harmony): Split-complementary of dominant
- * - Slot 4 (Neutral/Light): Light tint of grounding color for shirts
- * - Slot 5 (Pop): Desaturated complementary accent
+ * BOLD Palette (Streetwear/High-Contrast):
+ * - Anchor: Most vibrant color from image
+ * - Harmony: Triadic, Split-Complementary, and Complementary
+ * - Enhancement: Saturate(30-40) + Brighten(5-10) for MAXIMUM pop
+ * - Result: Vivid, high-energy colors that demand attention
+ * - Use Case: Street style, bold looks, statement outfits, nightlife
+ *
+ * MUTED Palette (Office/Low-Key):
+ * - Anchor: Muted or desaturated tones
+ * - Harmony: Analogous (±30° hue shifts) and Monochromatic
+ * - Enhancement: Desaturate(25-40) for heavily neutral tones
+ * - Result: Soft, earthy, neutral colors for professional settings
+ * - Use Case: Office wear, minimalist style, understated elegance
  *
  * @param imageUrl - Cloudinary URL or any CORS-accessible image URL
- * @returns ColorPalette with 5 hex colors and primary color
+ * @returns ColorPalette with bold[], muted[], and primaryColor
  */
 export async function generateSneakerPalette(imageUrl: string): Promise<ColorPalette> {
   try {
@@ -34,75 +42,130 @@ export async function generateSneakerPalette(imageUrl: string): Promise<ColorPal
     // Extract available swatches with fallbacks
     const vibrantSwatch = palette.Vibrant || palette.DarkVibrant || palette.LightVibrant;
     const mutedSwatch = palette.Muted || palette.DarkMuted || palette.LightMuted;
-    const darkSwatch = palette.DarkVibrant || palette.DarkMuted || vibrantSwatch;
+    const darkVibrantSwatch = palette.DarkVibrant || vibrantSwatch;
 
     if (!vibrantSwatch) {
       throw new Error('Could not extract any vibrant colors from image');
     }
 
-    // Slot 1: Dominant (most vibrant color)
+    // ========== BOLD PALETTE (High-Energy Streetwear) ==========
     const dominantColor = tinycolor(vibrantSwatch.hex);
-    const slot1 = dominantColor.toHexString();
 
-    // Slot 2: Grounding (muted/dark tone for pants)
-    let slot2: string;
-    if (mutedSwatch || darkSwatch) {
-      const groundingHex = mutedSwatch?.hex || darkSwatch?.hex || vibrantSwatch.hex;
-      const groundingColor = tinycolor(groundingHex);
-      // Ensure it's darker and less saturated
-      slot2 = groundingColor
-        .darken(10)
-        .desaturate(20)
-        .toHexString();
+    // Slot 1: Dominant vibrant (anchor) - MAXIMUM POP
+    const boldSlot1 = dominantColor
+      .saturate(40)
+      .lighten(5)
+      .toHexString();
+
+    // Slot 2: Dark vibrant for contrast - Deep, saturated
+    const boldSlot2 = tinycolor(darkVibrantSwatch?.hex || vibrantSwatch.hex)
+      .saturate(30)
+      .darken(15)
+      .toHexString();
+
+    // Slot 3: Split-complementary harmony (150° rotation) - VIVID
+    const splitComplementary = dominantColor.splitcomplement();
+    const boldSlot3 = splitComplementary[1]
+      .saturate(40)
+      .brighten(10)
+      .toHexString();
+
+    // Slot 4: Triadic harmony (120° rotation) - HIGH SATURATION
+    const triadic = dominantColor.triad();
+    const boldSlot4 = triadic[1]
+      .saturate(35)
+      .brighten(5)
+      .toHexString();
+
+    // Slot 5: Complementary pop (180° rotation) - MAXIMUM CONTRAST
+    const complementary = dominantColor.complement();
+    const boldSlot5 = complementary
+      .saturate(40)
+      .brighten(10)
+      .toHexString();
+
+    const boldPalette = [boldSlot1, boldSlot2, boldSlot3, boldSlot4, boldSlot5];
+
+    // ========== MUTED PALETTE (Low-Key Office/Minimalist) ==========
+    // If no muted swatch, derive from vibrant by desaturating heavily
+    let mutedAnchor: tinycolor.Instance;
+    if (mutedSwatch) {
+      mutedAnchor = tinycolor(mutedSwatch.hex);
     } else {
-      // Fallback: create dark version of dominant
-      slot2 = dominantColor
-        .clone()
-        .darken(30)
-        .desaturate(40)
-        .toHexString();
+      // Fallback: create muted version from vibrant
+      mutedAnchor = dominantColor.clone().desaturate(50).darken(10);
     }
 
-    // Slot 3: Harmony (split-complementary of dominant)
-    const splitComplementary = dominantColor.splitcomplement();
-    // Use the first split-complementary color (150° rotation)
-    const slot3 = splitComplementary[1].toHexString();
-
-    // Slot 4: Neutral/Light (light tint of grounding color for shirts)
-    const slot4 = tinycolor(slot2)
-      .lighten(40)
+    // Slot 1: Muted anchor (earthy base) - HEAVILY DESATURATED
+    const mutedSlot1 = mutedAnchor
       .desaturate(30)
       .toHexString();
 
-    // Slot 5: Pop (desaturated complementary accent)
-    const complementary = dominantColor.complement();
-    const slot5 = complementary
-      .desaturate(15)
+    // Slot 2: Darker muted tone (for pants/bottoms) - NEUTRAL DARK
+    const mutedSlot2 = mutedAnchor
+      .clone()
+      .darken(25)
+      .desaturate(35)
       .toHexString();
 
-    const colors = [slot1, slot2, slot3, slot4, slot5];
+    // Slot 3: Analogous harmony (+30° hue shift) - SUBTLE VARIATION
+    const mutedSlot3 = mutedAnchor
+      .clone()
+      .spin(30)
+      .desaturate(25)
+      .toHexString();
+
+    // Slot 4: Analogous harmony (-30° hue shift, lighter) - SOFT TONE
+    const mutedSlot4 = mutedAnchor
+      .clone()
+      .spin(-30)
+      .lighten(15)
+      .desaturate(30)
+      .toHexString();
+
+    // Slot 5: Monochromatic light (for layering/shirts) - VERY PALE
+    const mutedSlot5 = mutedAnchor
+      .clone()
+      .lighten(35)
+      .desaturate(40)
+      .toHexString();
+
+    const mutedPalette = [mutedSlot1, mutedSlot2, mutedSlot3, mutedSlot4, mutedSlot5];
 
     return {
-      colors,
-      primaryColor: slot1
+      bold: boldPalette,
+      muted: mutedPalette,
+      primaryColor: boldSlot1 // Use bold dominant as primary
     };
 
   } catch (error) {
     console.error('Error generating palette:', error);
 
-    // Fallback: Generate a monochromatic palette from a default color
-    const fallbackColor = tinycolor('#666666');
-    const colors = [
-      fallbackColor.toHexString(),
-      fallbackColor.clone().darken(20).toHexString(),
-      fallbackColor.clone().lighten(20).toHexString(),
-      fallbackColor.clone().lighten(40).toHexString(),
-      fallbackColor.clone().spin(180).toHexString()
+    // Fallback: Generate vibrant bold vs muted neutral palettes
+    const fallbackBase = tinycolor('#666666');
+
+    // Bold fallback: Vibrant, saturated colors
+    const boldFallback = [
+      tinycolor('#FF6B35').toHexString(), // Vibrant orange
+      tinycolor('#004E89').toHexString(), // Deep blue
+      tinycolor('#F7B801').toHexString(), // Bright yellow
+      tinycolor('#1A535C').toHexString(), // Teal
+      tinycolor('#FF1654').toHexString()  // Hot pink
+    ];
+
+    // Muted fallback: Neutral, desaturated tones
+    const mutedFallback = [
+      fallbackBase.toHexString(),                          // Medium gray
+      fallbackBase.clone().darken(20).toHexString(),      // Dark gray
+      fallbackBase.clone().lighten(15).toHexString(),     // Light gray
+      fallbackBase.clone().lighten(30).toHexString(),     // Very light gray
+      fallbackBase.clone().lighten(40).toHexString()      // Off-white
     ];
 
     return {
-      colors,
-      primaryColor: colors[0]
+      bold: boldFallback,
+      muted: mutedFallback,
+      primaryColor: boldFallback[0]
     };
   }
 }
