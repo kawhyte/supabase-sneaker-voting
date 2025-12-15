@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/use-toast'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { analyzeAndSaveColors } from '@/app/actions/color-analysis'
 import { cn } from '@/lib/utils'
-import { Loader2, Palette, Zap, Coffee } from 'lucide-react'
+import { Loader2, Palette, Zap, Coffee, RefreshCw } from 'lucide-react'
 
 interface SneakerPaletteCardProps {
   item: WardrobeItem
@@ -186,14 +186,33 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
 
               {/* Color circles */}
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground font-medium">
-                  {showToggle
-                    ? mode === 'bold'
-                      ? 'Bold Palette (Streetwear)'
-                      : 'Muted Palette (Office)'
-                    : 'Color Palette'
-                  }
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground font-medium">
+                    {showToggle
+                      ? mode === 'bold'
+                        ? 'Bold Palette (Streetwear)'
+                        : 'Muted Palette (Office)'
+                      : 'Color Palette'
+                    }
+                  </p>
+                  {/* Regenerate button */}
+                  <button
+                    onClick={handleGeneratePalette}
+                    disabled={isGenerating || !imageUrl}
+                    className={cn(
+                      'p-1 rounded hover:bg-muted transition-colors',
+                      'text-muted-foreground hover:text-foreground',
+                      'disabled:opacity-50 disabled:cursor-not-allowed'
+                    )}
+                    title="Regenerate palette with new algorithm"
+                    aria-label="Regenerate color palette"
+                  >
+                    <RefreshCw className={cn(
+                      'h-3 w-3',
+                      isGenerating && 'animate-spin'
+                    )} />
+                  </button>
+                </div>
                 <div className="flex gap-2 justify-between">
                   {displayColors.map((color, index) => (
                     <button
