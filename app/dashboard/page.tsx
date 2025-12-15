@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import { ViewDensityToggle } from '@/components/ViewDensityToggle'
 import { Button } from "@/components/ui/button";
 import { WardrobeDashboard } from "@/components/WardrobeDashboard";
-import { OutfitsDashboard } from "@/components/outfit-studio/OutfitsDashboard";
+import { SneakerInspirationView } from "@/components/outfit-studio/SneakerInspirationView";
 import {
 	Footprints,
 	Shirt,
@@ -233,14 +233,14 @@ function DashboardContent() {
 							</motion.div>
 						</TabsContent>
 
-						{/* Tab 4: Fits - Outfits */}
+						{/* Tab 4: Fits - Sneaker Inspiration */}
 						<TabsContent value='fits'>
 							<motion.div
 								initial={{ opacity: 0, y: 8 }}
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: 8 }}
 								transition={{ duration: 0.3 }}>
-								<OutfitsDashboard />
+								<SneakerInspirationView showHeader={false} />
 							</motion.div>
 						</TabsContent>
 
