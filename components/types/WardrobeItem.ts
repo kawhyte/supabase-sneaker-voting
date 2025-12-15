@@ -64,4 +64,8 @@ export interface WardrobeItem {
 
   // Social Sharing (Pinned to Profile)
   is_pinned?: boolean // Featured items on user's public profile
+
+  // Color Palette (Sneaker Inspiration)
+  color_palette?: string[] | null // Array of 5 harmonious hex colors
+  primary_color?: string | null // Dominant color from image
 }

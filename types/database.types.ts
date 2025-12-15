@@ -184,6 +184,7 @@ export type Database = {
           category: string | null
           cloudinary_id: string | null
           color: string | null
+          color_palette: Json | null
           comfort_rating: number | null
           created_at: string
           has_been_tried: boolean
@@ -199,6 +200,7 @@ export type Database = {
           lowest_price_seen: number | null
           model: string
           notes: string | null
+          primary_color: string | null
           price_check_failures: number | null
           product_url: string | null
           purchase_date: string | null
@@ -226,6 +228,7 @@ export type Database = {
           category?: string | null
           cloudinary_id?: string | null
           color?: string | null
+          color_palette?: Json | null
           comfort_rating?: number | null
           created_at?: string
           has_been_tried?: boolean
@@ -241,6 +244,7 @@ export type Database = {
           lowest_price_seen?: number | null
           model: string
           notes?: string | null
+          primary_color?: string | null
           price_check_failures?: number | null
           product_url?: string | null
           purchase_date?: string | null
@@ -268,6 +272,7 @@ export type Database = {
           category?: string | null
           cloudinary_id?: string | null
           color?: string | null
+          color_palette?: Json | null
           comfort_rating?: number | null
           created_at?: string
           has_been_tried?: boolean
@@ -283,6 +288,7 @@ export type Database = {
           lowest_price_seen?: number | null
           model?: string
           notes?: string | null
+          primary_color?: string | null
           price_check_failures?: number | null
           product_url?: string | null
           purchase_date?: string | null

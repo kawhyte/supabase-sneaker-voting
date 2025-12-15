@@ -530,6 +530,23 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 				if (photoError) throw photoError
 			}
 
+			// Trigger color analysis for footwear items (in background, non-blocking)
+			if (
+				mode !== 'edit' &&
+				uploadedPhotoData.length > 0 &&
+				['sneakers', 'shoes', 'footwear'].includes(data.category)
+			) {
+				const mainPhoto = uploadedPhotoData.find((p) => p.isMain) || uploadedPhotoData[0]
+				if (mainPhoto) {
+					// Import dynamically to avoid circular dependencies
+					import('@/app/actions/color-analysis').then(({ analyzeAndSaveColors }) => {
+						analyzeAndSaveColors(resultItem.id, mainPhoto.url).catch((err) =>
+							console.warn('Color analysis failed (non-critical):', err)
+						)
+					})
+				}
+			}
+
 			toast.success('Success', {
 				description: mode === 'edit' ? 'Item updated!' : 'Item added to your wardrobe!',
 			})
