@@ -1,7 +1,11 @@
 /**
- * OutfitCalendar - Weekly/Monthly calendar view for outfit planning
+ * DEPRECATED: OutfitCalendar - Replaced by Sneaker Inspiration (Inspo) Grid
  *
- * Features:
+ * This calendar-based outfit planning feature has been superseded by the new
+ * dual-vibe color palette system. The app now focuses on color inspiration
+ * from sneakers rather than manual outfit scheduling.
+ *
+ * Legacy Features (no longer actively maintained):
  * - Drag outfits onto calendar days
  * - View scheduled outfits
  * - Mark outfits as worn

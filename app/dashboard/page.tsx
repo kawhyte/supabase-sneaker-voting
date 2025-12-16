@@ -180,7 +180,7 @@ function DashboardContent() {
 										data-variant='underline'
 										className='relative py-2 px-4 rounded-xl  pb-4 bg-transparent flex items-center gap-2'>
 										<Sparkles className='h-4 w-4' />
-										Fits
+										Inspo
 									</TabsTrigger>
 								</TabsList>
 							</div>
@@ -233,7 +233,7 @@ function DashboardContent() {
 							</motion.div>
 						</TabsContent>
 
-						{/* Tab 4: Fits - Sneaker Inspiration */}
+						{/* Tab 4: Inspo - Sneaker Inspiration */}
 						<TabsContent value='fits'>
 							<motion.div
 								initial={{ opacity: 0, y: 8 }}

@@ -1,3 +1,7 @@
+// DEPRECATED: Replaced by Sneaker Inspiration (Inspo) Grid
+// This Canvas-based outfit composition feature has been superseded by the new
+// dual-vibe color palette system in SneakerInspirationView and SneakerPaletteCard.
+
 "use client";
 
 import { useCallback, useRef } from "react";

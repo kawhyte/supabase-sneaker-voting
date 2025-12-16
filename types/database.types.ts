@@ -200,8 +200,8 @@ export type Database = {
           lowest_price_seen: number | null
           model: string
           notes: string | null
-          primary_color: string | null
           price_check_failures: number | null
+          primary_color: string | null
           product_url: string | null
           purchase_date: string | null
           purchase_price: number | null
@@ -244,8 +244,8 @@ export type Database = {
           lowest_price_seen?: number | null
           model: string
           notes?: string | null
-          primary_color?: string | null
           price_check_failures?: number | null
+          primary_color?: string | null
           product_url?: string | null
           purchase_date?: string | null
           purchase_price?: number | null
@@ -288,8 +288,8 @@ export type Database = {
           lowest_price_seen?: number | null
           model?: string
           notes?: string | null
-          primary_color?: string | null
           price_check_failures?: number | null
+          primary_color?: string | null
           product_url?: string | null
           purchase_date?: string | null
           purchase_price?: number | null

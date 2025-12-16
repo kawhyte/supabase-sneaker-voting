@@ -1,3 +1,9 @@
+// DEPRECATED: Replaced by Sneaker Inspiration (Inspo) Grid
+// This Canvas/Calendar-based outfit creation feature has been superseded by the new
+// dual-vibe color palette system in SneakerInspirationView and SneakerPaletteCard.
+// The new system focuses on color inspiration rather than manual outfit composition.
+// Keeping this file for backward compatibility, but new development should use the Inspo system.
+
 'use client'
 
 import { useState, useEffect } from 'react'

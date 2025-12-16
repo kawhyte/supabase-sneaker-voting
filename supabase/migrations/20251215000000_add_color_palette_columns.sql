@@ -4,8 +4,8 @@
 
 BEGIN;
 
--- Add color_palette column to store array of 5 hex color strings
--- Example: ["#FF5733", "#C70039", "#900C3F", "#581845", "#FFC300"]
+-- Add color_palette column to store dual-vibe palette object
+-- Example: { "bold": ["#FF5733", "#C70039", "#900C3F", "#581845", "#FFC300"], "muted": ["#8B7355", "#A0826D", "#B8956A", "#C9B38C", "#D4C5A9"] }
 ALTER TABLE items
 ADD COLUMN IF NOT EXISTS color_palette JSONB DEFAULT NULL;
 
@@ -15,7 +15,7 @@ ALTER TABLE items
 ADD COLUMN IF NOT EXISTS primary_color TEXT DEFAULT NULL;
 
 -- Add comment to document the column structure
-COMMENT ON COLUMN items.color_palette IS 'Array of 5 harmonious hex color codes extracted from item image: [Dominant, Grounding, Harmony, Neutral/Light, Pop]';
+COMMENT ON COLUMN items.color_palette IS 'Dual-vibe color palette object with "bold" and "muted" arrays, each containing 5 hex color codes: { bold: string[], muted: string[] }';
 COMMENT ON COLUMN items.primary_color IS 'Primary/dominant color extracted from item image (hex code)';
 
 -- Create index on primary_color for filtering performance
