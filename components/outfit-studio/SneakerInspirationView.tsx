@@ -17,10 +17,10 @@ interface SneakerInspirationViewProps {
 }
 
 /**
- * SneakerInspirationView - Shared component for displaying sneaker grid with color palettes
+ * SneakerInspirationView - Shared component for displaying owned sneaker grid with color palettes
  *
  * Can be used in dashboard tabs or standalone pages.
- * Shows responsive grid of sneakers with generated color palettes.
+ * Shows responsive grid of OWNED sneakers (not wishlisted) with generated color palettes.
  */
 export function SneakerInspirationView({
   showHeader = true,
@@ -67,6 +67,7 @@ export function SneakerInspirationView({
         `)
         .eq('user_id', user.id)
         .in('category', ['sneakers', 'shoes', 'footwear'])
+        .eq('status', 'owned')
         .eq('is_archived', false)
         .order('created_at', { ascending: false })
 
