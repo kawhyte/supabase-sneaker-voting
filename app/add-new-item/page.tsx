@@ -70,10 +70,11 @@ export default function AddNewItemPage() {
   const router = useRouter()
 
   const handleSuccess = () => {
-    // Auto-redirect to dashboard after successful submission
+    // Auto-redirect to wishlist tab after successful submission
+    // New items are saved with 'wishlisted' status, so show them in the wishlist tab
     // Short delay allows user to see success toast before transition
     setTimeout(() => {
-      router.push('/dashboard')
+      router.push('/dashboard?tab=wishlist')
     }, 100)
   }
 
