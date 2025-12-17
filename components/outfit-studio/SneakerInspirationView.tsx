@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { SneakerPaletteCard } from '@/components/outfit-studio/SneakerPaletteCard'
+import { StyleGuideDialog } from '@/components/outfit-studio/StyleGuideDialog'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Button } from '@/components/ui/button'
 import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'
 import { toast } from '@/components/ui/use-toast'
 import { Palette, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
+import type { ColorWithRole } from '@/lib/color-utils'
 
 interface SneakerInspirationViewProps {
   showHeader?: boolean
@@ -145,12 +147,12 @@ export function SneakerInspirationView({
     }
   }
 
-  const handlePaletteGenerated = (itemId: string, palette: { bold: string[]; muted: string[] }) => {
+  const handlePaletteGenerated = (itemId: string, palette: { bold: ColorWithRole[]; muted: ColorWithRole[] }) => {
     // Update local state with the newly generated palette
     setItems(prevItems =>
       prevItems.map(item =>
         item.id === itemId
-          ? { ...item, color_palette: palette, primary_color: palette.bold[0] }
+          ? { ...item, color_palette: palette, primary_color: palette.bold[0].hex }
           : item
       )
     )
@@ -217,6 +219,8 @@ export function SneakerInspirationView({
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
+            {/* Style Guide Dialog Button */}
+            <StyleGuideDialog />
             {/* Upgrade Legacy Palettes Button */}
             {itemsWithLegacyPalettes > 0 && (
               <Button

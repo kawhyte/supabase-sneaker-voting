@@ -99,7 +99,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Plus, Bell, LogOut, Settings } from "lucide-react";
+import { Menu, X, Plus, Bell, LogOut, Settings, Sparkles } from "lucide-react";
 import { PawPrint } from 'lucide-react';
 import { createClient } from "@/utils/supabase/client";
 import {
@@ -121,6 +121,7 @@ interface NavLink {
 	href: string;
 	label: string;
 	isAction?: boolean;
+	icon?: React.ComponentType<{ className?: string }>;
 }
 
 interface NavbarClientProps {
@@ -236,6 +237,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 	const authenticatedNavLinks: NavLink[] = [
 		{ href: '/dashboard', label: 'My Wardrobe' },
+		{ href: '/outfits', label: 'Inspo', icon: Sparkles },
 		{ href: '/explore', label: 'Explore' },
 		{ href: '/achievements', label: 'Achievements' },
 		// { href: '/add-new-item', label: 'Add Item', isAction: true },
@@ -270,11 +272,12 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 							) : (
 								<Link key={link.href} href={link.href} className='relative'>
 									<span
-										className={`text-sm font-medium motion-safe:transition-all motion-safe:duration-150 motion-safe:hover:scale-105 will-change-transform ${
+										className={`text-sm font-medium motion-safe:transition-all motion-safe:duration-150 motion-safe:hover:scale-105 will-change-transform flex items-center gap-1.5 ${
 											isActive(link.href)
 												? "text-foreground"
 												: "text-muted-foreground hover:text-foreground"
 										}`}>
+										{link.icon && <link.icon className="h-4 w-4" />}
 										{link.label}
 									</span>
 									{isActive(link.href) && (
@@ -473,12 +476,13 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 								) : (
 									<Link key={link.href} href={link.href} className='relative'>
 										<span
-											className={`text-sm font-medium motion-safe:transition-all motion-safe:duration-150 block ${
+											className={`text-sm font-medium motion-safe:transition-all motion-safe:duration-150 flex items-center gap-1.5 ${
 												isActive(link.href)
 													? "text-foreground"
 													: "text-muted-foreground hover:text-foreground"
 											}`}
 											onClick={() => setIsMobileMenuOpen(false)}>
+											{link.icon && <link.icon className="h-4 w-4" />}
 											{link.label}
 										</span>
 										{isActive(link.href) && (

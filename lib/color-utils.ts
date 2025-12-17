@@ -1,17 +1,23 @@
 /**
  * Color Analysis Utilities for Sneaker Inspiration Feature
  *
- * PRIMARY/SECONDARY DOMINANT COLOR APPROACH:
+ * PRIMARY/SECONDARY DOMINANT COLOR APPROACH WITH LABELED ROLES:
  * Uses node-vibrant to extract actual colors, then identifies the TWO dominant
  * colors (by population) and builds intelligent palettes around them.
+ * Each color includes a descriptive role label for UX clarity.
  */
 
 import { Vibrant } from 'node-vibrant/node';
 import tinycolor from 'tinycolor2';
 
+export interface ColorWithRole {
+  hex: string;
+  role: string;
+}
+
 export interface ColorPalette {
-  bold: string[];
-  muted: string[];
+  bold: ColorWithRole[];
+  muted: ColorWithRole[];
   primaryColor: string;
 }
 
@@ -36,32 +42,33 @@ function calculateColorDistance(color1: string, color2: string): number {
 
 /**
  * Generates two harmonious 5-color palettes (Bold & Muted) from a sneaker image URL
+ * Each color includes a descriptive role label explaining its purpose.
  *
- * NEW PRIMARY/SECONDARY ALGORITHM:
+ * NEW PRIMARY/SECONDARY ALGORITHM WITH LABELED ROLES:
  * 1. Extract all swatches using node-vibrant
  * 2. Identify Primary Color: swatch with highest population
  * 3. Identify Secondary Color: swatch with 2nd highest population that's distinct (distance > 50)
- * 4. Build Bold Palette around these two dominant colors (high contrast/streetwear)
- * 5. Build Muted Palette around these two dominant colors (office/chill)
+ * 4. Build Bold Palette with labeled roles (high contrast/streetwear)
+ * 5. Build Muted Palette with labeled roles (office/chill)
  *
  * BOLD Palette (Streetwear/High-Contrast):
- * - Slot 1: Primary Color (Base)
- * - Slot 2: Direct Complement of Primary (High Contrast)
- * - Slot 3: Direct Complement of Secondary (Secondary Contrast)
- * - Slot 4: Split-Complement of Primary (High saturation)
- * - Slot 5: Secondary Color (Base)
+ * - Slot 1: Primary Color → "Primary Base"
+ * - Slot 2: Direct Complement of Primary → "High Contrast Pop"
+ * - Slot 3: Direct Complement of Secondary → "Secondary Pop"
+ * - Slot 4: Split-Complement of Primary → "Vibrant Harmony"
+ * - Slot 5: Secondary Color → "Shoe Accent"
  * - Tweak: High saturation (+10-20%)
  *
  * MUTED Palette (Office/Chill):
- * - Slot 1: Desaturated/Darker Primary
- * - Slot 2: Analogous to Primary (low contrast)
- * - Slot 3: Tetradic/Soft Complement of Secondary (desaturated)
- * - Slot 4: Neutral tone (Grey/Beige/Off-White) matching Primary's warmth
- * - Slot 5: Desaturated Secondary
+ * - Slot 1: Desaturated/Darker Primary → "Muted Base"
+ * - Slot 2: Analogous to Primary → "Subtle Harmony"
+ * - Slot 3: Tetradic/Soft Complement of Secondary → "Low-Key Pop"
+ * - Slot 4: Neutral tone → "Neutral Ground"
+ * - Slot 5: Desaturated Secondary → "Deep Accent"
  * - Tweak: Low saturation (-10-20%)
  *
  * @param imageUrl - Cloudinary URL or any CORS-accessible image URL
- * @returns ColorPalette with bold[], muted[], and primaryColor
+ * @returns ColorPalette with bold[], muted[] (each with { hex, role }), and primaryColor
  */
 export async function generateSneakerPalette(imageUrl: string): Promise<ColorPalette> {
   try {
@@ -98,7 +105,7 @@ export async function generateSneakerPalette(imageUrl: string): Promise<ColorPal
       throw new Error('Could not extract any colors from image');
     }
 
-    console.log('🎨 PRIMARY/SECONDARY DOMINANT COLOR ALGORITHM RUNNING');
+    console.log('🎨 PRIMARY/SECONDARY DOMINANT COLOR ALGORITHM (LABELED) RUNNING');
     console.log('Available swatches:', availableSwatches.map(([name, swatch]) => ({
       name,
       hex: swatch?.hex,
@@ -156,51 +163,81 @@ export async function generateSneakerPalette(imageUrl: string): Promise<ColorPal
 
     // ========== GENERATE BOLD PALETTE (High Contrast/Streetwear) ==========
 
-    const boldColors: string[] = [];
+    const boldColors: ColorWithRole[] = [];
 
     // Slot 1: Primary Color (enhanced saturation)
-    boldColors.push(primaryColor.clone().saturate(15).toHexString());
+    boldColors.push({
+      hex: primaryColor.clone().saturate(15).toHexString(),
+      role: 'Primary Base'
+    });
 
     // Slot 2: Direct Complement of Primary (high contrast)
     const primaryComplement = primaryColor.clone().complement();
-    boldColors.push(primaryComplement.saturate(20).toHexString());
+    boldColors.push({
+      hex: primaryComplement.saturate(20).toHexString(),
+      role: 'High Contrast Pop'
+    });
 
     // Slot 3: Direct Complement of Secondary
     const secondaryComplement = secondaryColor.clone().complement();
-    boldColors.push(secondaryComplement.saturate(15).toHexString());
+    boldColors.push({
+      hex: secondaryComplement.saturate(15).toHexString(),
+      role: 'Secondary Pop'
+    });
 
     // Slot 4: Split-Complement of Primary (one of the two split colors)
     const splitComplementColors = primaryColor.clone().splitcomplement();
-    boldColors.push(splitComplementColors[1].saturate(20).toHexString()); // Pick the second one
+    boldColors.push({
+      hex: splitComplementColors[1].saturate(20).toHexString(),
+      role: 'Vibrant Harmony'
+    });
 
     // Slot 5: Secondary Color (enhanced saturation)
-    boldColors.push(secondaryColor.clone().saturate(15).toHexString());
+    boldColors.push({
+      hex: secondaryColor.clone().saturate(15).toHexString(),
+      role: 'Shoe Accent'
+    });
 
     console.log('✅ BOLD PALETTE (Streetwear):', boldColors);
 
     // ========== GENERATE MUTED PALETTE (Office/Chill) ==========
 
-    const mutedColors: string[] = [];
+    const mutedColors: ColorWithRole[] = [];
 
     // Slot 1: Desaturated/Darker Primary
-    mutedColors.push(primaryColor.clone().desaturate(20).darken(10).toHexString());
+    mutedColors.push({
+      hex: primaryColor.clone().desaturate(20).darken(10).toHexString(),
+      role: 'Muted Base'
+    });
 
     // Slot 2: Analogous to Primary (low contrast - 30° rotation)
     const analogousColor = primaryColor.clone().spin(30); // Analogous harmony
-    mutedColors.push(analogousColor.desaturate(15).toHexString());
+    mutedColors.push({
+      hex: analogousColor.desaturate(15).toHexString(),
+      role: 'Subtle Harmony'
+    });
 
     // Slot 3: Tetradic/Soft Complement of Secondary (very desaturated)
     const secondarySoftComplement = secondaryColor.clone().spin(90); // Tetradic harmony
-    mutedColors.push(secondarySoftComplement.desaturate(30).toHexString());
+    mutedColors.push({
+      hex: secondarySoftComplement.desaturate(30).toHexString(),
+      role: 'Low-Key Pop'
+    });
 
     // Slot 4: Neutral tone (Grey/Beige/Off-White) matching Primary's warmth
     const primaryHsl = primaryColor.toHsl();
     const isWarm = (primaryHsl.h >= 0 && primaryHsl.h < 60) || primaryHsl.h >= 300; // Reds, oranges, yellows, pinks
     const neutralBase = isWarm ? '#D4C5A9' : '#B8C5D4'; // Warm beige vs cool gray-blue
-    mutedColors.push(tinycolor(neutralBase).desaturate(10).toHexString());
+    mutedColors.push({
+      hex: tinycolor(neutralBase).desaturate(10).toHexString(),
+      role: 'Neutral Ground'
+    });
 
     // Slot 5: Desaturated Secondary
-    mutedColors.push(secondaryColor.clone().desaturate(25).toHexString());
+    mutedColors.push({
+      hex: secondaryColor.clone().desaturate(25).toHexString(),
+      role: 'Deep Accent'
+    });
 
     console.log('✅ MUTED PALETTE (Office):', mutedColors);
 
@@ -213,31 +250,31 @@ export async function generateSneakerPalette(imageUrl: string): Promise<ColorPal
   } catch (error) {
     console.error('Error generating palette:', error);
 
-    // Fallback: Generate vibrant bold vs muted neutral palettes
+    // Fallback: Generate vibrant bold vs muted neutral palettes with roles
     const fallbackBase = tinycolor('#666666');
 
-    // Bold fallback: Vibrant, saturated colors
-    const boldFallback = [
-      tinycolor('#FF6B35').toHexString(), // Vibrant orange
-      tinycolor('#004E89').toHexString(), // Deep blue
-      tinycolor('#F7B801').toHexString(), // Bright yellow
-      tinycolor('#1A535C').toHexString(), // Teal
-      tinycolor('#FF1654').toHexString()  // Hot pink
+    // Bold fallback: Vibrant, saturated colors with roles
+    const boldFallback: ColorWithRole[] = [
+      { hex: tinycolor('#FF6B35').toHexString(), role: 'Primary Base' },
+      { hex: tinycolor('#004E89').toHexString(), role: 'High Contrast Pop' },
+      { hex: tinycolor('#F7B801').toHexString(), role: 'Secondary Pop' },
+      { hex: tinycolor('#1A535C').toHexString(), role: 'Vibrant Harmony' },
+      { hex: tinycolor('#FF1654').toHexString(), role: 'Shoe Accent' }
     ];
 
-    // Muted fallback: Neutral, desaturated tones
-    const mutedFallback = [
-      fallbackBase.toHexString(),                          // Medium gray
-      fallbackBase.clone().darken(20).toHexString(),      // Dark gray
-      fallbackBase.clone().lighten(15).toHexString(),     // Light gray
-      fallbackBase.clone().lighten(30).toHexString(),     // Very light gray
-      fallbackBase.clone().lighten(40).toHexString()      // Off-white
+    // Muted fallback: Neutral, desaturated tones with roles
+    const mutedFallback: ColorWithRole[] = [
+      { hex: fallbackBase.toHexString(), role: 'Muted Base' },
+      { hex: fallbackBase.clone().darken(20).toHexString(), role: 'Subtle Harmony' },
+      { hex: fallbackBase.clone().lighten(15).toHexString(), role: 'Low-Key Pop' },
+      { hex: fallbackBase.clone().lighten(30).toHexString(), role: 'Neutral Ground' },
+      { hex: fallbackBase.clone().lighten(40).toHexString(), role: 'Deep Accent' }
     ];
 
     return {
       bold: boldFallback,
       muted: mutedFallback,
-      primaryColor: boldFallback[0]
+      primaryColor: boldFallback[0].hex
     };
   }
 }

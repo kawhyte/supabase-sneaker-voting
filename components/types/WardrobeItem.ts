@@ -1,6 +1,7 @@
 import type { ItemCategory } from "./item-category"
 import type { ItemStatus } from "@/types/ItemStatus"
 import type { SizeType } from "@/types/SizeType"
+import type { ColorWithRole } from "@/lib/color-utils"
 
 export interface ItemPhoto {
   id: string
@@ -66,7 +67,10 @@ export interface WardrobeItem {
   is_pinned?: boolean // Featured items on user's public profile
 
   // Color Palette (Sneaker Inspiration)
-  // Supports both legacy format (string[]) and new dual-vibe format ({ bold: string[], muted: string[] })
-  color_palette?: string[] | { bold: string[]; muted: string[] } | null // 5 harmonious hex colors
+  // Supports multiple formats:
+  // - Legacy: string[] (5 hex colors)
+  // - Dual-vibe (old): { bold: string[], muted: string[] }
+  // - Dual-vibe (new): { bold: ColorWithRole[], muted: ColorWithRole[] } (with role labels)
+  color_palette?: string[] | { bold: string[]; muted: string[] } | { bold: ColorWithRole[]; muted: ColorWithRole[] } | null
   primary_color?: string | null // Dominant color from image
 }

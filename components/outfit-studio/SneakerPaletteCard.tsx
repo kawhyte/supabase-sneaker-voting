@@ -5,33 +5,43 @@ import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { toast } from '@/components/ui/use-toast'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { analyzeAndSaveColors } from '@/app/actions/color-analysis'
 import { cn } from '@/lib/utils'
 import { Loader2, Palette, Zap, Coffee, RefreshCw } from 'lucide-react'
+import type { ColorWithRole } from '@/lib/color-utils'
 
 interface SneakerPaletteCardProps {
   item: WardrobeItem
-  onPaletteGenerated?: (itemId: string, palette: { bold: string[]; muted: string[] }) => void
+  onPaletteGenerated?: (itemId: string, palette: { bold: ColorWithRole[]; muted: ColorWithRole[] }) => void
 }
 
 type PaletteMode = 'bold' | 'muted'
 
-type ColorPaletteData = string[] | { bold: string[]; muted: string[] }
+// Support multiple formats:
+// - Legacy: string[]
+// - Dual-vibe (old): { bold: string[], muted: string[] }
+// - Dual-vibe (new): { bold: ColorWithRole[], muted: ColorWithRole[] }
+type LegacyColorData = string[]
+type OldDualVibeData = { bold: string[]; muted: string[] }
+type NewDualVibeData = { bold: ColorWithRole[]; muted: ColorWithRole[] }
+type ColorPaletteData = LegacyColorData | OldDualVibeData | NewDualVibeData
 
 /**
  * SneakerPaletteCard - Displays a sneaker with its harmonious 5-color palette
  *
  * Features:
  * - Shows sneaker image in 4:3 aspect ratio
- * - Displays 5 color circles below image
+ * - Displays 5 color circles below image with descriptive role tooltips
  * - Toggle between Bold (streetwear) and Muted (office) vibes
  * - Backward compatible with legacy single-palette format
  * - Click color circle to copy hex code
  * - Generate Palette button if no palette exists
  * - Loading state during palette generation
  * - Toast notification on color copy
+ * - Shadcn Tooltips showing color role (e.g., "Primary Base", "High Contrast Pop")
  */
 export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteCardProps) {
   const [isGenerating, setIsGenerating] = useState(false)
@@ -40,20 +50,25 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
     item.color_palette || null
   )
 
-  // Helper: Check if palette is new format (object) or legacy format (array)
-  const isNewFormat = (palette: ColorPaletteData): palette is { bold: string[]; muted: string[] } => {
+  // Helper: Check if palette is dual-vibe format (object) or legacy format (array)
+  const isDualVibeFormat = (palette: ColorPaletteData): palette is (OldDualVibeData | NewDualVibeData) => {
     return palette !== null && typeof palette === 'object' && 'bold' in palette && 'muted' in palette
   }
 
-  // Determine if we should show the toggle (new format vs legacy)
-  const showToggle = localPalette && isNewFormat(localPalette)
+  // Helper: Check if colors have roles (new ColorWithRole[] format)
+  const hasRoles = (colors: string[] | ColorWithRole[]): colors is ColorWithRole[] => {
+    return colors.length > 0 && typeof colors[0] === 'object' && 'hex' in colors[0] && 'role' in colors[0]
+  }
+
+  // Determine if we should show the toggle (dual-vibe format vs legacy)
+  const showToggle = localPalette && isDualVibeFormat(localPalette)
 
   // Helper: Get the colors to display based on format and mode
-  const getDisplayColors = (): string[] | null => {
+  const getDisplayColors = (): (string[] | ColorWithRole[]) | null => {
     if (!localPalette) return null
 
-    if (isNewFormat(localPalette)) {
-      // New format: return bold or muted based on mode
+    if (isDualVibeFormat(localPalette)) {
+      // Dual-vibe format: return bold or muted based on mode
       return localPalette[mode]
     } else {
       // Legacy format: just return the array
@@ -61,34 +76,7 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
     }
   }
 
-  // Helper: Get tooltip labels for each color slot
-  const getColorLabels = (): string[] => {
-    if (!showToggle) {
-      // Legacy format: no specific labels
-      return ['Color 1', 'Color 2', 'Color 3', 'Color 4', 'Color 5']
-    }
-
-    if (mode === 'bold') {
-      return [
-        'Primary Color',
-        'Primary Complement',
-        'Secondary Complement',
-        'Split-Complement',
-        'Secondary Color'
-      ]
-    } else {
-      return [
-        'Muted Primary',
-        'Analogous Primary',
-        'Soft Secondary',
-        'Neutral Tone',
-        'Muted Secondary'
-      ]
-    }
-  }
-
   const displayColors = getDisplayColors()
-  const colorLabels = getColorLabels()
 
   // Get image URL (priority: main photo > legacy > first photo)
   const mainPhoto = item.item_photos?.find(photo => photo.is_main_image)
@@ -136,19 +124,24 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
     }
   }
 
-  const handleColorClick = async (color: string) => {
+  const handleColorClick = async (hex: string, role?: string) => {
     try {
-      await navigator.clipboard.writeText(color)
+      await navigator.clipboard.writeText(hex)
       toast({
         title: 'Color Copied',
         description: (
-          <div className="flex items-center gap-2">
-            <div
-              className="h-4 w-4 rounded border border-border"
-              style={{ backgroundColor: color }}
-              aria-hidden="true"
-            />
-            <span className="font-mono text-sm">{color}</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div
+                className="h-4 w-4 rounded border border-border"
+                style={{ backgroundColor: hex }}
+                aria-hidden="true"
+              />
+              <span className="font-mono text-sm">{hex}</span>
+            </div>
+            {role && (
+              <p className="text-xs text-muted-foreground">{role}</p>
+            )}
           </div>
         )
       })
@@ -213,7 +206,7 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
                 </Tabs>
               )}
 
-              {/* Color circles */}
+              {/* Color circles with Tooltips */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-muted-foreground font-medium">
@@ -242,24 +235,42 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
                     )} />
                   </button>
                 </div>
-                <div className="flex gap-2 justify-between">
-                  {displayColors.map((color, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleColorClick(color)}
-                      className={cn(
-                        'h-10 w-10 rounded-full border-2 border-border',
-                        'transition-transform duration-150',
-                        'hover:scale-110 hover:border-sun-400',
-                        'active:scale-95',
-                        'focus:outline-none focus:ring-2 focus:ring-sun-400 focus:ring-offset-2'
-                      )}
-                      style={{ backgroundColor: color }}
-                      title={`${colorLabels[index]} - ${color} (click to copy)`}
-                      aria-label={`${colorLabels[index]}: ${color}`}
-                    />
-                  ))}
-                </div>
+                <TooltipProvider>
+                  <div className="flex gap-2 justify-between">
+                    {displayColors.map((colorData, index) => {
+                      // Extract hex and role from either format
+                      const hex = hasRoles(displayColors) ? (colorData as ColorWithRole).hex : (colorData as string)
+                      const role = hasRoles(displayColors) ? (colorData as ColorWithRole).role : undefined
+
+                      return (
+                        <Tooltip key={index}>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={() => handleColorClick(hex, role)}
+                              className={cn(
+                                'h-10 w-10 rounded-full border-2 border-border',
+                                'transition-transform duration-150',
+                                'hover:scale-110 hover:border-sun-400',
+                                'active:scale-95',
+                                'focus:outline-none focus:ring-2 focus:ring-sun-400 focus:ring-offset-2'
+                              )}
+                              style={{ backgroundColor: hex }}
+                              aria-label={role ? `${role}: ${hex}` : hex}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            <div className="space-y-1">
+                              {role && (
+                                <p className="font-medium text-sm">{role}</p>
+                              )}
+                              <p className="font-mono text-xs text-muted-foreground">{hex}</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      )
+                    })}
+                  </div>
+                </TooltipProvider>
               </div>
             </div>
           ) : (

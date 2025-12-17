@@ -1,14 +1,14 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { generateSneakerPalette } from '@/lib/color-utils'
+import { generateSneakerPalette, type ColorWithRole } from '@/lib/color-utils'
 import { revalidatePath } from 'next/cache'
 
 export interface ColorAnalysisResult {
   success: boolean
   message: string
   itemId?: string
-  palette?: { bold: string[]; muted: string[] }
+  palette?: { bold: ColorWithRole[]; muted: ColorWithRole[] }
   primaryColor?: string
 }
 
