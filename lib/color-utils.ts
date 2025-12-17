@@ -1,8 +1,9 @@
 /**
  * Color Analysis Utilities for Sneaker Inspiration Feature
  *
- * Hybrid approach combining node-vibrant extraction with tinycolor2 color theory
- * to generate harmonious 5-color palettes from sneaker images.
+ * PRIMARY/SECONDARY DOMINANT COLOR APPROACH:
+ * Uses node-vibrant to extract actual colors, then identifies the TWO dominant
+ * colors (by population) and builds intelligent palettes around them.
  */
 
 import { Vibrant } from 'node-vibrant/node';
@@ -15,25 +16,49 @@ export interface ColorPalette {
 }
 
 /**
+ * Calculates the Euclidean distance between two colors in RGB space
+ * Used to determine if two colors are "distinctly different"
+ *
+ * @param color1 - First color (hex string)
+ * @param color2 - Second color (hex string)
+ * @returns Distance value (0-441, where > 50 is considered distinct)
+ */
+function calculateColorDistance(color1: string, color2: string): number {
+  const c1 = tinycolor(color1).toRgb();
+  const c2 = tinycolor(color2).toRgb();
+
+  const rDiff = c1.r - c2.r;
+  const gDiff = c1.g - c2.g;
+  const bDiff = c1.b - c2.b;
+
+  return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+}
+
+/**
  * Generates two harmonious 5-color palettes (Bold & Muted) from a sneaker image URL
  *
- * EXTRACTION-FIRST APPROACH:
- * Uses node-vibrant to extract ACTUAL colors from the sneaker, ensuring each
- * sneaker gets a unique palette that reflects its real colors.
+ * NEW PRIMARY/SECONDARY ALGORITHM:
+ * 1. Extract all swatches using node-vibrant
+ * 2. Identify Primary Color: swatch with highest population
+ * 3. Identify Secondary Color: swatch with 2nd highest population that's distinct (distance > 50)
+ * 4. Build Bold Palette around these two dominant colors (high contrast/streetwear)
+ * 5. Build Muted Palette around these two dominant colors (office/chill)
  *
  * BOLD Palette (Streetwear/High-Contrast):
- * - Source: Vibrant, DarkVibrant, LightVibrant swatches from image
- * - Enhancement: Moderate saturation boost (saturate(20))
- * - Supplements: Complementary/split-complementary only if needed
- * - Result: Real sneaker colors enhanced for streetwear
- * - Use Case: Street style, bold looks, statement outfits
+ * - Slot 1: Primary Color (Base)
+ * - Slot 2: Direct Complement of Primary (High Contrast)
+ * - Slot 3: Direct Complement of Secondary (Secondary Contrast)
+ * - Slot 4: Split-Complement of Primary (High saturation)
+ * - Slot 5: Secondary Color (Base)
+ * - Tweak: High saturation (+10-20%)
  *
- * MUTED Palette (Office/Low-Key):
- * - Source: Muted, DarkMuted, LightMuted swatches from image
- * - Enhancement: Slight desaturation (desaturate(15))
- * - Fallback: Heavily desaturated vibrant colors if needed
- * - Result: Real sneaker colors muted for professional settings
- * - Use Case: Office wear, minimalist style, understated elegance
+ * MUTED Palette (Office/Chill):
+ * - Slot 1: Desaturated/Darker Primary
+ * - Slot 2: Analogous to Primary (low contrast)
+ * - Slot 3: Tetradic/Soft Complement of Secondary (desaturated)
+ * - Slot 4: Neutral tone (Grey/Beige/Off-White) matching Primary's warmth
+ * - Slot 5: Desaturated Secondary
+ * - Tweak: Low saturation (-10-20%)
  *
  * @param imageUrl - Cloudinary URL or any CORS-accessible image URL
  * @returns ColorPalette with bold[], muted[], and primaryColor
@@ -44,9 +69,6 @@ export async function generateSneakerPalette(imageUrl: string): Promise<ColorPal
     let processableUrl = imageUrl;
 
     if (imageUrl.includes('cloudinary.com')) {
-      // Add format transformation to force PNG
-      // Example: https://res.cloudinary.com/xyz/image/upload/v123/abc.avif
-      // Becomes: https://res.cloudinary.com/xyz/image/upload/f_png/v123/abc.avif
       processableUrl = imageUrl.replace(
         /\/upload\//,
         '/upload/f_png,q_auto/'
@@ -76,101 +98,116 @@ export async function generateSneakerPalette(imageUrl: string): Promise<ColorPal
       throw new Error('Could not extract any colors from image');
     }
 
-    // ========== BOLD PALETTE (High-Energy Streetwear) ==========
-    // Strategy: Use ACTUAL vibrant colors from the sneaker, enhanced moderately
-
-    console.log('🎨 NEW EXTRACTION-FIRST ALGORITHM RUNNING');
+    console.log('🎨 PRIMARY/SECONDARY DOMINANT COLOR ALGORITHM RUNNING');
     console.log('Available swatches:', availableSwatches.map(([name, swatch]) => ({
       name,
       hex: swatch?.hex,
       population: swatch?.population
     })));
 
+    // ========== IDENTIFY PRIMARY AND SECONDARY COLORS ==========
+
+    // Primary Color: Highest population swatch
+    const primarySwatch = availableSwatches[0][1];
+    if (!primarySwatch) {
+      throw new Error('Could not identify primary color');
+    }
+    let primaryColor = tinycolor(primarySwatch.hex);
+
+    console.log('🎯 Primary Color (highest population):', primaryColor.toHexString(), 'pop:', primarySwatch.population);
+
+    // Secondary Color: Second highest population that is distinctly different (distance > 50)
+    let secondaryColor: tinycolor.Instance | null = null;
+    const DISTINCT_THRESHOLD = 50; // RGB distance threshold
+
+    for (let i = 1; i < availableSwatches.length; i++) {
+      const candidateSwatch = availableSwatches[i][1];
+      if (!candidateSwatch) continue;
+
+      const distance = calculateColorDistance(primaryColor.toHexString(), candidateSwatch.hex);
+      console.log(`  Checking candidate ${i}: ${candidateSwatch.hex} (pop: ${candidateSwatch.population}, distance: ${distance.toFixed(2)})`);
+
+      if (distance > DISTINCT_THRESHOLD) {
+        secondaryColor = tinycolor(candidateSwatch.hex);
+        console.log('✅ Secondary Color (distinct from primary):', secondaryColor.toHexString(), 'pop:', candidateSwatch.population);
+        break;
+      }
+    }
+
+    // Fallback: If no distinct secondary found, use DarkVibrant or Muted
+    if (!secondaryColor) {
+      console.log('⚠️  No distinct secondary color found, using fallback...');
+      const fallbackSwatch = palette.DarkVibrant || palette.Muted;
+      if (fallbackSwatch) {
+        secondaryColor = tinycolor(fallbackSwatch.hex);
+      }
+    }
+
+    // Edge case: Monochrome shoe (Primary and Secondary are effectively the same)
+    if (!secondaryColor || calculateColorDistance(primaryColor.toHexString(), secondaryColor.toHexString()) < DISTINCT_THRESHOLD) {
+      console.log('🔲 Monochrome detected - forcing Secondary to White/Black');
+      const primaryLuminance = primaryColor.getLuminance();
+      // If primary is dark, use white; if light, use black
+      secondaryColor = tinycolor(primaryLuminance > 0.5 ? '#000000' : '#FFFFFF');
+    }
+
+    console.log('Final Primary:', primaryColor.toHexString());
+    console.log('Final Secondary:', secondaryColor.toHexString());
+
+    // ========== GENERATE BOLD PALETTE (High Contrast/Streetwear) ==========
+
     const boldColors: string[] = [];
 
-    // Collect vibrant swatches (Vibrant, DarkVibrant, LightVibrant)
-    const vibrantSwatches = [
-      palette.Vibrant,
-      palette.DarkVibrant,
-      palette.LightVibrant
-    ].filter(s => s !== null && s !== undefined);
+    // Slot 1: Primary Color (enhanced saturation)
+    boldColors.push(primaryColor.clone().saturate(15).toHexString());
 
-    console.log('Vibrant swatches found:', vibrantSwatches.length);
+    // Slot 2: Direct Complement of Primary (high contrast)
+    const primaryComplement = primaryColor.clone().complement();
+    boldColors.push(primaryComplement.saturate(20).toHexString());
 
-    // Add real vibrant colors with moderate enhancement
-    vibrantSwatches.forEach(swatch => {
-      if (swatch && boldColors.length < 5) {
-        const color = tinycolor(swatch.hex);
-        boldColors.push(color.saturate(20).toHexString());
-      }
-    });
+    // Slot 3: Direct Complement of Secondary
+    const secondaryComplement = secondaryColor.clone().complement();
+    boldColors.push(secondaryComplement.saturate(15).toHexString());
 
-    // If we need more colors, add a complementary color based on the most vibrant
-    if (boldColors.length < 5 && palette.Vibrant) {
-      const complement = tinycolor(palette.Vibrant.hex).complement();
-      boldColors.push(complement.saturate(15).toHexString());
-    }
+    // Slot 4: Split-Complement of Primary (one of the two split colors)
+    const splitComplementColors = primaryColor.clone().splitcomplement();
+    boldColors.push(splitComplementColors[1].saturate(20).toHexString()); // Pick the second one
 
-    // If still need more, add a split-complementary
-    if (boldColors.length < 5 && palette.Vibrant) {
-      const splitComp = tinycolor(palette.Vibrant.hex).splitcomplement();
-      boldColors.push(splitComp[1].saturate(15).toHexString());
-    }
+    // Slot 5: Secondary Color (enhanced saturation)
+    boldColors.push(secondaryColor.clone().saturate(15).toHexString());
 
-    // Ensure we have exactly 5 colors
-    while (boldColors.length < 5) {
-      const baseColor = tinycolor(availableSwatches[0][1]?.hex || '#666666');
-      boldColors.push(baseColor.spin(boldColors.length * 72).saturate(20).toHexString());
-    }
+    console.log('✅ BOLD PALETTE (Streetwear):', boldColors);
 
-    const boldPalette = boldColors.slice(0, 5);
-
-    // ========== MUTED PALETTE (Low-Key Office/Minimalist) ==========
-    // Strategy: Use ACTUAL muted colors from the sneaker directly
+    // ========== GENERATE MUTED PALETTE (Office/Chill) ==========
 
     const mutedColors: string[] = [];
 
-    // Collect muted swatches (Muted, DarkMuted, LightMuted)
-    const mutedSwatches = [
-      palette.Muted,
-      palette.DarkMuted,
-      palette.LightMuted
-    ].filter(s => s !== null && s !== undefined);
+    // Slot 1: Desaturated/Darker Primary
+    mutedColors.push(primaryColor.clone().desaturate(20).darken(10).toHexString());
 
-    // Add real muted colors with slight desaturation for professional look
-    mutedSwatches.forEach(swatch => {
-      if (swatch && mutedColors.length < 5) {
-        const color = tinycolor(swatch.hex);
-        mutedColors.push(color.desaturate(15).toHexString());
-      }
-    });
+    // Slot 2: Analogous to Primary (low contrast - 30° rotation)
+    const analogousColor = primaryColor.clone().spin(30); // Analogous harmony
+    mutedColors.push(analogousColor.desaturate(15).toHexString());
 
-    // If we need more muted colors, desaturate the vibrant colors heavily
-    if (mutedColors.length < 5) {
-      vibrantSwatches.forEach(swatch => {
-        if (swatch && mutedColors.length < 5) {
-          const color = tinycolor(swatch.hex);
-          mutedColors.push(color.desaturate(40).darken(5).toHexString());
-        }
-      });
-    }
+    // Slot 3: Tetradic/Soft Complement of Secondary (very desaturated)
+    const secondarySoftComplement = secondaryColor.clone().spin(90); // Tetradic harmony
+    mutedColors.push(secondarySoftComplement.desaturate(30).toHexString());
 
-    // Ensure we have exactly 5 colors
-    while (mutedColors.length < 5) {
-      const baseColor = tinycolor(availableSwatches[0][1]?.hex || '#888888');
-      mutedColors.push(baseColor.desaturate(35).toHexString());
-    }
+    // Slot 4: Neutral tone (Grey/Beige/Off-White) matching Primary's warmth
+    const primaryHsl = primaryColor.toHsl();
+    const isWarm = (primaryHsl.h >= 0 && primaryHsl.h < 60) || primaryHsl.h >= 300; // Reds, oranges, yellows, pinks
+    const neutralBase = isWarm ? '#D4C5A9' : '#B8C5D4'; // Warm beige vs cool gray-blue
+    mutedColors.push(tinycolor(neutralBase).desaturate(10).toHexString());
 
-    const mutedPalette = mutedColors.slice(0, 5);
+    // Slot 5: Desaturated Secondary
+    mutedColors.push(secondaryColor.clone().desaturate(25).toHexString());
 
-    console.log('✅ FINAL PALETTES:');
-    console.log('Bold:', boldPalette);
-    console.log('Muted:', mutedPalette);
+    console.log('✅ MUTED PALETTE (Office):', mutedColors);
 
     return {
-      bold: boldPalette,
-      muted: mutedPalette,
-      primaryColor: boldPalette[0] // Use first bold color as primary
+      bold: boldColors,
+      muted: mutedColors,
+      primaryColor: primaryColor.toHexString() // Use primary as the dominant color
     };
 
   } catch (error) {

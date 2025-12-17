@@ -45,6 +45,9 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
     return palette !== null && typeof palette === 'object' && 'bold' in palette && 'muted' in palette
   }
 
+  // Determine if we should show the toggle (new format vs legacy)
+  const showToggle = localPalette && isNewFormat(localPalette)
+
   // Helper: Get the colors to display based on format and mode
   const getDisplayColors = (): string[] | null => {
     if (!localPalette) return null
@@ -58,8 +61,34 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
     }
   }
 
+  // Helper: Get tooltip labels for each color slot
+  const getColorLabels = (): string[] => {
+    if (!showToggle) {
+      // Legacy format: no specific labels
+      return ['Color 1', 'Color 2', 'Color 3', 'Color 4', 'Color 5']
+    }
+
+    if (mode === 'bold') {
+      return [
+        'Primary Color',
+        'Primary Complement',
+        'Secondary Complement',
+        'Split-Complement',
+        'Secondary Color'
+      ]
+    } else {
+      return [
+        'Muted Primary',
+        'Analogous Primary',
+        'Soft Secondary',
+        'Neutral Tone',
+        'Muted Secondary'
+      ]
+    }
+  }
+
   const displayColors = getDisplayColors()
-  const showToggle = localPalette && isNewFormat(localPalette)
+  const colorLabels = getColorLabels()
 
   // Get image URL (priority: main photo > legacy > first photo)
   const mainPhoto = item.item_photos?.find(photo => photo.is_main_image)
@@ -226,8 +255,8 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
                         'focus:outline-none focus:ring-2 focus:ring-sun-400 focus:ring-offset-2'
                       )}
                       style={{ backgroundColor: color }}
-                      title={`Click to copy ${color}`}
-                      aria-label={`Copy color ${color}`}
+                      title={`${colorLabels[index]} - ${color} (click to copy)`}
+                      aria-label={`${colorLabels[index]}: ${color}`}
                     />
                   ))}
                 </div>
