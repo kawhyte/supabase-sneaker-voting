@@ -36,7 +36,6 @@ export function WishlistSection({ items }: WishlistSectionProps) {
               onArchive: noopHandler,
               onUnarchive: noopHandler,
               onMarkAsPurchased: noopHandler,
-              onCreateOutfit: noopHandler,
               onRefreshPrice: noopAsyncHandler,
               onManualEntrySuccess: noopHandler,
               onTogglePinned: noopHandler,

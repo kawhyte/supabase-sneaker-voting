@@ -15,8 +15,6 @@ import {
 } from '@/components/types/item-category'
 import { PhotoItem } from '@/components/types/photo-item'
 import { ItemStatus } from '@/types/ItemStatus'
-import { detectSmartDuplicates, SmartDuplicationWarning } from '@/lib/smart-duplicate-detector'
-import { WardrobeItem } from '@/components/types/WardrobeItem'
 
 /**
  * Form validation schema.
@@ -212,9 +210,6 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 
 	// Additional state
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [duplicationWarning, setDuplicationWarning] = useState<SmartDuplicationWarning | null>(null)
-	const [warningDismissed, setWarningDismissed] = useState(false)
-	const [userId, setUserId] = useState<string | null>(null)
 	const [photos, setPhotos] = useState<PhotoItem[]>(
 		initialData?.item_photos?.map((p: any) => ({
 			id: p.id,
@@ -243,61 +238,6 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 					description: 'You must be logged in to add or edit an item.',
 				})
 				return
-			}
-
-			// Store user ID for duplication warning banner
-			setUserId(user.id)
-
-			// Check for duplicates (only when adding new items, not editing, and warning not already dismissed)
-			// Required fields: brand, category, color
-			if (mode !== 'edit' && !warningDismissed && data.brand && data.category && data.color) {
-				// Fetch user's duplicate detection settings
-				const { data: profile } = await supabase
-					.from('profiles')
-					.select('enable_duplication_warnings, enable_similar_item_warnings')
-					.eq('id', user.id)
-					.single()
-
-				const enableExact = profile?.enable_duplication_warnings ?? true
-				const enableSimilar = profile?.enable_similar_item_warnings ?? true
-
-				// Only run detection if at least one setting is enabled
-				if (enableExact || enableSimilar) {
-					// Fetch user's current wardrobe
-					const { data: wardrobe, error: wardrobeError } = await supabase
-						.from('items')
-						.select('*')
-						.eq('user_id', user.id)
-						.eq('status', ItemStatus.OWNED)
-						.eq('is_archived', false)
-
-					if (!wardrobeError && wardrobe) {
-						// Run smart duplicate detection
-						const warning = detectSmartDuplicates(
-							{
-								brand: data.brand,
-								model: data.model,
-								color: data.color,
-								category: data.category,
-							} as Partial<WardrobeItem>,
-							wardrobe as WardrobeItem[]
-						)
-
-						// Filter warning based on user settings
-						if (warning) {
-							const shouldShowWarning =
-								(warning.severity === 'exact' && enableExact) ||
-								(warning.severity === 'similar' && enableSimilar)
-
-							if (shouldShowWarning) {
-								// Show warning and stop submission
-								setDuplicationWarning(warning)
-								setIsSubmitting(false)
-								return
-							}
-						}
-					}
-				}
 			}
 
 			// Separate new and existing photos
@@ -581,33 +521,11 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 		setPhotos(updatedPhotos)
 	}
 
-	/**
-	 * Dismiss duplication warning and allow user to proceed with submission.
-	 */
-	const handleDismissWarning = () => {
-		setDuplicationWarning(null)
-		setWarningDismissed(true)
-	}
-
-	/**
-	 * Handle "Add Anyway" - dismiss warning and immediately resubmit.
-	 */
-	const handleAddAnyway = () => {
-		setDuplicationWarning(null)
-		setWarningDismissed(true)
-		// Resubmit the form (will skip duplicate check since warning is dismissed)
-		form.handleSubmit(onSubmit)()
-	}
-
 	return {
 		form,
 		isSubmitting,
 		photos,
-		duplicationWarning,
-		userId,
 		onSubmit: form.handleSubmit(onSubmit),
 		handlePhotosChange,
-		handleDismissWarning,
-		handleAddAnyway,
 	}
 }

@@ -14,7 +14,6 @@ import { WardrobeSkeleton } from "./WardrobeSkeleton";
 import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
 import { PurchasedConfirmationModal } from "./PurchasedConfirmationModal";
 import { ArchiveReasonDialog } from "./ArchiveReasonDialog";
-import { OutfitStudio } from "./outfit-studio/OutfitStudio";
 import { WardrobeItem } from "./types/WardrobeItem";
 import {
 	filterJournalEntries,
@@ -73,7 +72,6 @@ export function WardrobeDashboard({
 		useState<WardrobeItem | null>(null);
 	const [isPurchasedModalOpen, setIsPurchasedModalOpen] = useState(false);
 	const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
-	const [isOutfitStudioOpen, setIsOutfitStudioOpen] = useState(false);
 
 	// State - Bulk Price Checking
 	const [isBulkChecking, setIsBulkChecking] = useState(false);
@@ -890,7 +888,6 @@ export function WardrobeDashboard({
 				onMoveToWatchlist={moveItemToWishlist}
 				onMarkAsPurchased={handleOpenPurchasedModal}
 				onArchive={handleOpenArchiveDialog}
-				onCreateOutfit={() => setIsOutfitStudioOpen(true)}
 				onRefreshPrice={handleRefreshPrice}
 				onManualEntrySuccess={loadJournalEntries}
 				onTogglePinned={handleTogglePinned}
@@ -950,15 +947,6 @@ export function WardrobeDashboard({
 						? `${selectedItemForAction.brand} ${selectedItemForAction.model}`
 						: ""
 				}
-			/>
-
-			{/* Outfit Studio Modal */}
-			<OutfitStudio
-				isOpen={isOutfitStudioOpen}
-				onClose={() => setIsOutfitStudioOpen(false)}
-				userWardrobe={journalEntries.filter(
-					(e) => e.status === ItemStatus.OWNED
-				)}
 			/>
 		</div>
 	);

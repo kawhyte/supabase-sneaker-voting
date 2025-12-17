@@ -95,7 +95,6 @@ export function WardrobeCard({
 				onArchive,
 				onUnarchive,
 				onMarkAsPurchased,
-				onCreateOutfit,
 				onRefreshPrice,
 				onManualEntrySuccess,
 				onTogglePinned,

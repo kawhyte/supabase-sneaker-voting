@@ -8,7 +8,6 @@ import { PhotoSection } from './PhotoSection'
 import { SizingSection } from './SizingSection'
 import { ProductURLSection } from './ProductURLSection'
 import { FormActions } from './FormActions'
-import { DuplicationWarningBanner } from '@/components/DuplicationWarningBanner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -51,7 +50,6 @@ export interface AddItemFormProps {
  * - Quick/Advanced mode toggle (create mode only)
  * - URL scraping with auto-fill
  * - Smart target price suggestions
- * - Duplicate item detection
  * - Form validation with live feedback
  * - Image confirmation modal
  *
@@ -68,12 +66,8 @@ export default function AddItemForm({
 		form,
 		isSubmitting,
 		photos,
-		duplicationWarning,
-		userId,
 		onSubmit,
 		handlePhotosChange,
-		handleDismissWarning,
-		handleAddAnyway,
 	} = useFormLogic({ mode, initialData, onSuccess })
 
 	// Normalize mode: "add" and "create" both mean creating a new item
@@ -429,30 +423,6 @@ export default function AddItemForm({
 
 							{/* Basic Info Section */}
 							<BasicInfoSection form={form} />
-
-							{/* Duplication Warning Banner */}
-							{duplicationWarning && (
-								<div className="space-y-4">
-									<DuplicationWarningBanner
-										warning={duplicationWarning}
-										onDismiss={handleDismissWarning}
-										userId={userId || undefined}
-										newItemName={`${form.getValues('brand')} ${form.getValues('model')}`}
-									/>
-
-									{/* Add Anyway Button */}
-									<div className="flex justify-end">
-										<Button
-											type="button"
-											onClick={handleAddAnyway}
-											variant="outline"
-											className="min-w-[160px]"
-										>
-											Add Item Anyway
-										</Button>
-									</div>
-								</div>
-							)}
 
 							{/* Pricing Section */}
 							<PricingSection form={form} />

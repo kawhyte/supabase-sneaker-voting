@@ -55,7 +55,6 @@ interface WardrobeItemCardProps {
 		onArchive?: (item: WardrobeItem) => void;
 		onUnarchive?: (item: WardrobeItem) => void;
 		onMarkAsPurchased?: (item: WardrobeItem) => void;
-		onCreateOutfit?: (item: WardrobeItem) => void;
 		onRefreshPrice?: (itemId: string) => Promise<void>;
 		onManualEntrySuccess?: () => void;
 		onTogglePinned?: (item: WardrobeItem) => void; // Toggle pinned status (featured items)
@@ -286,7 +285,7 @@ function WardrobeItemCardComponent({
 							)}
 						</div>
 
-						{/* Footer - Outfit Creation & Cost Per Wear Button */}
+						{/* Footer - Cost Per Wear Button */}
 						{viewMode === 'collection'  && (
 						<div className='flex items-center border-t gap-2 flex-wrap mt-auto pt-4 border-stone-200'>
 							<ItemFooterBadges
@@ -295,7 +294,6 @@ function WardrobeItemCardComponent({
 								canTrackWears={permissions.canTrackWearCount}
 								onIncrementWear={actions.onIncrementWear}
 								onDecrementWear={actions.onDecrementWear}
-								onCreateOutfit={actions.onCreateOutfit}
 								userWardrobe={userWardrobe}
 							/>
 						</div>
