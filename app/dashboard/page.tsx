@@ -240,7 +240,7 @@ function DashboardContent() {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: 8 }}
 								transition={{ duration: 0.3 }}>
-								<SneakerInspirationView showHeader={false} />
+								<SneakerInspirationView showHeader={true} />
 							</motion.div>
 						</TabsContent>
 

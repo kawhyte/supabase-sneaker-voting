@@ -99,7 +99,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Plus, Bell, LogOut, Settings, Sparkles } from "lucide-react";
+import { Menu, X, Plus, Bell, LogOut, Settings } from "lucide-react";
 import { PawPrint } from 'lucide-react';
 import { createClient } from "@/utils/supabase/client";
 import {
@@ -237,7 +237,6 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 	const authenticatedNavLinks: NavLink[] = [
 		{ href: '/dashboard', label: 'My Wardrobe' },
-		{ href: '/outfits', label: 'Inspo', icon: Sparkles },
 		{ href: '/explore', label: 'Explore' },
 		{ href: '/achievements', label: 'Achievements' },
 		// { href: '/add-new-item', label: 'Add Item', isAction: true },
