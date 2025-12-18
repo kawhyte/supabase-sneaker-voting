@@ -816,56 +816,104 @@ export type Database = {
       }
       price_monitors: {
         Row: {
-          created_at: string | null
+          consecutive_failures: number
+          created_at: string
           id: string
-          is_active: boolean | null
+          is_active: boolean
+          item_id: string
           last_checked_at: string | null
           last_price: number | null
-          notification_sent: boolean | null
+          notification_sent: boolean
           product_url: string
-          sneaker_id: string | null
           store_name: string
           target_price: number | null
-          updated_at: string | null
-          user_name: string
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          created_at?: string | null
+          consecutive_failures?: number
+          created_at?: string
           id?: string
-          is_active?: boolean | null
+          is_active?: boolean
+          item_id: string
           last_checked_at?: string | null
           last_price?: number | null
-          notification_sent?: boolean | null
+          notification_sent?: boolean
           product_url: string
-          sneaker_id?: string | null
           store_name: string
           target_price?: number | null
-          updated_at?: string | null
-          user_name: string
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          created_at?: string | null
+          consecutive_failures?: number
+          created_at?: string
           id?: string
-          is_active?: boolean | null
+          is_active?: boolean
+          item_id?: string
           last_checked_at?: string | null
           last_price?: number | null
-          notification_sent?: boolean | null
+          notification_sent?: boolean
           product_url?: string
-          sneaker_id?: string | null
           store_name?: string
           target_price?: number | null
-          updated_at?: string | null
-          user_name?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "price_monitors_sneaker_id_fkey"
-            columns: ["sneaker_id"]
+            foreignKeyName: "price_monitors_item_id_fkey"
+            columns: ["item_id"]
             isOneToOne: false
             referencedRelation: "items"
             referencedColumns: ["id"]
           },
         ]
+      }
+      price_monitors_backup: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          is_active: boolean | null
+          last_checked_at: string | null
+          last_price: number | null
+          notification_sent: boolean | null
+          product_url: string | null
+          sneaker_id: string | null
+          store_name: string | null
+          target_price: number | null
+          updated_at: string | null
+          user_name: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          last_checked_at?: string | null
+          last_price?: number | null
+          notification_sent?: boolean | null
+          product_url?: string | null
+          sneaker_id?: string | null
+          store_name?: string | null
+          target_price?: number | null
+          updated_at?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          last_checked_at?: string | null
+          last_price?: number | null
+          notification_sent?: boolean | null
+          product_url?: string | null
+          sneaker_id?: string | null
+          store_name?: string | null
+          target_price?: number | null
+          updated_at?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {

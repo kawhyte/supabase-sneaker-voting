@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import * as cron from 'node-cron'
+
+// Service role client for cron jobs (bypasses RLS)
+const supabaseAdmin = createServiceClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+)
 
 interface PriceData {
   price?: number
@@ -122,11 +135,9 @@ async function stopPriceMonitoring() {
 }
 
 async function checkAllPricesNow() {
-  const supabase = await createClient()
-
   try {
-    // Get all active price monitors
-    const { data: monitors, error: monitorsError } = await supabase
+    // Get all active price monitors (using service role to bypass RLS)
+    const { data: monitors, error: monitorsError } = await supabaseAdmin
       .from('price_monitors')
       .select('*')
       .eq('is_active', true)
@@ -162,8 +173,8 @@ async function checkAllPricesNow() {
         const priceData: PriceData = await priceResponse.json()
 
         if (priceData.success && priceData.price) {
-          // Save price history
-          const { error: historyError } = await supabase
+          // Save price history (using service role)
+          const { error: historyError } = await supabaseAdmin
             .from('price_history')
             .insert({
               monitor_id: monitor.id,
@@ -187,7 +198,7 @@ async function checkAllPricesNow() {
             updateData.notification_sent = false // Reset to send new notification
           }
 
-          const { error: updateError } = await supabase
+          const { error: updateError } = await supabaseAdmin
             .from('price_monitors')
             .update(updateData)
             .eq('id', monitor.id)
@@ -249,19 +260,17 @@ async function checkAllPricesNow() {
 }
 
 async function generateDailySummary() {
-  const supabase = await createClient()
-
   try {
     // Get price changes from the last 24 hours
     const twentyFourHoursAgo = new Date()
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24)
 
-    const { data: recentHistory, error } = await supabase
+    const { data: recentHistory, error } = await supabaseAdmin
       .from('price_history')
       .select(`
         *,
-        price_monitors (
-          user_name,
+        price_monitors!inner (
+          user_id,
           store_name,
           product_url,
           target_price

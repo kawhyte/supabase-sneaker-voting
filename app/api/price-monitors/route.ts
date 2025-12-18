@@ -3,27 +3,20 @@ import { createClient } from '@/utils/supabase/server'
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
-  const { searchParams } = new URL(request.url)
-  const user_name = searchParams.get('user_name')
 
   try {
-    let query = supabase
+    // RLS automatically filters by authenticated user (user_id)
+    const { data: monitors, error } = await supabase
       .from('price_monitors')
       .select(`
         *,
-        sneakers (
+        items (
           brand,
           model,
           colorway
         )
       `)
       .order('created_at', { ascending: false })
-
-    if (user_name) {
-      query = query.eq('user_name', user_name)
-    }
-
-    const { data: monitors, error } = await query
 
     if (error) {
       throw new Error(error.message)
@@ -46,51 +39,45 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient()
 
   try {
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized - authentication required' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const {
       product_url,
       store_name,
-      user_name,
       target_price,
-      sneaker_id
+      item_id
     } = body
 
     // Validate required fields
-    if (!product_url || !store_name || !user_name) {
+    if (!product_url || !store_name || !item_id) {
       return NextResponse.json(
-        { success: false, error: 'Missing required fields: product_url, store_name, user_name' },
+        { success: false, error: 'Missing required fields: product_url, store_name, item_id' },
         { status: 400 }
       )
     }
 
-    // Check if monitor already exists for this URL and user
-    const { data: existing, error: existingError } = await supabase
-      .from('price_monitors')
-      .select('id')
-      .eq('product_url', product_url)
-      .eq('user_name', user_name)
-      .single()
-
-    if (existingError && existingError.code !== 'PGRST116') {
-      throw new Error(existingError.message)
-    }
-
-    if (existing) {
-      return NextResponse.json(
-        { success: false, error: 'Price monitor already exists for this product and user' },
-        { status: 409 }
-      )
-    }
+    // Note: Duplicate check removed - RLS + unique constraint (user_id, product_url) handles this
+    // If duplicate exists, Postgres will return error with code 23505
 
     // Create new price monitor
+    // RLS policy will enforce that user owns the item_id
     const { data: monitor, error: insertError } = await supabase
       .from('price_monitors')
       .insert({
+        user_id: user.id,
+        item_id,
         product_url,
         store_name,
-        user_name,
         target_price: target_price || null,
-        sneaker_id: sneaker_id || null,
         is_active: true,
         notification_sent: false
       })
