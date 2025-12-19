@@ -193,23 +193,6 @@ All spacing follows 8px increments: `p-2` (8px), `p-4` (16px), `p-6` (24px), `p-
 
 ---
 
-## Database Schema
-
-### Core Tables
-- `items` - Wardrobe items (all categories)
-- `item_photos` - Multi-photo support with ordering
-- `brands` - Brand master list with logos
-- `profiles` - User profile data
-- `outfits` - Outfit combinations with visual layout
-- `outfit_items` - Items within outfits (positioning, cropping)
-- `price_monitors` - Price tracking for wishlist items
-- `price_alerts` - Price drop notifications
-
-### Row Level Security
-All tables use RLS policies to ensure users only see their own data. No way to accidentally see someone else's wardrobe.
-
----
-
 ## Contributing
 
 This is a personal project, but if you find bugs or have suggestions, feel free to open an issue.
