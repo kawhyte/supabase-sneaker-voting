@@ -1,93 +1,246 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# PurrView
+
+**Your wardrobe deserves better than a messy closet.**
+
+PurrView is a modern wardrobe management app that helps you catalog your clothing, track what you actually wear, and make smarter purchasing decisions. Built for people who love fashion but hate clutter.
 
 <p align="center">
- The fastest way to build apps with Next.js and Supabase
+  <img src="https://img.shields.io/badge/Next.js-15+-black?style=flat-square&logo=next.js" alt="Next.js 15+">
+  <img src="https://img.shields.io/badge/Supabase-Backend-green?style=flat-square&logo=supabase" alt="Supabase">
+  <img src="https://img.shields.io/badge/TypeScript-Strict-blue?style=flat-square&logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Tailwind-v4-38bdf8?style=flat-square&logo=tailwind-css" alt="Tailwind CSS">
 </p>
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+---
 
-## Features
+## What It Does
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+### Wardrobe Management
+Catalog everything from sneakers to outerwear. Each item gets its own profile with photos, purchase info, sizing notes, and wear tracking. Filter by category, brand, color, or status. Search instantly. Never forget what you own.
 
-## Demo
+### Cost Per Wear Tracking
+Finally answer the question: "Was this worth it?" Track how often you wear each item and watch your cost-per-wear drop. The app calculates smart targets based on price tier (budget items hit $2/wear, premium pieces aim for $10/wear).
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+### Outfit Studio
+Compose outfits on a visual canvas, arrange items with drag-and-drop, and save your favorite combinations. Track which outfits you've worn and get inspired by what you already own.
 
-## Deploy to Vercel
+### Smart Duplicate Detection
+Before you buy the same white sneakers for the third time, PurrView warns you. Intelligent fuzzy matching catches duplicates and similar items based on category, color, brand, and model.
 
-Vercel deployment will guide you through creating a Supabase account and project.
+### Price Monitoring
+Wishlist items get automatic weekly price checks across major retailers. Drop alerts notify you when it's time to buy. Stop refreshing product pages manually.
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+### Multi-Photo Support
+Up to 5 photos per item with drag-and-drop reordering. Show different angles, close-ups, or wear photos. All images are optimized and delivered via Cloudinary CDN.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This%20starter%20configures%20Supabase%20Auth%20to%20use%20cookies%2C%20making%20the%20user's%20session%20available%20throughout%20the%20entire%20Next.js%20app%20-%20Client%20Components%2C%20Server%20Components%2C%20Route%20Handlers%2C%20Server%20Actions%20and%20Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6)
+---
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+## Tech Stack
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+**Frontend**
+- Next.js 15+ (App Router, React Server Components)
+- TypeScript (strict mode)
+- Tailwind CSS v4 (8px grid design system)
+- Radix UI (accessible primitives)
+- Shadcn/ui (New York style)
+- Framer Motion (animations)
+- React Hook Form + Zod (form validation)
 
-## Clone and run locally
+**Backend**
+- Supabase (PostgreSQL + Auth + Row Level Security)
+- Cloudinary (image hosting & optimization)
+- Browserless (web scraping for price monitoring)
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+**Performance**
+- Code splitting with dynamic imports
+- Next.js Image optimization
+- In-memory caching for product data
+- Lazy loading with Suspense boundaries
 
-2. Create a Next.js app using the Supabase Starter template npx command
+---
 
+## Getting Started
+
+### Prerequisites
+- Node.js 18+
+- npm or pnpm
+- Supabase account ([create one here](https://database.new))
+- Cloudinary account ([sign up here](https://cloudinary.com/users/register/free))
+
+### Installation
+
+1. **Clone the repository**
    ```bash
-   npx create-next-app -e with-supabase
+   git clone https://github.com/yourusername/purrview.git
+   cd purrview
    ```
 
-3. Use `cd` to change into the app's directory
-
+2. **Install dependencies**
    ```bash
-   cd name-of-new-app
+   npm install
    ```
 
-4. Rename `.env.local.example` to `.env.local` and update the following:
+3. **Set up environment variables**
 
+   Rename `.env.local.example` to `.env.local` and add your credentials:
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
+   CLOUDINARY_API_KEY=your-api-key
+   CLOUDINARY_API_SECRET=your-api-secret
+   BROWSERLESS_API_KEY=your-browserless-key  # Optional
    ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
+
+4. **Set up the database**
+   ```bash
+   npm run db:setup
+   npm run db:verify
    ```
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
+5. **Generate TypeScript types**
+   ```bash
+   npm run db:types
+   ```
 
-5. You can now run the Next.js local development server:
-
+6. **Run the development server**
    ```bash
    npm run dev
    ```
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+   Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+---
 
-## Feedback and issues
+## Project Structure
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+```
+purrview/
+├── app/                    # Next.js App Router pages
+│   ├── dashboard/          # Main wardrobe dashboard
+│   ├── outfits/           # Outfit studio
+│   └── api/               # API routes (price monitoring, notifications)
+├── components/
+│   ├── add-item-form/     # Modular form (8 section components)
+│   ├── wardrobe-item-card/ # Item display components
+│   ├── outfit-studio/     # Outfit creation UI
+│   └── ui/                # Shadcn/ui components
+├── lib/
+│   ├── smart-duplicate-detector.ts  # Fuzzy matching logic
+│   ├── wardrobe-item-utils.ts       # Cost-per-wear calculations
+│   ├── cloudinary.ts                # Image upload helpers
+│   └── product-scraper.ts           # Price monitoring
+├── types/                 # TypeScript definitions
+├── utils/supabase/        # Supabase client instances
+└── supabase/
+    └── migrations/        # Database migrations
+```
 
-## More Supabase examples
+---
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+## Key Features in Detail
+
+### Dashboard Views
+- **Owned**: Your full collection with wear tracking
+- **Want to Buy**: Wishlist items with price monitoring
+- **Outfits**: Saved outfit combinations
+- **Archive**: Items you've sold, donated, or retired
+
+### Size & Comfort Tracking
+Record try-on dates, size preferences, and comfort ratings (1-5 scale). Support for US, EU, UK, JP, KR, CM, and ONE_SIZE systems. Store preferred sizes per brand.
+
+### Archive Management
+Soft delete items with reasons (sold, donated, worn out, other). Archived items stay in your history but don't clutter your active wardrobe.
+
+### Responsive Design
+Built mobile-first with breakpoints at 640px (tablet), 1024px (desktop), and 1920px (ultra-wide). Compact density mode for power users.
+
+---
+
+## Development Commands
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run clean        # Clear Next.js cache
+npm run db:types     # Generate types from Supabase schema
+npm run db:setup     # Run database setup
+npm run db:verify    # Verify migrations
+```
+
+---
+
+## Design System
+
+### Color Palette
+- **Primary**: Sun 400 (#FFC700) - Brand yellow
+- **Background**: Blaze 50 - Energetic page background
+- **Semantic tokens**: `bg-background`, `text-foreground`, `bg-card`, `border-border`
+
+### Spacing (8px Grid)
+All spacing follows 8px increments: `p-2` (8px), `p-4` (16px), `p-6` (24px), `p-8` (32px), `p-12` (48px), `p-16` (64px).
+
+### Typography
+- **Font**: Poppins (geometric, modern)
+- **Base size**: 16px with 24px line height
+- **Line heights**: 8px multiples for vertical rhythm
+- **Contrast**: WCAG AAA compliant (16.5:1 ratio)
+
+### Component Sizing
+- Checkboxes: 16px (Material Design 3)
+- Switches: 24px × 44px (Industry standard)
+- Touch targets: 44px minimum for accessibility
+
+---
+
+## Database Schema
+
+### Core Tables
+- `items` - Wardrobe items (all categories)
+- `item_photos` - Multi-photo support with ordering
+- `brands` - Brand master list with logos
+- `profiles` - User profile data
+- `outfits` - Outfit combinations with visual layout
+- `outfit_items` - Items within outfits (positioning, cropping)
+- `price_monitors` - Price tracking for wishlist items
+- `price_alerts` - Price drop notifications
+
+### Row Level Security
+All tables use RLS policies to ensure users only see their own data. No way to accidentally see someone else's wardrobe.
+
+---
+
+## Contributing
+
+This is a personal project, but if you find bugs or have suggestions, feel free to open an issue.
+
+---
+
+## Performance
+
+- **Bundle size**: ~102 kB first load (optimized)
+- **Duplicate detection**: <200ms for 1000+ items
+- **Image loading**: Lazy loading + Cloudinary optimization
+- **Database queries**: Cached with Supabase query optimization
+
+---
+
+## License
+
+MIT License - see LICENSE file for details.
+
+---
+
+## Acknowledgments
+
+Built with:
+- [Next.js](https://nextjs.org) - The React framework
+- [Supabase](https://supabase.com) - Open source Firebase alternative
+- [Shadcn/ui](https://ui.shadcn.com) - Beautifully designed components
+- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS framework
+- [Cloudinary](https://cloudinary.com) - Image optimization
+- [Radix UI](https://www.radix-ui.com) - Accessible component primitives
+
+---
+
+**PurrView** - Because your wardrobe deserves better.
