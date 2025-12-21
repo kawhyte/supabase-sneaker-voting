@@ -162,6 +162,9 @@ export function PurchasedConfirmationModal({
                   onSelect={(date) => date && setPurchaseDate(date)}
                   initialFocus
                   disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                  captionLayout="dropdown-buttons"
+                  fromYear={1900}
+                  toYear={new Date().getFullYear()}
                 />
               </PopoverContent>
             </Popover>

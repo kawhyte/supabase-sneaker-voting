@@ -829,3 +829,30 @@ nav {
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* ============================================
+   CALENDAR DROPDOWN STYLING
+   Remove browser default focus outline
+   ============================================ */
+
+/* Target react-day-picker dropdown selects */
+.rdp-dropdown_month,
+.rdp-dropdown_year,
+.rdp-dropdown_month select,
+.rdp-dropdown_year select {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.rdp-dropdown_month:focus,
+.rdp-dropdown_year:focus,
+.rdp-dropdown_month select:focus,
+.rdp-dropdown_year select:focus,
+.rdp-dropdown_month:focus-visible,
+.rdp-dropdown_year:focus-visible,
+.rdp-dropdown_month select:focus-visible,
+.rdp-dropdown_year select:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: inherit !important;
+}
+
