@@ -64,7 +64,7 @@ export function SizingSection({
 	return (
 		<div className="space-y-6">
 			{/* Section Header */}
-			<div className="dense flex items-center gap-2 pb-2 border-b border-slate-300">
+			<div className="dense flex items-center gap-2 pb-2 border-b border-border">
 				<FileText className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
 				<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 					{watchedTriedOn ? (
@@ -135,7 +135,7 @@ export function SizingSection({
 
 			{/* PHASE 2: Store & Purchase Details (Optional) */}
 			<div className="pt-6 space-y-6">
-				<div className="dense flex items-center gap-2 pb-2 border-b border-slate-300">
+				<div className="dense flex items-center gap-2 pb-2 border-b border-border">
 					<Store className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
 					<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 						Store & Purchase (Optional)

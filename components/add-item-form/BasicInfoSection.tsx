@@ -47,7 +47,7 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 
 	return (
 		<div className="space-y-6">
-			<div className="dense flex items-center gap-2 pb-2 border-b border-slate-300">
+			<div className="dense flex items-center gap-2 pb-2 border-b border-border">
 				<Package className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
 				<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 					Product Details
@@ -55,7 +55,7 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 			</div>
 
 			{/* Row 1: Experience */}
-			<div className="dense flex items-center gap-3 p-4 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 transition-colors">
+			<div className="dense flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/30 hover:bg-muted/50 transition-colors">
 				<div className="w-full">
 					<div className="flex items-center gap-2 mb-2">
 						<Eye className="h-4 w-4 text-slate-600 flex-shrink-0" />

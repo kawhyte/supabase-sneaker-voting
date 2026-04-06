@@ -99,14 +99,14 @@ export function ProductURLSection({
 				initialData?.status === "wishlisted" ||
 				mode === "edit") && (
 				<div className="space-y-6 mt-12">
-					<div className="flex items-center gap-2 pb-2 border-b border-slate-300">
+					<div className="flex items-center gap-2 pb-2 border-b border-border">
 						<TrendingDown className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
 						<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 							Price Tracking
 						</h3>
 					</div>
 
-					<div className="space-y-4">
+					<div className="space-y-6">
 						{/* Toggle Switch */}
 						<div className="dense flex items-start justify-between gap-4">
 							<div className="flex-1">
