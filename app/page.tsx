@@ -5,7 +5,8 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { ArrowRight, TrendingDown, Footprints, MoveRight } from 'lucide-react'
-import { PublicCPWCalculator } from '@/components/PublicCPWCalculator'
+import { CalculatorForm } from '@/components/cost-per-wear-calculator/CalculatorForm'
+import { HowItWorksSection } from '@/components/cost-per-wear-calculator/HowItWorksSection'
 
 // Dynamically import Lottie component for code splitting
 const Lottie = dynamic(() => import('react-lottie-player'), {
@@ -29,7 +30,7 @@ function LottieAnimationWrapper() {
   if (hasError || !animationData) return null
 
   return (
-    <div className="w-full max-w-[320px] sm:max-w-[380px] aspect-square relative mx-auto">
+    <div className="w-full max-w-[260px] sm:max-w-[300px] aspect-square relative mx-auto">
       <div className="absolute inset-0 bg-sun-200/20 blur-[60px] rounded-full transform scale-75" />
       <Lottie
         loop
@@ -73,8 +74,8 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-stone-50 flex flex-col items-center pb-20">
 
-      {/* --- HERO SECTION: Calculator + Mascot --- */}
-      <section className="w-full max-w-6xl mx-auto px-6 pt-10 md:pt-16 pb-16 md:pb-24">
+      {/* --- HERO SECTION: Mascot + Tagline --- */}
+      <section className="w-full max-w-6xl mx-auto px-6 pt-10 md:pt-16 pb-10 md:pb-14">
 
         {/* Eyebrow */}
         <motion.p
@@ -91,53 +92,52 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-950 leading-[1.1] text-center mb-12 md:mb-16"
+          className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-950 leading-[1.1] text-center mb-8"
         >
           Is it worth <span className="text-slate-400">the cop?</span>
         </motion.h1>
 
-        {/* Two-column layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+        {/* Mascot + Tagline row */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10"
+        >
+          <LottieAnimationWrapper />
 
-          {/* Left: Calculator */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-sm"
-          >
-            <PublicCPWCalculator />
-          </motion.div>
-
-          {/* Right: Mascot + tagline */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="flex flex-col items-center gap-8 text-center"
-          >
-            <LottieAnimationWrapper />
-
-            <div className="space-y-3 max-w-xs">
-              <p className="text-xl font-extrabold text-slate-900">
-                Stop guessing. Start tracking.
-              </p>
-              <p className="text-base text-slate-500 font-medium leading-relaxed">
-                Every pair tells a story. PurrView helps you know if it&apos;s worth writing.
-              </p>
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 mt-2 text-sm font-bold text-slate-900 hover:text-sun-500 transition-colors"
-              >
-                Build your rotation <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </motion.div>
-        </div>
+          <div className="space-y-3 text-center sm:text-left max-w-xs">
+            <p className="text-xl font-extrabold text-slate-900">
+              Stop guessing. Start tracking.
+            </p>
+            <p className="text-base text-slate-500 font-medium leading-relaxed">
+              Every pair tells a story. PurrView helps you know if it&apos;s worth writing.
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 mt-2 text-sm font-bold text-slate-900 hover:text-sun-500 transition-colors"
+            >
+              Build your rotation <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </motion.div>
       </section>
 
+      {/* --- FULL CALCULATOR --- */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="w-full max-w-4xl mx-auto px-6 pb-16"
+      >
+        <CalculatorForm />
+      </motion.section>
+
+      {/* --- HOW IT WORKS --- */}
+      <HowItWorksSection />
+
       {/* --- BENTO GRID (2 cards) --- */}
-      <div className="w-full max-w-[900px] px-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+      <div className="w-full max-w-[900px] px-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-16">
 
         {/* Card 1: The Collection */}
         <BentoCard href="/login" delay={0.4}>

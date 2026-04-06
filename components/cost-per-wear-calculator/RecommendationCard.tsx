@@ -1,9 +1,10 @@
 // components/cost-per-wear-calculator/RecommendationCard.tsx
+import Link from 'next/link';
 import { Recommendation } from '@/lib/worth-it-calculator/calculator-logic';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { AlertTriangle, CheckCircle, Tag } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle, Tag } from 'lucide-react';
 
 interface Props {
   recommendation: Recommendation;
@@ -80,6 +81,15 @@ export function RecommendationCard({ recommendation }: Props) {
           </div>
         </div>
       )}
+
+      {/* Signup CTA */}
+      <Link
+        href="/signup"
+        className="mt-6 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-700 transition-colors"
+      >
+        Track this Sneaker
+        <ArrowRight className="w-4 h-4" />
+      </Link>
     </Card>
   );
 }
