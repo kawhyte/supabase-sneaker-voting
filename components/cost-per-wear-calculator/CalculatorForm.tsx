@@ -64,9 +64,9 @@ export function CalculatorForm() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-sm overflow-hidden">
+      <Card className="border-0 shadow-2xl bg-white overflow-hidden ring-1 ring-stone-200/60">
         {/* Progress Bar */}
-        <div className="h-1 w-full bg-stone-100">
+        <div className="h-1.5 w-full bg-stone-100">
           <div 
             className="h-full bg-sun-400 transition-all duration-500 ease-out"
             style={{ width: results ? '100%' : step === 1 ? '50%' : '90%' }} 
@@ -81,7 +81,7 @@ export function CalculatorForm() {
               <div className={step === 1 ? 'block' : 'hidden'}>
                 <div className="mb-6">
                   <h3 className="text-xl font-bold font-heading text-slate-900 flex items-center gap-2">
-                    <span className="bg-slate-900 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                    <span className="bg-sun-400 text-slate-900 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
                     The Basics
                   </h3>
                   <p className="text-stone-500 text-sm ml-8">What are we looking at?</p>
@@ -200,9 +200,9 @@ export function CalculatorForm() {
                   />
                 </div>
 
-                <Button 
-                  type="button" 
-                  className="w-full mt-8 group"
+                <Button
+                  type="button"
+                  className="w-full mt-8 h-12 text-base group bg-sun-400 hover:bg-sun-500 text-slate-900 font-bold shadow-sm hover:shadow-md transition-all"
                   onClick={async () => {
                     const valid = await form.trigger(['price', 'category', 'wearFrequency']);
                     if(valid) setStep(2);
@@ -217,7 +217,7 @@ export function CalculatorForm() {
               <div className={step === 2 ? 'block' : 'hidden'}>
                 <div className="mb-6">
                   <h3 className="text-xl font-bold font-heading text-slate-900 flex items-center gap-2">
-                    <span className="bg-slate-900 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                    <span className="bg-sun-400 text-slate-900 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                     The Reality Check
                   </h3>
                   <p className="text-stone-500 text-sm ml-8">Let&apos;s be honest about this purchase.</p>
@@ -248,8 +248,8 @@ export function CalculatorForm() {
                                   <RadioGroupItem value={opt.val} className="peer sr-only" />
                                 </FormControl>
                                 <FormLabel className={cn(
-                                  "flex items-start gap-3 rounded-xl border-2 border-muted bg-transparent p-4 hover:bg-stone-50 cursor-pointer transition-all h-full",
-                                  "peer-data-[state=checked]:border-slate-900 peer-data-[state=checked]:bg-slate-50"
+                                  "flex items-start gap-3 rounded-xl border-2 border-muted bg-transparent p-4 hover:bg-sun-50/50 cursor-pointer transition-all h-full",
+                                  "peer-data-[state=checked]:border-sun-400 peer-data-[state=checked]:bg-sun-50"
                                 )}>
                                   {/* Icon Render */}
                                   <opt.icon className={cn("w-6 h-6 mt-0.5", opt.color)} />
@@ -305,8 +305,8 @@ export function CalculatorForm() {
                                     <RadioGroupItem value={opt.val} className="peer sr-only" />
                                     </FormControl>
                                     <FormLabel className={cn(
-                                    "flex flex-col items-center text-center gap-2 rounded-xl border-2 border-muted bg-transparent p-4 hover:bg-stone-50 cursor-pointer transition-all h-full",
-                                    "peer-data-[state=checked]:border-slate-900 peer-data-[state=checked]:bg-slate-50"
+                                    "flex flex-col items-center text-center gap-2 rounded-xl border-2 border-muted bg-transparent p-4 hover:bg-sun-50/50 cursor-pointer transition-all h-full",
+                                    "peer-data-[state=checked]:border-sun-400 peer-data-[state=checked]:bg-sun-50"
                                     )}>
                                     <opt.icon className={cn(
                                         "w-6 h-6 mb-1", 
@@ -351,8 +351,8 @@ export function CalculatorForm() {
                                         <RadioGroupItem value={opt.val} className="peer sr-only" />
                                     </FormControl>
                                     <FormLabel className={cn(
-                                        "flex flex-col items-center text-center gap-2 rounded-xl border-2 border-muted bg-transparent p-3 hover:bg-stone-50 cursor-pointer transition-all h-full",
-                                        "peer-data-[state=checked]:border-slate-900 peer-data-[state=checked]:bg-slate-50"
+                                        "flex flex-col items-center text-center gap-2 rounded-xl border-2 border-muted bg-transparent p-3 hover:bg-sun-50/50 cursor-pointer transition-all h-full",
+                                        "peer-data-[state=checked]:border-sun-400 peer-data-[state=checked]:bg-sun-50"
                                     )}>
                                         <opt.icon className="w-5 h-5 text-slate-600 mb-1" />
                                         <div>
