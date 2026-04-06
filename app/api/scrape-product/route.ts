@@ -69,87 +69,8 @@ function detectCategory(url: string, title: string, breadcrumbs: string = ''): I
     return 'shoes'
   }
 
-  // Tops
-  if (
-    combined.includes('shirt') ||
-    combined.includes('blouse') ||
-    combined.includes('top') ||
-    combined.includes('sweater') ||
-    combined.includes('hoodie') ||
-    combined.includes('sweatshirt') ||
-    combined.includes('tee') ||
-    combined.includes('tank') ||
-    combined.includes('cardigan') ||
-    combined.includes('polo')
-  ) {
-    return 'tops'
-  }
-
-  // Bottoms
-  if (
-    combined.includes('pant') ||
-    combined.includes('jean') ||
-    combined.includes('short') ||
-    combined.includes('skirt') ||
-    combined.includes('trouser') ||
-    combined.includes('legging') ||
-    combined.includes('jogger')
-  ) {
-    return 'bottoms'
-  }
-
-  // Outerwear
-  if (
-    combined.includes('jacket') ||
-    combined.includes('coat') ||
-    combined.includes('blazer') ||
-    combined.includes('parka') ||
-    combined.includes('windbreaker') ||
-    combined.includes('bomber') ||
-    combined.includes('trench') ||
-    combined.includes('peacoat')
-  ) {
-    return 'outerwear'
-  }
-
-  // Jewelry & Watches (map to accessories)
-  if (
-    combined.includes('jewelry') ||
-    combined.includes('necklace') ||
-    combined.includes('bracelet') ||
-    combined.includes('ring') ||
-    combined.includes('earring') ||
-    combined.includes('pendant') ||
-    combined.includes('watch') ||
-    combined.includes('timepiece')
-  ) {
-    return 'accessories'
-  }
-
-  // Accessories (catch-all for bags, hats, etc.)
-  if (
-    combined.includes('bag') ||
-    combined.includes('backpack') ||
-    combined.includes('purse') ||
-    combined.includes('wallet') ||
-    combined.includes('belt') ||
-    combined.includes('hat') ||
-    combined.includes('cap') ||
-    combined.includes('scarf') ||
-    combined.includes('glove') ||
-    combined.includes('sunglass') ||
-    combined.includes('accessory') ||
-    combined.includes('duffle') ||
-    combined.includes('weekender') ||
-    combined.includes('tote') ||
-    combined.includes('crossbody') ||
-    combined.includes('shoulder bag')
-  ) {
-    return 'accessories'
-  }
-
-  // Default to accessories for unknown items
-  return 'accessories'
+  // Default to shoes for all other items
+  return 'shoes'
 }
 
 // Helper to retry scraping with Browserless if initial attempt fails
@@ -615,7 +536,7 @@ export async function POST(request: NextRequest) {
                 retailPrice: geminiData.retailPrice || productData.retailPrice,
                 salePrice: geminiData.salePrice || productData.salePrice,
                 images: geminiData.imageUrl ? [geminiData.imageUrl] : productData.images,
-                category: productData.category || 'accessories',
+                category: productData.category || 'shoes',
                 success: true,
                 error: 'Data extracted via Gemini AI fallback (CSS selectors failed)'
               }

@@ -57,63 +57,8 @@ function detectCategoryFromShopify(
     return 'shoes'
   }
 
-  // Tops
-  if (
-    combined.includes('shirt') ||
-    combined.includes('blouse') ||
-    combined.includes('top') ||
-    combined.includes('sweater') ||
-    combined.includes('hoodie') ||
-    combined.includes('sweatshirt') ||
-    combined.includes('tee') ||
-    combined.includes('tank') ||
-    combined.includes('bra') ||
-    combined.includes('bralette') ||
-    combined.includes('sports bra')
-  ) {
-    return 'tops'
-  }
-
-  // Bottoms
-  if (
-    combined.includes('pant') ||
-    combined.includes('jean') ||
-    combined.includes('short') ||
-    combined.includes('skirt') ||
-    combined.includes('trouser') ||
-    combined.includes('legging') ||
-    combined.includes('jogger') ||
-    combined.includes('sweatpant')
-  ) {
-    return 'bottoms'
-  }
-
-  // Outerwear
-  if (
-    combined.includes('jacket') ||
-    combined.includes('coat') ||
-    combined.includes('blazer') ||
-    combined.includes('parka') ||
-    combined.includes('windbreaker')
-  ) {
-    return 'outerwear'
-  }
-
-  // Accessories
-  if (
-    combined.includes('bag') ||
-    combined.includes('backpack') ||
-    combined.includes('hat') ||
-    combined.includes('cap') ||
-    combined.includes('accessory') ||
-    combined.includes('belt') ||
-    combined.includes('watch')
-  ) {
-    return 'accessories'
-  }
-
-  // Default to accessories
-  return 'accessories'
+  // Default to shoes
+  return 'shoes'
 }
 
 /**

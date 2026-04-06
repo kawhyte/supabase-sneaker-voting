@@ -1,11 +1,5 @@
 import {
 	Footprints,
-	Shirt,
-	Package,
-	Wind,
-	Backpack,
-	Gem,
-	Watch,
 	type LucideIcon,
 } from "lucide-react";
 
@@ -13,13 +7,7 @@ import {
 // ITEM CATEGORIES
 // ============================================================================
 
-export type ItemCategory =
-	| "shoes"
-	| "tops"
-	| "bottoms"
-	| "outerwear"
-	| "accessories"
-;
+export type ItemCategory = "shoes";
 
 export type SizeType = "shoe" | "clothing" | "onesize";
 
@@ -77,96 +65,6 @@ export const CATEGORY_CONFIGS: Record<ItemCategory, CategoryConfig> = {
 		sizeLabel: "Shoe Size",
 		sizePlaceholder: "Select size (US Men's, Women's, or EU)",
 	},
-	tops: {
-		id: "tops",
-		label: "Top",
-		labelPlural: "Tops",
-		icon: Shirt,
-		color: "green",
-		bgColor: "var(--color-green-50)",
-		borderColor: "var(--color-green-500)",
-		textColor: "var(--color-green-700)",
-		// Permissions
-		allowCollection: false,
-		allowPurchased: true,
-		allowWears: true,
-		// Field requirements
-		requiresSize: true,
-		requiresFit: false,
-		requiresComfort: false,
-		sizeType: "clothing",
-		// UX hints
-		sizeLabel: "Clothing Size",
-		sizePlaceholder: "Select size (XS, S, M, L, XL, etc.)",
-	},
-	bottoms: {
-		id: "bottoms",
-		label: "Bottoms",
-		labelPlural: "Bottoms",
-		icon: Package,
-		color: "purple",
-		bgColor: "var(--color-purple-50)",
-		borderColor: "var(--color-purple-500)",
-		textColor: "var(--color-purple-700)",
-		// Permissions
-		allowCollection: false,
-		allowPurchased: true,
-		allowWears: true,
-		// Field requirements
-		requiresSize: true,
-		requiresFit: false,
-		requiresComfort: false,
-		sizeType: "clothing",
-		// UX hints
-		sizeLabel: "Clothing Size",
-		sizePlaceholder: "Select size (XS, S, M, L, XL, etc.)",
-	},
-	outerwear: {
-		id: "outerwear",
-		label: "Outerwear",
-		labelPlural: "Outerwear",
-		icon: Wind,
-		color: "orange",
-		bgColor: "var(--color-orange-50)",
-		borderColor: "var(--color-orange-500)",
-		textColor: "var(--color-orange-700)",
-		// Permissions
-		allowCollection: false,
-		allowPurchased: true,
-		allowWears: true,
-		// Field requirements
-		requiresSize: true,
-		requiresFit: false,
-		requiresComfort: false,
-		sizeType: "clothing",
-		// UX hints
-		sizeLabel: "Clothing Size",
-		sizePlaceholder: "Select size (XS, S, M, L, XL, etc.)",
-	},
-	accessories: {
-		id: "accessories",
-		label: "Accessory",
-		labelPlural: "Accessories",
-		icon: Backpack,
-		color: "pink",
-		bgColor: "var(--color-pink-50)",
-		borderColor: "var(--color-pink-500)",
-		textColor: "var(--color-pink-700)",
-		// Permissions
-		allowCollection: false,
-		allowPurchased: true,
-		allowWears: true,
-		// Field requirements
-		requiresSize: false,
-		requiresFit: false,
-		requiresComfort: false,
-		sizeType: "onesize",
-		// UX hints
-		sizeLabel: "Size (Optional)",
-		sizePlaceholder: "One Size, or specify",
-	},
-		
-	
 };
 
 // ============================================================================

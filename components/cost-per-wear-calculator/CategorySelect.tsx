@@ -26,7 +26,7 @@ interface CategorySelectProps {
 }
 
 export function CategorySelect({ form }: CategorySelectProps) {
-  const categories: ItemCategory[] = ['shoes', 'tops', 'bottoms', 'outerwear', 'accessories'];
+  const categories: ItemCategory[] = ['shoes'];
 
   return (
     <FormField

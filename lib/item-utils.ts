@@ -133,58 +133,6 @@ export function detectCategoryFromUrl(url: string): ItemCategory | null {
 		}
 
 
-		// Accessories (bags, hats, etc.)
-		if (
-			hostname.includes("coach.com") ||
-			hostname.includes("beistravel.com") ||
-			urlLower.includes("/bags/") ||
-			urlLower.includes("/backpack/") ||
-			urlLower.includes("/accessories/") ||
-			urlLower.includes("/hats/") ||
-			urlLower.includes("/belts/")||
-			urlLower.includes("/watch/") ||
-			urlLower.includes("/socks/")
-		) {
-			return "accessories";
-		}
-
-		// Outerwear
-		if (
-			urlLower.includes("/coats/") ||
-			urlLower.includes("/jackets/") ||
-			urlLower.includes("/outerwear/") ||
-			urlLower.includes("/vests/")
-		) {
-			return "outerwear";
-		}
-
-		// Bottoms
-		if (
-			urlLower.includes("/pants/") ||
-			urlLower.includes("/jeans/") ||
-			urlLower.includes("/shorts/") ||
-			urlLower.includes("/trousers/") ||
-			urlLower.includes("/bottoms/")
-		) {
-			return "bottoms";
-		}
-
-		// Tops (default for clothing retailers)
-		if (
-			hostname.includes("gap.com") ||
-			hostname.includes("oldnavy.com") ||
-			hostname.includes("bananarepublic") ||
-			hostname.includes("stance.com") ||
-			urlLower.includes("/shirts/") ||
-			urlLower.includes("/hoodies/") ||
-			urlLower.includes("/sweatshirts/") ||
-			urlLower.includes("/tops/") ||
-			urlLower.includes("/tees/") ||
-			urlLower.includes("/t-shirts/")
-		) {
-			return "tops";
-		}
-
 		// No match found
 		return null;
 	} catch (error) {
@@ -203,11 +151,6 @@ export function detectCategoryFromUrl(url: string): ItemCategory | null {
 export function formatCategory(category: ItemCategory): string {
 	const labels: Record<ItemCategory, string> = {
 		shoes: "Shoes",
-		tops: "Top",
-		bottoms: "Bottoms",
-		outerwear: "Outerwear",
-		accessories: "Accessory",
-		
 	};
 	return labels[category] || category;
 }
@@ -218,11 +161,6 @@ export function formatCategory(category: ItemCategory): string {
 export function formatCategoryPlural(category: ItemCategory): string {
 	const labels: Record<ItemCategory, string> = {
 		shoes: "Shoes",
-		tops: "Tops",
-		bottoms: "Bottoms",
-		outerwear: "Outerwear",
-		accessories: "Accessories",
-		
 	};
 	return labels[category] || category;
 }
@@ -233,11 +171,7 @@ export function formatCategoryPlural(category: ItemCategory): string {
  */
 export function getCategoryIcon(category: ItemCategory): string {
 	const icons: Record<ItemCategory, string> = {
-		shoes: "Shirt",
-		tops: "Shirt",
-		bottoms: "Package",
-		outerwear: "Coat",
-		accessories: "Backpack",
+		shoes: "Footprints",
 	};
-	return icons[category] || "Package";
+	return icons[category] || "Footprints";
 }

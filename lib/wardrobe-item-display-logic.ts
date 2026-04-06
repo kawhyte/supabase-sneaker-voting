@@ -31,7 +31,6 @@ interface WardrobeItem {
 export function shouldShowWearCounter(item: WardrobeItem): boolean {
 	const wearableCategories: ItemCategory[] = [
 		'shoes',
-		'accessories',
 	]
 
 	return (

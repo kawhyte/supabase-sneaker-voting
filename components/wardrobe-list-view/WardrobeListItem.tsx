@@ -74,7 +74,7 @@ export function WardrobeListItem({
 	const mainImage = itemPhotos[0]?.image_url || "/images/placeholder.svg";
 
 	// Get category config for icon (fallback to accessories if category not found)
-	const categoryConfig = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS] || CATEGORY_CONFIGS.accessories;
+	const categoryConfig = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS] || CATEGORY_CONFIGS.shoes;
 	const CategoryIcon = categoryConfig.icon;
 
 	// Format price display

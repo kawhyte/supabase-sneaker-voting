@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 
 const smartCalculatorSchema = z.object({
   price: z.coerce.number().min(1, "Price is required"),
-  category: z.enum(['shoes', 'tops', 'bottoms', 'outerwear', 'accessories']),
+  category: z.enum(['shoes']),
   wearFrequency: z.enum(['rarely', 'monthly', 'weekly', 'daily']),
   resalePotential: z.enum(['none', 'low', 'medium', 'high']),
   wardrobeRole: z.enum(['gap_fill', 'upgrade', 'variety', 'duplicate']),
