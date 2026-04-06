@@ -117,7 +117,7 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
   }
 
   return (
-    <Card className="bg-muted px-8 py-8 ">
+    <Card className="bg-card border border-border rounded-2xl px-8 py-8">
       <CardContent className="pt-8">
         <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
           {/* Avatar Editor Section */}
@@ -140,7 +140,7 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Enter your display name"
                 required
-                className="motion-safe:transition-all motion-safe:duration-200 border-slate-200 focus:ring-2 focus:ring-slate-400/40"
+                className="motion-safe:transition-all motion-safe:duration-200 border-border focus:ring-2 focus:ring-slate-400/40"
               />
             </div>
 
@@ -155,21 +155,21 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
                 type="email"
                 value={user.email || ''}
                 disabled
-                className="bg-muted/50 text-muted-foreground cursor-not-allowed border-slate-200/50"
+                className="bg-muted/50 text-muted-foreground cursor-not-allowed border-border/50"
               />
             </div>
 
             {/* Last Sign In */}
             <div className="space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-900">
               <Label className="text-base font-semibold text-foreground">Last Signed In</Label>
-              <div className="text-sm text-muted-foreground/50 bg-muted/50 border border-slate-200/50 px-4 py-3 rounded-lg cursor-not-allowed ">
+              <div className="text-sm text-muted-foreground/50 bg-muted/50 border border-border/50 px-4 py-3 rounded-lg cursor-not-allowed ">
                 {formatLastSignIn(user.last_sign_in_at)}
               </div>
             </div>
           </div>
 
           {/* Save Button Section */}
-          <div className="pt-6 border-t border-slate-200/50">
+          <div className="pt-6 border-t border-border/50">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {hasUnsavedChanges && (

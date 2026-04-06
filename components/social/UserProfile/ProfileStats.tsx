@@ -57,11 +57,11 @@ export function ProfileStats({
 
   return (
     <>
-      <div className="flex items-center justify-center gap-8 border-y border-border py-6 sm:justify-start">
+      <div className="flex items-center justify-center gap-4 py-6 sm:justify-start">
         {stats.map((stat) => (
           <button
             key={stat.label}
-            className={`flex flex-col items-center gap-1 sm:items-start ${
+            className={`flex flex-col items-center gap-1 sm:items-start bg-muted/30 rounded-xl border border-border px-6 py-3 ${
               stat.clickable
                 ? "cursor-pointer hover:opacity-75 transition-opacity group"
                 : "cursor-default"

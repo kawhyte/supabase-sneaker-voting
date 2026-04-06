@@ -68,7 +68,7 @@ export function PublicProfileView({ data }: PublicProfileViewProps) {
   }, [profile.id, canView, reason, items.length, isOwnProfile]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Profile Header */}
       <ProfileHeader
         userId={profile.id}

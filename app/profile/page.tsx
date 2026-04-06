@@ -4,7 +4,7 @@ import { Suspense } from 'react'
 import { motion } from 'framer-motion'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { useTabNavigation, useTabKeyboardShortcuts } from '@/hooks/useTabNavigation'
-import { User, Bell, Users } from 'lucide-react'
+import { User, Bell, Users, Lightbulb } from 'lucide-react'
 import { ProfileForm } from '@/components/ProfileForm'
 import { NotificationPreferences } from '@/components/NotificationPreferences'
 import { PrivacySettings } from '@/components/PrivacySettings'
@@ -55,7 +55,7 @@ function SettingsContent() {
           {/* Tab List */}
           <TabsList
             data-variant="underline"
-            className="w-full justify-start border-b border-slate-200 bg-transparent p-0 gap-8 mb-8"
+            className="w-full justify-start border-b border-border bg-transparent p-0 gap-8 mb-8"
           >
             <TabsTrigger
               value="profile"
@@ -113,9 +113,10 @@ function SettingsContent() {
         </Tabs>
 
         {/* Keyboard Shortcuts Help */}
-        <div className="mt-8 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-slate-600">
-            💡 <strong>Tip:</strong> Use <kbd className="px-1 py-0.5 bg-white border rounded text-xs">Cmd</kbd> + <kbd className="px-1 py-0.5 bg-white border rounded text-xs">1/2/3</kbd> to quickly switch between tabs
+        <div className="mt-8 p-3 bg-muted/30 border border-border rounded-xl">
+          <p className="text-xs text-muted-foreground flex items-center gap-2">
+            <Lightbulb className="h-3.5 w-3.5 shrink-0" />
+            <span><strong>Tip:</strong> Use <kbd className="px-1 py-0.5 bg-background border border-border rounded text-xs">Cmd</kbd> + <kbd className="px-1 py-0.5 bg-background border border-border rounded text-xs">1/2/3</kbd> to quickly switch between tabs</span>
           </p>
         </div>
       </motion.div>

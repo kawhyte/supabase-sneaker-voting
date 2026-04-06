@@ -35,7 +35,7 @@ export function ProfileHeader({
       </Avatar>
 
       {/* User Info */}
-      <div className="flex flex-1 flex-col items-center gap-4 sm:items-start">
+      <div className="flex flex-1 flex-col items-center gap-6 sm:items-start">
         <div className="flex flex-col items-center gap-2 sm:items-start">
           <h1 className="text-3xl font-bold text-foreground">{name}</h1>
         </div>
