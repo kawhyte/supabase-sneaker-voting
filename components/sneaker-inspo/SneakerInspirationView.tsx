@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { SneakerPaletteCard } from '@/components/outfit-studio/SneakerPaletteCard'
-import { StyleGuideDialog } from '@/components/outfit-studio/StyleGuideDialog'
+import { SneakerPaletteCard } from '@/components/sneaker-inspo/SneakerPaletteCard'
+import { StyleGuideDialog } from '@/components/sneaker-inspo/StyleGuideDialog'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Button } from '@/components/ui/button'
 import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'

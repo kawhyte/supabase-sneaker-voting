@@ -58,7 +58,6 @@ export enum AnalyticsEvent {
   COLLECTION_VIEWED = 'collection_viewed',
   WISHLIST_VIEWED = 'wishlist_viewed',
   ARCHIVE_VIEWED = 'archive_viewed',
-  OUTFITS_VIEWED = 'outfits_viewed',
   PROFILE_VIEWED = 'profile_viewed',
 
   // Filter & Search
@@ -227,7 +226,6 @@ class Analytics {
    */
   private getCategoryForEvent(event: AnalyticsEvent): string {
     if (event.startsWith('item_')) return 'wardrobe'
-    if (event.startsWith('outfit_')) return 'outfits'
     if (event.startsWith('photo_')) return 'photos'
     if (event.startsWith('price_') || event.startsWith('product_')) return 'wishlist'
     if (event.startsWith('quiz_')) return 'purchase_prevention'

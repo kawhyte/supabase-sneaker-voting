@@ -1,4 +1,4 @@
-import { LucideIcon, Package, Shirt, Sparkles, Palette, Building2, Gem, TrendingUp, RefreshCw, Compass, Globe, Target } from 'lucide-react'
+import { LucideIcon, Package, Shirt, Sparkles, Gem, TrendingUp, RefreshCw, Compass, Globe, Target } from 'lucide-react'
 
 export interface AchievementDefinition {
   id: string
@@ -6,7 +6,7 @@ export interface AchievementDefinition {
   description: string
   icon: LucideIcon
   tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum'
-  category: 'wardrobe' | 'outfits' | 'efficiency' | 'discovery'
+  category: 'wardrobe' | 'efficiency' | 'discovery'
   points: number
   criteria: {
     type: 'count' | 'streak' | 'percentage' | 'custom'
@@ -55,28 +55,6 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     category: 'wardrobe',
     points: 50,
     criteria: { type: 'count', threshold: 50, metric: 'total_items' },
-  },
-
-  // Outfit Creation (Creative Expression)
-  {
-    id: 'outfit_creator',
-    name: 'Outfit Creator',
-    description: 'Create your first outfit composition',
-    icon: Palette,
-    tier: 'Bronze',
-    category: 'outfits',
-    points: 15,
-    criteria: { type: 'count', threshold: 1, metric: 'outfits_created' },
-  },
-  {
-    id: 'fashion_architect',
-    name: 'Fashion Architect',
-    description: 'Design 10 unique outfit combinations',
-    icon: Building2,
-    tier: 'Silver',
-    category: 'outfits',
-    points: 30,
-    criteria: { type: 'count', threshold: 10, metric: 'outfits_created' },
   },
 
   // Cost-Per-Wear (Value Focus)

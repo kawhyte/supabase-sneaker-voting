@@ -34,12 +34,6 @@ export async function generateFunFacts(userId: string, count: number = 6): Promi
     .eq('status', 'owned')
     .eq('is_archived', false)
 
-  const { data: outfits } = await supabase
-    .from('outfits')
-    .select('*, outfit_items(*)')
-    .eq('user_id', userId)
-    .eq('is_archived', false)
-
   if (!items || items.length === 0) {
     return getEmptyStateFacts()
   }
@@ -60,11 +54,7 @@ export async function generateFunFacts(userId: string, count: number = 6): Promi
   // 4. Color Preference
   allFacts.push(getColorPreferenceFact(items))
 
-  // 5. Wardrobe Versatility
-  const versatilityFact = getVersatilityFact(items, outfits || [])
-  if (versatilityFact) allFacts.push(versatilityFact)
-
-  // 6. Cost-Per-Wear Champion
+  // 5. Cost-Per-Wear Champion
   const cpwFact = getCostPerWearChampionFact(items)
   if (cpwFact) allFacts.push(cpwFact)
 
@@ -74,11 +64,7 @@ export async function generateFunFacts(userId: string, count: number = 6): Promi
   // 8. Wardrobe Age
   allFacts.push(getWardrobeAgeFact(items))
 
-  // 9. Most Versatile Item
-  const mostVersatile = getMostVersatileItemFact(items, outfits || [])
-  if (mostVersatile) allFacts.push(mostVersatile)
-
-  // 10. Category Diversity
+  // 9. Category Diversity
   allFacts.push(getCategoryDiversityFact(items))
 
   // 11. Average Wears
@@ -223,25 +209,6 @@ function getColorPreferenceFact(items: any[]): FunFact {
   }
 }
 
-function getVersatilityFact(items: any[], outfits: any[]): FunFact | null {
-  if (outfits.length === 0) return null
-
-  const uniqueItemsInOutfits = new Set(
-    outfits.flatMap((outfit) => outfit.outfit_items?.map((oi: any) => oi.item_id) || [])
-  ).size
-
-  const percentage = Math.round((uniqueItemsInOutfits / items.length) * 100)
-
-  return {
-    id: 'versatility',
-    title: 'Outfit Versatility',
-    message: `${percentage}% of your wardrobe has been featured in an outfit. You're great at mixing and matching!`,
-    emoji: '🎭',
-    category: 'creativity',
-    actionLabel: 'Create More',
-    actionLink: '/dashboard?tab=outfits',
-  }
-}
 
 function getCostPerWearChampionFact(items: any[]): FunFact | null {
   const itemsWithCPW = items
@@ -315,32 +282,6 @@ function getWardrobeAgeFact(items: any[]): FunFact {
   }
 }
 
-function getMostVersatileItemFact(items: any[], outfits: any[]): FunFact | null {
-  if (outfits.length === 0) return null
-
-  const itemUsage = new Map<string, number>()
-  outfits.forEach((outfit) => {
-    outfit.outfit_items?.forEach((oi: any) => {
-      itemUsage.set(oi.item_id, (itemUsage.get(oi.item_id) || 0) + 1)
-    })
-  })
-
-  const mostUsedId = Array.from(itemUsage.entries())
-    .sort((a, b) => b[1] - a[1])[0]
-
-  if (!mostUsedId) return null
-
-  const item = items.find((i) => i.id === mostUsedId[0])
-  if (!item) return null
-
-  return {
-    id: 'most-versatile',
-    title: 'Outfit MVP',
-    message: `Your ${item.brand} ${item.model} appears in ${mostUsedId[1]} outfits! That's true versatility.`,
-    emoji: '🌟',
-    category: 'creativity',
-  }
-}
 
 function getCategoryDiversityFact(items: any[]): FunFact {
   const uniqueCategories = new Set(items.map((item) => item.category)).size

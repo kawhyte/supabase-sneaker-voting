@@ -364,8 +364,8 @@ export async function createDuplicationFollowUp(
       title: 'Can You Style This?',
       message: `You already own ${dismissedWarning.similar_items.length} similar items. Try styling them in new ways before adding more!`,
       severity: 'low',
-      linkUrl: '/dashboard?tab=outfits&action=create',
-      actionLabel: 'Create Outfit',
+      linkUrl: '/dashboard',
+      actionLabel: 'View Wardrobe',
       metadata: {
         trigger: 'duplication_warning_dismissed',
         item_name: dismissedWarning.item_name,

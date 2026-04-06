@@ -43,13 +43,6 @@ export async function updateWardrobeStats(userId: string) {
       { id: null, wears: 0 }
     )
 
-    // Get total outfits
-    const { count: totalOutfits } = await supabase
-      .from('outfits')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('is_archived', false)
-
     // Get savings from price alerts
     const { data: alerts } = await supabase
       .from('price_alerts')
@@ -68,7 +61,6 @@ export async function updateWardrobeStats(userId: string) {
         total_items: allItems?.length || 0,
         owned_items: ownedItems.length,
         wishlisted_items: wishlistedItems.length,
-        total_outfits: totalOutfits || 0,
         total_spent: totalSpent,
         average_cost_per_wear: avgCPW,
         total_savings_from_alerts: totalSavings,

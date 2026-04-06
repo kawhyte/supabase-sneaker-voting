@@ -7,9 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import { ViewDensityToggle } from '@/components/ViewDensityToggle'
 import { Button } from "@/components/ui/button";
 import { WardrobeDashboard } from "@/components/WardrobeDashboard";
+import { SneakerInspirationView } from "@/components/sneaker-inspo/SneakerInspirationView";
 import {
 	Footprints,
 	Heart,
+	Sparkles,
 	Archive,
 	Plus,
 } from "lucide-react";
@@ -165,6 +167,13 @@ function DashboardContent() {
 										<Heart className='h-4 w-4' />
 										Wishlist
 									</TabsTrigger>
+									<TabsTrigger
+										value='fits'
+										data-variant='underline'
+										className='relative py-2 px-4 rounded-xl  pb-4 bg-transparent flex items-center gap-2'>
+										<Sparkles className='h-4 w-4' />
+										Inspo
+									</TabsTrigger>
 								</TabsList>
 							</div>
 							{/* Density Toggle */}
@@ -194,6 +203,17 @@ function DashboardContent() {
 								exit={{ opacity: 0, y: 8 }}
 								transition={{ duration: 0.3 }}>
 								<WardrobeDashboard status={[ItemStatus.WISHLISTED]} />
+							</motion.div>
+						</TabsContent>
+
+						{/* Tab 3: Inspo - Sneaker Inspiration */}
+						<TabsContent value='fits'>
+							<motion.div
+								initial={{ opacity: 0, y: 8 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 8 }}
+								transition={{ duration: 0.3 }}>
+								<SneakerInspirationView showHeader={true} />
 							</motion.div>
 						</TabsContent>
 
