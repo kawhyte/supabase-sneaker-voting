@@ -7,12 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import { ViewDensityToggle } from '@/components/ViewDensityToggle'
 import { Button } from "@/components/ui/button";
 import { WardrobeDashboard } from "@/components/WardrobeDashboard";
-import { SneakerInspirationView } from "@/components/outfit-studio/SneakerInspirationView";
 import {
 	Footprints,
-	Shirt,
 	Heart,
-	Sparkles,
 	Archive,
 	Plus,
 } from "lucide-react";
@@ -162,25 +159,11 @@ function DashboardContent() {
 										Sneakers
 									</TabsTrigger>
 									<TabsTrigger
-										value='closet'
-										data-variant='underline'
-										className='relative py-2 px-4 rounded-xl  pb-4 bg-transparent flex items-center gap-2'>
-										<Shirt className='h-4 w-4' />
-										Apparel
-									</TabsTrigger>
-									<TabsTrigger
 										value='wishlist'
 										data-variant='underline'
 										className='relative py-2 px-4 rounded-xl  pb-4 bg-transparent flex items-center gap-2'>
 										<Heart className='h-4 w-4' />
 										Wishlist
-									</TabsTrigger>
-									<TabsTrigger
-										value='fits'
-										data-variant='underline'
-										className='relative py-2 px-4 rounded-xl  pb-4 bg-transparent flex items-center gap-2'>
-										<Sparkles className='h-4 w-4' />
-										Inspo
 									</TabsTrigger>
 								</TabsList>
 							</div>
@@ -203,26 +186,7 @@ function DashboardContent() {
 							</motion.div>
 						</TabsContent>
 
-						{/* Tab 2: Apparel - Everything Except Shoes (Owned) */}
-						<TabsContent value='closet'>
-							<motion.div
-								initial={{ opacity: 0, y: 8 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: 8 }}
-								transition={{ duration: 0.3 }}>
-								<WardrobeDashboard
-									status={[ItemStatus.OWNED]}
-									categoryFilter={[
-										"tops",
-										"bottoms",
-										"outerwear",
-										"accessories",
-									]}
-								/>
-							</motion.div>
-						</TabsContent>
-
-						{/* Tab 3: Wishlist - All Wishlisted Items */}
+						{/* Tab 2: Wishlist - All Wishlisted Items */}
 						<TabsContent value='wishlist'>
 							<motion.div
 								initial={{ opacity: 0, y: 8 }}
@@ -230,17 +194,6 @@ function DashboardContent() {
 								exit={{ opacity: 0, y: 8 }}
 								transition={{ duration: 0.3 }}>
 								<WardrobeDashboard status={[ItemStatus.WISHLISTED]} />
-							</motion.div>
-						</TabsContent>
-
-						{/* Tab 4: Inspo - Sneaker Inspiration */}
-						<TabsContent value='fits'>
-							<motion.div
-								initial={{ opacity: 0, y: 8 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: 8 }}
-								transition={{ duration: 0.3 }}>
-								<SneakerInspirationView showHeader={true} />
 							</motion.div>
 						</TabsContent>
 
