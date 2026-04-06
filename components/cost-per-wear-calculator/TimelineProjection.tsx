@@ -36,7 +36,7 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
   };
 
   return (
-    <Card className="p-6 sm:p-8 bg-card border-border shadow-lg">
+    <Card className="p-6 sm:p-8 bg-card border-border shadow-none">
       <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
         <Clock className="h-6 w-6 text-primary" />
         <span>Time to Value</span>

@@ -25,7 +25,7 @@ export function AdvancedInsightsDisplay({ insights }: AdvancedInsightsDisplayPro
   if (!hasAnyInsights) return null;
 
   return (
-    <Card className="p-6 sm:p-8 bg-card border-border shadow-lg">
+    <Card className="p-6 sm:p-8 bg-card border-border shadow-none">
       <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
         <Info className="h-6 w-6 text-blue-500" />
         <span>Advanced Insights</span>

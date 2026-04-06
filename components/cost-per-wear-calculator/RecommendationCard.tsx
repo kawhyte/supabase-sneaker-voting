@@ -41,7 +41,7 @@ export function RecommendationCard({ recommendation }: Props) {
   const Icon = styles.icon;
 
   return (
-    <Card className={cn("relative overflow-hidden border-2 shadow-xl p-6 sm:p-8", styles.border, styles.bg)}>
+    <Card className={cn("relative overflow-hidden border-2 shadow-none p-6 sm:p-8", styles.border, styles.bg)}>
       {/* Score Badge */}
       <div className="absolute top-0 right-0 p-4">
         <div className={cn("flex flex-col items-center justify-center w-16 h-16 rounded-full border-4 bg-white font-bold text-xl shadow-sm", styles.border, styles.text)}>

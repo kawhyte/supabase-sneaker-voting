@@ -1,15 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Check } from 'lucide-react'
 import { CalculatorForm } from '@/components/cost-per-wear-calculator/CalculatorForm'
 import { HowItWorksSection } from '@/components/cost-per-wear-calculator/HowItWorksSection'
-
-const TRUST_CHIPS = [
-  'No account needed',
-  'Sneaker-specific math',
-  'Takes 60 seconds',
-]
 
 export default function HomePage() {
   return (
@@ -27,24 +20,6 @@ export default function HomePage() {
 
       {/* ─── COMPACT HEADER ─── */}
       <section className="w-full max-w-3xl mx-auto px-6 pt-14 md:pt-20 pb-12 text-center relative z-10">
-
-        {/* Trust chips */}
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="flex flex-wrap items-center justify-center gap-3 gap-y-2 mb-8"
-        >
-          {TRUST_CHIPS.map((chip) => (
-            <span
-              key={chip}
-              className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wide px-4 py-2 rounded-full bg-primary/15 text-amber-700 border border-primary/30"
-            >
-              <Check className="w-3 h-3 text-primary" />
-              {chip}
-            </span>
-          ))}
-        </motion.div>
 
         {/* Headline */}
         <motion.h1
@@ -79,20 +54,20 @@ export default function HomePage() {
         <CalculatorForm />
       </motion.div>
 
-      {/* ─── DARK STAT STRIP ─── */}
-      <div className="w-full bg-slate-950 py-16 px-6 text-center relative z-10">
+      {/* ─── STAT STRIP ─── */}
+      <div className="w-full bg-muted/30 border-t border-border py-16 px-6 text-center relative z-10">
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight max-w-2xl mx-auto leading-tight"
+          className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground tracking-tight max-w-2xl mx-auto leading-tight"
         >
           The average sneakerhead buys{' '}
           <span className="text-primary">12 pairs</span> a year.
           <br />Only <span className="text-primary">4</span> are worth it.
         </motion.p>
-        <p className="mt-4 text-slate-400 text-sm font-medium">Here&apos;s how to be in the 4.</p>
+        <p className="mt-4 text-muted-foreground text-sm font-medium">Here&apos;s how to be in the 4.</p>
       </div>
 
       {/* ─── HOW IT WORKS ─── */}

@@ -64,7 +64,7 @@ export function CalculatorForm() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <Card className="border-0 shadow-2xl bg-white overflow-hidden ring-1 ring-slate-200/60">
+      <Card className="border border-border shadow-none bg-card overflow-hidden rounded-2xl">
         {/* Progress Bar */}
         <div className="h-1.5 w-full bg-slate-100">
           <div 
@@ -374,7 +374,7 @@ export function CalculatorForm() {
 
                 <div className="flex gap-3 mt-12 pt-4 border-t border-slate-100">
                   <Button type="button" variant="outline" onClick={() => setStep(1)}>Back</Button>
-                  <Button type="submit" className="flex-1 bg-primary hover:bg-primary text-slate-900 font-bold shadow-md hover:shadow-lg transition-all">
+                  <Button type="submit" className="flex-1 bg-primary hover:bg-primary text-slate-900 font-bold transition-all">
                     <Sparkles className="w-4 h-4 mr-2" />
                     Reveal Verdict
                   </Button>

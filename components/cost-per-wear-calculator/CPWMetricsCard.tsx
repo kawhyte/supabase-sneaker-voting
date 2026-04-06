@@ -16,7 +16,7 @@ interface CPWMetricsCardProps {
 
 export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
   return (
-    <Card className="p-6 sm:p-8 bg-card border-border shadow-lg">
+    <Card className="p-6 sm:p-8 bg-card border-border shadow-none">
       <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
         <span className="bg-blue-100 text-blue-600 p-2 rounded-lg"><DollarSign className="w-5 h-5" /></span>
         <span>Financial Breakdown</span>
@@ -68,7 +68,7 @@ export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
         </div>
 
         {/* 3. Real CPW (The Hero Metric) */}
-        <div className="p-4 bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl border border-slate-700 text-white flex flex-col justify-between shadow-lg relative overflow-hidden">
+        <div className="p-4 bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl border border-slate-700 text-white flex flex-col justify-between shadow-none relative overflow-hidden">
           <div className="absolute top-0 right-0 p-3 opacity-10">
             <TrendingDown className="w-16 h-16" />
           </div>
