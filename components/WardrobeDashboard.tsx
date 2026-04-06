@@ -825,7 +825,7 @@ export function WardrobeDashboard({
 	if (isLoading) {
 		return (
 			<div
-				className='max-w-[1920px] mx-auto px-xl py-xl'
+				className='max-w-[1920px] mx-auto px-6 py-6'
 				role='status'
 				aria-busy='true'
 				aria-label='Loading items'>
@@ -836,9 +836,9 @@ export function WardrobeDashboard({
 	}
 
 	return (
-		<div className='max-w-[1920px] mx-auto px-xl py-xl'>
+		<div className='max-w-[1920px] mx-auto px-8 py-8'>
 			<DashboardHeader status={displayStatus} />
-			<div className='flex flex-col lg:flex-row justify-between md:gap-x-4 gap-y-4 lg:gap-y-0  mb-8'>
+			<div className='flex flex-col lg:flex-row justify-between md:gap-x-6 gap-y-6 lg:gap-y-0  mb-8'>
 				<WardrobeFilters
 					searchTerm={searchTerm}
 					onSearchChange={setSearchTerm}

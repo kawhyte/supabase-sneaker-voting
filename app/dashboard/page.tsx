@@ -123,7 +123,7 @@ function DashboardContent() {
 						<Link href='/dashboard?tab=archive'>
 							<Button
 								variant='outline'
-								className='flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:shadow-sm motion-safe:hover:scale-105 will-change-transform'>
+								className='flex items-center gap-2 px-4 py-2 rounded-lg transition-all motion-safe:hover:scale-105 will-change-transform'>
 								<Archive className='h-4 w-4' />
 								Archive
 							</Button>
@@ -131,7 +131,7 @@ function DashboardContent() {
 
 						{/* Add Item Button - Primary CTA */}
 						<Link href='/add-new-item'>
-							<Button className='flex items-center gap-2 bg-primary text-slate-900 hover:bg-primary shadow-sm font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
+							<Button className='flex items-center gap-2 bg-primary text-slate-900 hover:bg-primary font-semibold px-4 py-2 rounded-lg transition-all motion-safe:hover:scale-105 will-change-transform'>
 								<Plus className='h-4 w-4' />
 								Add Item
 							</Button>
@@ -147,7 +147,7 @@ function DashboardContent() {
 						defaultValue={defaultTab}
 						className='w-full max-w-[1920px] mx-auto rounded-lg '>
 						{/* Header with Tabs and Density Toggle */}
-						<div className='flex flex-col sm:flex-row justify-between sm:items-center gap-4 '>
+						<div className='flex flex-col sm:flex-row justify-between sm:items-center gap-6 '>
 							{/* Tabs */}
 							<div className='flex-1'>
 								<TabsList

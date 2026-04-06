@@ -42,7 +42,7 @@ export function ItemFooterBadges({
 					<Button
 						onClick={() => setWearDrawerOpen(true)}
 						variant='outline'
-						className='flex items-center gap-2 bg-foreground text-white shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95'
+						className='flex items-center gap-2 bg-foreground text-white transition-all duration-200 hover:scale-105 active:scale-95'
 						size='sm'
 						aria-label='View cost per wear statistics'>
 						{/* <TrendingDown className='h-4 w-4' /> */}

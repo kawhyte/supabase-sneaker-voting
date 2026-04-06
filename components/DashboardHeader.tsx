@@ -18,7 +18,7 @@ export function DashboardHeader({ status }: { status: ItemStatus }) {
 		titles[status] || titles[ItemStatus.WISHLISTED];
 
 	return (
-		<div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-4'>
+		<div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-4'>
 			<div>
 				{/* <h1 className='text-3xl font-bold font-heading -mb-2'>{title}</h1> */}
 				<p className='text-slate-600'>{description}</p>
