@@ -15,9 +15,9 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
 	metadataBase: new URL(defaultUrl),
-	title: "PurrView: Wardrobe Watchlist",
+	title: "PurrView: Sneaker Rotation Tracker",
 	description:
-		"Track your wardrobe items and add items to a watchlist and get notified when prices drop",
+		"Track your sneaker collection, monitor prices, and build your rotation — all in one place.",
 	icons: {
 		icon: "/icon-192x192.png",
 		shortcut: "/icon-192x192.png",

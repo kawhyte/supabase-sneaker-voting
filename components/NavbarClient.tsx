@@ -243,7 +243,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 	];
 
 	const navLinks = isAuthenticated
-		? [...publicNavLinks, ...authenticatedNavLinks]
+		? [...publicNavLinks.filter(l => l.href !== '/'), ...authenticatedNavLinks]
 		: publicNavLinks;
 
 	return (

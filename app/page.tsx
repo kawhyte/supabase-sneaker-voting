@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import { ArrowRight, Calculator, TrendingDown, Shirt, Sparkles, MoveRight } from 'lucide-react'
+import { ArrowRight, Calculator, TrendingDown, Footprints, Sparkles, MoveRight } from 'lucide-react'
 
 // Dynamically import Lottie component for code splitting
 const Lottie = dynamic(() => import('react-lottie-player'), {
@@ -96,7 +96,7 @@ export default function HomePage() {
             // UPDATE: Switched to text-slate-950 for higher contrast
             className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-slate-950 leading-[1.1]"
           >
-            Your Wardrobe. <span className="text-slate-400">Curated.</span>
+            Your Sneaker Rotation. <span className="text-slate-400">Curated.</span>
           </motion.h1>
           
           <motion.p
@@ -106,7 +106,7 @@ export default function HomePage() {
             // UPDATE: Slightly darker subtext
             className="text-lg sm:text-xl text-slate-600 font-medium max-w-lg mx-auto"
           >
-            Import styles. Track wears. Watch prices.
+            Track wears. Watch prices. Build your rotation.
           </motion.p>
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function HomePage() {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-3 bg-stone-100 rounded-2xl text-slate-900">
-                    <Shirt className="w-6 h-6" />
+                    <Footprints className="w-6 h-6" />
                   </div>
                   <span className="text-sm font-bold uppercase tracking-wider text-stone-500">The Collection</span>
                 </div>
