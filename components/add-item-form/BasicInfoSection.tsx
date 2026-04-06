@@ -15,23 +15,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import {
 	CheckCircle,
 	Eye,
 	Package,
 } from "lucide-react";
 import { BrandCombobox } from "@/components/BrandCombobox";
 import { useBrands } from "@/hooks/useBrands";
-import {
-	CATEGORY_CONFIGS,
-	type ItemCategory,
-} from "@/components/types/item-category";
 
 interface BasicInfoSectionProps {
 	form: UseFormReturn<any>;
@@ -54,7 +43,6 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 
 	const { brands } = useBrands();
 	const watchedTriedOn = watch("triedOn");
-	const watchedCategory = watch("category");
 	const watchedBrandId = watch("brandId");
 
 	return (
@@ -66,73 +54,42 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 				</h3>
 			</div>
 
-			{/* Row 1: Experience & Item Category */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<div className="dense flex items-center gap-3 p-4 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors h-fit">
-					<div className="w-full">
-						<div className="flex items-center gap-2 mb-2">
-							<Eye className="h-4 w-4 text-slate-600 flex-shrink-0" />
-							<Label className="block text-sm font-semibold text-slate-900">
-								Did you try on this item?
-							</Label>
-						</div>
-						<div className="flex items-center gap-3">
-							<Switch
-								checked={watchedTriedOn}
-								onCheckedChange={(checked) =>
-									setValue("triedOn", checked, {
-										shouldValidate: true,
-									})
-								}
-								id="triedOn"
-							/>
-							<Label
-								htmlFor="triedOn"
-								className="cursor-pointer text-sm font-medium text-slate-900"
-							>
-								{watchedTriedOn ? (
-									<>
-										Yes{" "}
-										<CheckCircle className="inline h-4 w-4 text-meadow-600 ml-1" />
-									</>
-								) : (
-									"No"
-								)}
-							</Label>
-						</div>
-						{watchedTriedOn && (
-							<p className="text-xs text-meadow-600 mt-2">
-								Great! Your feedback will help track the fit.
-							</p>
-						)}
+			{/* Row 1: Experience */}
+			<div className="dense flex items-center gap-3 p-4 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors">
+				<div className="w-full">
+					<div className="flex items-center gap-2 mb-2">
+						<Eye className="h-4 w-4 text-slate-600 flex-shrink-0" />
+						<Label className="block text-sm font-semibold text-slate-900">
+							Did you try on this item?
+						</Label>
 					</div>
-				</div>
-				<div>
-					<Label className="text-sm font-medium text-slate-900">
-						Item Category <span className="text-red-500">*</span>
-					</Label>
-					<Select
-						onValueChange={(v) =>
-							setValue("category", v as ItemCategory, {
-								shouldValidate: true,
-							})
-						}
-						value={watchedCategory}
-					>
-						<SelectTrigger className="mt-2">
-							<SelectValue placeholder="Select a category" />
-						</SelectTrigger>
-						<SelectContent>
-							{Object.values(CATEGORY_CONFIGS).map((c) => (
-								<SelectItem key={c.id} value={c.id}>
-									{c.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					{errors.category && (
-						<p className="text-sm text-red-600 mt-1">
-							{String(errors.category.message || "Category is required")}
+					<div className="flex items-center gap-3">
+						<Switch
+							checked={watchedTriedOn}
+							onCheckedChange={(checked) =>
+								setValue("triedOn", checked, {
+									shouldValidate: true,
+								})
+							}
+							id="triedOn"
+						/>
+						<Label
+							htmlFor="triedOn"
+							className="cursor-pointer text-sm font-medium text-slate-900"
+						>
+							{watchedTriedOn ? (
+								<>
+									Yes{" "}
+									<CheckCircle className="inline h-4 w-4 text-meadow-600 ml-1" />
+								</>
+							) : (
+								"No"
+							)}
+						</Label>
+					</div>
+					{watchedTriedOn && (
+						<p className="text-xs text-meadow-600 mt-2">
+							Great! Your feedback will help track the fit.
 						</p>
 					)}
 				</div>

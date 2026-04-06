@@ -23,18 +23,7 @@ import { ItemStatus } from '@/types/ItemStatus'
 export const itemFormSchema = z
 	.object({
 		triedOn: z.boolean().default(false),
-		category: z.enum(
-			[
-				'shoes',
-				'tops',
-				'bottoms',
-				'outerwear',
-				'accessories',
-			],
-			{
-				required_error: 'Please select the item category',
-			}
-		),
+		category: z.literal('shoes').default('shoes'),
 		productUrl: z
 			.string()
 			.url('Please enter a valid URL')
@@ -182,7 +171,7 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 			mode === 'edit' && initialData
 				? {
 						triedOn: initialData.has_been_tried || false,
-						category: initialData.category || undefined,
+						category: 'shoes',
 						brandId: initialData.brand_id || undefined,
 						brand: initialData.brand || '',
 						model: initialData.model || '',
@@ -204,6 +193,7 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 				  }
 				: {
 						triedOn: false,
+						category: 'shoes' as const,
 						wears: 0,
 				  },
 	})
