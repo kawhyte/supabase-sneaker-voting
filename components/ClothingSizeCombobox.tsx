@@ -67,7 +67,7 @@ export function ClothingSizeCombobox({ value, onChange, disabled }: ClothingSize
                 >
                   <Check
                     className={cn(
-                      'mr-[var(--space-xs)] h-4 w-4',
+                      'mr-1 h-4 w-4',
                       value === size ? 'opacity-100' : 'opacity-0'
                     )}
                   />

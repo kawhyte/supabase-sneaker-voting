@@ -34,7 +34,7 @@ const TabsTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       // Default (pill) variant
-      "inline-flex rounded-2xl items-center justify-center whitespace-nowrap px-sm py-xs text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:scale-105 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-slate-100 data-[state=active]:bg-primary data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-sm",
+      "inline-flex rounded-2xl items-center justify-center whitespace-nowrap px-sm py-xs text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:scale-105 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-slate-100 data-[state=active]:bg-primary data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-none",
       // Underline variant overrides
       variant === 'underline' && "relative px-0 py-3 pb-4 rounded-none bg-transparent text-base text-slate-600 font-medium hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-none after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:opacity-0 data-[state=active]:after:opacity-100 after:transition-all after:duration-300",
       className

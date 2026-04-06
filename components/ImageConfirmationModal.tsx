@@ -260,7 +260,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
 
                 {/* Main Image Badge */}
                 {isMain && (
-                  <div className="absolute top-[var(--space-md)] right-[var(--space-md)] bg-primary text-white text-xs md:text-sm px-[var(--space-md)] py-[var(--space-xs)] rounded font-semibold">
+                  <div className="absolute top-4 right-4 bg-primary text-white text-xs md:text-sm px-4 py-1 rounded font-semibold">
                     Main
                   </div>
                 )}
@@ -273,7 +273,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
                       const index = selectedImages.indexOf(image)
                       setMainImageIndex(index)
                     }}
-                    className="absolute bottom-[var(--space-md)] right-[var(--space-md)] bg-white/90 hover:bg-white text-xs md:text-sm px-[var(--space-md)] py-[var(--space-xs)] rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity font-medium"
+                    className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-xs md:text-sm px-4 py-1 rounded shadow-none opacity-0 group-hover:opacity-100 transition-opacity font-medium"
                   >
                     Set as Main
                   </button>
@@ -286,7 +286,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
                       e.stopPropagation()
                       toggleImageSelection(image)
                     }}
-                    className="absolute top-[var(--space-md)] right-[var(--space-md)] bg-destructive/10 hover:bg-destructive/10 text-white p-[var(--space-xs)] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-4 right-4 bg-destructive/10 hover:bg-destructive/10 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X className="h-3 w-3" />
                   </button>

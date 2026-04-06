@@ -65,8 +65,8 @@ function Calendar({
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
-        dropdown_month: "bg-background border border-border rounded-lg px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-accent cursor-pointer !outline-none focus:!outline-none focus:bg-accent focus:shadow-md transition-all min-w-[130px]",
-        dropdown_year: "bg-background border border-border rounded-lg px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-accent cursor-pointer !outline-none focus:!outline-none focus:bg-accent focus:shadow-md transition-all min-w-[90px]",
+        dropdown_month: "bg-background border border-border rounded-lg px-4 py-2 text-sm font-semibold text-foreground shadow-none hover:bg-accent cursor-pointer !outline-none focus:!outline-none focus:bg-accent transition-all min-w-[130px]",
+        dropdown_year: "bg-background border border-border rounded-lg px-4 py-2 text-sm font-semibold text-foreground shadow-none hover:bg-accent cursor-pointer !outline-none focus:!outline-none focus:bg-accent transition-all min-w-[90px]",
         dropdown_icon: "hidden",
         vhidden: "sr-only",
         ...classNames,
