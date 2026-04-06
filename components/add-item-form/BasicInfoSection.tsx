@@ -47,7 +47,7 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 
 	return (
 		<div className="space-y-6">
-			<div className="dense flex items-center gap-2 pb-2 border-b border-stone-300">
+			<div className="dense flex items-center gap-2 pb-2 border-b border-slate-300">
 				<Package className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
 				<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 					Product Details
@@ -55,7 +55,7 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 			</div>
 
 			{/* Row 1: Experience */}
-			<div className="dense flex items-center gap-3 p-4 rounded-lg border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-colors">
+			<div className="dense flex items-center gap-3 p-4 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 transition-colors">
 				<div className="w-full">
 					<div className="flex items-center gap-2 mb-2">
 						<Eye className="h-4 w-4 text-slate-600 flex-shrink-0" />
@@ -80,7 +80,7 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 							{watchedTriedOn ? (
 								<>
 									Yes{" "}
-									<CheckCircle className="inline h-4 w-4 text-meadow-600 ml-1" />
+									<CheckCircle className="inline h-4 w-4 text-emerald-500 ml-1" />
 								</>
 							) : (
 								"No"
@@ -88,7 +88,7 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 						</Label>
 					</div>
 					{watchedTriedOn && (
-						<p className="text-xs text-meadow-600 mt-2">
+						<p className="text-xs text-emerald-500 mt-2">
 							Great! Your feedback will help track the fit.
 						</p>
 					)}

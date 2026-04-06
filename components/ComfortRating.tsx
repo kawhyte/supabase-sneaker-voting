@@ -56,7 +56,7 @@ export function ComfortRating({
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-slate-900">Comfort Rating</label>
         {value && (
-          <span className="text-xs font-medium text-sun-600">
+          <span className="text-xs font-medium text-primary">
             {comfortLevels.find(l => l.id === value)?.label}
           </span>
         )}
@@ -86,16 +86,16 @@ export function ComfortRating({
                 ${
                   disabled
                     ? 'opacity-50 cursor-not-allowed'
-                    : 'cursor-pointer hover:bg-stone-50'
+                    : 'cursor-pointer hover:bg-slate-50'
                 }
                 ${
                   isSelected
-                    ? 'border-sun-400 bg-sun-50'
-                    : 'border-stone-200 bg-white'
+                    ? 'border-primary bg-primary'
+                    : 'border-slate-200 bg-white'
                 }
                 ${
                   isHovered && !isSelected
-                    ? 'border-sun-300 shadow-sm'
+                    ? 'border-primary shadow-sm'
                     : ''
                 }
               `}
@@ -104,7 +104,7 @@ export function ComfortRating({
               <Icon
                 className={`w-6 h-6 transition-colors duration-300 ${
                   isSelected
-                    ? 'text-sun-600'
+                    ? 'text-primary'
                     : isHovered
                       ? 'text-slate-600'
                       : 'text-slate-400'
@@ -116,7 +116,7 @@ export function ComfortRating({
                 <div
                   className={`text-xs font-semibold transition-colors duration-300 ${
                     isSelected
-                      ? 'text-sun-600'
+                      ? 'text-primary'
                       : isHovered
                         ? 'text-slate-700'
                         : 'text-slate-600'
@@ -133,7 +133,7 @@ export function ComfortRating({
 
               {/* Selected indicator ring */}
               {isSelected && (
-                <div className="absolute inset-0 rounded-lg pointer-events-none border-2 border-sun-600 opacity-20" />
+                <div className="absolute inset-0 rounded-lg pointer-events-none border-2 border-primary opacity-20" />
               )}
             </button>
           )

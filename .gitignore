@@ -42,6 +42,7 @@ next-env.d.ts
 .next-backup/
 fix-permissions.sh
 
-# MD files
-
+# MD files (keep README and CLAUDE checked in)
 *.md
+!README.md
+!CLAUDE.md

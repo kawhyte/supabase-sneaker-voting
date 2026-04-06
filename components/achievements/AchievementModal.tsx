@@ -55,7 +55,7 @@ export function AchievementModal({ achievement, isUnlocked, onClose }: Achieveme
             <div className="bg-muted px-3 py-1 rounded-full">
               <span className="font-medium">{achievement.tier}</span>
             </div>
-            <div className="bg-sun-200 px-3 py-1 rounded-full">
+            <div className="bg-primary px-3 py-1 rounded-full">
               <span className="font-medium">{achievement.points} points</span>
             </div>
           </div>

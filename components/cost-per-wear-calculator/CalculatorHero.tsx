@@ -8,11 +8,11 @@ import { Calculator, Check } from 'lucide-react';
 
 export function CalculatorHero() {
   return (
-    <section className="relative py-16 px-6 bg-gradient-to-b from-sun-100 to-white">
+    <section className="relative py-16 px-6 bg-gradient-to-b from-primary to-white">
       <div className="max-w-4xl mx-auto text-center space-y-6">
         {/* Icon */}
         <div className="flex justify-center">
-          <div className="h-16 w-16 rounded-2xl bg-sun-400 flex items-center justify-center">
+          <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center">
             <Calculator className="h-8 w-8 text-slate-900" />
           </div>
         </div>

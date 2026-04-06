@@ -18,7 +18,7 @@ export function WardrobeEmptyState() {
         Time to wake up your closet! Add your first item to get started on your
         journey to conscious wardrobe management.
       </p>
-      <Button className="bg-sun-400 hover:bg-sun-600 text-foreground">
+      <Button className="bg-primary hover:bg-primary text-foreground">
         Add Your First Item
       </Button>
     </div>
@@ -63,7 +63,7 @@ export function OutfitsEmptyState({ onCreateOutfit }: { onCreateOutfit: () => vo
       </p>
       <Button
         onClick={onCreateOutfit}
-        className="bg-sun-400 hover:bg-sun-600 text-foreground"
+        className="bg-primary hover:bg-primary text-foreground"
       >
         Create Your First Outfit
       </Button>
@@ -141,7 +141,7 @@ export function EmptyState({
       {action && (
         <Button
           onClick={action.onClick}
-          className="bg-sun-400 hover:bg-sun-600 text-foreground"
+          className="bg-primary hover:bg-primary text-foreground"
         >
           {action.label}
         </Button>

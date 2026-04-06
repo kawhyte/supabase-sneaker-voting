@@ -157,7 +157,7 @@ export function MilestoneCelebrationModal({
 
         <div className="flex flex-col items-center justify-center py-8 px-4">
           {/* Icon */}
-          <milestone.icon className="h-20 w-20 mb-6 animate-bounce text-sun-400" />
+          <milestone.icon className="h-20 w-20 mb-6 animate-bounce text-primary" />
 
           {/* Title */}
           <h2 className="text-2xl font-bold text-center text-foreground mb-3">
@@ -170,7 +170,7 @@ export function MilestoneCelebrationModal({
           </p>
 
           {/* Cat Message */}
-          <div className="bg-sun-200 rounded-lg p-4 mb-6 w-full flex items-center justify-center gap-2">
+          <div className="bg-primary rounded-lg p-4 mb-6 w-full flex items-center justify-center gap-2">
             <Cat className="h-4 w-4" />
             <p className="text-center text-sm font-medium text-foreground">
               {milestone.catMessage}
@@ -180,7 +180,7 @@ export function MilestoneCelebrationModal({
           {/* Close Button */}
           <Button
             onClick={onClose}
-            className="w-full bg-sun-400 hover:bg-sun-600 text-foreground"
+            className="w-full bg-primary hover:bg-primary text-foreground"
           >
             Thanks! Let's Keep Going
           </Button>

@@ -38,7 +38,7 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
   return (
     <Card className="p-6 sm:p-8 bg-card border-border shadow-lg">
       <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-        <Clock className="h-6 w-6 text-sun-400" />
+        <Clock className="h-6 w-6 text-primary" />
         <span>Time to Value</span>
       </h3>
 
@@ -46,8 +46,8 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
         {/* Timeline Visual */}
         <div className="relative pt-2 pb-6 px-2">
           {/* Line */}
-          <div className="absolute left-4 right-4 top-6 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-             <div className="h-full bg-gradient-to-r from-stone-300 to-green-400 w-full origin-left" />
+          <div className="absolute left-4 right-4 top-6 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+             <div className="h-full bg-gradient-to-r from-slate-300 to-green-400 w-full origin-left" />
           </div>
 
           {/* Points Container */}
@@ -55,10 +55,10 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
             
             {/* Start Point */}
             <div className="flex flex-col items-center gap-3">
-              <div className="w-4 h-4 rounded-full bg-stone-400 ring-4 ring-white z-10" />
+              <div className="w-4 h-4 rounded-full bg-slate-400 ring-4 ring-white z-10" />
               <div className="text-center">
-                <div className="font-bold text-sm text-stone-500">Today</div>
-                <div className="text-xs text-stone-400">{formatDate(today)}</div>
+                <div className="font-bold text-sm text-slate-500">Today</div>
+                <div className="text-xs text-slate-400">{formatDate(today)}</div>
               </div>
             </div>
 
@@ -77,31 +77,31 @@ export function TimelineProjection({ metrics, input }: TimelineProjectionProps) 
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 bg-stone-50 rounded-lg border border-stone-200 text-center">
-            <div className="text-xs uppercase tracking-wide text-stone-500 font-semibold mb-1">Time to ROI</div>
-            <div className="text-lg font-bold text-stone-900">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 text-center">
+            <div className="text-xs uppercase tracking-wide text-slate-500 font-semibold mb-1">Time to ROI</div>
+            <div className="text-lg font-bold text-slate-900">
               {monthsToBreakEven < 1 ? '< 1 Month' : `${monthsToBreakEven} Months`}
             </div>
           </div>
           
-          <div className="p-4 bg-stone-50 rounded-lg border border-stone-200 text-center">
-            <div className="text-xs uppercase tracking-wide text-stone-500 font-semibold mb-1">Wears Needed</div>
-            <div className="text-lg font-bold text-stone-900">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 text-center">
+            <div className="text-xs uppercase tracking-wide text-slate-500 font-semibold mb-1">Wears Needed</div>
+            <div className="text-lg font-bold text-slate-900">
               {metrics.breakEvenWears}
             </div>
           </div>
 
-          <div className="p-4 bg-stone-50 rounded-lg border border-stone-200 text-center">
-            <div className="text-xs uppercase tracking-wide text-stone-500 font-semibold mb-1">Usage Rate</div>
-            <div className="text-lg font-bold text-stone-900">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 text-center">
+            <div className="text-xs uppercase tracking-wide text-slate-500 font-semibold mb-1">Usage Rate</div>
+            <div className="text-lg font-bold text-slate-900">
               {getFrequencyLabel(input.wearFrequency).split(' ')[0]}
             </div>
           </div>
         </div>
 
         {/* Contextual Tip */}
-        <div className="flex gap-3 text-sm text-stone-600 bg-stone-50 p-4 rounded-md">
-          <Calendar className="w-5 h-5 text-stone-400 flex-shrink-0" />
+        <div className="flex gap-3 text-sm text-slate-600 bg-slate-50 p-4 rounded-md">
+          <Calendar className="w-5 h-5 text-slate-400 flex-shrink-0" />
           <p>
             At your <strong>{input.wearFrequency}</strong> wear rate, this item breaks even in <strong>{yearsToBreakEven.toFixed(1)} years</strong>.
             {metrics.estimatedLifespanYears > yearsToBreakEven

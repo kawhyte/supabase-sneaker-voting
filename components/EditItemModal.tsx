@@ -13,12 +13,12 @@
  *    - w-[95vw] max-w-7xl: 1280px maximum width, centered, responsive (80rem exactly)
  *    - px-4 sm:px-6 lg:px-8: Responsive horizontal gutters (16px→24px→32px)
  *    - max-h-[85vh] md:max-h-[90vh]: Responsive overflow height
- *    - bg-card border border-stone-300: Elevated white surface with subtle border
+ *    - bg-card border border-slate-300: Elevated white surface with subtle border
  *    - overflow-y-auto: Smooth scrolling for long forms
  *
  * 2. Header Section (STICKY)
  *    - sticky top-0 bg-card z-10: Stays visible while form scrolls
- *    - pb-[var(--spacing-6)] border-b border-stone-300: 24px spacing + separator
+ *    - pb-[var(--spacing-6)] border-b border-slate-300: 24px spacing + separator
  *    - -mx-4 sm:-mx-6 lg:-mx-8: Negative margins extend borders edge-to-edge
  *    - px-4 sm:px-6 lg:px-8: Re-apply responsive padding
  *    - Title: text-xl md:text-2xl responsive heading
@@ -31,8 +31,8 @@
  *
  * **Color System Integration (Design System v2.0):**
  * - Dialog background: bg-card (white)
- * - Dialog border: border-stone-300 (warm neutral, subtle)
- * - Header separator: border-stone-300 (visual hierarchy)
+ * - Dialog border: border-slate-300 (warm neutral, subtle)
+ * - Header separator: border-slate-300 (visual hierarchy)
  * - Text: text-foreground for title, text-muted-foreground for description
  *
  * **Spacing System (Perfect 8px Grid Alignment):**
@@ -98,8 +98,8 @@ export function EditItemModal({ experience, isOpen, onClose, onSave }: EditItemM
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-7xl px-4 sm:px-6 lg:px-8 max-h-[85vh] md:max-h-[90vh] overflow-y-auto bg-card border border-stone-300">
-        <DialogHeader className="sticky top-0 bg-card  pb-[var(--spacing-6)]  border-stone-300 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 z-50">
+      <DialogContent className="w-[95vw] max-w-7xl px-4 sm:px-6 lg:px-8 max-h-[85vh] md:max-h-[90vh] overflow-y-auto bg-card border border-slate-300">
+        <DialogHeader className="sticky top-0 bg-card  pb-[var(--spacing-6)]  border-slate-300 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 z-50">
           <DialogTitle className="text-xl md:text-2xl p-8">Edit Item</DialogTitle>
         </DialogHeader>
 

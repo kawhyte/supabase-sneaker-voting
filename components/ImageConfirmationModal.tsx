@@ -14,12 +14,12 @@
  *    - w-[95vw] max-w-7xl: 1280px maximum width, centered (80rem exactly)
  *    - px-4 sm:px-6 lg:px-8: Responsive horizontal gutters (16px→24px→32px)
  *    - max-h-[85vh] md:max-h-[90vh]: Responsive overflow height
- *    - bg-card border border-stone-300: Elevated white surface with subtle border
+ *    - bg-card border border-slate-300: Elevated white surface with subtle border
  *    - overflow-y-auto: Smooth scrolling content area
  *
  * 2. Header Section (STICKY)
  *    - sticky top-0 bg-card z-10: Stays visible while grid scrolls
- *    - pb-[var(--spacing-6)] border-b border-stone-300: 24px bottom spacing with separator
+ *    - pb-[var(--spacing-6)] border-b border-slate-300: 24px bottom spacing with separator
  *    - -mx-4 sm:-mx-6 lg:-mx-8: Negative margin to extend borders edge-to-edge
  *    - px-4 sm:px-6 lg:px-8: Re-apply responsive padding to content
  *    - Title: text-xl md:text-2xl responsive heading
@@ -36,22 +36,22 @@
  *    - h-40 md:h-44 lg:h-48: Responsive heights (160px→176px→192px, 8px grid)
  *    - object-cover: Center crop images to square
  *    - Borders:
- *      * Unselected: border-2 border-stone-300 (neutral gray)
- *      * Selected: border-2 border-sun-400 (primary brand yellow)
- *      * Main: ring-2 ring-sun-600 ring-offset-2 (darker yellow highlight)
+ *      * Unselected: border-2 border-slate-300 (neutral gray)
+ *      * Selected: border-2 border-primary (primary brand yellow)
+ *      * Main: ring-2 ring-primary ring-offset-2 (darker yellow highlight)
  *    - shadow-sm hover:shadow-md: Subtle elevation feedback
  *
  * 5. Selection UI (NEW: Prominent Center Checkmark)
  *    - Selection overlay: Prominent dark overlay (bg-black/25) when selected
  *    - Checkmark indicator: Large white CheckCircle (h-12 w-12 = 48px) centered
  *    - Drop shadow: drop-shadow-lg for visibility on varied backgrounds
- *    - Main badge: bg-sun-600 text-white text-xs md:text-sm font-semibold (top-right)
+ *    - Main badge: bg-primary text-white text-xs md:text-sm font-semibold (top-right)
  *    - Hover buttons: opacity-0 group-hover:opacity-100 for "Set as Main" and deselect
  *    - "Set as Main": bg-white/90 hover:bg-white text-xs md:text-sm
- *    - Deselect (X): bg-ember-500 hover:bg-ember-600 text-white
+ *    - Deselect (X): bg-destructive/10 hover:bg-destructive/10 text-white
  *
  * 6. Footer Section (VISUAL SEPARATOR)
- *    - pt-[var(--spacing-6)] border-t border-stone-300: 24px top spacing with separator
+ *    - pt-[var(--spacing-6)] border-t border-slate-300: 24px top spacing with separator
  *    - -mx-4 sm:-mx-6 lg:-mx-8: Negative margin to extend borders edge-to-edge
  *    - px-4 sm:px-6 lg:px-8: Re-apply responsive padding to content
  *    - Counter (LEFT): text-xs md:text-sm text-muted-foreground font-medium
@@ -59,14 +59,14 @@
  *
  * **Color System Integration (Design System v2.0):**
  * - Dialog background: bg-card (white)
- * - Dialog border: border-stone-300 (warm neutral, subtle)
- * - Header/Footer separators: border-stone-300 (visual hierarchy)
- * - Selected border: border-sun-400 (primary accent yellow, #FFC700 range)
- * - Unselected border: border-stone-300 (neutral warm gray)
- * - Main image ring: ring-sun-600 (darker primary, strong highlight)
- * - Checkbox selected: bg-sun-600 (primary highlight)
- * - Main badge: bg-sun-600 text-white (brand identity)
- * - Deselect button: bg-ember-500 hover:bg-ember-600 (destructive red)
+ * - Dialog border: border-slate-300 (warm neutral, subtle)
+ * - Header/Footer separators: border-slate-300 (visual hierarchy)
+ * - Selected border: border-primary (primary accent yellow, #FFC700 range)
+ * - Unselected border: border-slate-300 (neutral warm gray)
+ * - Main image ring: ring-primary (darker primary, strong highlight)
+ * - Checkbox selected: bg-primary (primary highlight)
+ * - Main badge: bg-primary text-white (brand identity)
+ * - Deselect button: bg-destructive/10 hover:bg-destructive/10 (destructive red)
  * - Text: text-muted-foreground (slate-600 for secondary info)
  * - Icons: text-white (CheckCircle on selected checkbox)
  *
@@ -91,7 +91,7 @@
  * - Keyboard navigation: Full Tab support through images and buttons
  * - Touch targets: 44px minimum on mobile (image cards ≥40px)
  * - Color not sole indicator: Selection shown by checkbox + border + ring
- * - Focus indicators: Native browser focus rings on buttons (ring-sun-400)
+ * - Focus indicators: Native browser focus rings on buttons (ring-primary)
  * - Sticky header: Maintains context while scrolling
  * - Contrast: All text meets WCAG AAA (16.5:1+ ratios)
  *
@@ -203,8 +203,8 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-7xl px-4 sm:px-6 lg:px-8 max-h-[85vh] md:max-h-[90vh] overflow-y-auto bg-card border border-stone-300">
-        <DialogHeader className="sticky top-0 bg-card z-10 pb-[var(--spacing-6)] pt-[var(--spacing-6)] border-b border-stone-300 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+      <DialogContent className="w-[95vw] max-w-7xl px-4 sm:px-6 lg:px-8 max-h-[85vh] md:max-h-[90vh] overflow-y-auto bg-card border border-slate-300">
+        <DialogHeader className="sticky top-0 bg-card z-10 pb-[var(--spacing-6)] pt-[var(--spacing-6)] border-b border-slate-300 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
           <DialogTitle className="text-xl md:text-2xl">Select Product Images</DialogTitle>
           <DialogDescription className="text-muted-foreground">
             Choose which images to import and select your main product image
@@ -221,8 +221,8 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
                 key={index}
                 className={cn(
                   "relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all h-40 md:h-44 lg:h-48 shadow-sm hover:shadow-md",
-                  isSelected ? "border-sun-400" : "border-stone-300 hover:border-stone-300",
-                  isMain && "ring-2 ring-sun-600 ring-offset-2"
+                  isSelected ? "border-primary" : "border-slate-300 hover:border-slate-300",
+                  isMain && "ring-2 ring-primary ring-offset-2"
                 )}
                 onClick={() => toggleImageSelection(image)}
               >
@@ -260,7 +260,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
 
                 {/* Main Image Badge */}
                 {isMain && (
-                  <div className="absolute top-[var(--space-md)] right-[var(--space-md)] bg-sun-600 text-white text-xs md:text-sm px-[var(--space-md)] py-[var(--space-xs)] rounded font-semibold">
+                  <div className="absolute top-[var(--space-md)] right-[var(--space-md)] bg-primary text-white text-xs md:text-sm px-[var(--space-md)] py-[var(--space-xs)] rounded font-semibold">
                     Main
                   </div>
                 )}
@@ -286,7 +286,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
                       e.stopPropagation()
                       toggleImageSelection(image)
                     }}
-                    className="absolute top-[var(--space-md)] right-[var(--space-md)] bg-ember-500 hover:bg-ember-600 text-white p-[var(--space-xs)] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-[var(--space-md)] right-[var(--space-md)] bg-destructive/10 hover:bg-destructive/10 text-white p-[var(--space-xs)] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -296,7 +296,7 @@ export function ImageConfirmationModal({ open, onOpenChange, images, onConfirm }
           })}
         </div>
 
-        <DialogFooter className="flex justify-between items-center py-[var(--spacing-6)] border-t border-stone-300 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+        <DialogFooter className="flex justify-between items-center py-[var(--spacing-6)] border-t border-slate-300 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
           <div className="text-xs md:text-sm text-muted-foreground font-medium px-[var(--spacing-6)]">
             {selectedImages.length} of {images.length} selected
           </div>

@@ -232,7 +232,7 @@ function NotificationCardComponent({
           ${severity === 'high' ? 'border-l-red-500' : ''}
           ${severity === 'medium' ? 'border-l-yellow-500' : ''}
           ${severity === 'low' ? 'border-l-blue-500' : ''}
-          ${isSelected ? 'ring-2 ring-sun-400' : ''}
+          ${isSelected ? 'ring-2 ring-primary' : ''}
           transition-all hover:shadow-md cursor-pointer
         `}
       >
@@ -331,14 +331,14 @@ function NotificationCardComponent({
               <div className="mt-3 space-y-3">
                 {/* Tips Section */}
                 {notification.metadata.tips && Array.isArray(notification.metadata.tips) && notification.metadata.tips.length > 0 && (
-                  <div className="rounded-lg bg-sun-50 p-3">
+                  <div className="rounded-lg bg-primary p-3">
                     <p className="mb-2 font-semibold text-xs text-slate-700 uppercase tracking-wide">
                       What to do this season:
                     </p>
                     <ul className="space-y-1.5">
                       {notification.metadata.tips.map((tip: string, index: number) => (
                         <li key={index} className="flex items-start gap-2 text-sm text-slate-700">
-                          <span className="text-sun-600 flex-shrink-0">•</span>
+                          <span className="text-primary flex-shrink-0">•</span>
                           <span>{tip}</span>
                         </li>
                       ))}
@@ -356,7 +356,7 @@ function NotificationCardComponent({
                       {notification.metadata.suggested_categories.map((category: string, index: number) => (
                         <span
                           key={index}
-                          className="rounded-full bg-sun-200 px-3 py-1 text-xs font-semibold text-sun-900"
+                          className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary"
                         >
                           {category}
                         </span>

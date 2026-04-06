@@ -48,7 +48,7 @@ export function AvatarEditor({ profile, user, onAvatarChange }: AvatarEditorProp
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 pb-8 border-b border-stone-200/50">
+    <div className="flex flex-col items-center gap-6 pb-8 border-b border-slate-200/50">
       {/* Current Avatar Display */}
       <div className="group relative motion-safe:transition-all motion-safe:duration-300">
         <AvatarDisplay
@@ -60,7 +60,7 @@ export function AvatarEditor({ profile, user, onAvatarChange }: AvatarEditorProp
           displayName={currentProfile.display_name}
           email={user.email}
           size="xl"
-          className="ring-2 ring-stone-300/40"
+          className="ring-2 ring-slate-300/40"
         />
         <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/10 motion-safe:transition-colors motion-safe:duration-300"></div>
       </div>

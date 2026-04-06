@@ -76,7 +76,7 @@ export function ProfileStats({
             <span
               className={`text-sm ${
                 stat.clickable
-                  ? "text-muted-foreground group-hover:text-sun-400 transition-colors"
+                  ? "text-muted-foreground group-hover:text-primary transition-colors"
                   : "text-muted-foreground"
               }`}
             >

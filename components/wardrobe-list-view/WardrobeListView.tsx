@@ -62,13 +62,13 @@ export function WardrobeListView({
 
 	return (
 		<motion.div
-			className="flex flex-col bg-card rounded-lg border border-stone-200 shadow-sm overflow-hidden"
+			className="flex flex-col bg-card rounded-lg border border-slate-200 shadow-sm overflow-hidden"
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			transition={{ duration: 0.3 }}
 		>
 			{/* List Header - Matches row column widths exactly */}
-			<div className="hidden lg:flex items-center gap-3 px-4 py-3 bg-stone-100 border-b border-stone-200 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+			<div className="hidden lg:flex items-center gap-3 px-4 py-3 bg-slate-100 border-b border-slate-200 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
 				<div className="flex-shrink-0 w-5"></div> {/* Spacer for expand icon */}
 				<div className="flex-shrink-0 w-16 lg:w-20">Image</div>
 				<div className="flex-1 min-w-0 max-w-[550px]">Item</div>
@@ -79,7 +79,7 @@ export function WardrobeListView({
 			</div>
 
 			{/* List Items */}
-			<div className="divide-y divide-stone-200">
+			<div className="divide-y divide-slate-200">
 				{entries.map((entry) => (
 					<WardrobeListItem
 						key={entry.id}

@@ -311,7 +311,7 @@ export default function AddItemForm({
 					{/* URL Import Section - Create Mode Only */}
 					{!isFormVisible && (mode === 'create' || mode === 'add') ? (
 						<div className="space-y-6">
-							<div className="bg-blaze-50 rounded-lg p-4 sm:p-6 border-2 border-sun-300">
+							<div className="bg-orange-500 rounded-lg p-4 sm:p-6 border-2 border-primary">
 								<h3 className="text-base font-semibold text-foreground mb-4 font-heading">
 									Auto-fill from URL
 								</h3>
@@ -388,8 +388,8 @@ export default function AddItemForm({
 
 							{/* Form Mode Toggle - Create Mode Only */}
 							{(mode === 'create' || mode === 'add') && (
-								<div className="flex items-center gap-3 p-4 rounded-lg bg-blaze-50 border border-sun-300">
-									<Lightbulb className="h-5 w-5 text-sun-400 flex-shrink-0" />
+								<div className="flex items-center gap-3 p-4 rounded-lg bg-orange-500 border border-primary">
+									<Lightbulb className="h-5 w-5 text-primary flex-shrink-0" />
 									<div className="flex-1">
 										<p className="text-sm font-medium text-slate-900">
 											{formMode === 'quick' ? 'Quick Mode' : 'Advanced Mode'}

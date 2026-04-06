@@ -35,8 +35,8 @@ export function HeroSection({ stats }: HeroSectionProps) {
       >
         {/* Total Items */}
         <div className="bg-card border border-border rounded-lg p-6 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-sun-200 rounded-full mb-3">
-            <Package className="h-6 w-6 text-sun-600" />
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-primary rounded-full mb-3">
+            <Package className="h-6 w-6 text-primary" />
           </div>
           <div className="text-4xl font-bold text-foreground mb-1">
             {stats.totalItems}
@@ -48,8 +48,8 @@ export function HeroSection({ stats }: HeroSectionProps) {
 
         {/* Total Wears */}
         <div className="bg-card border border-border rounded-lg p-6 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-meadow-200 rounded-full mb-3">
-            <Footprints className="h-6 w-6 text-meadow-600" />
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-500 rounded-full mb-3">
+            <Footprints className="h-6 w-6 text-emerald-500" />
           </div>
           <div className="text-4xl font-bold text-foreground mb-1">
             {stats.totalWears.toLocaleString()}

@@ -237,13 +237,13 @@ export function ValidationStatusCard({
 						<SheetTitle className='flex items-center gap-2'>
 							{hasMissingRequired ? (
 								<>
-									<AlertCircle className='h-5 w-5 text-ember-600' />
-									<span className='text-ember-900'>{totalRequired - completed} items to complete</span>
+									<AlertCircle className='h-5 w-5 text-destructive' />
+									<span className='text-destructive'>{totalRequired - completed} items to complete</span>
 								</>
 							) : (
 								<>
-									<CheckCircle2 className='h-5 w-5 text-meadow-600' />
-									<span className='text-meadow-900'>Almost ready!</span>
+									<CheckCircle2 className='h-5 w-5 text-emerald-500' />
+									<span className='text-emerald-500'>Almost ready!</span>
 								</>
 							)}
 						</SheetTitle>
@@ -256,7 +256,7 @@ export function ValidationStatusCard({
 								<span className='text-sm font-semibold text-slate-900'>
 									{completed} of {totalRequired} completed
 								</span>
-								<span className='text-sm font-bold text-sun-600'>{completionPercent}%</span>
+								<span className='text-sm font-bold text-primary'>{completionPercent}%</span>
 							</div>
 							<Progress value={completionPercent} className='h-2' />
 						</div>
@@ -295,14 +295,14 @@ export function ValidationStatusCard({
 							className='w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors rounded-lg'>
 							<div className='flex items-center gap-3'>
 								{hasMissingRequired ? (
-									<AlertCircle className='h-5 w-5 text-ember-600' />
+									<AlertCircle className='h-5 w-5 text-destructive' />
 								) : (
-									<CheckCircle2 className='h-5 w-5 text-meadow-600' />
+									<CheckCircle2 className='h-5 w-5 text-emerald-500' />
 								)}
-								<span className={cn('text-sm font-semibold ', hasMissingRequired ? 'text-ember-900' : 'text-meadow-900')}>
+								<span className={cn('text-sm font-semibold ', hasMissingRequired ? 'text-destructive' : 'text-emerald-500')}>
 									{completed} of {totalRequired} complete
 								</span>
-								<span className='text-sm font-bold text-sun-600'>{completionPercent}%</span>
+								<span className='text-sm font-bold text-primary'>{completionPercent}%</span>
 								<Progress value={completionPercent} className='h-1.5 w-32 ml-2' />
 							</div>
 							<ChevronDown className='h-4 w-4 text-slate-600' />
@@ -314,14 +314,14 @@ export function ValidationStatusCard({
 								<CardTitle className='text-sm flex items-center justify-between'>
 									<div className='flex items-center gap-3 p-4'>
 										{hasMissingRequired ? (
-											<AlertCircle className='h-5 w-5 text-ember-600' />
+											<AlertCircle className='h-5 w-5 text-destructive' />
 										) : (
-											<CheckCircle2 className='h-5 w-5 text-meadow-600' />
+											<CheckCircle2 className='h-5 w-5 text-emerald-500' />
 										)}
-										<span className={hasMissingRequired ? 'text-ember-900' : 'text-meadow-900'}>
+										<span className={hasMissingRequired ? 'text-destructive' : 'text-emerald-500'}>
 											{completed} of {totalRequired} complete
 										</span>
-										<span className='text-sm font-bold text-sun-600'>{completionPercent}%</span>
+										<span className='text-sm font-bold text-primary'>{completionPercent}%</span>
 									</div>
 									<button
 										onClick={() => setIsCollapsed(true)}
@@ -381,9 +381,9 @@ function ValidationItemRow({
 		const baseClass = 'flex-shrink-0'
 		const size = isCompact ? 'h-4 w-4' : 'h-5 w-5'
 		const color = {
-			complete: 'text-meadow-600',
-			pending: 'text-ember-600',
-			conditional: 'text-sun-600',
+			complete: 'text-emerald-500',
+			pending: 'text-destructive',
+			conditional: 'text-primary',
 		}[status] || ''
 		return cn(size, color, baseClass)
 	}
@@ -391,18 +391,18 @@ function ValidationItemRow({
 	const statusConfig = {
 		complete: {
 			icon: <CheckCircle2 className={getIconClass('complete', compact)} />,
-			textColor: 'text-meadow-900',
-			bgColor: 'bg-meadow-50',
+			textColor: 'text-emerald-500',
+			bgColor: 'bg-emerald-500',
 		},
 		pending: {
 			icon: <AlertCircle className={getIconClass('pending', compact)} />,
-			textColor: 'text-ember-900',
-			bgColor: 'bg-ember-50',
+			textColor: 'text-destructive',
+			bgColor: 'bg-destructive/10',
 		},
 		conditional: {
 			icon: <Info className={getIconClass('conditional', compact)} />,
-			textColor: 'text-sun-900',
-			bgColor: 'bg-sun-50',
+			textColor: 'text-primary',
+			bgColor: 'bg-primary',
 		},
 	}
 

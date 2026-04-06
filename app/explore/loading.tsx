@@ -7,7 +7,7 @@ export default function ExploreLoading() {
         {/* Page Header Skeleton */}
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <Sparkles className="h-8 w-8 text-sun-400" />
+            <Sparkles className="h-8 w-8 text-primary" />
             <div className="h-9 w-64 bg-muted animate-pulse rounded" />
           </div>
           <div className="h-6 w-96 bg-muted animate-pulse rounded" />

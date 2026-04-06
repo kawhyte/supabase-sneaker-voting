@@ -49,7 +49,7 @@ export function WearStatsDrawer({
 		<Sheet open={isOpen} onOpenChange={onOpenChange}>
 			<SheetContent side="right" className="w-full sm:w-96 p-0 flex flex-col">
 				{/* Header */}
-				<SheetHeader className="px-6 pt-6 pb-4 border-b border-stone-200">
+				<SheetHeader className="px-6 pt-6 pb-4 border-b border-slate-200">
 					<SheetTitle className="text-lg font-semibold">Wear Statistics</SheetTitle>
 					<SheetDescription className="text-xs text-muted-foreground">
 						 {item.model}
@@ -64,14 +64,14 @@ export function WearStatsDrawer({
 							<h3 className="text-sm font-semibold text-foreground">Wear Count</h3>
 
 							{/* Counter Controls */}
-							<div className="dense flex items-center justify-between gap-4 bg-stone-50 p-4 rounded-lg">
+							<div className="dense flex items-center justify-between gap-4 bg-slate-50 p-4 rounded-lg">
 								{/* Decrement Button */}
 								<Tooltip delayDuration={200}>
 									<TooltipTrigger asChild>
 										<button
 											onClick={() => onDecrementWear?.(item)}
 											disabled={!item.wears || item.wears === 0}
-											className="h-10 w-10 rounded-lg flex items-center justify-center transition-all bg-stone-100 hover:bg-stone-200 active:bg-stone-300 disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground font-semibold"
+											className="h-10 w-10 rounded-lg flex items-center justify-center transition-all bg-slate-100 hover:bg-slate-200 active:bg-slate-300 disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground font-semibold"
 											type="button"
 											aria-label="Decrease wear count">
 											<Minus className="h-5 w-5" />
@@ -114,7 +114,7 @@ export function WearStatsDrawer({
 						</div>
 
 						{/* Divider */}
-						<div className="h-px bg-stone-200" />
+						<div className="h-px bg-slate-200" />
 
 						{/* Cost Per Wear Section */}
 						{hasWearPrice && (
@@ -122,7 +122,7 @@ export function WearStatsDrawer({
 								<h3 className="text-sm font-semibold text-foreground">Actual Cost Per Wear</h3>
 
 								{/* CPW Value Display */}
-								<div className="bg-gradient-to-br from-sun-50 to-meadow-50 p-4 rounded-lg border border-sun-200">
+								<div className="bg-gradient-to-br from-primary to-emerald-500 p-4 rounded-lg border border-primary">
 									<div className="flex items-baseline gap-1">
 										<span className="text-2xl font-bold text-foreground">
 											${calculateCostPerWear(item.purchase_price, item.retail_price, item.wears)}
@@ -131,7 +131,7 @@ export function WearStatsDrawer({
 									</div>
 
 									{/* Calculation explanation */}
-									<div className="text-xs text-muted-foreground mt-3 pt-3 border-t border-sun-200">
+									<div className="text-xs text-muted-foreground mt-3 pt-3 border-t border-primary">
 										<p>
 											${item.purchase_price || item.retail_price} ÷ {item.wears || 0}{" "}
 											{item.wears === 1 ? "wear" : "wears"}
@@ -153,7 +153,7 @@ export function WearStatsDrawer({
 						{/* Size & Comfort Info */}
 						{(item.size_tried || comfortInfo) && (
 							<>
-								<div className="h-px bg-stone-200" />
+								<div className="h-px bg-slate-200" />
 
 								<div className="flex flex-col gap-2">
 									<h3 className="text-sm font-semibold text-foreground">Item Details</h3>

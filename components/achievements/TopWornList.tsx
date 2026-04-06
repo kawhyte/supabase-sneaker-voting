@@ -119,11 +119,11 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
           >
             <Link
               href="/dashboard?tab=owned"
-              className="block bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-sun-400 transition-all"
+              className="block bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-primary transition-all"
             >
               {/* Rank Badge */}
               <div className="relative">
-                <div className="absolute top-2 left-2 bg-sun-400 text-foreground font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm z-10">
+                <div className="absolute top-2 left-2 bg-primary text-foreground font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm z-10">
                   #{index + 1}
                 </div>
 
@@ -160,9 +160,9 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
 
                 {/* Wear Count */}
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-sun-200 rounded-full h-2 overflow-hidden">
+                  <div className="flex-1 bg-primary rounded-full h-2 overflow-hidden">
                     <div
-                      className="bg-sun-400 h-full"
+                      className="bg-primary h-full"
                       style={{ width: `${Math.min(100, (item.wears / (items[0]?.wears || 1)) * 100)}%` }}
                     />
                   </div>

@@ -128,19 +128,19 @@ export function PricingSection({ form }: PricingSectionProps) {
 				watchedRetailPrice &&
 				parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
 					<div
-						className="p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300 bg-meadow-50 border-meadow-300"
+						className="p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300 bg-emerald-500 border-emerald-500"
 						role="status"
 						aria-live="polite"
 					>
 						<Sparkles
-							className="h-4 w-4 flex-shrink-0 text-meadow-600 mt-0.5"
+							className="h-4 w-4 flex-shrink-0 text-emerald-500 mt-0.5"
 							aria-hidden="true"
 						/>
 						<div className="flex-1 min-w-0">
-							<p className="text-sm font-semibold text-meadow-700">
+							<p className="text-sm font-semibold text-emerald-500">
 								Active sale: ${watchedSalePrice}
 							</p>
-							<p className="text-xs text-meadow-600">
+							<p className="text-xs text-emerald-500">
 								Save $
 								{(
 									parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)
@@ -204,7 +204,7 @@ export function PricingSection({ form }: PricingSectionProps) {
 							className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border-2 text-xs font-bold transition-all duration-150 ${
 								watchedFrequency === value
 									? 'border-slate-900 bg-slate-900 text-white'
-									: 'border-stone-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
+									: 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
 							}`}
 						>
 							{icon}

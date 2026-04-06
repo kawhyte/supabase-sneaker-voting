@@ -247,12 +247,12 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 		: publicNavLinks;
 
 	return (
-		<nav className='sticky top-0 z-50 w-full bg-background backdrop-blur-md supports-[backdrop-filter]:bg-stone-50'>
+		<nav className='sticky top-0 z-50 w-full bg-background backdrop-blur-md supports-[backdrop-filter]:bg-slate-50'>
 			<div className='container mx-auto px-4 sm:px-6'>
 				<div className='flex h-16 items-center justify-between gap-6'>
 					{/* Logo/Brand - Minimalist Design with Poppins SemiBold (Outside Pill) */}
 					<Link href='/' className='flex items-center gap-2 motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:scale-105 flex-shrink-0'>
-						<PawPrint className='text-sun-600 h-8 w-8' />
+						<PawPrint className='text-primary h-8 w-8' />
 						<span className='text-2xl font-extrabold '>
 							PurrView
 						</span>
@@ -263,7 +263,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 						{navLinks.map((link) => (
 							link.isAction ? (
 								<Link key={link.href} href={link.href}>
-									<Button className='flex items-center gap-2  bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-sm  font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
+									<Button className='flex items-center gap-2  bg-primary text-slate-900 hover:bg-primary shadow-sm  font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
 										<Plus className='h-4 w-4' />
 										{link.label}
 									</Button>
@@ -299,7 +299,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 								aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
 								title="Notifications (Shift+N)"
 							>
-								<Bell className={`h-5 w-5 text-foreground ${hasNewNotification ? 'text-sun-600' : ''}`} />
+								<Bell className={`h-5 w-5 text-foreground ${hasNewNotification ? 'text-primary' : ''}`} />
 								{unreadCount > 0 && (
 									<span className={`absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-xs font-bold ${
 										hasNewNotification ? 'motion-safe:animate-pulse motion-safe:scale-110' : 'motion-safe:animate-pulse'
@@ -308,7 +308,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 									</span>
 								)}
 								{hasNewNotification && (
-									<span className="absolute inset-0 rounded-full bg-sun-400/20 motion-safe:animate-ping" />
+									<span className="absolute inset-0 rounded-full bg-primary/20 motion-safe:animate-ping" />
 								)}
 							</button>
 
@@ -329,7 +329,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 										) : (
 											<Avatar className="h-8 w-8">
 												<AvatarImage src={user?.user_metadata?.avatar_url} />
-												<AvatarFallback className="bg-sun-400 text-slate-900 font-semibold">
+												<AvatarFallback className="bg-primary text-slate-900 font-semibold">
 													{user?.email?.[0].toUpperCase() || 'U'}
 												</AvatarFallback>
 											</Avatar>
@@ -354,7 +354,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 											) : (
 												<Avatar className="h-12 w-12">
 													<AvatarImage src={user?.user_metadata?.avatar_url} />
-													<AvatarFallback className="bg-sun-400 text-slate-900 text-lg font-semibold">
+													<AvatarFallback className="bg-primary text-slate-900 text-lg font-semibold">
 														{user?.email?.[0].toUpperCase() || 'U'}
 													</AvatarFallback>
 												</Avatar>
@@ -452,7 +452,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 									aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
 								>
 									<div className="flex items-center gap-3">
-										<Bell className={`h-5 w-5 ${hasNewNotification ? 'text-sun-600' : 'text-foreground'}`} />
+										<Bell className={`h-5 w-5 ${hasNewNotification ? 'text-primary' : 'text-foreground'}`} />
 										<span className="text-sm font-medium">Notifications</span>
 									</div>
 									{unreadCount > 0 && (
@@ -467,7 +467,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 							{navLinks.map((link) => (
 								link.isAction ? (
 									<Link key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
-										<Button className='flex items-center gap-2 bg-sun-400 hover:bg-sun-500 text-slate-900 font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md w-full justify-center'>
+										<Button className='flex items-center gap-2 bg-primary hover:bg-primary text-slate-900 font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md w-full justify-center'>
 											<Plus className='h-4 w-4' />
 											{link.label}
 										</Button>

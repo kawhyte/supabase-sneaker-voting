@@ -25,22 +25,22 @@ export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* 1. The Sticker Price vs Net Cost */}
-        <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 flex flex-col justify-between">
+        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
           <div>
-            <div className="text-sm text-stone-500 font-medium mb-1">Net Cost</div>
-            <div className="text-2xl font-bold text-stone-900">
+            <div className="text-sm text-slate-500 font-medium mb-1">Net Cost</div>
+            <div className="text-2xl font-bold text-slate-900">
               ${metrics.netCost.toFixed(0)}
             </div>
-            <div className="text-xs text-stone-400 mt-1">
+            <div className="text-xs text-slate-400 mt-1">
               What you actually pay
             </div>
           </div>
           
           {metrics.estimatedResaleValue > 0 && (
-            <div className="mt-4 pt-4 border-t border-stone-200">
+            <div className="mt-4 pt-4 border-t border-slate-200">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-stone-500">Retail Price</span>
-                <span className="font-medium strike-through text-stone-400">${input.price}</span>
+                <span className="text-slate-500">Retail Price</span>
+                <span className="font-medium strike-through text-slate-400">${input.price}</span>
               </div>
               <div className="flex justify-between items-center text-sm mt-1">
                 <span className="text-green-600 font-medium">Est. Resale</span>
@@ -51,17 +51,17 @@ export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
         </div>
 
         {/* 2. Lifetime Wears */}
-        <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 flex flex-col justify-between">
+        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
           <div>
-            <div className="text-sm text-stone-500 font-medium mb-1">Estimated Lifespan</div>
-            <div className="text-2xl font-bold text-stone-900">
+            <div className="text-sm text-slate-500 font-medium mb-1">Estimated Lifespan</div>
+            <div className="text-2xl font-bold text-slate-900">
               {metrics.estimatedLifespanYears} Years
             </div>
-            <div className="text-xs text-stone-400 mt-1">
+            <div className="text-xs text-slate-400 mt-1">
               Based on quality rating
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-stone-200 flex items-center gap-2 text-stone-600">
+          <div className="mt-4 pt-4 border-t border-slate-200 flex items-center gap-2 text-slate-600">
             <Repeat className="w-4 h-4" />
             <span className="text-sm font-medium">{metrics.totalLifetimeWears} total wears</span>
           </div>

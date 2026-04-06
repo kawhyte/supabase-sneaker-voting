@@ -75,7 +75,7 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<div className='space-y-2.5 px-3 py-3 rounded-lg border border-stone-300 bg-stone-50'>
+				<div className='space-y-2.5 px-3 py-3 rounded-lg border border-slate-300 bg-slate-50'>
 					{/* Header */}
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
@@ -85,7 +85,7 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 							</span>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<Info className='h-3.5 w-3.5 text-stone-400 hover:text-stone-600 cursor-help transition-colors' />
+									<Info className='h-3.5 w-3.5 text-slate-400 hover:text-slate-600 cursor-help transition-colors' />
 								</TooltipTrigger>
 								<TooltipContent side='top' className='max-w-xs'>
 									<p className='text-xs'>
@@ -95,7 +95,7 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 							</Tooltip>
 						</div>
 						{isWorthIt && (
-							<span className='text-xs font-bold px-2 py-1 rounded-full bg-meadow-500 text-white flex items-center gap-1'>
+							<span className='text-xs font-bold px-2 py-1 rounded-full bg-emerald-500 text-white flex items-center gap-1'>
 								<Sparkles className='h-3 w-3' /> Worth It!
 							</span>
 						)}
@@ -126,7 +126,7 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 					</div>
 
 					{/* Progress Bar */}
-					<div className='w-full bg-stone-200 rounded-full h-2.5 overflow-hidden border border-stone-300'>
+					<div className='w-full bg-slate-200 rounded-full h-2.5 overflow-hidden border border-slate-300'>
 						<div
 							className='h-full rounded-full transition-all duration-500 ease-out'
 							style={{
@@ -143,7 +143,7 @@ export function CostPerWearProgress({ item }: CostPerWearProgressProps) {
 					{/* Milestone Message */}
 					<div className='text-xs text-slate-700 font-medium'>
 						{isWorthIt ? (
-							<span className='text-meadow-700 font-semibold'>
+							<span className='text-emerald-500 font-semibold'>
 								{metrics.milestoneMessage}
 							</span>
 						) : metrics.wearsRemaining > 0 ? (

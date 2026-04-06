@@ -23,11 +23,11 @@ export function RecommendationCard({ recommendation }: Props) {
       iconColor: 'text-green-600'
     },
     WAIT_FOR_SALE: {
-      border: 'border-sun-500',
+      border: 'border-primary',
       bg: 'bg-amber-50',
       text: 'text-amber-900',
       icon: Tag,
-      iconColor: 'text-sun-600'
+      iconColor: 'text-primary'
     },
     PASS: {
       border: 'border-red-500',
@@ -46,7 +46,7 @@ export function RecommendationCard({ recommendation }: Props) {
       <div className="absolute top-0 right-0 p-4">
         <div className={cn("flex flex-col items-center justify-center w-16 h-16 rounded-full border-4 bg-white font-bold text-xl shadow-sm", styles.border, styles.text)}>
           <span>{score}</span>
-          <span className="text-[10px] uppercase font-normal text-stone-500 -mt-1">Score</span>
+          <span className="text-[10px] uppercase font-normal text-slate-500 -mt-1">Score</span>
         </div>
       </div>
 
@@ -61,7 +61,7 @@ export function RecommendationCard({ recommendation }: Props) {
           <h2 className={cn("text-3xl font-bold font-heading mb-2", styles.text)}>
             {headline}
           </h2>
-          <p className="text-stone-700 text-lg leading-relaxed max-w-xl">
+          <p className="text-slate-700 text-lg leading-relaxed max-w-xl">
             {description}
           </p>
         </div>
@@ -69,7 +69,7 @@ export function RecommendationCard({ recommendation }: Props) {
 
       {/* Action Prompt (The "Wait for Sale" Logic) */}
       {actionPrompt && (
-        <div className="mt-6 p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-stone-200 flex items-start gap-3">
+        <div className="mt-6 p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-slate-200 flex items-start gap-3">
           <div className="bg-slate-900 text-white p-1.5 rounded-full mt-0.5">
             <Tag className="w-4 h-4" />
           </div>

@@ -38,7 +38,7 @@ export function UserPreviewCard({ user }: UserPreviewCardProps) {
           <Link href={`/users/${user.user_id}`} onClick={handleCardClick}>
             <Avatar className="h-12 w-12">
               <AvatarImage src={user.avatar_url || undefined} alt={displayName} />
-              <AvatarFallback className="bg-sun-400 text-slate-900">
+              <AvatarFallback className="bg-primary text-slate-900">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -46,7 +46,7 @@ export function UserPreviewCard({ user }: UserPreviewCardProps) {
 
           <div className="flex-1 min-w-0">
             <Link href={`/users/${user.user_id}`} onClick={handleCardClick}>
-              <h3 className="font-semibold text-base truncate hover:text-sun-400 transition-colors">
+              <h3 className="font-semibold text-base truncate hover:text-primary transition-colors">
                 {displayName}
               </h3>
             </Link>

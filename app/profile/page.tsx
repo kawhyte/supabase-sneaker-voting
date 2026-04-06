@@ -55,7 +55,7 @@ function SettingsContent() {
           {/* Tab List */}
           <TabsList
             data-variant="underline"
-            className="w-full justify-start border-b border-stone-200 bg-transparent p-0 gap-8 mb-8"
+            className="w-full justify-start border-b border-slate-200 bg-transparent p-0 gap-8 mb-8"
           >
             <TabsTrigger
               value="profile"

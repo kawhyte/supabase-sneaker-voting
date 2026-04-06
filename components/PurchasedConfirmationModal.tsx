@@ -175,7 +175,7 @@ export function PurchasedConfirmationModal({
           </div>
         </div>
 
-        <DialogFooter className="gap-3 sm:gap-2 pt-4 border-t border-stone-200">
+        <DialogFooter className="gap-3 sm:gap-2 pt-4 border-t border-slate-200">
           <Button
             type="button"
             variant="outline"
@@ -189,7 +189,7 @@ export function PurchasedConfirmationModal({
             type="button"
             onClick={handleConfirm}
             disabled={!purchasePrice || !isPriceValid || isSubmitting}
-            className="min-h-11 bg-meadow-600 hover:bg-meadow-700 text-white focus-ring"
+            className="min-h-11 bg-emerald-500 hover:bg-emerald-500 text-white focus-ring"
             aria-busy={isSubmitting}
           >
             {isSubmitting ? (

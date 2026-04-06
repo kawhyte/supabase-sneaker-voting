@@ -53,7 +53,7 @@ export function ItemStoreAndDate({
 								href={storeUrl}
 								target='_blank'
 								rel='noopener noreferrer'
-								className='inline-flex items-center gap-1 text-sun-600 hover:text-sun-700 underline decoration-dotted underline-offset-2 transition-colors'
+								className='inline-flex items-center gap-1 text-primary hover:text-primary underline decoration-dotted underline-offset-2 transition-colors'
 								title={getFullDomain(storeUrl) || storeUrl}
 								onClick={(e) => e.stopPropagation()} // Prevent card click when clicking link
 							>

@@ -250,9 +250,9 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
                               className={cn(
                                 'h-10 w-10 rounded-full border-2 border-border',
                                 'transition-transform duration-150',
-                                'hover:scale-110 hover:border-sun-400',
+                                'hover:scale-110 hover:border-primary',
                                 'active:scale-95',
-                                'focus:outline-none focus:ring-2 focus:ring-sun-400 focus:ring-offset-2'
+                                'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
                               )}
                               style={{ backgroundColor: hex }}
                               aria-label={role ? `${role}: ${hex}` : hex}

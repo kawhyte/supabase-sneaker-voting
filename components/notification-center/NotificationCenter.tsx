@@ -373,7 +373,7 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
                   Notifications
                 </SheetTitle>
                 {unreadCount > 0 && (
-                  <span className="dense flex items-center justify-center min-w-[20px] h-5 px-2 rounded-full bg-sun-400 text-slate-900 text-xs font-semibold">
+                  <span className="dense flex items-center justify-center min-w-[20px] h-5 px-2 rounded-full bg-primary text-slate-900 text-xs font-semibold">
                     {unreadCount}
                   </span>
                 )}
@@ -402,7 +402,7 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
                     placeholder="Search notifications..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full rounded-lg border border-stone-200 py-2 pl-10 pr-3 text-sm focus:border-sun-400 focus:outline-none focus:ring-2 focus:ring-sun-400/20"
+                    className="w-full rounded-lg border border-slate-200 py-2 pl-10 pr-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     aria-label="Search notifications"
                     role="searchbox"
                   />
@@ -411,7 +411,7 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
                   variant="outline"
                   size="sm"
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`dense ${showFilters ? 'bg-sun-50 border-sun-400' : ''}`}
+                  className={`dense ${showFilters ? 'bg-primary border-primary' : ''}`}
                   aria-label="Toggle filters"
                 >
                   <Filter className="h-4 w-4" />
@@ -434,8 +434,8 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
                       onClick={() => setFilterType(null)}
                       className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
                         filterType === null
-                          ? 'bg-sun-400 text-white'
-                          : 'bg-stone-100 text-slate-700 hover:bg-stone-200'
+                          ? 'bg-primary text-white'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
                       All
@@ -451,8 +451,8 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
                         onClick={() => setFilterType(type)}
                         className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
                           filterType === type
-                            ? 'bg-sun-400 text-white'
-                            : 'bg-stone-100 text-slate-700 hover:bg-stone-200'
+                            ? 'bg-primary text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                         }`}
                       >
                         {label}
@@ -536,7 +536,7 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
           )}
 
           {/* Keyboard Shortcuts Legend */}
-          <div className="border-t border-stone-200 bg-stone-50 p-3 mt-auto">
+          <div className="border-t border-slate-200 bg-slate-50 p-3 mt-auto">
             <button
               onClick={() => setShowShortcuts(!showShortcuts)}
               className="flex w-full items-center justify-between text-xs text-slate-600 hover:text-slate-900"
@@ -578,7 +578,7 @@ function ShortcutItem({ keys, description }: { keys: string[]; description: stri
         {keys.map((key, i) => (
           <kbd
             key={i}
-            className="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-mono text-xs font-semibold text-slate-700"
+            className="rounded border border-slate-300 bg-white px-1.5 py-0.5 font-mono text-xs font-semibold text-slate-700"
           >
             {key}
           </kbd>

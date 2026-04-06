@@ -88,19 +88,19 @@ export function AchievementsPreview({ userId }: { userId?: string }) {
       <DropdownMenuLabel className="text-xs">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-sun-400" />
+            <Trophy className="h-4 w-4 text-primary" />
             <span className="font-semibold">
               {unlockedCount} of {totalCount} Achievements
             </span>
           </div>
           <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
             <div
-              className="bg-sun-400 h-full transition-all duration-300"
+              className="bg-primary h-full transition-all duration-300"
               style={{ width: `${percentage}%` }}
             />
           </div>
           <DropdownMenuItem asChild>
-            <Link href="/achievements" className="cursor-pointer text-xs text-sun-400 hover:text-sun-600">
+            <Link href="/achievements" className="cursor-pointer text-xs text-primary hover:text-primary">
               View all achievements →
             </Link>
           </DropdownMenuItem>

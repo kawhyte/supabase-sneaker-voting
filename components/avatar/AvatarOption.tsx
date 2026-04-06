@@ -20,8 +20,8 @@ export function AvatarOption({ id, name, isSelected, onClick }: AvatarOptionProp
         'hover:scale-105 hover:shadow-md',
         'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
         isSelected
-          ? 'border-primary bg-sun-200/30 shadow-md'
-          : 'border-border bg-card hover:border-sun-400/50'
+          ? 'border-primary bg-primary/30 shadow-md'
+          : 'border-border bg-card hover:border-primary/50'
       )}
       aria-label={`Select ${name} avatar`}
       aria-pressed={isSelected}

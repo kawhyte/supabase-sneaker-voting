@@ -74,7 +74,7 @@ export function AvatarDisplay({
         onLoad={() => setIsLoading(false)}
         onError={() => setIsLoading(false)}
       />
-      <AvatarFallback className="bg-sun-400 text-slate-900 font-semibold">
+      <AvatarFallback className="bg-primary text-slate-900 font-semibold">
         {getInitials()}
       </AvatarFallback>
     </Avatar>

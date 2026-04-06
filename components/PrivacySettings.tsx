@@ -252,7 +252,7 @@ export function PrivacySettings() {
 						<Button
 							onClick={handleSave}
 							disabled={!hasChanges || saving}
-							className='bg-sun-400 text-slate-900 hover:bg-sun-500'>
+							className='bg-primary text-slate-900 hover:bg-primary'>
 							{saving ? "Saving..." : "Save Changes"}
 						</Button>
 					</div>

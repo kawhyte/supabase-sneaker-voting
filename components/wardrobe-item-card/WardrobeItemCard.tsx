@@ -98,7 +98,7 @@ function WardrobeItemCardComponent({
 	return (
 		<TooltipProvider delayDuration={300}>
 			<Card
-				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full min-h-[420px] border border-stone-200 shadow-sm hover:shadow-md hover:border-stone-300 will-change-transform focus-visible:ring-2 focus-visible:ring-sun-400 focus-visible:ring-offset-2'
+				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full min-h-[420px] border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 will-change-transform focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
 				tabIndex={0}
 				role='article'
 				aria-label={`${item.brand} ${item.model}`}>
@@ -119,7 +119,7 @@ function WardrobeItemCardComponent({
 
 					{/* Archived Badge - Show when archived but not in archive view */}
 					{item.is_archived && viewMode !== 'archive' && (
-						<div className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1 bg-stone-100 text-slate-600'>
+						<div className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1 bg-slate-100 text-slate-600'>
 							<Archive className='h-3 w-3' />
 							Archived
 						</div>
@@ -129,7 +129,7 @@ function WardrobeItemCardComponent({
 					{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
 						<Tooltip delayDuration={200}>
 							<TooltipTrigger asChild>
-								<div className='absolute top-2 left-2 z-40 p-1.5 rounded-full bg-sun-100 text-sun-600 shadow-sm hover:bg-sun-200 transition-colors cursor-help'>
+								<div className='absolute top-2 left-2 z-40 p-1.5 rounded-full bg-primary text-primary shadow-sm hover:bg-primary transition-colors cursor-help'>
 									<Pin className='h-3.5 w-3.5' />
 								</div>
 							</TooltipTrigger>
@@ -149,7 +149,7 @@ function WardrobeItemCardComponent({
 					/>
 
 					{/* Content Section */}
-					<CardContent className='flex-1 p-4 flex flex-col gap-3 md:border-l md:border-stone-200'>
+					<CardContent className='flex-1 p-4 flex flex-col gap-3 md:border-l md:border-slate-200'>
 						{/* Brand - With Logo if Available */}
 						<div className='flex items-center gap-2'>
 							{item.brands?.brand_logo && (
@@ -244,7 +244,7 @@ function WardrobeItemCardComponent({
 						{showNotes && item.notes && item.notes.trim() && item.notes.toLowerCase() !== 'no note added' && (
 							<Tooltip delayDuration={300}>
 								<TooltipTrigger asChild>
-									<div className='mt-1 p-2.5 bg-stone-50 rounded-lg italic text-sm text-muted-foreground line-clamp-3 leading-relaxed cursor-help transition-colors hover:bg-stone-100'>
+									<div className='mt-1 p-2.5 bg-slate-50 rounded-lg italic text-sm text-muted-foreground line-clamp-3 leading-relaxed cursor-help transition-colors hover:bg-slate-100'>
 										{item.notes}
 									</div>
 								</TooltipTrigger>
@@ -287,7 +287,7 @@ function WardrobeItemCardComponent({
 
 						{/* Footer - Cost Per Wear Button */}
 						{viewMode === 'collection'  && (
-						<div className='flex items-center border-t gap-2 flex-wrap mt-auto pt-4 border-stone-200'>
+						<div className='flex items-center border-t gap-2 flex-wrap mt-auto pt-4 border-slate-200'>
 							<ItemFooterBadges
 								item={item}
 								viewMode={viewMode}

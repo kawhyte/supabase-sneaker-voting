@@ -43,8 +43,8 @@ import Link from "next/link";
      - max-w-[1920px] mx-auto constrains ultra-wide displays (>2560px)
 
   4. Tab Triggers (ENHANCED v2.2 - Premium UX)
-     - Active Tab: bg-sun-400 (vibrant yellow) for instant recognition
-     - Inactive Tab: text-muted-foreground with hover:bg-stone-100 feedback
+     - Active Tab: bg-primary (vibrant yellow) for instant recognition
+     - Inactive Tab: text-muted-foreground with hover:bg-slate-100 feedback
      - Active Tab: font-semibold + shadow-sm for depth perception
      - Cursor Pointer: cursor-pointer for affordance recognition
      - Hover Animation: scale-105 for interactive feedback (smooth transition)
@@ -131,7 +131,7 @@ function DashboardContent() {
 
 						{/* Add Item Button - Primary CTA */}
 						<Link href='/add-new-item'>
-							<Button className='flex items-center gap-2 bg-sun-400 text-slate-900 hover:bg-sun-500 shadow-sm font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
+							<Button className='flex items-center gap-2 bg-primary text-slate-900 hover:bg-primary shadow-sm font-semibold px-4 py-2 rounded-lg transition-all hover:shadow-md motion-safe:hover:scale-105 will-change-transform'>
 								<Plus className='h-4 w-4' />
 								Add Item
 							</Button>
@@ -152,7 +152,7 @@ function DashboardContent() {
 							<div className='flex-1'>
 								<TabsList
 									data-variant='underline'
-									className='w-full justify-start border-b border-stone-200 bg-transparent p-0 gap-8 mb-8'>
+									className='w-full justify-start border-b border-slate-200 bg-transparent p-0 gap-8 mb-8'>
 									<TabsTrigger
 										value='rotation'
 										data-variant='underline'

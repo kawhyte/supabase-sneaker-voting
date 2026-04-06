@@ -125,9 +125,9 @@ export function StyleGuideDialog({ trigger }: StyleGuideDialogProps) {
           </div>
 
           {/* General Tips */}
-          <div className="bg-sun-50 dark:bg-sun-950/20 rounded-lg p-4 space-y-2 border border-sun-200 dark:border-sun-800">
-            <h4 className="text-sm font-semibold text-sun-900 dark:text-sun-100">General Styling Tips</h4>
-            <ul className="space-y-1.5 text-sm text-sun-800 dark:text-sun-200">
+          <div className="bg-primary dark:bg-primary/20 rounded-lg p-4 space-y-2 border border-primary dark:border-primary">
+            <h4 className="text-sm font-semibold text-primary dark:text-primary">General Styling Tips</h4>
+            <ul className="space-y-1.5 text-sm text-primary dark:text-primary">
               <li>• Click any color circle to copy its hex code for shopping reference</li>
               <li>• The first color (Primary/Muted Base) usually works best for your largest garment</li>
               <li>• Mix bold and muted approaches: bold sneakers + muted outfit, or vice versa</li>

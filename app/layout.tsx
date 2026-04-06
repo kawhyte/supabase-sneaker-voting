@@ -118,8 +118,8 @@ export default function RootLayout({
 
     4. Use functional colors for badges:
        - Sold out: className="bg-slate-100 text-slate-600"
-       - New release: className="bg-blaze-400 text-blaze-600"
-       - Good deal: className="bg-meadow-400 text-meadow-600"
+       - New release: className="bg-orange-500 text-orange-500"
+       - Good deal: className="bg-emerald-500 text-emerald-500"
 
     ♿ ACCESSIBILITY NOTES:
     - All -600+ shades are WCAG AAA compliant for text

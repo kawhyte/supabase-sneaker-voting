@@ -164,14 +164,14 @@ export function WardrobeStatsWidget({ userId }: { userId?: string }) {
           {/* Achievements with Progress Bar */}
           {/* <div className="flex flex-col gap-2 pt-1">
             <div className="flex items-center gap-2">
-              <Trophy className="h-3 w-3 text-sun-400" />
+              <Trophy className="h-3 w-3 text-primary" />
               <span className="text-muted-foreground">
                 {unlockedCount} of {totalCount} Achievements
               </span>
             </div>
             <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
               <div
-                className="bg-sun-400 h-full transition-all duration-300"
+                className="bg-primary h-full transition-all duration-300"
                 style={{ width: `${achievementPercentage}%` }}
               />
             </div>

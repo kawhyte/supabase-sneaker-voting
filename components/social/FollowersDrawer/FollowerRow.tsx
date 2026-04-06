@@ -28,18 +28,18 @@ export function FollowerRow({ user }: FollowerRowProps) {
         href={`/users/${user.id}`}
         className="flex items-center gap-3 flex-1 min-w-0 group"
       >
-        <Avatar className="h-10 w-10 ring-2 ring-background group-hover:ring-sun-400/50 transition-all">
+        <Avatar className="h-10 w-10 ring-2 ring-background group-hover:ring-primary/50 transition-all">
           <AvatarImage
             src={user.avatar_url || undefined}
             alt={user.display_name}
           />
-          <AvatarFallback className="bg-sun-400/10 text-sun-400 font-medium">
+          <AvatarFallback className="bg-primary/10 text-primary font-medium">
             {initials}
           </AvatarFallback>
         </Avatar>
 
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-foreground group-hover:text-sun-400 transition-colors truncate">
+          <p className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
             {user.display_name}
           </p>
         </div>

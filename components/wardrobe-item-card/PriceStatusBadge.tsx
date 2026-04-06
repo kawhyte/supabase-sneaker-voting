@@ -67,10 +67,10 @@ export function PriceStatusBadge({
     return {
       Icon: CheckCircle2,
       text: `Checked ${daysSince === 0 ? 'today' : daysSince === 1 ? 'yesterday' : `${daysSince}d ago`}`,
-      color: 'text-meadow-700',
-      iconColor: 'text-meadow-600',
-      bgColor: 'bg-meadow-50',
-      borderColor: 'border-meadow-200',
+      color: 'text-emerald-500',
+      iconColor: 'text-emerald-500',
+      bgColor: 'bg-emerald-500',
+      borderColor: 'border-emerald-500',
       tooltip: `Price is up to date. Last checked ${daysSince === 0 ? 'today' : daysSince === 1 ? 'yesterday' : `${daysSince} days ago`}.`,
     };
   };

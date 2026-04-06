@@ -13,7 +13,7 @@ const TRUST_CHIPS = [
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-stone-50 flex flex-col items-center pb-20 relative overflow-hidden">
+    <main className="min-h-screen bg-slate-50 flex flex-col items-center pb-20 relative overflow-hidden">
 
       {/* Yellow ambient glow — sits behind everything */}
       <div
@@ -26,21 +26,21 @@ export default function HomePage() {
       />
 
       {/* ─── COMPACT HEADER ─── */}
-      <section className="w-full max-w-3xl mx-auto px-6 pt-10 md:pt-14 pb-8 text-center relative z-10">
+      <section className="w-full max-w-3xl mx-auto px-6 pt-14 md:pt-20 pb-12 text-center relative z-10">
 
         {/* Trust chips */}
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="flex flex-wrap items-center justify-center gap-2 mb-6"
+          className="flex flex-wrap items-center justify-center gap-3 gap-y-2 mb-8"
         >
           {TRUST_CHIPS.map((chip) => (
             <span
               key={chip}
-              className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full bg-sun-400/15 text-amber-700 border border-sun-400/30"
+              className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wide px-4 py-2 rounded-full bg-primary/15 text-amber-700 border border-primary/30"
             >
-              <Check className="w-3 h-3 text-sun-500" />
+              <Check className="w-3 h-3 text-primary" />
               {chip}
             </span>
           ))}
@@ -51,18 +51,10 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-950 leading-[1.08]"
+          className="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tighter text-slate-950 leading-[1.0]"
         >
           Is it worth{' '}
-          <span
-            className="relative inline-block"
-            style={{
-              backgroundImage: 'linear-gradient(135deg, #b8860b 0%, #FFC700 50%, #e6a817 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
+          <span className="text-primary">
             the cop?
           </span>
         </motion.h1>
@@ -71,9 +63,9 @@ export default function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.18 }}
-          className="mt-4 text-base text-slate-500 font-medium"
+          className="mt-6 text-lg text-slate-500 font-medium"
         >
-          Every pair tells a story — find out if it&apos;s worth writing.
+          Stop guessing. Start knowing.
         </motion.p>
       </section>
 
@@ -86,6 +78,22 @@ export default function HomePage() {
       >
         <CalculatorForm />
       </motion.div>
+
+      {/* ─── DARK STAT STRIP ─── */}
+      <div className="w-full bg-slate-950 py-16 px-6 text-center relative z-10">
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight max-w-2xl mx-auto leading-tight"
+        >
+          The average sneakerhead buys{' '}
+          <span className="text-primary">12 pairs</span> a year.
+          <br />Only <span className="text-primary">4</span> are worth it.
+        </motion.p>
+        <p className="mt-4 text-slate-400 text-sm font-medium">Here&apos;s how to be in the 4.</p>
+      </div>
 
       {/* ─── HOW IT WORKS ─── */}
       <div className="w-full relative z-10">

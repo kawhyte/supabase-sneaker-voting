@@ -106,7 +106,7 @@ export function WardrobeListItem({
 	};
 
 	return (
-		<div className="border-b border-stone-200 hover:bg-stone-50/50 transition-colors">
+		<div className="border-b border-slate-200 hover:bg-slate-50/50 transition-colors">
 			{/* Main Row */}
 			<div
 				className="flex items-center gap-3 p-4 cursor-pointer"
@@ -133,7 +133,7 @@ export function WardrobeListItem({
 
 				{/* Thumbnail - Fixed width */}
 				<div className="flex-shrink-0 w-16 lg:w-20">
-					<div className="w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden bg-stone-100 border border-stone-200 relative">
+					<div className="w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 relative">
 						<img
 							src={mainImage}
 							alt={`${item.brand} ${item.model}`}
@@ -145,7 +145,7 @@ export function WardrobeListItem({
 						{/* Pinned indicator - left side */}
 						{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
 							<div
-								className="absolute top-1 left-1 bg-sun-400 text-sun-900 rounded-full p-1 shadow-sm"
+								className="absolute top-1 left-1 bg-primary text-primary rounded-full p-1 shadow-sm"
 								title="Pinned"
 								aria-label="This item is pinned"
 							>
@@ -202,7 +202,7 @@ export function WardrobeListItem({
 							</span>
 							<Badge
 								variant="outline"
-								className="text-xs px-2 py-0.5 rounded-md border-meadow-400 bg-meadow-50 text-meadow-600"
+								className="text-xs px-2 py-0.5 rounded-md border-emerald-500 bg-emerald-500 text-emerald-500"
 							>
 								Sale
 							</Badge>
@@ -216,7 +216,7 @@ export function WardrobeListItem({
 					{item.is_archived && viewMode !== "archive" && (
 						<Badge
 							variant="outline"
-							className="text-xs px-2 py-0.5 rounded-md border-stone-300 bg-stone-100 text-stone-700"
+							className="text-xs px-2 py-0.5 rounded-md border-slate-300 bg-slate-100 text-slate-700"
 						>
 							<Archive className="h-3 w-3 mr-1" />
 							Archived
@@ -261,7 +261,7 @@ export function WardrobeListItem({
 						transition={{ duration: 0.2, ease: "easeInOut" }}
 						className="overflow-hidden"
 					>
-						<div className="px-4 pb-4 pl-16 border-t border-stone-100 bg-stone-50/30">
+						<div className="px-4 pb-4 pl-16 border-t border-slate-100 bg-slate-50/30">
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
 								{/* Column 1: Basic Info */}
 								<div className="space-y-3">
@@ -366,7 +366,7 @@ export function WardrobeListItem({
 													<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
 														Current Price
 													</span>
-													<p className="text-sm mt-1 font-semibold text-meadow-600">
+													<p className="text-sm mt-1 font-semibold text-emerald-500">
 														${item.sale_price}
 													</p>
 												</div>
@@ -388,7 +388,7 @@ export function WardrobeListItem({
 							{item.notes &&
 								item.notes.trim() &&
 								item.notes.toLowerCase() !== "no note added" && (
-									<div className="mt-4 pt-4 border-t border-stone-200">
+									<div className="mt-4 pt-4 border-t border-slate-200">
 										<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
 											Notes
 										</span>

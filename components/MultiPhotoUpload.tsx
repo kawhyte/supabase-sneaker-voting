@@ -77,7 +77,7 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
         {/* Main Photo Badge */}
         {photo.isMain && (
           <div className="absolute top-1 left-0 right-0 z-10 flex items-center justify-center">
-            <Badge className="bg-sun-400 text-slate-900 px-1.5 py-0.5 text-[10px] font-semibold shadow-sm">
+            <Badge className="bg-primary text-slate-900 px-1.5 py-0.5 text-[10px] font-semibold shadow-sm">
               Main
             </Badge>
           </div>
@@ -120,7 +120,7 @@ function SortablePhoto({ photo, index, onRemove, onSetMain }: SortablePhotoProps
         </div>
 
         {/* Photo Info */}
-        <div className={`p-2 text-xs ${photo.isExisting ? 'bg-blue-50 text-blue-700' : 'bg-stone-50 text-slate-600'}`}>
+        <div className={`p-2 text-xs ${photo.isExisting ? 'bg-blue-50 text-blue-700' : 'bg-slate-50 text-slate-600'}`}>
           <div className="flex items-center justify-between">
             <span className="truncate font-medium">{photo.file?.name || 'Existing photo'}</span>
             <span>#{photo.order}</span>
@@ -258,8 +258,8 @@ export function MultiPhotoUpload({
           className={`
             relative border-2 border-dashed rounded-lg p-6 text-center transition-colors
             ${draggedOver
-              ? 'border-sun-400 bg-sun-50'
-              : 'border-stone-300 hover:border-stone-400'
+              ? 'border-primary bg-primary'
+              : 'border-slate-300 hover:border-slate-400'
             }
           `}
         >
@@ -337,7 +337,7 @@ export function MultiPhotoUpload({
       )}
 
       {/* Instructions */}
-      <div className="text-xs text-slate-500 p-3 bg-stone-50 rounded-lg">
+      <div className="text-xs text-slate-500 p-3 bg-slate-50 rounded-lg">
         <div className="flex items-start gap-2">
           <GripVertical className="h-3 w-3 mt-0.5 text-slate-400" />
           <div>

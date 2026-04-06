@@ -43,7 +43,7 @@ export function ItemPricingDisplay({
 		if (!item.purchase_price) return null;
 
 		return (
-			<div className='flex items-center gap-1.5 px-2 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
+			<div className='flex items-center gap-1.5 px-2 -mx-2 rounded-md transition-colors hover:bg-slate-50/50'>
 				<span className='text-sm text-muted-foreground'>
 					Purchase Price:
 				</span>
@@ -59,7 +59,7 @@ export function ItemPricingDisplay({
 		<div className='flex flex-col gap-2.5'>
 			{/* Show pricing if we have either retail price OR sale price */}
 			{(item.retail_price || item.sale_price) && (
-				<div className='flex items-center gap-1.5 flex-wrap px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
+				<div className='flex items-center gap-1.5 flex-wrap px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-slate-50/50'>
 					{item.retail_price && (
 						<>
 							<span className='text-sm text-muted-foreground'>Retail:</span>
@@ -68,12 +68,12 @@ export function ItemPricingDisplay({
 									<span className='text-sm line-through text-muted-foreground'>
 										${item.retail_price}
 									</span>
-									<span className='text-base font-bold text-meadow-600'>
+									<span className='text-base font-bold text-emerald-500'>
 										${item.sale_price}
 									</span>
 									<Badge
 										variant='outline'
-										className='text-xs px-1.5 py-0 rounded-md border-meadow-400 bg-meadow-50 text-meadow-600 transition-all duration-200'
+										className='text-xs px-1.5 py-0 rounded-md border-emerald-500 bg-emerald-500 text-emerald-500 transition-all duration-200'
 									>
 										On Sale!
 									</Badge>
@@ -100,7 +100,7 @@ export function ItemPricingDisplay({
 
 			{/* Target price - Hide in public view */}
 			{!isPublicView && item.target_price && (
-				<div className='flex items-center gap-1.5 px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-stone-50/50'>
+				<div className='flex items-center gap-1.5 px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-slate-50/50'>
 					<span className='text-sm text-muted-foreground'>Target:</span>
 					<span className='text-base font-semibold text-foreground'>
 						${item.target_price}
@@ -122,7 +122,7 @@ export function ItemPricingDisplay({
 							onClick={onOpenDrawer}
 							variant='outline'
 							size='sm'
-							className='w-full justify-center gap-2 h-9 bg-white hover:bg-stone-50 border-stone-300 text-foreground'
+							className='w-full justify-center gap-2 h-9 bg-white hover:bg-slate-50 border-slate-300 text-foreground'
 						>
 							<Info className='h-4 w-4' />
 							View Details

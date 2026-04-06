@@ -44,10 +44,10 @@ export function CoreStatsGrid({ stats }: CoreStatsGridProps) {
         <motion.div variants={itemVariants}>
           <Link
             href={stats.mostWornItem ? `/dashboard?tab=owned` : '#'}
-            className="block bg-gradient-to-br from-sun-100 to-sun-200 border border-sun-300 rounded-lg p-6 hover:shadow-lg transition-shadow"
+            className="block bg-gradient-to-br from-primary to-primary border border-primary rounded-lg p-6 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center gap-3 mb-3">
-              <Trophy className="h-6 w-6 text-sun-600" />
+              <Trophy className="h-6 w-6 text-primary" />
               <h3 className="font-semibold text-foreground">Wardrobe MVP</h3>
             </div>
 
@@ -70,9 +70,9 @@ export function CoreStatsGrid({ stats }: CoreStatsGridProps) {
 
         {/* Best Value */}
         <motion.div variants={itemVariants}>
-          <div className="bg-gradient-to-br from-meadow-100 to-meadow-200 border border-meadow-300 rounded-lg p-6">
+          <div className="bg-gradient-to-br from-emerald-500 to-emerald-500 border border-emerald-500 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-3">
-              <Zap className="h-6 w-6 text-meadow-600" />
+              <Zap className="h-6 w-6 text-emerald-500" />
               <h3 className="font-semibold text-foreground">Best Value</h3>
             </div>
 

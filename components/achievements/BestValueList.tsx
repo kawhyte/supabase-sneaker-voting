@@ -117,7 +117,7 @@ export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
           >
             <Link
               href="/dashboard?tab=owned"
-              className="block bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-sun-400 transition-all"
+              className="block bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-primary transition-all"
             >
               {/* Value Badge */}
               <div className="relative">

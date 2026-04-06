@@ -244,10 +244,10 @@ export function NotificationPreferences() {
 	if (!prefs) return null;
 
 	return (
-		<Card className='border-stone-200 bg-muted px-8 py-8'>
-			<CardHeader className='border-b border-stone-200 pb-4'>
+		<Card className='border-slate-200 bg-muted px-8 py-8'>
+			<CardHeader className='border-b border-slate-200 pb-4'>
 				<CardTitle className='flex items-center gap-2'>
-					<Bell className='h-5 w-5 text-sun-400' />
+					<Bell className='h-5 w-5 text-primary' />
 					Notification Preferences
 				</CardTitle>
 				<CardDescription>
@@ -314,7 +314,7 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* NOTIFICATION TYPES */}
-				<div className='border-t border-stone-200 pt-6'>
+				<div className='border-t border-slate-200 pt-6'>
 					<h3 className='text-sm font-semibold mb-3'>Notification Types</h3>
 					<div className='space-y-3'>
 						{/* Price Alerts */}
@@ -442,7 +442,7 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* BUNDLING PREFERENCES */}
-				<div className='border-t border-stone-200 pt-6'>
+				<div className='border-t border-slate-200 pt-6'>
 					<div className='dense flex items-center justify-between mb-3'>
 						<div>
 							<h3 className='text-sm font-semibold'>Smart Bundling</h3>
@@ -486,7 +486,7 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* MAX DAILY NOTIFICATIONS */}
-				<div className='border-t border-stone-200 pt-6'>
+				<div className='border-t border-slate-200 pt-6'>
 					<div className='dense'>
 						<Label htmlFor='max-daily' className='text-sm font-semibold'>
 							Max Daily Notifications: {prefs.max_daily_notifications}
@@ -510,7 +510,7 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* Save Button Section */}
-				<div className='border-t border-stone-200 pt-6'>
+				<div className='border-t border-slate-200 pt-6'>
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
 							{hasUnsavedChanges && (
@@ -546,7 +546,7 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* TEST NOTIFICATION */}
-				<div className='border-t border-stone-200 pt-6'>
+				<div className='border-t border-slate-200 pt-6'>
 					<div className='flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200'>
 						<AlertCircle className='h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5' />
 						<div className='flex-1'>

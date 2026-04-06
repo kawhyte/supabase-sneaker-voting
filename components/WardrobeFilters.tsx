@@ -161,10 +161,10 @@ export function WardrobeFilters({
 						placeholder="Search items..."
 						value={searchTerm}
 						onChange={(e) => onSearchChange(e.target.value)}
-						className="pl-10 h-10 text-sm border-stone-300 focus:ring-sun-400 focus:ring-2 bg-white hover:bg-stone-50 focus:bg-stone-50 transition-all duration-200"
+						className="pl-10 h-10 text-sm border-slate-300 focus:ring-primary focus:ring-2 bg-white hover:bg-slate-50 focus:bg-slate-50 transition-all duration-200"
 					/>
 					<svg
-						className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 transition-colors duration-200 group-focus-within:text-sun-500"
+						className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 transition-colors duration-200 group-focus-within:text-primary"
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 24 24"
 						fill="none"
@@ -183,12 +183,12 @@ export function WardrobeFilters({
 					<SheetTrigger asChild>
 						<Button
 							variant="outline"
-							className="h-10 gap-2 border-stone-300 text-slate-900 hover:bg-stone-100 relative whitespace-nowrap shadow-sm transition-all duration-200 hover:scale-105 active:scale-95"
+							className="h-10 gap-2 border-slate-300 text-slate-900 hover:bg-slate-100 relative whitespace-nowrap shadow-sm transition-all duration-200 hover:scale-105 active:scale-95"
 						>
 							<Sliders className="h-4 w-4" />
 							Filters
 							{activeFilterCount > 0 && (
-								<span className="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-semibold bg-sun-400 text-slate-900 animate-pulse">
+								<span className="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-semibold bg-primary text-slate-900 animate-pulse">
 									{activeFilterCount}
 								</span>
 							)}
@@ -196,9 +196,9 @@ export function WardrobeFilters({
 					</SheetTrigger>
 
 					{/* Filter Drawer Content */}
-					<SheetContent side="left" className="w-full sm:w-96 bg-white border-r border-stone-300 shadow-lg flex flex-col p-0">
+					<SheetContent side="left" className="w-full sm:w-96 bg-white border-r border-slate-300 shadow-lg flex flex-col p-0">
 						<div className="w-full h-full flex flex-col">
-							<SheetHeader className="border-b border-stone-200 bg-stone-50 shrink-0 px-6 py-4">
+							<SheetHeader className="border-b border-slate-200 bg-slate-50 shrink-0 px-6 py-4">
 								<SheetTitle className="text-lg font-semibold text-slate-900">
 									Filters
 								</SheetTitle>
@@ -214,7 +214,7 @@ export function WardrobeFilters({
 										</h3>
 										<button
 											onClick={handleSelectAllCategories}
-											className="text-xs font-semibold text-sun-600 hover:text-sun-700 px-2 py-1 rounded-md hover:bg-sun-50 transition-all duration-200 hover:scale-105 active:scale-95"
+											className="text-xs font-semibold text-primary hover:text-primary px-2 py-1 rounded-md hover:bg-primary transition-all duration-200 hover:scale-105 active:scale-95"
 										>
 											{selectedCategories.length === allCategoryIds.length
 												? 'Clear All'
@@ -233,7 +233,7 @@ export function WardrobeFilters({
 														id={`category-${config.id}`}
 														checked={isSelected}
 														onCheckedChange={() => handleCategoryToggle(config.id)}
-														className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400 h-4 w-4 flex-shrink-0"
+														className="border-slate-300 data-[state=checked]:bg-primary data-[state=checked]:border-primary h-4 w-4 flex-shrink-0"
 													/>
 													<Label
 														htmlFor={`category-${config.id}`}
@@ -260,7 +260,7 @@ export function WardrobeFilters({
 											Brand
 										</h3>
 										{isBrandsLoading && (
-											<Loader2 className="h-4 w-4 animate-spin text-sun-500" />
+											<Loader2 className="h-4 w-4 animate-spin text-primary" />
 										)}
 									</div>
 									<Select
@@ -270,7 +270,7 @@ export function WardrobeFilters({
 										}}
 										disabled={isBrandsLoading}
 									>
-										<SelectTrigger className="h-11 border-stone-300 text-slate-900 bg-white hover:bg-stone-50 focus:ring-sun-400 transition-all duration-200 hover:border-sun-200 disabled:opacity-50 disabled:cursor-not-allowed">
+										<SelectTrigger className="h-11 border-slate-300 text-slate-900 bg-white hover:bg-slate-50 focus:ring-primary transition-all duration-200 hover:border-primary disabled:opacity-50 disabled:cursor-not-allowed">
 											<SelectValue
 												placeholder={
 													isBrandsLoading
@@ -281,7 +281,7 @@ export function WardrobeFilters({
 												}
 											/>
 										</SelectTrigger>
-										<SelectContent className="dense bg-white border-stone-300">
+										<SelectContent className="dense bg-white border-slate-300">
 											{brands.length === 0 && !isBrandsLoading && (
 												<div className="py-6 text-center text-sm text-slate-500">
 													No brands available
@@ -302,7 +302,7 @@ export function WardrobeFilters({
 																	e.stopPropagation()
 																	handleBrandToggle(brand.name || '')
 																}}
-																className="border-stone-300 data-[state=checked]:bg-sun-400 data-[state=checked]:border-sun-400 h-4 w-4 flex-shrink-0"
+																className="border-slate-300 data-[state=checked]:bg-primary data-[state=checked]:border-primary h-4 w-4 flex-shrink-0"
 																onChange={() => {}}
 															/>
 															{brand.brand_logo && (
@@ -329,12 +329,12 @@ export function WardrobeFilters({
 											{selectedBrandsList.map((brand) => (
 												<div
 													key={brand}
-													className="inline-flex items-center gap-2 bg-sun-50 text-sun-700 px-3 py-2 rounded-lg text-xs font-medium border border-sun-200 hover:bg-sun-100 hover:border-sun-300 transition-all duration-200 animate-in fade-in zoom-in-50"
+													className="inline-flex items-center gap-2 bg-primary text-primary px-3 py-2 rounded-lg text-xs font-medium border border-primary hover:bg-primary hover:border-primary transition-all duration-200 animate-in fade-in zoom-in-50"
 												>
 													{brand}
 													<button
 														onClick={() => handleBrandToggle(brand)}
-														className="hover:text-sun-900 ml-1 -mr-1 flex items-center justify-center hover:scale-125 active:scale-95 transition-transform duration-150"
+														className="hover:text-primary ml-1 -mr-1 flex items-center justify-center hover:scale-125 active:scale-95 transition-transform duration-150"
 														aria-label={`Remove ${brand} filter`}
 													>
 														<X className="h-3 w-3" />
@@ -347,17 +347,17 @@ export function WardrobeFilters({
 							</div>
 
 							{/* Filter Actions */}
-							<SheetFooter className="border-t border-stone-200 bg-stone-50 flex-row gap-3 justify-end px-6 py-4 shrink-0">
+							<SheetFooter className="border-t border-slate-200 bg-slate-50 flex-row gap-3 justify-end px-6 py-4 shrink-0">
 								<Button
 									variant="outline"
 									onClick={handleClearFilters}
-									className="border-stone-300 text-slate-900 hover:bg-stone-100 hover:border-stone-400 transition-all duration-200 hover:scale-105 active:scale-95"
+									className="border-slate-300 text-slate-900 hover:bg-slate-100 hover:border-slate-400 transition-all duration-200 hover:scale-105 active:scale-95"
 								>
 									Clear All
 								</Button>
 								<Button
 									onClick={handleApplyFilters}
-									className="bg-sun-400 hover:bg-sun-500 text-slate-900 font-semibold shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 hover:brightness-110"
+									className="bg-primary hover:bg-primary text-slate-900 font-semibold shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 hover:brightness-110"
 								>
 									Apply Filters
 								</Button>
@@ -368,10 +368,10 @@ export function WardrobeFilters({
 
 				{/* Sort Dropdown - Full width on mobile, fixed width on desktop */}
 				<Select value={sortBy} onValueChange={onSortChange}>
-					<SelectTrigger className="h-10 border-stone-300 text-slate-900 bg-white hover:bg-stone-50 focus:ring-sun-400 w-full md:w-[180px] transition-all duration-200 hover:border-sun-200">
+					<SelectTrigger className="h-10 border-slate-300 text-slate-900 bg-white hover:bg-slate-50 focus:ring-primary w-full md:w-[180px] transition-all duration-200 hover:border-primary">
 						<SelectValue placeholder="Sort by" />
 					</SelectTrigger>
-					<SelectContent className="bg-white border-stone-300">
+					<SelectContent className="bg-white border-slate-300">
 						<SelectItem value="date-desc">Newest First</SelectItem>
 						<SelectItem value="date-asc">Oldest First</SelectItem>
 						<SelectItem value="fit-rating">By Fit Rating</SelectItem>

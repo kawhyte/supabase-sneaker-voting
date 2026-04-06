@@ -98,10 +98,10 @@ export function WishlistDetailsDrawer({
 			Icon: CheckCircle2,
 			text: `Checked ${daysSince === 0 ? 'today' : daysSince === 1 ? 'yesterday' : `${daysSince} days ago`}`,
 			description: 'Price is up to date. Prices are checked automatically every Sunday.',
-			color: 'text-meadow-700',
-			iconColor: 'text-meadow-600',
-			bgColor: 'bg-meadow-50',
-			borderColor: 'border-meadow-200',
+			color: 'text-emerald-500',
+			iconColor: 'text-emerald-500',
+			bgColor: 'bg-emerald-500',
+			borderColor: 'border-emerald-500',
 		};
 	};
 
@@ -145,7 +145,7 @@ export function WishlistDetailsDrawer({
 			<Sheet open={isOpen} onOpenChange={onOpenChange}>
 				<SheetContent side="right" className="w-full sm:w-96 p-0 flex flex-col">
 					{/* Header */}
-					<SheetHeader className="px-6 pt-6 pb-4 border-b border-stone-200">
+					<SheetHeader className="px-6 pt-6 pb-4 border-b border-slate-200">
 						<SheetTitle className="text-lg font-semibold">Wishlist Details</SheetTitle>
 						<SheetDescription className="text-xs text-muted-foreground">
 							{item.model}
@@ -202,7 +202,7 @@ export function WishlistDetailsDrawer({
 							</div>
 
 							{/* Divider */}
-							<div className="h-px bg-stone-200" />
+							<div className="h-px bg-slate-200" />
 
 							{/* Try-On Details Section */}
 							{(item.size_tried || comfortInfo) && (
@@ -212,14 +212,14 @@ export function WishlistDetailsDrawer({
 
 										<div className="space-y-3">
 											{item.size_tried && (
-												<div className="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
+												<div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
 													<span className="text-sm text-muted-foreground">Ideal Size</span>
 													<span className="text-base font-semibold">{item.size_tried}</span>
 												</div>
 											)}
 
 											{comfortInfo && (
-												<div className="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
+												<div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
 													<span className="text-sm text-muted-foreground">Comfort Rating</span>
 													<span className={`text-base font-semibold ${comfortInfo.color}`}>
 														{comfortInfo.label}
@@ -230,7 +230,7 @@ export function WishlistDetailsDrawer({
 									</div>
 
 									{/* Divider */}
-									<div className="h-px bg-stone-200" />
+									<div className="h-px bg-slate-200" />
 								</>
 							)}
 
@@ -240,7 +240,7 @@ export function WishlistDetailsDrawer({
 									<div className="flex flex-col gap-3">
 										<h3 className="text-sm font-semibold text-foreground">Notes</h3>
 
-										<div className="p-4 bg-stone-50 rounded-lg">
+										<div className="p-4 bg-slate-50 rounded-lg">
 											<p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
 												{item.notes}
 											</p>
@@ -252,7 +252,7 @@ export function WishlistDetailsDrawer({
 									</div>
 
 									{/* Divider */}
-									<div className="h-px bg-stone-200" />
+									<div className="h-px bg-slate-200" />
 								</>
 							)}
 
@@ -264,7 +264,7 @@ export function WishlistDetailsDrawer({
 									{onMarkAsPurchased && (
 										<Button
 											onClick={handleMarkAsPurchased}
-											className="w-full justify-start gap-2 h-10 bg-meadow-500 hover:bg-meadow-600 text-white"
+											className="w-full justify-start gap-2 h-10 bg-emerald-500 hover:bg-emerald-500 text-white"
 											variant="default"
 										>
 											<ShoppingBag className="h-4 w-4" />
@@ -286,7 +286,7 @@ export function WishlistDetailsDrawer({
 							</div>
 
 							{/* Product Info */}
-							<div className="flex flex-col gap-2 pt-4 border-t border-stone-200">
+							<div className="flex flex-col gap-2 pt-4 border-t border-slate-200">
 								<div className="flex items-center justify-between text-xs">
 									<span className="text-muted-foreground">Added to wishlist</span>
 									<span className="font-medium">
@@ -305,7 +305,7 @@ export function WishlistDetailsDrawer({
 											href={item.product_url}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="font-medium text-sun-600 hover:text-sun-700 hover:underline max-w-[180px] truncate"
+											className="font-medium text-primary hover:text-primary hover:underline max-w-[180px] truncate"
 										>
 											View Product
 										</a>

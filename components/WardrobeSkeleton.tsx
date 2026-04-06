@@ -29,14 +29,14 @@ export function WardrobeSkeleton({ viewMode = 'collection', count = 6 }: Wardrob
       {[...Array(count)].map((_, i) => (
         <Card
           key={i}
-          className="overflow-hidden flex flex-col rounded-xl w-full min-h-[420px] border border-stone-200 shadow-sm"
+          className="overflow-hidden flex flex-col rounded-xl w-full min-h-[420px] border border-slate-200 shadow-sm"
         >
           {/* Actions Menu Placeholder */}
           <div className="absolute top-2 right-2 z-40 h-8 w-8" />
 
           {/* Image Section - matches aspect ratio of photo carousel */}
           <div
-            className="relative w-full bg-stone-100 animate-pulse"
+            className="relative w-full bg-slate-100 animate-pulse"
             style={{ aspectRatio: aspectRatioValue }}
             aria-label="Loading image"
           />
@@ -91,7 +91,7 @@ export function WardrobeSkeleton({ viewMode = 'collection', count = 6 }: Wardrob
 
             {/* Notes Section - Only show if not compact */}
             {showNotes && (
-              <div className="mt-3 p-2.5 bg-stone-50 rounded-lg">
+              <div className="mt-3 p-2.5 bg-slate-50 rounded-lg">
                 <Skeleton className="h-12 w-full animate-pulse" />
               </div>
             )}
@@ -109,7 +109,7 @@ export function WardrobeSkeleton({ viewMode = 'collection', count = 6 }: Wardrob
             </div>
 
             {/* Footer - Outfit Creation & Cost Per Wear Button */}
-            <div className="flex gap-2 mt-auto pt-4 border-t border-stone-200">
+            <div className="flex gap-2 mt-auto pt-4 border-t border-slate-200">
               {viewMode !== 'archive' && (
                 <Skeleton className="h-8 w-28 rounded-md animate-pulse" />
               )}

@@ -27,7 +27,7 @@ export function getComfortLabel(rating: number | undefined): { label: string; co
 		},
 		2: {
 			label: 'Uncomfortable',
-			color: 'text-sun-600',
+			color: 'text-primary',
 		},
 		3: {
 			label: 'Neutral',
@@ -35,11 +35,11 @@ export function getComfortLabel(rating: number | undefined): { label: string; co
 		},
 		4: {
 			label: 'Comfortable',
-			color: 'text-meadow-600',
+			color: 'text-emerald-500',
 		},
 		5: {
 			label: 'Perfect',
-			color: 'text-sun-400',
+			color: 'text-primary',
 		},
 	};
 

@@ -119,7 +119,7 @@ export function ExploreGrid() {
         <p className="text-destructive">{error}</p>
         <button
           onClick={() => fetchUsers(0, false)}
-          className="mt-4 px-4 py-2 bg-sun-400 text-slate-900 rounded-lg hover:bg-sun-500 transition-colors"
+          className="mt-4 px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary transition-colors"
         >
           Try Again
         </button>
@@ -149,7 +149,7 @@ export function ExploreGrid() {
       {/* Loading more indicator */}
       {loadingMore && (
         <div className="flex justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-sun-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       )}
 

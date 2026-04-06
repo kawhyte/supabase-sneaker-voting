@@ -20,7 +20,7 @@ export function WardrobeStats({ journalEntries }: WardrobeStatsProps) {
     {
       value: totalEntries,
       label: 'Total Entries',
-      colorClass: 'text-sun-400'
+      colorClass: 'text-primary'
     },
     {
       value: recommended,

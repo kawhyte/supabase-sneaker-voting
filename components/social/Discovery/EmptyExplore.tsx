@@ -9,11 +9,11 @@ export function EmptyExplore() {
       <div className="flex flex-col items-center gap-6 max-w-md mx-auto">
         {/* Icon */}
         <div className="relative">
-          <div className="h-20 w-20 rounded-full bg-sun-400/10 flex items-center justify-center">
-            <Users className="h-10 w-10 text-sun-400" />
+          <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+            <Users className="h-10 w-10 text-primary" />
           </div>
           <div className="absolute -top-1 -right-1">
-            <Sparkles className="h-6 w-6 text-sun-400" />
+            <Sparkles className="h-6 w-6 text-primary" />
           </div>
         </div>
 

@@ -17,7 +17,7 @@ const TabsList = React.forwardRef<
       // Default (pill) variant
       "inline-flex h-10 items-center justify-center rounded-md bg-muted text-muted-foreground",
       // Underline variant overrides
-      variant === 'underline' && "h-auto bg-transparent p-0 border-b border-stone-200 rounded-none gap-8",
+      variant === 'underline' && "h-auto bg-transparent p-0 border-b border-slate-200 rounded-none gap-8",
       className
     )}
     data-variant={variant}
@@ -34,9 +34,9 @@ const TabsTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       // Default (pill) variant
-      "inline-flex rounded-2xl items-center justify-center whitespace-nowrap px-sm py-xs text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:scale-105 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-stone-100 data-[state=active]:bg-sun-200 data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-sm",
+      "inline-flex rounded-2xl items-center justify-center whitespace-nowrap px-sm py-xs text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:scale-105 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-slate-100 data-[state=active]:bg-primary data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-sm",
       // Underline variant overrides
-      variant === 'underline' && "relative px-0 py-3 pb-4 rounded-none bg-transparent text-base text-slate-600 font-medium hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-none after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-sun-400 after:opacity-0 data-[state=active]:after:opacity-100 after:transition-all after:duration-300",
+      variant === 'underline' && "relative px-0 py-3 pb-4 rounded-none bg-transparent text-base text-slate-600 font-medium hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-none after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:opacity-0 data-[state=active]:after:opacity-100 after:transition-all after:duration-300",
       className
     )}
     data-variant={variant}

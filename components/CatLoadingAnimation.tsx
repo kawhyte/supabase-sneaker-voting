@@ -57,7 +57,7 @@ export function CatLoadingAnimation({ type = 'organizing' }: { type?: CatLoading
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
       {/* Animated icon */}
-      <animation.icon className="h-16 w-16 mb-4 animate-bounce text-sun-400" />
+      <animation.icon className="h-16 w-16 mb-4 animate-bounce text-primary" />
 
       {/* Loading text */}
       <p className="text-lg font-medium text-foreground mb-4">{animation.text}</p>
@@ -69,9 +69,9 @@ export function CatLoadingAnimation({ type = 'organizing' }: { type?: CatLoading
 
       {/* Loading dots */}
       <div className="flex gap-1 mt-4">
-        <div className="w-2 h-2 bg-sun-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-        <div className="w-2 h-2 bg-sun-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-        <div className="w-2 h-2 bg-sun-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
       </div>
     </div>
   )
@@ -90,7 +90,7 @@ export function CatLoadingSpinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }
 
   return (
     <div className="flex items-center gap-2">
-      <div className={`${sizeClasses[size]} animate-spin rounded-full border-2 border-sun-400 border-t-transparent`} />
+      <div className={`${sizeClasses[size]} animate-spin rounded-full border-2 border-primary border-t-transparent`} />
       <span className="text-sm text-muted-foreground">Loading...</span>
     </div>
   )

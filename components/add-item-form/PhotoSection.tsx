@@ -35,7 +35,7 @@ export function PhotoSection({
 }: PhotoSectionProps) {
 	return (
 		<div className="space-y-6 mt-16">
-			<div className="flex items-center gap-2 pb-2 border-b border-stone-300">
+			<div className="flex items-center gap-2 pb-2 border-b border-slate-300">
 				<Camera className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
 				<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 					Photos

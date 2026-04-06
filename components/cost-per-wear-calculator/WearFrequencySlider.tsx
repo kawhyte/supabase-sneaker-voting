@@ -83,7 +83,7 @@ export function WearFrequencySlider({ form }: WearFrequencySliderProps) {
                   />
                   <Label
                     htmlFor={option.value}
-                    className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-border bg-background p-4 hover:bg-accent hover:border-sun-400 cursor-pointer transition-all peer-data-[state=checked]:border-sun-400 peer-data-[state=checked]:bg-sun-50"
+                    className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-border bg-background p-4 hover:bg-accent hover:border-primary cursor-pointer transition-all peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
                   >
                     <option.icon className="h-8 w-8 text-muted-foreground" />
                     <div className="text-center space-y-1">

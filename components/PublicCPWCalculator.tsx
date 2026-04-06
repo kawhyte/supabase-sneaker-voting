@@ -65,7 +65,7 @@ export function PublicCPWCalculator() {
             placeholder="170"
             min="1"
             max="10000"
-            className="w-full pl-9 pr-4 py-4 text-2xl font-bold rounded-2xl border-2 border-stone-200 bg-white text-slate-900 placeholder:text-stone-300 focus:outline-none focus:border-slate-400 transition-colors"
+            className="w-full pl-9 pr-4 py-4 text-2xl font-bold rounded-2xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-slate-400 transition-colors"
           />
         </div>
       </div>
@@ -84,7 +84,7 @@ export function PublicCPWCalculator() {
               className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 text-xs font-bold transition-all duration-150 ${
                 frequency === value
                   ? 'border-slate-900 bg-slate-900 text-white shadow-md scale-[1.03]'
-                  : 'border-stone-200 bg-white text-slate-600 hover:border-slate-400 hover:text-slate-900'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-400 hover:text-slate-900'
               }`}
             >
               {icon}
@@ -124,7 +124,7 @@ export function PublicCPWCalculator() {
                 <span>Value Score</span>
                 <span className="font-bold text-slate-700">{rec.score}/100</span>
               </div>
-              <div className="h-2 w-full bg-stone-200 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${rec.score}%` }}
@@ -188,9 +188,9 @@ export function PublicCPWCalculator() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="rounded-2xl border-2 border-dashed border-stone-200 p-8 text-center"
+            className="rounded-2xl border-2 border-dashed border-slate-200 p-8 text-center"
           >
-            <p className="text-sm font-medium text-stone-400">
+            <p className="text-sm font-medium text-slate-400">
               Enter a price to see your verdict
             </p>
           </motion.div>
