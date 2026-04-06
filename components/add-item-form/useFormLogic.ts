@@ -71,6 +71,7 @@ export const itemFormSchema = z
 			.optional()
 			.or(z.literal('')),
 		wears: z.coerce.number().min(0).max(10000).optional().default(0),
+		wearFrequency: z.enum(['rarely', 'monthly', 'weekly', 'daily']).default('weekly'),
 		notes: z.string().max(120).trim().optional().or(z.literal('')),
 
 		// PHASE 2: Store & Purchase Fields (Optional)
@@ -183,6 +184,7 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 						salePrice: initialData.sale_price?.toString() || '',
 						targetPrice: initialData.target_price?.toString() || '',
 						wears: initialData.wears || 0,
+						wearFrequency: initialData.wear_frequency || 'weekly',
 						notes: initialData.notes || '',
 						productUrl: initialData.product_url || '',
 
@@ -289,6 +291,7 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 				purchase_date: data.purchaseDate || null,
 
 				wears: data.wears || 0,
+				wear_frequency: data.wearFrequency || 'weekly',
 				status: (mode === 'add' || mode === 'create' ? ItemStatus.WISHLISTED : initialData?.status) as ItemStatus,
 				has_been_tried: data.triedOn,
 			}

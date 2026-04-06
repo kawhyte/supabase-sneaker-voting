@@ -14,7 +14,15 @@
 import { UseFormReturn } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Clock, TrendingUp, Zap, Flame } from "lucide-react";
+import type { WearFrequency } from "@/lib/worth-it-calculator/calculator-logic";
+
+const WEAR_FREQUENCIES: { value: WearFrequency; label: string; icon: React.ReactNode }[] = [
+	{ value: 'rarely',  label: 'Rarely',  icon: <Clock className="w-3 h-3" /> },
+	{ value: 'monthly', label: 'Monthly', icon: <TrendingUp className="w-3 h-3" /> },
+	{ value: 'weekly',  label: 'Weekly',  icon: <Zap className="w-3 h-3" /> },
+	{ value: 'daily',   label: 'Daily',   icon: <Flame className="w-3 h-3" /> },
+];
 
 interface PricingSectionProps {
 	form: UseFormReturn<any>;
@@ -49,12 +57,14 @@ export function PricingSection({ form }: PricingSectionProps) {
 	const {
 		register,
 		watch,
+		setValue,
 		formState: { errors },
 	} = form;
 
 	const watchedRetailPrice = watch("retailPrice");
 	const watchedSalePrice = watch("salePrice");
 	const watchedTargetPrice = watch("targetPrice");
+	const watchedFrequency = (watch("wearFrequency") || "weekly") as WearFrequency;
 
 	// Calculate suggested target price
 	const suggestedTarget = calculateSuggestedTargetPrice(watchedRetailPrice);
@@ -178,6 +188,33 @@ export function PricingSection({ form }: PricingSectionProps) {
 						{String(errors.targetPrice.message)}
 					</p>
 				)}
+			</div>
+
+			{/* Wear Frequency */}
+			<div>
+				<Label className="text-sm font-medium text-slate-900">
+					How often will you wear these?
+				</Label>
+				<div className="grid grid-cols-4 gap-2 mt-2">
+					{WEAR_FREQUENCIES.map(({ value, label, icon }) => (
+						<button
+							key={value}
+							type="button"
+							onClick={() => setValue("wearFrequency", value, { shouldDirty: true })}
+							className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border-2 text-xs font-bold transition-all duration-150 ${
+								watchedFrequency === value
+									? 'border-slate-900 bg-slate-900 text-white'
+									: 'border-stone-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
+							}`}
+						>
+							{icon}
+							{label}
+						</button>
+					))}
+				</div>
+				<p className="text-xs text-slate-400 mt-1.5">
+					Used to estimate cost-per-wear over time
+				</p>
 			</div>
 		</div>
 	);

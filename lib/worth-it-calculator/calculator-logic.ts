@@ -192,3 +192,28 @@ export function generateSmartRecommendation(
 export function getRecommendation(metrics: CalculatorMetrics, input: CalculatorInput): Recommendation {
   return generateSmartRecommendation(metrics, input);
 }
+
+/**
+ * Smart defaults for sneaker-only calculations.
+ * Hardcoded so the public calculator only needs price + frequency.
+ */
+export const SNEAKER_DEFAULTS = {
+  category: 'shoes' as ItemCategory,
+  qualityRating: 'average' as QualityRating,
+  resalePotential: 'low' as ResalePotential,
+  wardrobeRole: 'variety' as WardrobeRole,
+};
+
+/**
+ * Simplified entry point for the public CPW calculator.
+ * Only requires price and wear frequency — everything else uses smart defaults.
+ */
+export function calculateForSneakers(
+  price: number,
+  wearFrequency: WearFrequency
+): CalculatorResults {
+  const input: CalculatorInput = { ...SNEAKER_DEFAULTS, price, wearFrequency };
+  const metrics = calculateSmartMetrics(input);
+  const recommendation = generateSmartRecommendation(metrics, input);
+  return { metrics, recommendation, input };
+}
