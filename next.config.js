@@ -94,6 +94,9 @@ const nextConfig = {
     ],
   },
   transpilePackages: ['undici', 'cheerio'],
+  // node-vibrant and @jimp/* use ESM internals that webpack can't resolve —
+  // mark them as server-external so Node.js requires them natively at runtime.
+  serverExternalPackages: ['node-vibrant', '@vibrant/image-node', '@jimp/custom', '@jimp/core'],
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals.push('re2');

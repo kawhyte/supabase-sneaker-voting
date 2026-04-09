@@ -24,9 +24,16 @@ import {
 	type UrlValidationResult,
 } from '@/lib/retailer-url-validator'
 import { detectCategoryFromUrl } from '@/lib/item-utils'
-import { Loader2, Lightbulb } from 'lucide-react'
+import { Loader2, Search, Sparkles, Shirt, Star } from 'lucide-react'
 import { type PhotoItem } from '@/components/types/photo-item'
 import { type ItemCategory } from '@/components/types/item-category'
+
+interface MagicSearchResult {
+	title: string
+	price: number
+	imageUrl: string
+	brand: string
+}
 
 export interface AddItemFormProps {
 	mode: 'add' | 'edit' | 'create'
@@ -61,6 +68,9 @@ export default function AddItemForm({
 	onSuccess,
 	onCancel,
 }: AddItemFormProps) {
+	// Intent: 'own' (item is already owned) vs 'wishlist' (want to buy)
+	const [intent, setIntent] = useState<'own' | 'wishlist'>('own')
+
 	// Form logic hook
 	const {
 		form,
@@ -68,7 +78,7 @@ export default function AddItemForm({
 		photos,
 		onSubmit,
 		handlePhotosChange,
-	} = useFormLogic({ mode, initialData, onSuccess })
+	} = useFormLogic({ mode, initialData, onSuccess, intent })
 
 	// Normalize mode: "add" and "create" both mean creating a new item
 	const normalizedMode = mode === 'add' ? 'create' : mode
@@ -92,6 +102,12 @@ export default function AddItemForm({
 	})
 	const [showRetailersDialog, setShowRetailersDialog] = useState(false)
 	const [attemptedSubmit, setAttemptedSubmit] = useState(false)
+
+	// Magic Search state
+	const [magicSearchQuery, setMagicSearchQuery] = useState('')
+	const [isMagicSearching, setIsMagicSearching] = useState(false)
+	const [magicSearchResults, setMagicSearchResults] = useState<MagicSearchResult[]>([])
+	const [hasSearched, setHasSearched] = useState(false)
 
 	const formRef = useRef<HTMLFormElement>(null)
 
@@ -238,6 +254,82 @@ export default function AddItemForm({
 	}
 
 	/**
+	 * Search eBay for products matching the query
+	 */
+	const handleMagicSearch = async () => {
+		if (!magicSearchQuery.trim()) return
+		setIsMagicSearching(true)
+		setMagicSearchResults([])
+		try {
+			const response = await fetch('/api/magic-search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ query: magicSearchQuery }),
+			})
+			if (!response.ok) throw new Error('Search failed')
+			const data = await response.json()
+			if (data.success) {
+				setMagicSearchResults(data.results)
+			}
+		} catch (error) {
+			console.error('Magic search error:', error)
+		} finally {
+			setIsMagicSearching(false)
+			setHasSearched(true)
+		}
+	}
+
+	/**
+	 * Instantly fill the form from a Magic Search result card.
+	 * Shows the form immediately; proxies the image in the background.
+	 */
+	const handleMagicResultSelect = (result: MagicSearchResult) => {
+		// Sync: populate form fields instantly
+		form.setValue('model', result.title, { shouldValidate: true, shouldDirty: true })
+		form.setValue('retailPrice', result.price.toString(), {
+			shouldValidate: true,
+			shouldDirty: true,
+		})
+		form.setValue('category', 'shoes', { shouldValidate: true, shouldDirty: true })
+		if (result.brand) {
+			form.setValue('brand', result.brand, { shouldValidate: true, shouldDirty: true })
+		}
+
+		// Show the full form immediately — don't wait for the image
+		setIsFormVisible(true)
+
+		// Async: proxy the eBay image in the background (fire-and-forget)
+		if (result.imageUrl) {
+			fetch('/api/proxy-image', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ imageUrl: result.imageUrl }),
+			})
+				.then((res) => {
+					if (!res.ok) throw new Error('Proxy failed')
+					return res.blob()
+				})
+				.then((blob) => {
+					const file = new File([blob], 'magic-search-import.jpg', {
+						type: blob.type || 'image/jpeg',
+					})
+					const photoItem: PhotoItem = {
+						id: `new-${Date.now()}-0`,
+						file,
+						preview: URL.createObjectURL(file),
+						isMain: true,
+						order: 0,
+					}
+					handlePhotosChange([photoItem])
+				})
+				.catch((err) => {
+					console.warn('Background image proxy failed:', err)
+					// Silently fail — user can upload a photo manually
+				})
+		}
+	}
+
+	/**
 	 * Handle image confirmation from scraping
 	 */
 	const handleImageConfirm = async (
@@ -311,6 +403,110 @@ export default function AddItemForm({
 					{/* URL Import Section - Create Mode Only */}
 					{!isFormVisible && (mode === 'create' || mode === 'add') ? (
 						<div className="space-y-6">
+							{/* Intent Toggle */}
+							<div className="grid grid-cols-2 gap-2">
+								<Button
+									type="button"
+									variant={intent === 'own' ? 'default' : 'outline'}
+									onClick={() => setIntent('own')}
+									className="w-full flex items-center justify-center gap-2 h-12"
+								>
+									<Shirt className="h-4 w-4" />
+									I Own This
+								</Button>
+								<Button
+									type="button"
+									variant={intent === 'wishlist' ? 'default' : 'outline'}
+									onClick={() => setIntent('wishlist')}
+									className="w-full flex items-center justify-center gap-2 h-12"
+								>
+									<Star className="h-4 w-4" />
+									Wishlist
+								</Button>
+							</div>
+
+							{/* === MAGIC SEARCH SECTION === */}
+							<div className="bg-muted/40 rounded-xl p-6 border border-border">
+								<h3 className="text-base font-semibold text-foreground mb-1 font-heading flex items-center gap-2">
+									<Sparkles className="h-4 w-4 text-primary" />
+									Magic Search
+								</h3>
+								<p className="text-xs text-muted-foreground mb-4">
+									Search eBay to instantly fill in product details.
+								</p>
+								<div className="flex flex-col sm:flex-row gap-2">
+									<Input
+										placeholder="e.g. Nike Air Max 90, Jordan 1 Bred..."
+										value={magicSearchQuery}
+										onChange={(e) => setMagicSearchQuery(e.target.value)}
+										onKeyDown={(e) => {
+											if (e.key === 'Enter') {
+												e.preventDefault()
+												handleMagicSearch()
+											}
+										}}
+										disabled={isMagicSearching}
+										className="flex-1"
+									/>
+									<Button
+										type="button"
+										onClick={handleMagicSearch}
+										disabled={isMagicSearching || !magicSearchQuery.trim()}
+									>
+										{isMagicSearching ? (
+											<Loader2 className="h-4 w-4 mr-2 animate-spin" />
+										) : (
+											<Search className="h-4 w-4 mr-2" />
+										)}
+										Search
+									</Button>
+								</div>
+
+								{/* Results grid — shown after a successful search */}
+								{magicSearchResults.length > 0 && (
+									<div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+										{magicSearchResults.map((result, index) => (
+											<button
+												key={index}
+												type="button"
+												onClick={() => handleMagicResultSelect(result)}
+												className="group text-left rounded-lg border border-border bg-background overflow-hidden hover:border-primary hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+											>
+												<div className="aspect-square w-full overflow-hidden bg-muted">
+													{/* Plain img tag — eBay images load directly, no remotePatterns needed */}
+													<img
+														src={result.imageUrl}
+														alt={result.title}
+														className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+														loading="lazy"
+													/>
+												</div>
+												<div className="p-2">
+													<p className="text-xs font-medium text-foreground line-clamp-2 leading-snug">
+														{result.title}
+													</p>
+													<p className="text-xs text-primary font-semibold mt-1">
+														${result.price.toFixed(2)}
+													</p>
+												</div>
+											</button>
+										))}
+									</div>
+								)}
+
+								{/* Empty state — only shown after a search returns nothing */}
+								{hasSearched && !isMagicSearching && magicSearchResults.length === 0 && (
+									<p className="mt-3 text-xs text-muted-foreground">
+										No results found. Try a different search term.
+									</p>
+								)}
+							</div>
+
+							<div className="relative flex justify-center text-xs uppercase">
+								<span className="bg-background px-2 text-muted-foreground font-bold">Or</span>
+							</div>
+
+							{/* === EXISTING URL IMPORT SECTION (unchanged) === */}
 							<div className="bg-muted/40 rounded-xl p-6 border border-border">
 								<h3 className="text-base font-semibold text-foreground mb-4 font-heading">
 									Auto-fill from URL
@@ -342,12 +538,8 @@ export default function AddItemForm({
 								</div>
 							</div>
 
-							<div className="relative">
-								<div className="relative flex justify-center text-xs uppercase">
-									<span className="bg-background px-2 text-muted-foreground font-bold">
-										Or
-									</span>
-								</div>
+							<div className="relative flex justify-center text-xs uppercase">
+								<span className="bg-background px-2 text-muted-foreground font-bold">Or</span>
 							</div>
 
 							<Button
@@ -386,37 +578,26 @@ export default function AddItemForm({
 								onDismiss={() => setAttemptedSubmit(false)}
 							/>
 
-							{/* Form Mode Toggle - Create Mode Only */}
+							{/* Intent Toggle - Create Mode Only */}
 							{(mode === 'create' || mode === 'add') && (
-								<div className="flex items-center gap-3 p-4 rounded-xl bg-muted/40 border border-border">
-									<Lightbulb className="h-5 w-5 text-primary flex-shrink-0" />
-									<div className="flex-1">
-										<p className="text-sm font-medium text-slate-900">
-											{formMode === 'quick' ? 'Quick Mode' : 'Advanced Mode'}
-										</p>
-										<p className="text-xs text-slate-600">
-											{formMode === 'quick'
-												? 'Add essentials in 15-30 seconds'
-												: 'Full details including SKU, notes, and more'}
-										</p>
-									</div>
+								<div className="grid grid-cols-2 gap-2">
 									<Button
 										type="button"
-										variant={formMode === 'quick' ? 'default' : 'outline'}
-										size="sm"
-										onClick={() => setFormMode('quick')}
-										className="text-xs"
+										variant={intent === 'own' ? 'default' : 'outline'}
+										onClick={() => setIntent('own')}
+										className="w-full flex items-center justify-center gap-2 h-12"
 									>
-										Quick
+										<Shirt className="h-4 w-4" />
+										I Own This
 									</Button>
 									<Button
 										type="button"
-										variant={formMode === 'advanced' ? 'default' : 'outline'}
-										size="sm"
-										onClick={() => setFormMode('advanced')}
-										className="text-xs"
+										variant={intent === 'wishlist' ? 'default' : 'outline'}
+										onClick={() => setIntent('wishlist')}
+										className="w-full flex items-center justify-center gap-2 h-12"
 									>
-										Advanced
+										<Star className="h-4 w-4" />
+										Wishlist
 									</Button>
 								</div>
 							)}
@@ -425,7 +606,7 @@ export default function AddItemForm({
 							<BasicInfoSection form={form} />
 
 							{/* Pricing Section */}
-							<PricingSection form={form} />
+							<PricingSection form={form} intent={intent} />
 
 							{/* Photos Section */}
 							<PhotoSection
@@ -434,25 +615,30 @@ export default function AddItemForm({
 								errors={form.formState.errors}
 							/>
 
-							{/* Product URL & Price Tracking Section */}
-							<ProductURLSection
-								form={form}
-								isScrapingUrl={isScrapingUrl}
-								uploadProgress={uploadProgress}
-								urlValidation={urlValidation}
-								onUrlScrape={handleUrlScrape}
-								onShowRetailersDialog={() => setShowRetailersDialog(true)}
-								mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
-								initialData={initialData}
-							/>
+							{/* Product URL & Price Tracking — Wishlist only in create mode */}
+							{(mode === 'edit' || intent === 'wishlist') && (
+								<ProductURLSection
+									form={form}
+									isScrapingUrl={isScrapingUrl}
+									uploadProgress={uploadProgress}
+									urlValidation={urlValidation}
+									onUrlScrape={handleUrlScrape}
+									onShowRetailersDialog={() => setShowRetailersDialog(true)}
+									mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
+									initialData={initialData}
+								/>
+							)}
 
-							{/* Sizing & Additional Details - Advanced Mode Only */}
-							<SizingSection
-								form={form}
-								mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
-								initialData={initialData}
-								formMode={formMode}
-							/>
+							{/* Sizing & Additional Details — Own intent shows flat; Wishlist hides entirely */}
+							{(mode === 'edit' || intent === 'own') && (
+								<SizingSection
+									form={form}
+									mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
+									initialData={initialData}
+									formMode={formMode}
+									intent={intent}
+								/>
+							)}
 
 							{/* Form Actions */}
 							<FormActions isSubmitting={isSubmitting} mode={mode} onCancel={onCancel} />

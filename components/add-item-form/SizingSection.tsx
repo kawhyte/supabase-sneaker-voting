@@ -31,6 +31,7 @@ interface SizingSectionProps {
 	mode: "create" | "edit" | "add";
 	initialData?: any;
 	formMode: "quick" | "advanced";
+	intent?: 'own' | 'wishlist';
 }
 
 /**
@@ -45,6 +46,7 @@ export function SizingSection({
 	mode,
 	initialData,
 	formMode,
+	intent,
 }: SizingSectionProps) {
 	const {
 		register,
@@ -56,10 +58,9 @@ export function SizingSection({
 	const watchedTriedOn = watch("triedOn");
 	const watchedCategory = watch("category");
 
-	// PHASE 1 FIX: In edit mode, always show all fields regardless of formMode
-	// This ensures users can edit SKU, Notes, and Wears that were previously added
-	// In create mode, respect the Quick/Advanced mode toggle
-	if (mode !== 'edit' && formMode !== 'advanced') return null;
+	// Show in edit mode always; in create mode only for 'own' intent (flat layout)
+	// Wishlist intent hides this section entirely (handled at parent level too)
+	if (mode !== 'edit' && intent !== 'own') return null;
 
 	return (
 		<div className="space-y-6">

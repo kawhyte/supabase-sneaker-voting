@@ -145,7 +145,7 @@ export function ValidationStatusCard({
 				id: 'retailPrice',
 				label: 'Retail Price',
 				status: isMissing(watchedValues.retailPrice) ? 'pending' : 'complete',
-				required: true,
+				required: false,
 				hint: 'Must be valid price format (e.g., 170 or 170.00)',
 			},
 		]

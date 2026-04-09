@@ -49,7 +49,9 @@ export const itemFormSchema = z
 				if (val === '') return true
 				const price = parseFloat(val)
 				return price >= 0 && price <= 10000
-			}, 'Price must be between $0 and $10,000'),
+			}, 'Price must be between $0 and $10,000')
+			.optional()
+			.or(z.literal('')),
 		salePrice: z
 			.string()
 			.regex(/^\d+(\.\d{1,2})?$/, 'Please enter a valid price (e.g., 150 or 150.00)')
@@ -71,7 +73,6 @@ export const itemFormSchema = z
 			.optional()
 			.or(z.literal('')),
 		wears: z.coerce.number().min(0).max(10000).optional().default(0),
-		wearFrequency: z.enum(['rarely', 'monthly', 'weekly', 'daily']).default('weekly'),
 		notes: z.string().max(120).trim().optional().or(z.literal('')),
 
 		// PHASE 2: Store & Purchase Fields (Optional)
@@ -145,6 +146,7 @@ export interface UseFormLogicProps {
 	mode: 'add' | 'create' | 'edit'
 	initialData?: any
 	onSuccess?: () => void
+	intent?: 'own' | 'wishlist'
 }
 
 /**
@@ -160,7 +162,7 @@ export interface UseFormLogicProps {
  * @param props - Configuration options
  * @returns Form methods, state, and handlers
  */
-export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps) {
+export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLogicProps) {
 	const router = useRouter()
 	const supabase = createClient()
 
@@ -184,7 +186,6 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 						salePrice: initialData.sale_price?.toString() || '',
 						targetPrice: initialData.target_price?.toString() || '',
 						wears: initialData.wears || 0,
-						wearFrequency: initialData.wear_frequency || 'weekly',
 						notes: initialData.notes || '',
 						productUrl: initialData.product_url || '',
 
@@ -291,8 +292,13 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 				purchase_date: data.purchaseDate || null,
 
 				wears: data.wears || 0,
-				wear_frequency: data.wearFrequency || 'weekly',
-				status: (mode === 'add' || mode === 'create' ? ItemStatus.WISHLISTED : initialData?.status) as ItemStatus,
+				status: (
+					mode === 'edit'
+						? initialData?.status
+						: intent === 'own'
+							? ItemStatus.OWNED
+							: ItemStatus.WISHLISTED
+				) as ItemStatus,
 				has_been_tried: data.triedOn,
 			}
 
@@ -498,7 +504,10 @@ export function useFormLogic({ mode, initialData, onSuccess }: UseFormLogicProps
 			onSuccess?.()
 			router.refresh()
 		} catch (error) {
-			console.error('Error saving item:', error)
+			// console.error('Error saving item:', error)
+			// This forces the hidden Supabase error to show its true face
+console.error('Error saving item raw:', error);
+console.error('Error saving item stringified:', JSON.stringify(error, null, 2));
 			toast.error('Error', {
 				description: error instanceof Error ? error.message : 'Failed to save item',
 			})
