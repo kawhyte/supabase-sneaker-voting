@@ -30,7 +30,6 @@ interface SizingSectionProps {
 	form: UseFormReturn<any>;
 	mode: "create" | "edit" | "add";
 	initialData?: any;
-	formMode: "quick" | "advanced";
 	intent?: 'own' | 'wishlist';
 }
 
@@ -45,7 +44,6 @@ export function SizingSection({
 	form,
 	mode,
 	initialData,
-	formMode,
 	intent,
 }: SizingSectionProps) {
 	const {

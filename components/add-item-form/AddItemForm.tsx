@@ -17,7 +17,6 @@ import { SupportedRetailersDialog } from '@/components/SupportedRetailersDialog'
 import { ValidationStatusCard } from '@/components/ItemValidationStatusCard'
 import { useValidationVisibility } from '@/hooks/useValidationVisibility'
 import { useSmartDefaults } from '@/hooks/useSmartDefaults'
-import { useFormMode } from '@/lib/form-mode-context'
 import {
 	validateProductUrl,
 	isSupportedRetailer,
@@ -83,9 +82,6 @@ export default function AddItemForm({
 	// Normalize mode: "add" and "create" both mean creating a new item
 	const normalizedMode = mode === 'add' ? 'create' : mode
 
-	// Form mode context (Quick vs Advanced)
-	const { mode: formMode, setMode: setFormMode } = useFormMode()
-
 	// Smart defaults from user preferences
 	const smartDefaults = useSmartDefaults()
 
@@ -136,23 +132,6 @@ export default function AddItemForm({
 			})
 		}
 	}, [smartDefaults, mode, form])
-
-	// PHASE 1 FIX: Smart default formMode in edit mode
-	// If editing an item that has advanced fields filled (SKU, notes, or wears),
-	// ensure formMode is set to 'advanced' so users can see and edit those fields
-	// This prevents confusion when user's localStorage has formMode='quick'
-	useEffect(() => {
-		if (mode === 'edit' && initialData) {
-			const hasAdvancedFields = !!(
-				initialData.sku ||
-				initialData.notes ||
-				(initialData.wears && initialData.wears > 0)
-			)
-			if (hasAdvancedFields && formMode === 'quick') {
-				setFormMode('advanced')
-			}
-		}
-	}, [mode, initialData, formMode, setFormMode])
 
 	// Real-time URL validation when price tracking is enabled
 	useEffect(() => {
@@ -403,28 +382,6 @@ export default function AddItemForm({
 					{/* URL Import Section - Create Mode Only */}
 					{!isFormVisible && (mode === 'create' || mode === 'add') ? (
 						<div className="space-y-6">
-							{/* Intent Toggle */}
-							<div className="grid grid-cols-2 gap-2">
-								<Button
-									type="button"
-									variant={intent === 'own' ? 'default' : 'outline'}
-									onClick={() => setIntent('own')}
-									className="w-full flex items-center justify-center gap-2 h-12"
-								>
-									<Shirt className="h-4 w-4" />
-									I Own This
-								</Button>
-								<Button
-									type="button"
-									variant={intent === 'wishlist' ? 'default' : 'outline'}
-									onClick={() => setIntent('wishlist')}
-									className="w-full flex items-center justify-center gap-2 h-12"
-								>
-									<Star className="h-4 w-4" />
-									Wishlist
-								</Button>
-							</div>
-
 							{/* === MAGIC SEARCH SECTION === */}
 							<div className="bg-muted/40 rounded-xl p-6 border border-border">
 								<h3 className="text-base font-semibold text-foreground mb-1 font-heading flex items-center gap-2">
@@ -580,25 +537,31 @@ export default function AddItemForm({
 
 							{/* Intent Toggle - Create Mode Only */}
 							{(mode === 'create' || mode === 'add') && (
-								<div className="grid grid-cols-2 gap-2">
-									<Button
+								<div className="grid grid-cols-2 gap-3">
+									<button
 										type="button"
-										variant={intent === 'own' ? 'default' : 'outline'}
 										onClick={() => setIntent('own')}
-										className="w-full flex items-center justify-center gap-2 h-12"
+										className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-5 px-4 font-semibold text-sm transition-all duration-150 ${
+											intent === 'own'
+												? 'bg-slate-900 text-white border-slate-900 shadow-md'
+												: 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+										}`}
 									>
-										<Shirt className="h-4 w-4" />
-										I Own This
-									</Button>
-									<Button
+										<Shirt className="h-5 w-5" />
+										I Own These
+									</button>
+									<button
 										type="button"
-										variant={intent === 'wishlist' ? 'default' : 'outline'}
 										onClick={() => setIntent('wishlist')}
-										className="w-full flex items-center justify-center gap-2 h-12"
+										className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-5 px-4 font-semibold text-sm transition-all duration-150 ${
+											intent === 'wishlist'
+												? 'bg-slate-900 text-white border-slate-900 shadow-md'
+												: 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+										}`}
 									>
-										<Star className="h-4 w-4" />
-										Wishlist
-									</Button>
+										<Star className="h-5 w-5" />
+										Add to Wishlist
+									</button>
 								</div>
 							)}
 
@@ -635,7 +598,6 @@ export default function AddItemForm({
 									form={form}
 									mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
 									initialData={initialData}
-									formMode={formMode}
 									intent={intent}
 								/>
 							)}
