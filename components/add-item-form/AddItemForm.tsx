@@ -520,9 +520,10 @@ export default function AddItemForm({
 									retailPrice: watchedRetailPrice,
 									triedOn: watchedTriedOn,
 									sizeTried: watchedSizeTried,
-									comfortRating: watchedComfortRating,
+									comfortRating: watchedComfortRating ?? undefined,
 									photos: photos.length,
 								}}
+								intent={intent}
 								photosLength={photos.length}
 								isDirty={form.formState.isDirty}
 								isValid={form.formState.isValid}
@@ -540,7 +541,14 @@ export default function AddItemForm({
 								<div className="grid grid-cols-2 gap-3">
 									<button
 										type="button"
-										onClick={() => setIntent('own')}
+										onClick={() => {
+											setIntent('own')
+											// Scrub wishlist-only fields so stale state
+											// doesn't bleed into validation or the progress tracker.
+											form.setValue('triedOn', false, { shouldValidate: true })
+											form.setValue('comfortRating', null, { shouldValidate: false })
+											form.clearErrors(['triedOn', 'sizeTried', 'comfortRating'])
+										}}
 										className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-5 px-4 font-semibold text-sm transition-all duration-150 ${
 											intent === 'own'
 												? 'bg-slate-900 text-white border-slate-900 shadow-md'
@@ -552,7 +560,13 @@ export default function AddItemForm({
 									</button>
 									<button
 										type="button"
-										onClick={() => setIntent('wishlist')}
+										onClick={() => {
+											setIntent('wishlist')
+											// Scrub own-only fields so stale state
+											// doesn't bleed into validation or the progress tracker.
+											form.setValue('wears', 0, { shouldValidate: false })
+											form.clearErrors(['wears', 'sizeTried'])
+										}}
 										className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-5 px-4 font-semibold text-sm transition-all duration-150 ${
 											intent === 'wishlist'
 												? 'bg-slate-900 text-white border-slate-900 shadow-md'
@@ -566,7 +580,7 @@ export default function AddItemForm({
 							)}
 
 							{/* Basic Info Section */}
-							<BasicInfoSection form={form} />
+							<BasicInfoSection form={form} intent={intent} />
 
 							{/* Pricing Section */}
 							<PricingSection form={form} intent={intent} />
@@ -592,15 +606,13 @@ export default function AddItemForm({
 								/>
 							)}
 
-							{/* Sizing & Additional Details — Own intent shows flat; Wishlist hides entirely */}
-							{(mode === 'edit' || intent === 'own') && (
-								<SizingSection
-									form={form}
-									mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
-									initialData={initialData}
-									intent={intent}
-								/>
-							)}
+							{/* Sizing & Additional Details — morphs based on intent */}
+							<SizingSection
+								form={form}
+								mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
+								initialData={initialData}
+								intent={intent}
+							/>
 
 							{/* Form Actions */}
 							<FormActions isSubmitting={isSubmitting} mode={mode} onCancel={onCancel} />

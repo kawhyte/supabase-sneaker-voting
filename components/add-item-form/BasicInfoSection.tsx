@@ -24,6 +24,7 @@ import { useBrands } from "@/hooks/useBrands";
 
 interface BasicInfoSectionProps {
 	form: UseFormReturn<any>;
+	intent?: "own" | "wishlist";
 }
 
 /**
@@ -33,7 +34,7 @@ interface BasicInfoSectionProps {
  * and tried-on status. This section appears first in the form and contains
  * all required fields for basic item identification.
  */
-export function BasicInfoSection({ form }: BasicInfoSectionProps) {
+export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 	const {
 		register,
 		setValue,
@@ -54,46 +55,48 @@ export function BasicInfoSection({ form }: BasicInfoSectionProps) {
 				</h3>
 			</div>
 
-			{/* Row 1: Experience */}
-			<div className="dense flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/30 hover:bg-muted/50 transition-colors">
-				<div className="w-full">
-					<div className="flex items-center gap-2 mb-2">
-						<Eye className="h-4 w-4 text-slate-600 flex-shrink-0" />
-						<Label className="block text-sm font-semibold text-slate-900">
-							Did you try on this item?
-						</Label>
+			{/* Tried-On Toggle — Wishlist only */}
+			{intent === "wishlist" && (
+				<div className="dense flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/30 hover:bg-muted/50 transition-colors">
+					<div className="w-full">
+						<div className="flex items-center gap-2 mb-2">
+							<Eye className="h-4 w-4 text-slate-600 flex-shrink-0" />
+							<Label className="block text-sm font-semibold text-slate-900">
+								Did you try on this item?
+							</Label>
+						</div>
+						<div className="flex items-center gap-3">
+							<Switch
+								checked={watchedTriedOn}
+								onCheckedChange={(checked) =>
+									setValue("triedOn", checked, {
+										shouldValidate: true,
+									})
+								}
+								id="triedOn"
+							/>
+							<Label
+								htmlFor="triedOn"
+								className="cursor-pointer text-sm font-medium text-slate-900"
+							>
+								{watchedTriedOn ? (
+									<>
+										Yes{" "}
+										<CheckCircle className="inline h-4 w-4 text-emerald-500 ml-1" />
+									</>
+								) : (
+									"No"
+								)}
+							</Label>
+						</div>
+						{watchedTriedOn && (
+							<p className="text-xs text-emerald-500 mt-2">
+								Great! Your feedback will help track the fit.
+							</p>
+						)}
 					</div>
-					<div className="flex items-center gap-3">
-						<Switch
-							checked={watchedTriedOn}
-							onCheckedChange={(checked) =>
-								setValue("triedOn", checked, {
-									shouldValidate: true,
-								})
-							}
-							id="triedOn"
-						/>
-						<Label
-							htmlFor="triedOn"
-							className="cursor-pointer text-sm font-medium text-slate-900"
-						>
-							{watchedTriedOn ? (
-								<>
-									Yes{" "}
-									<CheckCircle className="inline h-4 w-4 text-emerald-500 ml-1" />
-								</>
-							) : (
-								"No"
-							)}
-						</Label>
-					</div>
-					{watchedTriedOn && (
-						<p className="text-xs text-emerald-500 mt-2">
-							Great! Your feedback will help track the fit.
-						</p>
-					)}
 				</div>
-			</div>
+			)}
 
 			{/* Row 2: Brand & Item Name */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,14 +1,17 @@
 /**
- * Sizing Section - Size Tried, Comfort Rating, Additional Details
+ * Sizing Section - Intent-aware sizing, comfort, and details fields.
  *
- * Contains try-on related fields and optional metadata:
- * - Size tried (shoe sizes or clothing sizes based on category)
- * - Comfort rating (1-5 stars for applicable categories)
- * - SKU/Style code (optional)
- * - Notes (120 character limit)
- * - Wears counter (edit mode only, for owned items)
+ * Scenario A (intent === 'own' or edit):
+ *   - No triedOn toggle (handled in BasicInfoSection)
+ *   - Size always visible (Required for size-relevant categories)
+ *   - Comfort Rating always visible (Optional)
+ *   - Sizing Notes always visible (Optional)
+ *   - SKU, Store & Purchase, Wears Counter
  *
- * Note: Color field moved to BasicInfoSection (required field)
+ * Scenario B (intent === 'wishlist', create mode):
+ *   - "Have you tried these on in-store?" toggle
+ *   - Target Size always visible (Optional) + hint text
+ *   - If triedOn: Comfort Rating (Optional) + Sizing Notes (Optional)
  */
 
 "use client";
@@ -17,7 +20,7 @@ import { UseFormReturn } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, FileText, Store } from "lucide-react";
+import { FileText, Store, Ruler } from "lucide-react";
 import { SizeCombobox } from "@/components/SizeCombobox";
 import { ClothingSizeCombobox } from "@/components/ClothingSizeCombobox";
 import { ComfortRating } from "@/components/ComfortRating";
@@ -30,16 +33,9 @@ interface SizingSectionProps {
 	form: UseFormReturn<any>;
 	mode: "create" | "edit" | "add";
 	initialData?: any;
-	intent?: 'own' | 'wishlist';
+	intent?: "own" | "wishlist";
 }
 
-/**
- * SizingSection Component
- *
- * Shows additional optional fields in Advanced mode only.
- * Contains size selection, comfort rating, and metadata fields.
- * Fields are shown directly without accordion nesting.
- */
 export function SizingSection({
 	form,
 	mode,
@@ -56,57 +52,140 @@ export function SizingSection({
 	const watchedTriedOn = watch("triedOn");
 	const watchedCategory = watch("category");
 
-	// Show in edit mode always; in create mode only for 'own' intent (flat layout)
-	// Wishlist intent hides this section entirely (handled at parent level too)
-	if (mode !== 'edit' && intent !== 'own') return null;
+	// Wishlist create mode gets a streamlined, frictionless layout
+	const isWishlistCreate = intent === "wishlist" && mode !== "edit";
 
-	return (
-		<div className="space-y-6">
-			{/* Section Header */}
-			<div className="dense flex items-center gap-2 pb-2 border-b border-border">
-				<FileText className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
-				<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
-					{watchedTriedOn ? (
-						<>
-							<CheckCircle className="inline h-4 w-4 text-emerald-500 mr-2" />
-							Try-On Details
-						</>
-					) : (
-						"Additional Details (Optional)"
-					)}
-				</h3>
-			</div>
-
-			{/* Row 1: SKU and Size Tried (if applicable) */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<div>
-					<Label className="text-sm font-medium text-slate-900">
-						SKU / Style Code
-					</Label>
-					<Input {...register("sku")} className="mt-2" placeholder="e.g., DQ4478-001" />
+	// ── Scenario B: Wishlist (create) ─────────────────────────────────────────
+	if (isWishlistCreate) {
+		return (
+			<div className="space-y-6">
+				{/* Section Header */}
+				<div className="dense flex items-center gap-2 pb-2 border-b border-border">
+					<Ruler className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
+					<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
+						Sizing{" "}
+						<span className="font-normal text-muted-foreground">(Optional)</span>
+					</h3>
 				</div>
 
-				{isSizeRequired(watchedCategory) && watchedTriedOn && (
+				{/* Target Size — always shown for size-relevant categories */}
+				{isSizeRequired(watchedCategory) && (
 					<div>
 						<Label className="text-sm font-medium text-slate-900">
-							Size Tried
+							Target Size{" "}
+							<span className="font-normal text-muted-foreground">(Optional)</span>
 						</Label>
 						{watchedCategory === "shoes" ? (
 							<SizeCombobox
 								value={watch("sizeTried")}
 								onChange={(v) =>
-									setValue("sizeTried", v, {
-										shouldValidate: true,
-									})
+									setValue("sizeTried", v, { shouldValidate: true })
 								}
 							/>
 						) : (
 							<ClothingSizeCombobox
 								value={watch("sizeTried")}
 								onChange={(v) =>
-									setValue("sizeTried", v, {
-										shouldValidate: true,
-									})
+									setValue("sizeTried", v, { shouldValidate: true })
+								}
+							/>
+						)}
+						<p className="text-xs text-muted-foreground mt-1">
+							Selecting a size helps us find better price matches later.
+						</p>
+					</div>
+				)}
+
+				{/* Comfort Rating & Sizing Notes — only when tried on */}
+				{watchedTriedOn && (
+					<>
+						{isComfortRequired(watchedCategory) && (
+							<div>
+								<Label className="text-sm font-medium text-slate-900 mb-2 block">
+									Comfort Rating{" "}
+									<span className="font-normal text-muted-foreground">(Optional)</span>
+								</Label>
+								<ComfortRating
+									value={watch("comfortRating")}
+									onChange={(value) =>
+										setValue("comfortRating", value, {
+											shouldValidate: false,
+											shouldDirty: true,
+										})
+									}
+									error={
+										errors.comfortRating?.message
+											? String(errors.comfortRating.message)
+											: undefined
+									}
+								/>
+								<p className="text-xs text-muted-foreground mt-1">
+									e.g., Great arch support
+								</p>
+							</div>
+						)}
+
+						<div>
+							<Label className="text-sm font-medium text-slate-900">
+								Sizing Notes{" "}
+								<span className="font-normal text-muted-foreground">(Optional)</span>{" "}
+								({watch("notes")?.length || 0} / 120)
+							</Label>
+							<Textarea
+								{...register("notes")}
+								maxLength={120}
+								className="mt-2"
+								placeholder="e.g., Runs a bit narrow, go up half a size"
+							/>
+						</div>
+					</>
+				)}
+			</div>
+		);
+	}
+
+	// ── Scenario A: Own / Edit ─────────────────────────────────────────────────
+	return (
+		<div className="space-y-6">
+			{/* Section Header */}
+			<div className="dense flex items-center gap-2 pb-2 border-b border-border">
+				<FileText className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
+				<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
+					Additional Details{" "}
+					<span className="font-normal text-muted-foreground">(Optional)</span>
+				</h3>
+			</div>
+
+			{/* Row 1: SKU and Size */}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<div>
+					<Label className="text-sm font-medium text-slate-900">
+						SKU / Style Code
+					</Label>
+					<Input
+						{...register("sku")}
+						className="mt-2"
+						placeholder="e.g., DQ4478-001"
+					/>
+				</div>
+
+				{isSizeRequired(watchedCategory) && (
+					<div>
+						<Label className="text-sm font-medium text-slate-900">
+							Size <span className="text-red-500">*</span>
+						</Label>
+						{watchedCategory === "shoes" ? (
+							<SizeCombobox
+								value={watch("sizeTried")}
+								onChange={(v) =>
+									setValue("sizeTried", v, { shouldValidate: true })
+								}
+							/>
+						) : (
+							<ClothingSizeCombobox
+								value={watch("sizeTried")}
+								onChange={(v) =>
+									setValue("sizeTried", v, { shouldValidate: true })
 								}
 							/>
 						)}
@@ -119,30 +198,32 @@ export function SizingSection({
 				)}
 			</div>
 
-			{/* Notes Field */}
+			{/* Sizing Notes */}
 			<div>
 				<Label className="text-sm font-medium text-slate-900">
-					Notes ({watch("notes")?.length || 0} / 120)
+					Sizing Notes{" "}
+					<span className="font-normal text-muted-foreground">(Optional)</span>{" "}
+					({watch("notes")?.length || 0} / 120)
 				</Label>
 				<Textarea
 					{...register("notes")}
 					maxLength={120}
 					className="mt-2"
-					placeholder="E.g., Great comfort, runs large, perfect for running"
+					placeholder="e.g., Runs a bit narrow, go up half a size"
 				/>
 			</div>
 
-			{/* PHASE 2: Store & Purchase Details (Optional) */}
+			{/* Store & Purchase Details */}
 			<div className="pt-6 space-y-6">
 				<div className="dense flex items-center gap-2 pb-2 border-b border-border">
 					<Store className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
 					<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
-						Store & Purchase (Optional)
+						Store & Purchase{" "}
+						<span className="font-normal text-muted-foreground">(Optional)</span>
 					</h3>
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-					{/* Store Name */}
 					<div>
 						<Label className="text-sm font-medium text-slate-900">
 							Store Name
@@ -159,7 +240,6 @@ export function SizingSection({
 						)}
 					</div>
 
-					{/* Purchase Date */}
 					<div>
 						<Label className="text-sm font-medium text-slate-900">
 							Purchase Date
@@ -168,7 +248,7 @@ export function SizingSection({
 							{...register("purchaseDate")}
 							type="date"
 							className="mt-2"
-							max={new Date().toISOString().split('T')[0]}
+							max={new Date().toISOString().split("T")[0]}
 						/>
 						{errors.purchaseDate && (
 							<p className="text-sm text-red-600 mt-1">
@@ -178,7 +258,6 @@ export function SizingSection({
 					</div>
 				</div>
 
-				{/* Store URL */}
 				<div>
 					<Label className="text-sm font-medium text-slate-900">
 						Store / Product URL
@@ -200,7 +279,7 @@ export function SizingSection({
 				</div>
 			</div>
 
-			{/* Wears Counter - For tracking item usage (Edit mode only, owned items) */}
+			{/* Wears Counter — Edit mode, owned items only */}
 			{mode === "edit" && initialData?.status === "owned" && (
 				<div>
 					<Label className="text-sm font-medium text-slate-900">
@@ -230,9 +309,13 @@ export function SizingSection({
 				</div>
 			)}
 
-			{/* Comfort Rating - Shows when tried on and category requires it */}
-			{watchedTriedOn && isComfortRequired(watchedCategory) && (
+			{/* Comfort Rating — Optional, no triedOn gate */}
+			{isComfortRequired(watchedCategory) && (
 				<div className="pt-4">
+					<Label className="text-sm font-medium text-slate-900 mb-2 block">
+						Comfort Rating{" "}
+						<span className="font-normal text-muted-foreground">(Optional)</span>
+					</Label>
 					<ComfortRating
 						value={watch("comfortRating")}
 						onChange={(value) =>
@@ -241,8 +324,15 @@ export function SizingSection({
 								shouldDirty: true,
 							})
 						}
-						error={errors.comfortRating?.message ? String(errors.comfortRating.message) : undefined}
+						error={
+							errors.comfortRating?.message
+								? String(errors.comfortRating.message)
+								: undefined
+						}
 					/>
+					<p className="text-xs text-muted-foreground mt-1">
+						e.g., Great arch support
+					</p>
 				</div>
 			)}
 		</div>

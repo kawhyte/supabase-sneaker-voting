@@ -49,6 +49,7 @@ interface ValidationStatusCardProps {
 		comfortRating?: number
 		photos?: number
 	}
+	intent?: 'own' | 'wishlist'
 	photosLength: number
 	isDirty: boolean
 	isValid: boolean
@@ -86,6 +87,7 @@ const isMissing = (value: any): boolean => {
 export function ValidationStatusCard({
 	errors,
 	watchedValues,
+	intent,
 	photosLength,
 	isDirty,
 	isValid,
@@ -165,54 +167,61 @@ export function ValidationStatusCard({
 		}
 	}, [photosLength])
 
-	// Calculate validation state for conditional fields (dynamically required when triedOn = true)
+	// Calculate validation state for conditional fields.
+	// These only apply in wishlist mode — size and comfort are NEVER
+	// required for "I Own These" items regardless of triedOn state.
 	const conditionalFieldsStatus = useMemo(() => {
-		const fields: RequiredField[] = []
+		const fields: ValidationItem[] = []
 
-		// Size Tried - required if tried on AND size is required for category
-		if (watchedValues.triedOn) {
-			const sizeRequired = ['shoes', 'tops', 'bottoms', 'outerwear'].includes(
-				watchedValues.category || ''
-			)
-			if (sizeRequired) {
-				fields.push({
-					id: 'sizeTried',
-					label: 'Size Tried',
-					status: isMissing(watchedValues.sizeTried) ? 'pending' : 'complete',
-					hint: 'Size you tried on',
-					required: true,
-				})
-			}
+		// Only gate on triedOn for wishlist intent.
+		// For own intent, these fields are always optional and never shown here.
+		if (intent !== 'wishlist' || !watchedValues.triedOn) {
+			return fields
 		}
 
-		// Comfort Rating - required if tried on AND category requires comfort
-		if (watchedValues.triedOn) {
-			const comfortRequired = ['shoes', 'tops', 'bottoms', 'outerwear'].includes(
-				watchedValues.category || ''
-			)
-			if (comfortRequired) {
-				// Check for 0, null, and undefined
-				const comfortMissing =
-					watchedValues.comfortRating === undefined ||
-					watchedValues.comfortRating === null ||
-					watchedValues.comfortRating === 0
+		// Size Tried - required in wishlist mode when tried on AND category needs a size
+		const sizeRequired = ['shoes', 'tops', 'bottoms', 'outerwear'].includes(
+			watchedValues.category || ''
+		)
+		if (sizeRequired) {
+			fields.push({
+				id: 'sizeTried',
+				label: 'Size Tried',
+				status: isMissing(watchedValues.sizeTried) ? 'pending' : 'complete',
+				hint: 'Size you tried on',
+				required: true,
+			})
+		}
 
-				fields.push({
-					id: 'comfortRating',
-					label: 'Comfort Rating',
-					status: comfortMissing ? 'pending' : 'complete',
-					hint: 'Rate how comfortable the item is (1-5)',
-					required: true,
-				})
-			}
+		// Comfort Rating — shown as informational (not blocking) in wishlist + tried-on mode.
+		// It is always optional, so we never mark it as 'pending' (red).
+		const comfortApplies = ['shoes', 'tops', 'bottoms', 'outerwear'].includes(
+			watchedValues.category || ''
+		)
+		if (comfortApplies) {
+			const comfortFilled =
+				watchedValues.comfortRating !== undefined &&
+				watchedValues.comfortRating !== null &&
+				watchedValues.comfortRating > 0
+
+			fields.push({
+				id: 'comfortRating',
+				label: 'Comfort Rating',
+				// 'conditional' renders as blue/info, never red — it is always optional.
+				status: comfortFilled ? 'complete' : 'conditional',
+				hint: 'Optional — rate comfort (1-5)',
+				required: false,
+			})
 		}
 
 		return fields
-	}, [watchedValues.triedOn, watchedValues.category, watchedValues.sizeTried, watchedValues.comfortRating])
+	}, [intent, watchedValues.triedOn, watchedValues.category, watchedValues.sizeTried, watchedValues.comfortRating])
 
-	// Count completion (include conditional fields when they're required)
-	const totalRequired = requiredFieldsStatus.length + 1 + conditionalFieldsStatus.length // +1 for photos, + conditional required fields
-	const completedConditional = conditionalFieldsStatus.filter((f) => f.status === 'complete').length
+	// Only truly-required conditional fields (required: true, status: 'pending'|'complete')
+	// contribute to the progress count. Optional ones (status: 'conditional') are decorative only.
+	const requiredConditional = conditionalFieldsStatus.filter((f): f is RequiredField => f.required === true && f.status !== 'conditional')
+	const totalRequired = requiredFieldsStatus.length + 1 + requiredConditional.length // +1 for photos
+	const completedConditional = requiredConditional.filter((f) => f.status === 'complete').length
 	const completed = requiredFieldsStatus.filter((f) => f.status === 'complete').length + (photosLength > 0 ? 1 : 0) + completedConditional
 	const completionPercent = Math.round((completed / totalRequired) * 100)
 
@@ -220,8 +229,8 @@ export function ValidationStatusCard({
 	const hasMissingRequired =
 		requiredFieldsStatus.some((f) => f.status === 'pending') ||
 		photosLength === 0 ||
-		conditionalFieldsStatus.some((f) => f.status === 'pending')
-	const allValid = isValid && photosLength > 0 && conditionalFieldsStatus.every((f) => f.status === 'complete')
+		requiredConditional.some((f) => f.status === 'pending')
+	const allValid = isValid && photosLength > 0 && requiredConditional.every((f) => f.status === 'complete')
 
 	// Don't show card if no issues
 	if (!shouldShowCard || !isDirty) {
@@ -391,7 +400,7 @@ function ValidationItemRow({
 	const statusConfig = {
 		complete: {
 			icon: <CheckCircle2 className={getIconClass('complete', compact)} />,
-			textColor: 'text-emerald-500',
+			textColor: 'text-black',
 			bgColor: 'bg-emerald-500',
 		},
 		pending: {

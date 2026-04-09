@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -22,6 +22,7 @@ import { ItemStatus } from '@/types/ItemStatus'
  */
 export const itemFormSchema = z
 	.object({
+		intent: z.enum(['own', 'wishlist']).optional().default('own'),
 		triedOn: z.boolean().default(false),
 		category: z.literal('shoes').default('shoes'),
 		productUrl: z
@@ -38,7 +39,12 @@ export const itemFormSchema = z
 		sku: z.string().max(50).optional().or(z.literal('')),
 		color: z.string().min(1, 'Color is required').max(100).trim(),
 		sizeTried: z.string().optional(),
-		comfortRating: z.coerce.number().min(1).max(5).optional(),
+		// Preprocess 0 → null so an unset rating doesn't trip min(1).
+		// The field is always optional; null and undefined are both valid "not set" values.
+		comfortRating: z.preprocess(
+			(v) => (v === 0 || v === '' || v === undefined ? null : v),
+			z.number().min(1).max(5).nullable().optional()
+		),
 		retailPrice: z
 			.string()
 			.regex(
@@ -73,7 +79,7 @@ export const itemFormSchema = z
 			.optional()
 			.or(z.literal('')),
 		wears: z.coerce.number().min(0).max(10000).optional().default(0),
-		notes: z.string().max(120).trim().optional().or(z.literal('')),
+		notes: z.string().max(120).trim().optional().nullable().or(z.literal('')),
 
 		// PHASE 2: Store & Purchase Fields (Optional)
 		storeName: z.string().max(100).trim().optional().or(z.literal('')),
@@ -95,24 +101,15 @@ export const itemFormSchema = z
 	})
 	.refine(
 		(data) => {
+			// Wishlist: size is always optional
+			if (data.intent === 'wishlist') return true
+			// Own/edit: size required when tried on and category needs it
 			if (isSizeRequired(data.category) && data.triedOn) {
 				return data.sizeTried && data.sizeTried.length > 0
 			}
 			return true
 		},
 		{ message: 'Please select the size you tried on', path: ['sizeTried'] }
-	)
-	.refine(
-		(data) => {
-			if (
-				isComfortRequired(data.category) &&
-				data.triedOn
-			) {
-				return data.comfortRating !== undefined
-			}
-			return true
-		},
-		{ message: 'Please rate the comfort', path: ['comfortRating'] }
 	)
 	.refine(
 		(data) => {
@@ -173,6 +170,7 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 		defaultValues:
 			mode === 'edit' && initialData
 				? {
+						intent: 'own',
 						triedOn: initialData.has_been_tried || false,
 						category: 'shoes',
 						brandId: initialData.brand_id || undefined,
@@ -195,11 +193,17 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 						purchaseDate: initialData.purchase_date || '',
 				  }
 				: {
+						intent: intent || 'own',
 						triedOn: false,
 						category: 'shoes' as const,
 						wears: 0,
 				  },
 	})
+
+	// Keep the form's intent field in sync when the parent toggles own/wishlist
+	useEffect(() => {
+		form.setValue('intent', intent || 'own')
+	}, [intent]) // eslint-disable-line react-hooks/exhaustive-deps
 
 	// Additional state
 	const [isSubmitting, setIsSubmitting] = useState(false)
