@@ -504,9 +504,19 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 				}).catch((err) => console.warn('Achievement check failed:', err))
 			}
 
-			// Call success callback and refresh
+			// Call success callback, then route to the correct dashboard tab.
+			// Only redirect for new items — edits stay on the current page.
 			onSuccess?.()
-			router.refresh()
+			if (mode !== 'edit') {
+				router.refresh()
+				if (intent === 'wishlist') {
+					router.push('/dashboard?tab=wishlist')
+				} else {
+					router.push('/dashboard?tab=rotation')
+				}
+			} else {
+				router.refresh()
+			}
 		} catch (error) {
 			// console.error('Error saving item:', error)
 			// This forces the hidden Supabase error to show its true face

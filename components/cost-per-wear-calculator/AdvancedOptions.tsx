@@ -199,7 +199,7 @@ export function AdvancedOptions({ form, showAdvanced, setShowAdvanced }: Advance
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-medium cursor-pointer">
-                    This fills a missing need in my wardrobe
+                    This fills a missing need in my closet
                   </FormLabel>
                   <FormDescription>
                     Essential items that fill gaps tend to get worn more
