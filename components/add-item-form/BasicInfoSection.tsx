@@ -11,6 +11,7 @@
 "use client";
 
 import { UseFormReturn } from "react-hook-form";
+import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -45,6 +46,20 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 	const { brands } = useBrands();
 	const watchedTriedOn = watch("triedOn");
 	const watchedBrandId = watch("brandId");
+	const watchedBrandName = watch("brand");
+
+	// When editing an item whose brand_id is null (legacy data), resolve it from
+	// the stored brand name once the brands list has loaded.
+	useEffect(() => {
+		if (!watchedBrandId && watchedBrandName && brands.length > 0) {
+			const match = brands.find(
+				(b) => b.name?.toLowerCase() === watchedBrandName.toLowerCase()
+			);
+			if (match) {
+				setValue("brandId", match.id, { shouldValidate: true });
+			}
+		}
+	}, [brands, watchedBrandName, watchedBrandId, setValue]);
 
 	return (
 		<div className="space-y-6">
