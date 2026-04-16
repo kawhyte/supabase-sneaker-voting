@@ -8,6 +8,7 @@ import { PhotoSection } from './PhotoSection'
 import { SizingSection } from './SizingSection'
 import { ProductURLSection } from './ProductURLSection'
 import { FormActions } from './FormActions'
+import { BulkImportSection } from './BulkImportSection'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -98,6 +99,9 @@ export default function AddItemForm({
 	})
 	const [showRetailersDialog, setShowRetailersDialog] = useState(false)
 	const [attemptedSubmit, setAttemptedSubmit] = useState(false)
+
+	// Bulk Import mode
+	const [isBulkMode, setIsBulkMode] = useState(false)
 
 	// Magic Search state
 	const [magicSearchQuery, setMagicSearchQuery] = useState('')
@@ -381,6 +385,9 @@ export default function AddItemForm({
 				<CardContent className="pt-6">
 					{/* URL Import Section - Create Mode Only */}
 					{!isFormVisible && (mode === 'create' || mode === 'add') ? (
+						isBulkMode ? (
+							<BulkImportSection onBack={() => setIsBulkMode(false)} />
+						) : (
 						<div className="space-y-6">
 							{/* === MAGIC SEARCH SECTION === */}
 							<div className="bg-muted/40 rounded-xl p-6 border border-border">
@@ -506,7 +513,14 @@ export default function AddItemForm({
 							>
 								Enter Details Manually
 							</Button>
+
+							<p className="text-sm text-slate-500 hover:text-slate-800 underline-offset-4 hover:underline cursor-pointer text-center mt-4 transition-colors"
+								onClick={() => setIsBulkMode(true)}
+							>
+								Adding your whole collection? Try Bulk Import
+							</p>
 						</div>
+						)
 					) : (
 						<form onSubmit={handleFormSubmit} className="space-y-8" ref={formRef}>
 							{/* Validation Status Card - Smart floating sidebar */}
