@@ -170,7 +170,7 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 		defaultValues:
 			mode === 'edit' && initialData
 				? {
-						intent: 'own',
+						intent: initialData?.status === 'wishlisted' ? 'wishlist' : 'own',
 						triedOn: initialData.has_been_tried || false,
 						category: 'shoes',
 						brandId: initialData.brand_id || undefined,
@@ -296,13 +296,7 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 				purchase_date: data.purchaseDate || null,
 
 				wears: data.wears || 0,
-				status: (
-					mode === 'edit'
-						? initialData?.status
-						: intent === 'own'
-							? ItemStatus.OWNED
-							: ItemStatus.WISHLISTED
-				) as ItemStatus,
+				status: (intent === 'own' ? ItemStatus.OWNED : ItemStatus.WISHLISTED) as ItemStatus,
 				has_been_tried: data.triedOn,
 			}
 

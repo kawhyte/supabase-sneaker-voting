@@ -69,7 +69,10 @@ export default function AddItemForm({
 	onCancel,
 }: AddItemFormProps) {
 	// Intent: 'own' (item is already owned) vs 'wishlist' (want to buy)
-	const [intent, setIntent] = useState<'own' | 'wishlist'>('own')
+	// In edit mode, derive from the item's stored status
+	const [intent, setIntent] = useState<'own' | 'wishlist'>(
+		mode === 'edit' && initialData?.status === 'wishlisted' ? 'wishlist' : 'own'
+	)
 
 	// Form logic hook
 	const {
@@ -593,6 +596,28 @@ export default function AddItemForm({
 								</div>
 							)}
 
+							{/* Move to Wardrobe — Edit mode, wishlist items only */}
+							{(mode === 'edit') && intent === 'wishlist' && (
+								<div className="rounded-xl border-2 border-dashed border-slate-300 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+									<div>
+										<p className="text-sm font-semibold text-slate-900">Ready to buy?</p>
+										<p className="text-xs text-muted-foreground mt-0.5">Move this item into your wardrobe and start tracking wears.</p>
+									</div>
+									<Button
+										type="button"
+										variant="default"
+										onClick={() => {
+											setIntent('own')
+											form.setValue('intent', 'own')
+											form.clearErrors(['triedOn', 'sizeTried', 'comfortRating'])
+										}}
+									>
+										<Shirt className="h-4 w-4 mr-2" />
+										Move to Wardrobe
+									</Button>
+								</div>
+							)}
+
 							{/* Basic Info Section */}
 							<BasicInfoSection form={form} intent={intent} />
 
@@ -606,19 +631,18 @@ export default function AddItemForm({
 								errors={form.formState.errors}
 							/>
 
-							{/* Product URL & Price Tracking — Wishlist only in create mode */}
-							{(mode === 'edit' || intent === 'wishlist') && (
-								<ProductURLSection
-									form={form}
-									isScrapingUrl={isScrapingUrl}
-									uploadProgress={uploadProgress}
-									urlValidation={urlValidation}
-									onUrlScrape={handleUrlScrape}
-									onShowRetailersDialog={() => setShowRetailersDialog(true)}
-									mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
-									initialData={initialData}
-								/>
-							)}
+							{/* Product URL & Price Tracking */}
+							<ProductURLSection
+								form={form}
+								isScrapingUrl={isScrapingUrl}
+								uploadProgress={uploadProgress}
+								urlValidation={urlValidation}
+								onUrlScrape={handleUrlScrape}
+								onShowRetailersDialog={() => setShowRetailersDialog(true)}
+								mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
+								initialData={initialData}
+								intent={intent}
+							/>
 
 							{/* Sizing & Additional Details — morphs based on intent */}
 							<SizingSection

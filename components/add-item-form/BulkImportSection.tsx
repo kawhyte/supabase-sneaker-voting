@@ -289,11 +289,11 @@ export function BulkImportSection({ onBack }: BulkImportSectionProps) {
 										}`}
 									>
 										{/* Selection checkbox */}
-										<div className="absolute top-1.5 left-1.5 z-10 dense">
+										<div className="absolute top-2 left-2 z-10 dense">
 											<Checkbox
 												checked={selectedIndices.has(index)}
 												onCheckedChange={() => toggleSelected(index)}
-												className="h-4 w-4 bg-background/80"
+												className="h-6 w-6 rounded-full border-2"
 												aria-label={selectedIndices.has(index) ? 'Deselect item' : 'Select item'}
 											/>
 										</div>

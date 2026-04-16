@@ -53,15 +53,6 @@ export function ComfortRating({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-slate-900">Comfort Rating</label>
-        {value && (
-          <span className="text-xs font-medium text-primary">
-            {comfortLevels.find(l => l.id === value)?.label}
-          </span>
-        )}
-      </div>
-
       {/* Responsive Grid: 1 column on mobile, 5 columns on desktop */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
         {comfortLevels.map(level => {

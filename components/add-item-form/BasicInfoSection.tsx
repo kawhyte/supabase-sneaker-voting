@@ -49,7 +49,7 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 	return (
 		<div className="space-y-6">
 			<div className="dense flex items-center gap-2 pb-2 border-b border-border">
-				<Package className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
+				<Package className="h-5 w-5 text-slate-600 flex-shrink-0" />
 				<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 					Product Details
 				</h3>

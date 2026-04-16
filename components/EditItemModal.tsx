@@ -98,12 +98,14 @@ export function EditItemModal({ experience, isOpen, onClose, onSave }: EditItemM
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-7xl px-4 sm:px-6 lg:px-8 max-h-[85vh] md:max-h-[90vh] overflow-y-auto bg-card border border-slate-300">
-        <DialogHeader className="sticky top-0 bg-card  pb-[var(--spacing-6)]  border-slate-300 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 z-50">
-          <DialogTitle className="text-xl md:text-2xl p-8">Edit Item</DialogTitle>
+      <DialogContent className="w-[95vw] max-w-7xl flex flex-col max-h-[85vh] md:max-h-[90vh] bg-card border border-slate-300 p-0 gap-0">
+        {/* Header — sits above the scroll zone, never moves */}
+        <DialogHeader className="flex-shrink-0 border-b border-slate-300 px-4 sm:px-6 lg:px-8 py-4">
+          <DialogTitle className="text-xl md:text-2xl">Edit Item</DialogTitle>
         </DialogHeader>
 
-        <div className="pt-[var(--spacing-6)]">
+        {/* Scrollable form area */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
           <AddItemForm
             initialData={experience}
             mode="edit"

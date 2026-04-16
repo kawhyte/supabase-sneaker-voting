@@ -52,16 +52,16 @@ export function SizingSection({
 	const watchedTriedOn = watch("triedOn");
 	const watchedCategory = watch("category");
 
-	// Wishlist create mode gets a streamlined, frictionless layout
-	const isWishlistCreate = intent === "wishlist" && mode !== "edit";
+	// Wishlist mode (both create and edit) gets a streamlined, frictionless layout
+	const isWishlistMode = intent === "wishlist";
 
-	// ── Scenario B: Wishlist (create) ─────────────────────────────────────────
-	if (isWishlistCreate) {
+	// ── Scenario B: Wishlist ───────────────────────────────────────────────────
+	if (isWishlistMode) {
 		return (
 			<div className="space-y-6">
 				{/* Section Header */}
 				<div className="dense flex items-center gap-2 pb-2 border-b border-border">
-					<Ruler className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
+					<Ruler className="h-5 w-5 text-slate-600 flex-shrink-0" />
 					<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 						Sizing{" "}
 						<span className="font-normal text-muted-foreground">(Optional)</span>
@@ -149,7 +149,7 @@ export function SizingSection({
 		<div className="space-y-6">
 			{/* Section Header */}
 			<div className="dense flex items-center gap-2 pb-2 border-b border-border">
-				<FileText className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
+				<FileText className="h-5 w-5 text-slate-600 flex-shrink-0" />
 				<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 					Additional Details{" "}
 					<span className="font-normal text-muted-foreground">(Optional)</span>
@@ -216,7 +216,7 @@ export function SizingSection({
 			{/* Store & Purchase Details */}
 			<div className="pt-6 space-y-6">
 				<div className="dense flex items-center gap-2 pb-2 border-b border-border">
-					<Store className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
+					<Store className="h-5 w-5 text-slate-600 flex-shrink-0" />
 					<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 						Store & Purchase{" "}
 						<span className="font-normal text-muted-foreground">(Optional)</span>
@@ -279,8 +279,8 @@ export function SizingSection({
 				</div>
 			</div>
 
-			{/* Wears Counter — Edit mode, owned items only */}
-			{mode === "edit" && initialData?.status === "owned" && (
+			{/* Wears Counter — Edit mode, owned intent only */}
+			{mode === "edit" && intent === "own" && (
 				<div>
 					<Label className="text-sm font-medium text-slate-900">
 						Times Worn{" "}

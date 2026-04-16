@@ -37,6 +37,7 @@ interface ProductURLSectionProps {
 	onShowRetailersDialog: () => void;
 	mode: "create" | "edit";
 	initialData?: any;
+	intent?: "own" | "wishlist";
 }
 
 /**
@@ -55,6 +56,7 @@ export function ProductURLSection({
 	onShowRetailersDialog,
 	mode,
 	initialData,
+	intent,
 }: ProductURLSectionProps) {
 	const {
 		register,
@@ -94,13 +96,11 @@ export function ProductURLSection({
 				)}
 			</div>
 
-			{/* Price Tracking Section - Wishlisted Items or Edit Mode */}
-			{(mode === "create" ||
-				initialData?.status === "wishlisted" ||
-				mode === "edit") && (
+			{/* Price Tracking Section - Wishlist mode only */}
+			{(mode === "create" || intent === "wishlist") && (
 				<div className="space-y-6 mt-12">
 					<div className="flex items-center gap-2 pb-2 border-b border-border">
-						<TrendingDown className="relative -top-[8px] h-5 w-5 text-slate-600 flex-shrink-0" />
+						<TrendingDown className="h-5 w-5 text-slate-600 flex-shrink-0" />
 						<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 							Price Tracking
 						</h3>
