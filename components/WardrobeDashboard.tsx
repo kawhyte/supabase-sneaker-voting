@@ -741,8 +741,18 @@ export function WardrobeDashboard({
 
 	const handleTogglePinned = async (item: WardrobeItem) => {
 		try {
-			// Optimistic update
 			const newPinnedStatus = !item.is_pinned;
+
+			// Client-side limit check to avoid optimistic update + revert cycle
+			if (newPinnedStatus) {
+				const pinnedCount = journalEntries.filter(e => e.is_pinned && !e.is_archived).length;
+				if (pinnedCount >= 5) {
+					toast.error("Pin limit reached. Unpin an item to pin this one.");
+					return;
+				}
+			}
+
+			// Optimistic update
 			setJournalEntries((prev) =>
 				prev.map((entry) =>
 					entry.id === item.id

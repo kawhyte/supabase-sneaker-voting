@@ -1,27 +1,17 @@
 /**
  * WardrobeListItem - Individual row in list view
  *
- * Displays a horizontal row with essential item information:
- * - Thumbnail (96x96 desktop, 80x80 tablet, 64x64 mobile)
- * - Brand + Model
- * - Size
- * - Price (purchase for owned, retail/sale for wishlist)
- * - Status badges (wishlist, owned, pinned)
- * - Actions menu
+ * Mobile: stacked card (image left, content right, absolute actions)
+ * Desktop (md+): full horizontal row with dedicated columns
  *
- * Click row to expand inline and show:
- * - Color, Category, Wear count
- * - Notes (if any)
- * - Full pricing details
- * - Purchase date / tracking info
- *
- * Industry standard: Gmail, Notion, Linear, GitHub Issues
+ * Click row to expand inline details.
  */
 
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight, Pin, Archive } from "lucide-react";
+import { ChevronDown, ChevronRight, Pin, Archive, Plus } from "lucide-react";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { WardrobeItem } from "@/components/types/WardrobeItem";
@@ -64,36 +54,34 @@ export function WardrobeListItem({
 }: WardrobeListItemProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 
-	// Prepare data
 	const itemPhotos = prepareItemPhotos(item);
 	const displayLogic = useItemDisplayLogic(item);
 	const permissions = useItemPermissions(item.category);
 	const purchasedDate = item.purchase_date || purchaseDate;
 
-	// Get main image with fallback to placeholder
 	const mainImage = itemPhotos[0]?.image_url || "/images/placeholder.svg";
 
-	// Get category config for icon (fallback to accessories if category not found)
 	const categoryConfig = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS] || CATEGORY_CONFIGS.shoes;
 	const CategoryIcon = categoryConfig.icon;
 
-	// Format price display
 	const getPriceDisplay = () => {
 		if (displayLogic.isOwned) {
 			if (item.purchase_price) return `$${item.purchase_price}`;
 			return "—";
 		}
-		// Wishlist
-		if (displayLogic.isOnSale && item.sale_price) {
-			return `$${item.sale_price}`;
-		}
+		if (displayLogic.isOnSale && item.sale_price) return `$${item.sale_price}`;
 		if (item.retail_price) return `$${item.retail_price}`;
 		return "—";
 	};
 
-	// Handle row click (expand/collapse) - but don't trigger on action menu clicks
+	const handleIncrementWear = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		actions.onIncrementWear?.(item);
+		toast.success("Wear count updated!");
+	};
+
 	const handleRowClick = (e: React.MouseEvent) => {
-		// Don't expand if clicking on buttons or links
 		const target = e.target as HTMLElement;
 		if (
 			target.closest("button") ||
@@ -109,7 +97,7 @@ export function WardrobeListItem({
 		<div className="border-b border-slate-200 hover:bg-slate-50/50 transition-colors">
 			{/* Main Row */}
 			<div
-				className="flex items-center gap-3 p-4 cursor-pointer"
+				className="relative flex flex-row items-start md:items-center gap-4 p-4 cursor-pointer"
 				onClick={handleRowClick}
 				role="button"
 				tabIndex={0}
@@ -122,8 +110,8 @@ export function WardrobeListItem({
 				aria-expanded={isExpanded}
 				aria-label={`${item.brand} ${item.model} - Click to ${isExpanded ? "collapse" : "expand"} details`}
 			>
-				{/* Expand Icon - Fixed width */}
-				<div className="flex-shrink-0 w-5 text-muted-foreground">
+				{/* Expand Icon - desktop only, in-flow */}
+				<div className="hidden md:flex flex-shrink-0 w-5 items-center text-muted-foreground">
 					{isExpanded ? (
 						<ChevronDown className="h-5 w-5" />
 					) : (
@@ -131,9 +119,9 @@ export function WardrobeListItem({
 					)}
 				</div>
 
-				{/* Thumbnail - Fixed width */}
-				<div className="flex-shrink-0 w-16 lg:w-20">
-					<div className="w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 relative">
+				{/* Thumbnail */}
+				<div className="flex-shrink-0">
+					<div className="w-20 h-20 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 relative">
 						<img
 							src={mainImage}
 							alt={`${item.brand} ${item.model}`}
@@ -142,17 +130,15 @@ export function WardrobeListItem({
 								e.currentTarget.src = '/images/placeholder.svg';
 							}}
 						/>
-						{/* Pinned indicator - left side */}
 						{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
 							<div
-								className="absolute top-1 left-1 bg-primary text-primary rounded-full p-1 shadow-sm"
+								className="absolute top-1 left-1 bg-orange-500 text-white rounded-full p-1 shadow-sm"
 								title="Pinned"
 								aria-label="This item is pinned"
 							>
 								<Pin className="h-3 w-3" />
 							</div>
 						)}
-						{/* Photo count indicator - right side */}
 						{itemPhotos.length > 1 && (
 							<div className="absolute top-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
 								{itemPhotos.length}
@@ -161,11 +147,12 @@ export function WardrobeListItem({
 					</div>
 				</div>
 
-				{/* Brand + Model - Fixed width with truncation */}
-				<div className="flex-1 min-w-0 max-w-[550px]">
-					<div className="flex items-center gap-2">
+				{/* Content zone — flex-1, stacks on mobile */}
+				<div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5 pr-10 md:pr-0">
+					{/* Brand + Model */}
+					<div className="flex items-center gap-2 min-w-0">
 						{item.brands?.brand_logo && (
-							<div className="relative w-5 h-5 flex-shrink-0">
+							<div className="relative w-4 h-4 flex-shrink-0">
 								<img
 									src={item.brands.brand_logo}
 									alt={item.brands.name || "Brand logo"}
@@ -173,36 +160,47 @@ export function WardrobeListItem({
 								/>
 							</div>
 						)}
-						<div className="flex flex-col min-w-0">
-							<div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground truncate">
-								{item.brands?.name || item.brand}
-							</div>
-							<h3 className="text-base font-semibold leading-tight line-clamp-1">
-								{item.model}
-							</h3>
-						</div>
+						<span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground truncate">
+							{item.brands?.name || item.brand}
+						</span>
+					</div>
+					<h3 className="text-base font-semibold leading-tight line-clamp-2 md:line-clamp-1">
+						{item.model}
+					</h3>
+
+					{/* Mobile: size + price inline */}
+					<div className="flex items-center gap-3 mt-1 md:hidden">
+						{item.size_tried && (
+							<span className="text-xs text-muted-foreground">{item.size_tried}</span>
+						)}
+						<span className="text-sm font-semibold">{getPriceDisplay()}</span>
+						{!displayLogic.isOwned && displayLogic.isOnSale && (
+							<Badge
+								variant="outline"
+								className="text-xs px-1.5 py-0 rounded-md border-emerald-500 bg-emerald-500 text-white font-bold"
+							>
+								Sale
+							</Badge>
+						)}
 					</div>
 				</div>
 
-				{/* Size - Fixed width, centered */}
-				<div className="hidden md:flex flex-shrink-0 w-20 text-start ">
-					<span className="text-sm font-medium">
-						{item.size_tried || "—"}
-					</span>
+				{/* Size — desktop only */}
+				<div className="hidden md:flex flex-shrink-0 w-20 items-center justify-end">
+					<span className="text-sm font-medium">{item.size_tried || "—"}</span>
 				</div>
 
-				{/* Price - Fixed width, right-aligned */}
-				<div className="hidden sm:flex flex-shrink-0 w-48 flex-col text-right gap-1">
+				{/* Price — desktop only */}
+				<div className="hidden sm:flex flex-shrink-0 w-48 flex-col items-end gap-1 justify-center">
 					<span className="text-base font-semibold">{getPriceDisplay()}</span>
-					{/* Horizontal layout: strikethrough + Sale badge */}
-					{displayLogic.isOnSale && item.retail_price && (
-						<div className="flex items-center justify-end gap-2">
+					{!displayLogic.isOwned && displayLogic.isOnSale && item.retail_price && (
+						<div className="flex items-center gap-2">
 							<span className="text-xs text-muted-foreground line-through">
 								${item.retail_price}
 							</span>
 							<Badge
 								variant="outline"
-								className="text-xs px-2 py-0.5 rounded-md border-emerald-500 bg-emerald-500 text-emerald-500"
+								className="text-xs px-2 py-0.5 rounded-md border-emerald-500 bg-emerald-500 text-white font-bold"
 							>
 								Sale
 							</Badge>
@@ -210,9 +208,8 @@ export function WardrobeListItem({
 					)}
 				</div>
 
-				{/* Status Badges - Fixed width */}
+				{/* Status Badges — large desktop only */}
 				<div className="hidden lg:flex items-center gap-2 flex-shrink-0 w-[300px] ml-12">
-					{/* Archived Badge */}
 					{item.is_archived && viewMode !== "archive" && (
 						<Badge
 							variant="outline"
@@ -222,8 +219,6 @@ export function WardrobeListItem({
 							Archived
 						</Badge>
 					)}
-
-					{/* Price Tracking Badge - Wishlist only */}
 					{viewMode === "wishlist" && !isReadOnly && (
 						<PriceStatusBadge
 							lastPriceCheckAt={item.last_price_check_at ?? null}
@@ -233,8 +228,22 @@ export function WardrobeListItem({
 					)}
 				</div>
 
-				{/* Actions Menu - Click won't trigger expansion */}
-				<div className="flex-shrink-0 w-8 ml-4 flex justify-end" onClick={(e) => e.stopPropagation()}>
+				{/* Actions — absolute on mobile, in-flow on desktop */}
+				<div
+					className="absolute top-2 right-2 md:relative md:top-auto md:right-auto flex-shrink-0 md:w-24 md:ml-4 flex items-center justify-end gap-2 pr-4"
+					onClick={(e) => e.stopPropagation()}
+				>
+					{displayLogic.isOwned && permissions.canTrackWearCount && !isReadOnly && (
+						<button
+							onClick={handleIncrementWear}
+							className="text-xs px-2 py-1 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1"
+							aria-label="Increment wear count"
+							title="Log a wear"
+						>
+							<Plus size={12} />
+							Wear
+						</button>
+					)}
 					<ItemCardActions
 						item={item}
 						isArchivePage={isArchivePage}
@@ -261,7 +270,7 @@ export function WardrobeListItem({
 						transition={{ duration: 0.2, ease: "easeInOut" }}
 						className="overflow-hidden"
 					>
-						<div className="px-4 pb-4 pl-16 border-t border-slate-100 bg-slate-50/30">
+						<div className="px-4 pb-4 pl-4 md:pl-16 border-t border-slate-100 bg-slate-50/30">
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
 								{/* Column 1: Basic Info */}
 								<div className="space-y-3">
@@ -384,7 +393,6 @@ export function WardrobeListItem({
 								</div>
 							</div>
 
-							{/* Notes - Full Width */}
 							{item.notes &&
 								item.notes.trim() &&
 								item.notes.toLowerCase() !== "no note added" && (

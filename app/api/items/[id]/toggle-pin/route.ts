@@ -49,14 +49,6 @@ export async function POST(
       )
     }
 
-    // Only wishlist items can be pinned
-    if (item.status !== 'wishlisted') {
-      return NextResponse.json(
-        { error: 'Only wishlist items can be pinned' },
-        { status: 400 }
-      )
-    }
-
     const newPinnedStatus = !item.is_pinned
 
     // If pinning, check limit (max 5)

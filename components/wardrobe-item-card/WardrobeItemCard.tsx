@@ -129,7 +129,7 @@ function WardrobeItemCardComponent({
 					{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
 						<Tooltip delayDuration={200}>
 							<TooltipTrigger asChild>
-								<div className='absolute top-2 left-2 z-40 p-1.5 rounded-full bg-primary text-primary shadow-sm hover:bg-primary transition-colors cursor-help'>
+								<div className='absolute top-2 left-2 z-40 p-1.5 rounded-full bg-orange-500 text-white shadow-sm cursor-help'>
 									<Pin className='h-3.5 w-3.5' />
 								</div>
 							</TooltipTrigger>

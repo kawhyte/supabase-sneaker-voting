@@ -72,10 +72,10 @@ export function WardrobeListView({
 				<div className="flex-shrink-0 w-5"></div> {/* Spacer for expand icon */}
 				<div className="flex-shrink-0 w-16 lg:w-20">Image</div>
 				<div className="flex-1 min-w-0 max-w-[550px]">Item</div>
-				<div className="flex-shrink-0 w-20">Size</div>
+				<div className="flex-shrink-0 w-20 text-right">Size</div>
 				<div className="flex-shrink-0 w-48 text-right">Price</div>
 				<div className="flex-shrink-0 w-[300px] ml-12">Status</div>
-				<div className="flex-shrink-0 w-8 ml-4 text-right">Actions</div>
+				<div className="flex-shrink-0 w-24 ml-4 text-right pr-4">Actions</div>
 			</div>
 
 			{/* List Items */}
