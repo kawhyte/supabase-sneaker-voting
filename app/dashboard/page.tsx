@@ -38,7 +38,7 @@ function DashboardContent() {
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}>
 				<div className='flex justify-between items-center'>
-					<h3 className='text-3xl font-bold font-heading -mb-2'>My Closet</h3>
+					<h3 className='text-3xl font-bold font-heading -mb-2'>My Collection</h3>
 
 					<div className='flex items-center gap-3'>
 						<Link href='/dashboard?tab=archive'>

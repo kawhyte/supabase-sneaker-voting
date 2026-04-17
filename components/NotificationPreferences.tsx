@@ -4,11 +4,9 @@
  * Features:
  * - Channel toggles (In-App, Push, Email)
  * - Per-notification-type toggles
- * - Quiet hours with timezone awareness
  * - Bundling preferences
  * - Max daily notifications slider
  * - Test notification button
- * - IMPORTANT: Use .dense class where appropriate
  */
 
 "use client";
@@ -96,7 +94,6 @@ export function NotificationPreferences() {
 
 			// If no preferences exist, create default ones
 			if (!data) {
-				console.log("No preferences found, creating defaults...");
 				const defaultPrefs: Partial<NotificationPrefs> = {
 						enable_in_app: true,
 					enable_push: false,
@@ -140,26 +137,27 @@ export function NotificationPreferences() {
 		fetchPrefs();
 	}, [supabase]);
 
-	// Manual save function
+	// Shared save logic used by manual save and auto-save
+	const savePrefs = async (prefsToSave: NotificationPrefs) => {
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) throw new Error("Not authenticated");
+
+		const { error } = await supabase
+			.from("notification_preferences")
+			.update(prefsToSave)
+			.eq("user_id", user.id);
+
+		if (error) throw error;
+		setOriginalPrefs(prefsToSave);
+	};
+
+	// Manual save with toast feedback
 	const handleSave = async () => {
 		if (!prefs) return;
 
 		setIsSaving(true);
-
 		try {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
-			if (!user) throw new Error("Not authenticated");
-
-			const { error } = await supabase
-				.from("notification_preferences")
-				.update(prefs)
-				.eq("user_id", user.id);
-
-			if (error) throw error;
-
-			setOriginalPrefs(prefs);
+			await savePrefs(prefs);
 			toast.success("Preferences saved successfully");
 		} catch (error: any) {
 			console.error("Error saving preferences:", error);
@@ -175,29 +173,17 @@ export function NotificationPreferences() {
 		setPrefs({ ...prefs, ...updates });
 	};
 
-	// Auto-save as fallback after 60 seconds
+	// Auto-save as fallback after 60 seconds (no toast)
 	useEffect(() => {
 		if (!prefs || !hasUnsavedChanges || isLoading) return;
 
 		const timer = setTimeout(async () => {
 			try {
-				const {
-					data: { user },
-				} = await supabase.auth.getUser();
-				if (!user) return;
-
-				const { error } = await supabase
-					.from("notification_preferences")
-					.update(prefs)
-					.eq("user_id", user.id);
-
-				if (error) throw error;
-
-				setOriginalPrefs(prefs);
+				await savePrefs(prefs);
 			} catch (error: any) {
 				console.error("Auto-save error:", error);
 			}
-		}, 60000); // 60 seconds
+		}, 60000);
 
 		return () => clearTimeout(timer);
 	}, [prefs, hasUnsavedChanges, isLoading, supabase]);
@@ -205,18 +191,8 @@ export function NotificationPreferences() {
 	// Test notification
 	const sendTestNotification = async () => {
 		try {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
-			if (!user) return;
-
-			// Create test notification via service
-			const response = await fetch("/api/notifications/test", {
-				method: "POST",
-			});
-
+			const response = await fetch("/api/notifications/test", { method: "POST" });
 			if (!response.ok) throw new Error("Failed to send test notification");
-
 			toast.success("Test notification sent! Check your notification center.");
 		} catch (error: any) {
 			console.error("Error sending test:", error);
@@ -244,8 +220,8 @@ export function NotificationPreferences() {
 	if (!prefs) return null;
 
 	return (
-		<Card className='border-slate-200 bg-muted px-8 py-8'>
-			<CardHeader className='border-b border-slate-200 pb-4'>
+		<Card className='border-border bg-muted px-8 py-8'>
+			<CardHeader className='border-b border-border pb-4'>
 				<CardTitle className='flex items-center gap-2'>
 					<Bell className='h-5 w-5 text-primary' />
 					Notification Preferences
@@ -261,7 +237,7 @@ export function NotificationPreferences() {
 					<h3 className='text-sm font-semibold mb-3'>Notification Channels</h3>
 					<div className='space-y-3'>
 						{/* In-App Notifications */}
-						<div className=' dense flex items-center justify-between'>
+						<div className='dense flex items-center justify-between'>
 							<div>
 								<Label htmlFor='in-app'>In-App Notifications</Label>
 								<p className='text-xs text-muted-foreground'>
@@ -296,7 +272,7 @@ export function NotificationPreferences() {
 						</div>
 
 						{/* Email Notifications */}
-						<div className=' dense flex items-center justify-between opacity-50'>
+						<div className='dense flex items-center justify-between opacity-50'>
 							<div>
 								<Label htmlFor='email'>Email Notifications</Label>
 								<p className='text-xs text-muted-foreground'>
@@ -314,11 +290,11 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* NOTIFICATION TYPES */}
-				<div className='border-t border-slate-200 pt-6'>
+				<div className='border-t border-border pt-6'>
 					<h3 className='text-sm font-semibold mb-3'>Notification Types</h3>
 					<div className='space-y-3'>
 						{/* Price Alerts */}
-						<div className=' dense flex items-center justify-between space-y-4'>
+						<div className='dense flex items-center justify-between space-y-4'>
 							<div className='flex items-start gap-4'>
 								<div className='flex gap-x-4'>
 									<Tag className='h-4 w-4 text-muted-foreground' />
@@ -342,7 +318,7 @@ export function NotificationPreferences() {
 						</div>
 
 						{/* Wear Reminders */}
-						<div className=' dense flex items-center justify-between space-y-4'>
+						<div className='dense flex items-center justify-between space-y-4'>
 							<div className='flex items-start gap-4'>
 								<div className='flex gap-x-4'>
 									<Package className='h-4 w-4 text-muted-foreground' />
@@ -366,7 +342,7 @@ export function NotificationPreferences() {
 						</div>
 
 						{/* Seasonal Tips */}
-						<div className=' dense flex items-center justify-between space-y-4'>
+						<div className='dense flex items-center justify-between space-y-4'>
 							<div className='flex items-start gap-4'>
 								<div className='flex gap-x-4'>
 									<Sparkles className='h-4 w-4 text-muted-foreground' />
@@ -390,7 +366,7 @@ export function NotificationPreferences() {
 						</div>
 
 						{/* Achievements */}
-						<div className=' dense flex items-center justify-between space-y-4'>
+						<div className='dense flex items-center justify-between space-y-4'>
 							<div className='flex items-start gap-4'>
 								<div className='flex gap-x-4'>
 									<Trophy className='h-4 w-4 text-muted-foreground' />
@@ -414,7 +390,7 @@ export function NotificationPreferences() {
 						</div>
 
 						{/* Cost-Per-Wear Milestones */}
-						<div className=' dense flex items-center justify-between space-y-4'>
+						<div className='dense flex items-center justify-between space-y-4'>
 							<div className='flex items-start gap-4'>
 								<div className='flex gap-x-4'>
 									<TrendingUp className='h-4 w-4 text-muted-foreground' />
@@ -442,7 +418,7 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* BUNDLING PREFERENCES */}
-				<div className='border-t border-slate-200 pt-6'>
+				<div className='border-t border-border pt-6'>
 					<div className='dense flex items-center justify-between mb-3'>
 						<div>
 							<h3 className='text-sm font-semibold'>Smart Bundling</h3>
@@ -486,7 +462,7 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* MAX DAILY NOTIFICATIONS */}
-				<div className='border-t border-slate-200 pt-6'>
+				<div className='border-t border-border pt-6'>
 					<div className='dense'>
 						<Label htmlFor='max-daily' className='text-sm font-semibold'>
 							Max Daily Notifications: {prefs.max_daily_notifications}
@@ -510,7 +486,7 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* Save Button Section */}
-				<div className='border-t border-slate-200 pt-6'>
+				<div className='border-t border-border pt-6'>
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
 							{hasUnsavedChanges && (
@@ -546,7 +522,7 @@ export function NotificationPreferences() {
 				</div>
 
 				{/* TEST NOTIFICATION */}
-				<div className='border-t border-slate-200 pt-6'>
+				<div className='border-t border-border pt-6'>
 					<div className='flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200'>
 						<AlertCircle className='h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5' />
 						<div className='flex-1'>

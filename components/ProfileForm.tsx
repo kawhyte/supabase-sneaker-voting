@@ -39,7 +39,18 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
     displayName.trim() !== (profile.display_name || '') ||
     selectedAvatarId !== profile.preset_avatar_id
 
-  // Manual save function with optimistic updates
+  // Shared save logic used by both manual save and auto-save
+  const saveChanges = async (name: string, avatarId: string | null) => {
+    if (avatarId && avatarId !== profile.preset_avatar_id) {
+      await updateAvatar(avatarId)
+    }
+    if (name.trim() !== profile.display_name) {
+      await updateProfile({ display_name: name.trim() })
+    }
+    onProfileUpdate?.()
+  }
+
+  // Manual save with validation and toast feedback
   const handleSave = async () => {
     if (!displayName.trim()) {
       toast.error('Display name cannot be empty')
@@ -48,56 +59,25 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
 
     setIsSaving(true)
     try {
-      // Update avatar if changed
-      if (selectedAvatarId && selectedAvatarId !== profile.preset_avatar_id) {
-        await updateAvatar(selectedAvatarId)
-      }
-
-      // Update display name if changed
-      if (displayName.trim() !== profile.display_name) {
-        await updateProfile({
-          display_name: displayName.trim()
-        })
-      }
-
-      onProfileUpdate?.()
+      await saveChanges(displayName, selectedAvatarId)
       toast.success('Profile saved successfully')
-    } catch (error: any) {
+    } catch {
       toast.error('Failed to save profile')
     } finally {
       setIsSaving(false)
     }
   }
 
-  // Auto-save as fallback after 60 seconds
+  // Auto-save as fallback after 60 seconds (no toast)
   const { isSaving: isAutoSaving } = useAutoSave({
     data: { display_name: displayName, preset_avatar_id: selectedAvatarId },
     onSave: async (data) => {
-      if (!data.display_name.trim()) {
-        throw new Error('Display name cannot be empty')
-      }
-
-      // Update avatar if changed
-      if (data.preset_avatar_id && data.preset_avatar_id !== profile.preset_avatar_id) {
-        await updateAvatar(data.preset_avatar_id)
-      }
-
-      // Update display name if changed
-      if (data.display_name.trim() !== profile.display_name) {
-        await updateProfile({
-          display_name: data.display_name.trim()
-        })
-      }
-
-      onProfileUpdate?.()
+      if (!data.display_name.trim()) throw new Error('Display name cannot be empty')
+      await saveChanges(data.display_name, data.preset_avatar_id)
     },
-    delay: 60000, // 60 seconds
-    showToasts: false // Disable toasts for auto-save
+    delay: 60000,
+    showToasts: false
   })
-
-  const handleAvatarChange = (avatarId: string) => {
-    setSelectedAvatarId(avatarId)
-  }
 
   // Format the last sign in date
   const formatLastSignIn = (date: string | undefined) => {
@@ -118,11 +98,11 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
 
   return (
     <Card className="bg-card border border-border rounded-2xl px-8 py-8">
-      <CardContent className="pt-8">
+      <CardContent>
         <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
           {/* Avatar Editor Section */}
           <AvatarErrorBoundary>
-            <AvatarEditor profile={profile} user={user} onAvatarChange={handleAvatarChange} />
+            <AvatarEditor profile={profile} user={user} onAvatarChange={setSelectedAvatarId} />
           </AvatarErrorBoundary>
 
           {/* Form Fields Section */}

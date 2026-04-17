@@ -29,9 +29,10 @@ export function PrivacySettings() {
 		useState<WishlistPrivacy>("private");
 	const [followerCount, setFollowerCount] = useState(0);
 	const [followingCount, setFollowingCount] = useState(0);
-	const [hasChanges, setHasChanges] = useState(false);
 	const [initialPrivacy, setInitialPrivacy] =
 		useState<WishlistPrivacy>("private");
+
+	const hasChanges = wishlistPrivacy !== initialPrivacy;
 
 	const supabase = createClient();
 
@@ -71,11 +72,6 @@ export function PrivacySettings() {
 		loadSettings();
 	}, [supabase]);
 
-	// Track changes
-	useEffect(() => {
-		setHasChanges(wishlistPrivacy !== initialPrivacy);
-	}, [wishlistPrivacy, initialPrivacy]);
-
 	const handleSave = async () => {
 		try {
 			setSaving(true);
@@ -96,7 +92,6 @@ export function PrivacySettings() {
 			if (error) throw error;
 
 			setInitialPrivacy(wishlistPrivacy);
-			setHasChanges(false);
 			toast.success("Privacy settings saved!");
 		} catch (error) {
 			console.error("Error saving privacy settings:", error);
@@ -152,7 +147,7 @@ export function PrivacySettings() {
 			<Card>
 				<CardHeader>
 					<CardTitle className='text-xl'>Your Social Stats</CardTitle>
-					<CardDescription>Connect with other sneakerheads</CardDescription>
+					<CardDescription>See how your community connects</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<div className='grid grid-cols-2 gap-4'>
@@ -245,14 +240,14 @@ export function PrivacySettings() {
 					</div>
 
 					{/* Save Button */}
-					<div className='flex items-center justify-between pt-4 border-t'>
+					<div className='flex items-center justify-between pt-4 border-t border-border'>
 						<div className='text-sm text-muted-foreground'>
 							{hasChanges && "• Unsaved changes"}
 						</div>
 						<Button
 							onClick={handleSave}
 							disabled={!hasChanges || saving}
-							className='bg-primary text-slate-900 hover:bg-primary'>
+							className='bg-primary text-slate-900'>
 							{saving ? "Saving..." : "Save Changes"}
 						</Button>
 					</div>

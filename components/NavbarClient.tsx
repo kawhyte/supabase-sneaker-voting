@@ -236,7 +236,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 	];
 
 	const authenticatedNavLinks: NavLink[] = [
-		{ href: '/dashboard', label: 'My Closet' },
+		{ href: '/dashboard', label: 'My Collection' },
 		{ href: '/explore', label: 'Explore' },
 		{ href: '/achievements', label: 'Sneaker Insights' },
 		// { href: '/add-new-item', label: 'Add Item', isAction: true },

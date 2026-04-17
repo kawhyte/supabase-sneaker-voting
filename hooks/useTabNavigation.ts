@@ -60,16 +60,6 @@ export function useTabNavigation(defaultTab: string = 'profile') {
     }
   }, [defaultTab])
 
-  // Sync with hash on mount (for direct URL navigation)
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash.slice(1)
-      if (hash && hash !== activeTab) {
-        setActiveTabState(hash)
-      }
-    }
-  }, []) // Run once on mount
-
   return {
     activeTab,
     setActiveTab
@@ -87,7 +77,7 @@ export function useTabNavigation(defaultTab: string = 'profile') {
  * @example
  * ```tsx
  * const { activeTab, setActiveTab } = useTabNavigation()
- * useTabKeyboardShortcuts(['profile', 'purchase-prevention', 'notifications'], setActiveTab)
+ * useTabKeyboardShortcuts(['profile', 'notifications', 'privacy'], setActiveTab)
  * ```
  */
 export function useTabKeyboardShortcuts(
