@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { analyzeAndSaveColors } from '@/app/actions/color-analysis'
 import { cn } from '@/lib/utils'
@@ -52,6 +52,10 @@ export function SneakerPaletteCard({ item, onPaletteGenerated, isSelected, onSel
     item.color_palette || null
   )
 
+  useEffect(() => {
+    setLocalPalette(item.color_palette || null)
+  }, [item.color_palette])
+
   // Helper: Check if palette is dual-vibe format (object) or legacy format (array)
   const isDualVibeFormat = (palette: ColorPaletteData): palette is (OldDualVibeData | NewDualVibeData) => {
     return palette !== null && typeof palette === 'object' && 'bold' in palette && 'muted' in palette
@@ -65,20 +69,11 @@ export function SneakerPaletteCard({ item, onPaletteGenerated, isSelected, onSel
   // Determine if we should show the toggle (dual-vibe format vs legacy)
   const showToggle = localPalette && isDualVibeFormat(localPalette)
 
-  // Helper: Get the colors to display based on format and mode
-  const getDisplayColors = (): (string[] | ColorWithRole[]) | null => {
-    if (!localPalette) return null
-
-    if (isDualVibeFormat(localPalette)) {
-      // Dual-vibe format: return bold or muted based on mode
-      return localPalette[mode]
-    } else {
-      // Legacy format: just return the array
-      return localPalette
-    }
-  }
-
-  const displayColors = getDisplayColors()
+  const displayColors: (string[] | ColorWithRole[]) | null = !localPalette
+    ? null
+    : isDualVibeFormat(localPalette)
+      ? localPalette[mode]
+      : localPalette
 
   // Get image URL (priority: main photo > legacy > first photo)
   const mainPhoto = item.item_photos?.find(photo => photo.is_main_image)
@@ -86,11 +81,7 @@ export function SneakerPaletteCard({ item, onPaletteGenerated, isSelected, onSel
 
   const handleGeneratePalette = async () => {
     if (!imageUrl) {
-      toast({
-        title: 'No Image',
-        description: 'This item needs an image to generate a color palette.',
-        variant: 'destructive'
-      })
+      toast.error('No Image', { description: 'This item needs an image to generate a color palette.' })
       return
     }
 
@@ -103,24 +94,13 @@ export function SneakerPaletteCard({ item, onPaletteGenerated, isSelected, onSel
         setLocalPalette(result.palette)
         onPaletteGenerated?.(item.id, result.palette)
 
-        toast({
-          title: 'Dual Palette Generated',
-          description: 'Bold and Muted color palettes created successfully!'
-        })
+        toast.success('Dual Palette Generated', { description: 'Bold and Muted color palettes created successfully!' })
       } else {
-        toast({
-          title: 'Generation Failed',
-          description: result.message || 'Could not generate color palette.',
-          variant: 'destructive'
-        })
+        toast.error('Generation Failed', { description: result.message || 'Could not generate color palette.' })
       }
     } catch (error) {
       console.error('Error generating palette:', error)
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred.',
-        variant: 'destructive'
-      })
+      toast.error('An unexpected error occurred.')
     } finally {
       setIsGenerating(false)
     }
@@ -129,31 +109,10 @@ export function SneakerPaletteCard({ item, onPaletteGenerated, isSelected, onSel
   const handleColorClick = async (hex: string, role?: string) => {
     try {
       await navigator.clipboard.writeText(hex)
-      toast({
-        title: 'Color Copied',
-        description: (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div
-                className="h-4 w-4 rounded border border-border"
-                style={{ backgroundColor: hex }}
-                aria-hidden="true"
-              />
-              <span className="font-mono text-sm">{hex}</span>
-            </div>
-            {role && (
-              <p className="text-xs text-muted-foreground">{role}</p>
-            )}
-          </div>
-        )
-      })
+      toast.success(`Copied ${hex}`, { description: role })
     } catch (error) {
       console.error('Failed to copy color:', error)
-      toast({
-        title: 'Copy Failed',
-        description: 'Could not copy color to clipboard.',
-        variant: 'destructive'
-      })
+      toast.error('Could not copy color to clipboard.')
     }
   }
 

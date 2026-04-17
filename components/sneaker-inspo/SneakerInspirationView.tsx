@@ -11,7 +11,6 @@ import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Button } from '@/components/ui/button'
 import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'
 import { toast } from 'sonner'
-import { calculateWorthItMetrics } from '@/lib/wardrobe-item-utils'
 import { Palette, Loader2, AlertCircle, RefreshCw, X, Shirt, Wind, Layers, Watch, ShoppingBag } from 'lucide-react'
 import type { ColorWithRole } from '@/lib/color-utils'
 
@@ -480,7 +479,7 @@ export function SneakerInspirationView({
                     title={formula.title}
                     description={formula.description}
                     extractedColors={getExtractedColors(selectedItem)}
-                    doodleItems={formula.doodleItems.map(d => ({ ...d }))}
+                    doodleItems={[...formula.doodleItems]}
                     sneakerName={`${selectedItem.brand} ${selectedItem.model}`}
                     projectedCPW={getProjectedCPW(selectedItem)}
                     onLogWear={() => handleLogWear(selectedItem)}

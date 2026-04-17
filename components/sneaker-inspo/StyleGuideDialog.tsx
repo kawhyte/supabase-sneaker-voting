@@ -1,5 +1,6 @@
 'use client'
 
+import { ReactNode } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Info, Droplet, Zap, Anchor, TrendingDown } from 'lucide-react'
 
 interface StyleGuideDialogProps {
-  trigger?: React.ReactNode
+  trigger?: ReactNode
 }
 
 export function StyleGuideDialog({ trigger }: StyleGuideDialogProps) {
