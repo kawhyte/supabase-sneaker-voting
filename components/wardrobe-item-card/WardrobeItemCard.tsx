@@ -125,18 +125,22 @@ function WardrobeItemCardComponent({
 						</div>
 					)}
 
-					{/* Pinned Indicator - Show when item is pinned to profile */}
-					{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
-						<Tooltip delayDuration={200}>
-							<TooltipTrigger asChild>
-								<div className='absolute top-2 left-2 z-40 p-1.5 rounded-full bg-orange-500 text-white shadow-sm cursor-help'>
-									<Pin className='h-3.5 w-3.5' />
-								</div>
-							</TooltipTrigger>
-							<TooltipContent side="right">
-								<p className="text-xs">Pinned to your profile</p>
-							</TooltipContent>
-						</Tooltip>
+					{/* Pin Button — always visible when not archived and toggle is available */}
+					{!isReadOnly && !item.is_archived && actions.onTogglePinned && (
+						<button
+							className={`absolute top-2 left-2 p-1.5 rounded-full transition-all duration-200 z-20 flex items-center justify-center ${
+								displayLogic.isPinned
+									? 'bg-orange-500 text-white shadow-md'
+									: 'bg-white/70 backdrop-blur-sm text-slate-500 hover:bg-white hover:text-slate-800 hover:shadow-sm'
+							}`}
+							onClick={(e) => { e.preventDefault(); e.stopPropagation(); actions.onTogglePinned!(item); }}
+							onMouseEnter={(e) => e.stopPropagation()}
+							onMouseLeave={(e) => e.stopPropagation()}
+							aria-label={displayLogic.isPinned ? 'Unpin from profile' : 'Pin to profile'}
+							title={displayLogic.isPinned ? 'Unpin from profile' : 'Pin to profile'}
+						>
+							<Pin className='h-3.5 w-3.5' fill={displayLogic.isPinned ? 'currentColor' : 'none'} />
+						</button>
 					)}
 
 					{/* Image Section */}

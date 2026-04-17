@@ -10,7 +10,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight, Pin, Archive, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, Pin, Archive, Plus, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
@@ -81,6 +81,14 @@ export function WardrobeListItem({
 		toast.success("Wear count updated!");
 	};
 
+	const handleDecrementWear = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (!item.wears || item.wears <= 0) return;
+		actions.onDecrementWear?.(item);
+		toast.success("Wear count updated!");
+	};
+
 	const handleRowClick = (e: React.MouseEvent) => {
 		const target = e.target as HTMLElement;
 		if (
@@ -130,14 +138,21 @@ export function WardrobeListItem({
 								e.currentTarget.src = '/images/placeholder.svg';
 							}}
 						/>
-						{!isReadOnly && displayLogic.isPinned && !item.is_archived && (
-							<div
-								className="absolute top-1 left-1 bg-orange-500 text-white rounded-full p-1 shadow-sm"
-								title="Pinned"
-								aria-label="This item is pinned"
+						{!isReadOnly && !item.is_archived && actions.onTogglePinned && (
+							<button
+								className={`absolute top-1 left-1 p-1 rounded-full transition-all duration-200 z-20 flex items-center justify-center ${
+									displayLogic.isPinned
+										? 'bg-orange-500 text-white shadow-md'
+										: 'bg-white/70 backdrop-blur-sm text-slate-500 hover:bg-white hover:text-slate-800 hover:shadow-sm'
+								}`}
+								onClick={(e) => { e.preventDefault(); e.stopPropagation(); actions.onTogglePinned!(item); }}
+								onMouseEnter={(e) => e.stopPropagation()}
+								onMouseLeave={(e) => e.stopPropagation()}
+								aria-label={displayLogic.isPinned ? 'Unpin from profile' : 'Pin to profile'}
+								title={displayLogic.isPinned ? 'Unpin from profile' : 'Pin to profile'}
 							>
-								<Pin className="h-3 w-3" />
-							</div>
+								<Pin className="h-3 w-3" fill={displayLogic.isPinned ? 'currentColor' : 'none'} />
+							</button>
 						)}
 						{itemPhotos.length > 1 && (
 							<div className="absolute top-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
@@ -234,15 +249,27 @@ export function WardrobeListItem({
 					onClick={(e) => e.stopPropagation()}
 				>
 					{displayLogic.isOwned && permissions.canTrackWearCount && !isReadOnly && (
-						<button
-							onClick={handleIncrementWear}
-							className="text-xs px-2 py-1 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1"
-							aria-label="Increment wear count"
-							title="Log a wear"
-						>
-							<Plus size={12} />
-							Wear
-						</button>
+						<div className="flex items-center gap-1">
+							<button
+								onClick={handleDecrementWear}
+								disabled={!item.wears || item.wears <= 0}
+								className="text-xs px-2 py-1 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed"
+								aria-label="Decrement wear count"
+								title="Remove a wear"
+							>
+								<Minus size={12} />
+								Wear
+							</button>
+							<button
+								onClick={handleIncrementWear}
+								className="text-xs px-2 py-1 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1"
+								aria-label="Increment wear count"
+								title="Log a wear"
+							>
+								<Plus size={12} />
+								Wear
+							</button>
+						</div>
 					)}
 					<ItemCardActions
 						item={item}
