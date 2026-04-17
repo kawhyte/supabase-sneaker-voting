@@ -1,20 +1,55 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { SneakerPaletteCard } from '@/components/sneaker-inspo/SneakerPaletteCard'
 import { StyleGuideDialog } from '@/components/sneaker-inspo/StyleGuideDialog'
+import { FitFormulaCard } from '@/components/sneaker-inspo/FitFormulaCard'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Button } from '@/components/ui/button'
 import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'
 import { toast } from '@/components/ui/use-toast'
-import { Palette, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
+import { calculateWorthItMetrics } from '@/lib/wardrobe-item-utils'
+import { Palette, Loader2, AlertCircle, RefreshCw, X, Shirt, Wind, Layers, Watch, ShoppingBag } from 'lucide-react'
 import type { ColorWithRole } from '@/lib/color-utils'
 
 interface SneakerInspirationViewProps {
   showHeader?: boolean
   className?: string
 }
+
+const FIT_FORMULAS = [
+  {
+    id: 'monochromatic',
+    title: 'Monochromatic / Tonal',
+    description: 'One color family, head to toe. Let texture and silhouette do the talking.',
+    doodleItems: [
+      { name: 'Tee', icon: Shirt },
+      { name: 'Trousers', icon: Layers },
+      { name: 'Jacket', icon: Wind },
+    ],
+  },
+  {
+    id: 'high-contrast',
+    title: 'High-Contrast',
+    description: "Opposites attract. Use the shoe's boldest color as a graphic accent.",
+    doodleItems: [
+      { name: 'Graphic Tee', icon: Shirt, isTinted: true },
+      { name: 'Dark Bottoms', icon: Layers },
+      { name: 'Accessory', icon: Watch },
+    ],
+  },
+  {
+    id: 'anchor',
+    title: 'The Anchor',
+    description: 'Neutral base — let the shoe be the star. Everything else steps back.',
+    doodleItems: [
+      { name: 'White Tee', icon: Shirt },
+      { name: 'Khakis', icon: Layers },
+      { name: 'Bag', icon: ShoppingBag },
+    ],
+  },
+] as const
 
 /**
  * SneakerInspirationView - Shared component for displaying owned sneaker grid with color palettes
@@ -31,6 +66,8 @@ export function SneakerInspirationView({
   const [isMigrating, setIsMigrating] = useState(false)
   const [isMigratingLegacy, setIsMigratingLegacy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+  const fitFormulaSectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadSneakers()
@@ -177,6 +214,45 @@ export function SneakerInspirationView({
     if (!item.color_palette) return false
     return Array.isArray(item.color_palette)
   }
+
+  const handleSelectItem = (itemId: string) => {
+    const next = selectedItemId === itemId ? null : itemId
+    setSelectedItemId(next)
+    if (next) {
+      setTimeout(() => {
+        fitFormulaSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 50)
+    }
+  }
+
+  // Derive extracted colors + projected CPW for the selected item
+  const selectedItem = items.find(item => item.id === selectedItemId) ?? null
+
+  const getExtractedColors = (item: WardrobeItem): [string, string, string] => {
+    const palette = item.color_palette
+    if (palette && typeof palette === 'object' && 'bold' in palette) {
+      const bold = (palette as { bold: ColorWithRole[] }).bold
+      return [
+        bold[0]?.hex ?? '#888888',
+        bold[1]?.hex ?? '#888888',
+        bold[2]?.hex ?? '#888888',
+      ]
+    }
+    return ['#888888', '#888888', '#888888']
+  }
+
+  const getProjectedCPW = (item: WardrobeItem): number => {
+    const price = item.purchase_price ?? item.retail_price ?? 0
+    if (!price) return 0
+    const wears = (item.wears ?? 0) + 1
+    return price / wears
+  }
+
+  const selectedHasBoldPalette = selectedItem
+    ? !!(selectedItem.color_palette &&
+        typeof selectedItem.color_palette === 'object' &&
+        'bold' in selectedItem.color_palette)
+    : false
 
   // Count items without palettes
   const itemsWithoutPalettes = items.filter(item => !hasPalette(item)).length
@@ -337,9 +413,47 @@ export function SneakerInspirationView({
                 key={item.id}
                 item={item}
                 onPaletteGenerated={handlePaletteGenerated}
+                isSelected={item.id === selectedItemId}
+                onSelect={() => handleSelectItem(item.id)}
               />
             ))}
           </div>
+
+          {/* Fit Formulas Section */}
+          {selectedItem && selectedHasBoldPalette && (
+            <div ref={fitFormulaSectionRef} className="mt-10 scroll-mt-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-semibold tracking-tight text-gray-900">
+                    Fit Formulas
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {selectedItem.brand} {selectedItem.model}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedItemId(null)}
+                  className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                  aria-label="Dismiss fit formulas"
+                >
+                  <X className="h-4 w-4 text-gray-600" />
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {FIT_FORMULAS.map(formula => (
+                  <FitFormulaCard
+                    key={formula.id}
+                    title={formula.title}
+                    description={formula.description}
+                    extractedColors={getExtractedColors(selectedItem)}
+                    doodleItems={formula.doodleItems.map(d => ({ ...d }))}
+                    sneakerName={`${selectedItem.brand} ${selectedItem.model}`}
+                    projectedCPW={getProjectedCPW(selectedItem)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Stats Footer */}
           {showHeader && (

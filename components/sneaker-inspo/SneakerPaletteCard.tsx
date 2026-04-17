@@ -16,6 +16,8 @@ import type { ColorWithRole } from '@/lib/color-utils'
 interface SneakerPaletteCardProps {
   item: WardrobeItem
   onPaletteGenerated?: (itemId: string, palette: { bold: ColorWithRole[]; muted: ColorWithRole[] }) => void
+  isSelected?: boolean
+  onSelect?: () => void
 }
 
 type PaletteMode = 'bold' | 'muted'
@@ -43,7 +45,7 @@ type ColorPaletteData = LegacyColorData | OldDualVibeData | NewDualVibeData
  * - Toast notification on color copy
  * - Shadcn Tooltips showing color role (e.g., "Primary Base", "High Contrast Pop")
  */
-export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteCardProps) {
+export function SneakerPaletteCard({ item, onPaletteGenerated, isSelected, onSelect }: SneakerPaletteCardProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [mode, setMode] = useState<PaletteMode>('bold')
   const [localPalette, setLocalPalette] = useState<ColorPaletteData | null>(
@@ -156,7 +158,13 @@ export function SneakerPaletteCard({ item, onPaletteGenerated }: SneakerPaletteC
   }
 
   return (
-    <Card className="overflow-hidden border-border shadow-sm hover:shadow-md transition-shadow duration-200">
+    <Card
+      className={cn(
+        'overflow-hidden border-border shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer',
+        isSelected && 'ring-2 ring-offset-2 ring-gray-900'
+      )}
+      onClick={onSelect}
+    >
       <CardContent className="p-0">
         {/* Sneaker Image */}
         <div className="relative w-full aspect-[4/3] bg-slate-100">
