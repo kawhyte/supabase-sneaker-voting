@@ -15,6 +15,7 @@ import {
 } from '@/components/types/item-category'
 import { PhotoItem } from '@/components/types/photo-item'
 import { ItemStatus } from '@/types/ItemStatus'
+import { analyzeAndSaveColors } from '@/app/actions/color-analysis'
 
 /**
  * Form validation schema.
@@ -467,20 +468,13 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 				if (photoError) throw photoError
 			}
 
-			// Trigger color analysis for footwear items (in background, non-blocking)
-			if (
-				mode !== 'edit' &&
-				uploadedPhotoData.length > 0 &&
-				['sneakers', 'shoes', 'footwear'].includes(data.category)
-			) {
+			// Fire-and-forget color analysis for new items with photos (non-blocking)
+			if (mode !== 'edit' && uploadedPhotoData.length > 0) {
 				const mainPhoto = uploadedPhotoData.find((p) => p.isMain) || uploadedPhotoData[0]
 				if (mainPhoto) {
-					// Import dynamically to avoid circular dependencies
-					import('@/app/actions/color-analysis').then(({ analyzeAndSaveColors }) => {
-						analyzeAndSaveColors(resultItem.id, mainPhoto.url).catch((err) =>
-							console.warn('Color analysis failed (non-critical):', err)
-						)
-					})
+					analyzeAndSaveColors(resultItem.id, mainPhoto.url).catch((err) =>
+						console.warn('Color analysis failed (non-critical):', err)
+					)
 				}
 			}
 
