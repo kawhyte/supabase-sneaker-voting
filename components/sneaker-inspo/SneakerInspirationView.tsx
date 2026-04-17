@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useTransition } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { SneakerPaletteCard } from '@/components/sneaker-inspo/SneakerPaletteCard'
 import { StyleGuideDialog } from '@/components/sneaker-inspo/StyleGuideDialog'
@@ -8,7 +8,7 @@ import { FitFormulaCard } from '@/components/sneaker-inspo/FitFormulaCard'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Button } from '@/components/ui/button'
 import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { calculateWorthItMetrics } from '@/lib/wardrobe-item-utils'
 import { Palette, Loader2, AlertCircle, RefreshCw, X, Shirt, Wind, Layers, Watch, ShoppingBag } from 'lucide-react'
 import type { ColorWithRole } from '@/lib/color-utils'
@@ -63,8 +63,8 @@ export function SneakerInspirationView({
 }: SneakerInspirationViewProps) {
   const [items, setItems] = useState<WardrobeItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isMigrating, setIsMigrating] = useState(false)
   const [isMigratingLegacy, setIsMigratingLegacy] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [isLoggingId, setIsLoggingId] = useState<string | null>(null)
@@ -120,37 +120,22 @@ export function SneakerInspirationView({
     }
   }
 
-  const handleMigrateAll = async () => {
-    setIsMigrating(true)
+  const handleGenerateMissing = () => {
+    startTransition(async () => {
+      try {
+        const result = await migrateAllSneakers()
 
-    try {
-      const result = await migrateAllSneakers()
-
-      if (result.success) {
-        toast({
-          title: 'Migration Complete',
-          description: result.message
-        })
-
-        // Reload items to show newly generated palettes
-        await loadSneakers()
-      } else {
-        toast({
-          title: 'Migration Failed',
-          description: result.message,
-          variant: 'destructive'
-        })
+        if (result.success) {
+          toast.success(`Successfully generated formulas for ${result.succeeded} items!`)
+          await loadSneakers()
+        } else {
+          toast.error(result.message || 'Failed to generate formulas')
+        }
+      } catch (error) {
+        console.error('Migration error:', error)
+        toast.error('An unexpected error occurred')
       }
-    } catch (error) {
-      console.error('Migration error:', error)
-      toast({
-        title: 'Migration Error',
-        description: 'An unexpected error occurred during migration.',
-        variant: 'destructive'
-      })
-    } finally {
-      setIsMigrating(false)
-    }
+    })
   }
 
   const handleMigrateLegacy = async () => {
@@ -160,27 +145,14 @@ export function SneakerInspirationView({
       const result = await migrateLegacyPalettes()
 
       if (result.success) {
-        toast({
-          title: 'Legacy Palettes Upgraded',
-          description: result.message
-        })
-
-        // Reload items to show upgraded palettes with toggle
+        toast.success(result.message || 'Legacy palettes upgraded')
         await loadSneakers()
       } else {
-        toast({
-          title: 'Upgrade Failed',
-          description: result.message,
-          variant: 'destructive'
-        })
+        toast.error(result.message || 'Upgrade failed')
       }
     } catch (error) {
       console.error('Legacy migration error:', error)
-      toast({
-        title: 'Upgrade Error',
-        description: 'An unexpected error occurred during upgrade.',
-        variant: 'destructive'
-      })
+      toast.error('An unexpected error occurred during upgrade.')
     } finally {
       setIsMigratingLegacy(false)
     }
@@ -232,11 +204,10 @@ export function SneakerInspirationView({
 
       if (error) throw error
 
-      toast({ title: 'Wear logged!', description: 'CPW updated.' })
+      toast.success('Wear logged! CPW updated.')
     } catch (err) {
-      // Revert optimistic update
       setItems(prev => prev.map(i => i.id === item.id ? { ...i, wears: item.wears } : i))
-      toast({ title: 'Failed to log wear', description: 'Please try again.', variant: 'destructive' })
+      toast.error('Failed to log wear. Please try again.')
     } finally {
       setIsLoggingId(null)
     }
@@ -350,11 +321,12 @@ export function SneakerInspirationView({
             {/* Batch Migration Button */}
             {itemsWithoutPalettes > 0 && (
               <Button
-                onClick={handleMigrateAll}
-                disabled={isMigrating}
+                onClick={handleGenerateMissing}
+                disabled={isPending}
                 size="lg"
+                variant="outline"
               >
-                {isMigrating ? (
+                {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Generating...
@@ -362,7 +334,7 @@ export function SneakerInspirationView({
                 ) : (
                   <>
                     <Palette className="h-4 w-4 mr-2" />
-                    Generate All ({itemsWithoutPalettes})
+                    Generate Missing Formulas ({itemsWithoutPalettes})
                   </>
                 )}
               </Button>
@@ -399,11 +371,12 @@ export function SneakerInspirationView({
           {/* Generate All Button */}
           {itemsWithoutPalettes > 0 && (
             <Button
-              onClick={handleMigrateAll}
-              disabled={isMigrating}
+              onClick={handleGenerateMissing}
+              disabled={isPending}
               size="sm"
+              variant="outline"
             >
-              {isMigrating ? (
+              {isPending ? (
                 <>
                   <Loader2 className="h-3 w-3 mr-2 animate-spin" />
                   Generating...
@@ -411,7 +384,7 @@ export function SneakerInspirationView({
               ) : (
                 <>
                   <Palette className="h-3 w-3 mr-2" />
-                  Generate All ({itemsWithoutPalettes})
+                  Generate Missing ({itemsWithoutPalettes})
                 </>
               )}
             </Button>
