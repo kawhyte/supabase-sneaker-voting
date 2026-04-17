@@ -22,13 +22,12 @@ export function FitFormulaCard({
   projectedCPW,
 }: FitFormulaCardProps) {
   const ambientBackgroundStyle = {
-    background: `radial-gradient(circle at 0% 0%, ${extractedColors[0]}40 0%, transparent 50%), radial-gradient(circle at 100% 100%, ${extractedColors[1]}40 0%, transparent 50%), radial-gradient(circle at 50% 50%, ${extractedColors[2]}20 0%, transparent 50%)`,
-    backgroundColor: '#ffffff',
+    backgroundImage: `radial-gradient(circle at 0% 0%, ${extractedColors[0]}40 0%, transparent 50%), radial-gradient(circle at 100% 100%, ${extractedColors[1]}40 0%, transparent 50%), radial-gradient(circle at 50% 50%, ${extractedColors[2]}20 0%, transparent 50%)`,
   }
 
   return (
     <div className="group relative overflow-hidden rounded-[2rem] border border-gray-200/60 shadow-sm transition-all hover:shadow-md">
-      <div className="absolute inset-0 z-0" style={ambientBackgroundStyle} />
+      <div className="absolute inset-0 z-0 bg-white" style={ambientBackgroundStyle} />
       <div className="absolute inset-0 z-0 bg-white/60 backdrop-blur-3xl" />
 
       <div className="relative z-10 flex flex-col gap-6 p-6">
@@ -59,7 +58,7 @@ export function FitFormulaCard({
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm">
               <div
                 className="h-6 w-6 rounded-full border-2 border-white shadow-sm"
-                style={{ background: `linear-gradient(135deg, ${extractedColors[0]}, ${extractedColors[1]})` }}
+                style={{ backgroundImage: `linear-gradient(135deg, ${extractedColors[0]}, ${extractedColors[1]})` }}
               />
             </div>
             <span className="text-xs font-medium text-gray-900 text-center leading-tight max-w-[56px] truncate">
