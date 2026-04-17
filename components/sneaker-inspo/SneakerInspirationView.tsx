@@ -123,17 +123,23 @@ export function SneakerInspirationView({
   const handleGenerateMissing = () => {
     startTransition(async () => {
       try {
-        const result = await migrateAllSneakers()
+        const [newResult, legacyResult] = await Promise.all([
+          migrateAllSneakers(),
+          migrateLegacyPalettes()
+        ])
 
-        if (result.success) {
-          toast.success(`Successfully generated formulas for ${result.succeeded} items!`)
-          await loadSneakers()
+        const totalProcessed = newResult.succeeded + legacyResult.succeeded
+
+        if (newResult.success && legacyResult.success) {
+          toast.success(`Successfully generated formulas for ${totalProcessed} items!`)
         } else {
-          toast.error(result.message || 'Failed to generate formulas')
+          toast.error('Migration finished, but some formulas failed. Check console.')
         }
+
+        await loadSneakers()
       } catch (error) {
         console.error('Migration error:', error)
-        toast.error('An unexpected error occurred')
+        toast.error('An unexpected error occurred during generation')
       }
     })
   }

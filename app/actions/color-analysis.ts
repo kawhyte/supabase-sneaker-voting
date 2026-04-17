@@ -136,7 +136,6 @@ export async function migrateAllSneakers(): Promise<MigrationResult> {
       .from('items')
       .select('id, image_url, category')
       .eq('user_id', user.id)
-      .in('category', ['sneakers', 'shoes', 'footwear'])
       .is('color_palette', null)
       .not('image_url', 'is', null)
 
