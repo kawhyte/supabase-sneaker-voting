@@ -17,30 +17,17 @@ export function FunFactsSection({ userId }: FunFactsSectionProps) {
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
-    loadFacts()
+    fetchFacts()
   }, [userId])
 
-  async function loadFacts() {
-    setIsLoading(true)
+  async function fetchFacts(isRefresh = false) {
+    isRefresh ? setIsRefreshing(true) : setIsLoading(true)
     try {
-      const generated = await generateFunFacts(userId, 6)
-      setFacts(generated)
+      setFacts(await generateFunFacts(userId, 6))
     } catch (error) {
       console.error('Error generating fun facts:', error)
     } finally {
-      setIsLoading(false)
-    }
-  }
-
-  async function refreshFacts() {
-    setIsRefreshing(true)
-    try {
-      const generated = await generateFunFacts(userId, 6)
-      setFacts(generated)
-    } catch (error) {
-      console.error('Error refreshing fun facts:', error)
-    } finally {
-      setIsRefreshing(false)
+      isRefresh ? setIsRefreshing(false) : setIsLoading(false)
     }
   }
 
@@ -71,7 +58,7 @@ export function FunFactsSection({ userId }: FunFactsSectionProps) {
         </div>
 
         <Button
-          onClick={refreshFacts}
+          onClick={() => fetchFacts(true)}
           disabled={isRefreshing}
           variant="outline"
           size="sm"

@@ -6,10 +6,13 @@
  */
 
 import { createClient } from '@/utils/supabase/client'
+import { getTargetCostPerWear } from '@/lib/wardrobe-item-utils'
 
 export interface WardrobeStats {
   totalItems: number
   totalWears: number
+  totalValue: number
+  averageCpw: number
   daysTracked: number
   mostWornItem: MostWornItem | null
   bestValue: BestValueItem | null
@@ -91,6 +94,8 @@ export async function getWardrobeStats(userId: string): Promise<WardrobeStats> {
       return {
         totalItems: 0,
         totalWears: 0,
+        totalValue: 0,
+        averageCpw: 0,
         daysTracked: 0,
         mostWornItem: null,
         bestValue: null,
@@ -99,8 +104,15 @@ export async function getWardrobeStats(userId: string): Promise<WardrobeStats> {
       }
     }
 
-    // Calculate total wears
     const totalWears = items.reduce((sum, item) => sum + (item.wears || 0), 0)
+    const totalValue = items.reduce((sum, item) => sum + (item.purchase_price || item.retail_price || 0), 0)
+    const wornItems = items.filter((item) => (item.wears || 0) > 0 && (item.purchase_price || item.retail_price))
+    const averageCpw = wornItems.length > 0
+      ? wornItems.reduce((sum, item) => {
+          const price = item.purchase_price || item.retail_price || 0
+          return sum + price / (item.wears || 1)
+        }, 0) / wornItems.length
+      : 0
 
     // Calculate days tracked (from oldest item)
     const oldestItemDate = items.reduce((oldest, item) => {
@@ -144,15 +156,14 @@ export async function getWardrobeStats(userId: string): Promise<WardrobeStats> {
           : best
       }, null as any)
 
-    // Get total saved from price alerts (placeholder - implement later)
-    const totalSaved = 0 // Phase 2
-
-    // Get current wear logging streak (placeholder - implement later)
-    const currentStreak = 0 // Phase 2
+    const totalSaved = 0
+    const currentStreak = 0
 
     return {
       totalItems: items.length,
       totalWears,
+      totalValue,
+      averageCpw,
       daysTracked,
       mostWornItem: mostWornItem
         ? {
@@ -173,16 +184,6 @@ export async function getWardrobeStats(userId: string): Promise<WardrobeStats> {
     console.error('Error calculating wardrobe stats:', error)
     throw error
   }
-}
-
-/**
- * Get target cost-per-wear based on price
- * (Copied from wardrobe-item-utils.ts)
- */
-function getTargetCostPerWear(price: number, _category: string): number {
-  if (price < 50) return 2 // Budget items: $2/wear
-  if (price < 150) return 5 // Mid-range: $5/wear
-  return 10 // Premium: $10/wear
 }
 
 /**

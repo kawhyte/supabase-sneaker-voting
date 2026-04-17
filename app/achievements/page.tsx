@@ -9,7 +9,6 @@ import {
   SidebarSkeleton,
   FinancialInsightsSkeleton,
   GallerySkeleton,
-  FactsSkeleton,
 } from '@/components/achievements/Skeletons'
 import {
   getWardrobeStats,
@@ -21,37 +20,19 @@ import {
   type LeastWornItem,
   type BestValueItem,
 } from '@/lib/achievements-stats'
-// Analytics removed - not configured yet
-// TODO: Re-add when Google Analytics 4 is set up
-// import analytics, { AnalyticsEvent } from '@/lib/analytics'
-
 import { FinancialInsights } from '@/components/achievements/FinancialInsights'
 
-// Lazy load heavy components
 const AchievementsGallery = lazy(() =>
   import('@/components/achievements/AchievementsGallery').then((mod) => ({
     default: mod.AchievementsGallery,
   }))
 )
-const FunFactsSection = lazy(() =>
-  import('@/components/achievements/FunFactsSection').then((mod) => ({
-    default: mod.FunFactsSection,
-  }))
-)
 
-// Helper function for personalized greeting
 function getGreeting(userName?: string | null): string {
   const hour = new Date().getHours()
   const timeOfDay = hour < 12 ? 'Morning' : hour < 18 ? 'Afternoon' : 'Evening'
-
-  // Fallback chain: userName → 'there'
   let name = userName || 'there'
-
-  // Truncate very long names (>20 chars)
-  if (name.length > 20) {
-    name = name.substring(0, 17) + '...'
-  }
-
+  if (name.length > 20) name = name.substring(0, 17) + '...'
   return `Good ${timeOfDay}, ${name}!`
 }
 
@@ -72,7 +53,6 @@ function AchievementsPageContent() {
       try {
         setIsLoading(true)
 
-        // Get current user
         const {
           data: { user },
         } = await supabase.auth.getUser()
@@ -84,7 +64,6 @@ function AchievementsPageContent() {
 
         setUserId(user.id)
 
-        // Fetch user's display name from profiles table
         const { data: profile } = await supabase
           .from('profiles')
           .select('display_name')
@@ -95,23 +74,12 @@ function AchievementsPageContent() {
           setUserName(profile.display_name || null)
         }
 
-        // Analytics removed - not configured yet
-        // try {
-        //   analytics.track(AnalyticsEvent.DASHBOARD_VIEWED, {
-        //     userId: user.id,
-        //     page: 'achievements',
-        //     timestamp: Date.now(),
-        //   })
-        // } catch (e) {
-        //   console.error('Failed to track page view:', e)
-        // }
-
-        // Fetch all stats in parallel (fetch 5 items for responsive Top 3/5 display)
+        // Fetch 5 items; components slice to 3 on mobile
         const [statsData, topWornData, leastWornData, bestValueData] = await Promise.all([
           getWardrobeStats(user.id),
-          getTopWornItems(user.id, 5),   // Fetch 5 for desktop, component will slice to 3 on mobile
-          getLeastWornItems(user.id, 5), // Fetch 5 for desktop, component will slice to 3 on mobile
-          getBestValueItems(user.id, 5), // Fetch 5 for desktop, component will slice to 3 on mobile
+          getTopWornItems(user.id, 5),
+          getLeastWornItems(user.id, 5),
+          getBestValueItems(user.id, 5),
         ])
 
         setStats(statsData)
@@ -146,7 +114,6 @@ function AchievementsPageContent() {
           <div className="lg:col-span-2 space-y-8">
             <FinancialInsightsSkeleton />
             <GallerySkeleton />
-            <FactsSkeleton />
           </div>
           <div>
             <SidebarSkeleton />
@@ -156,56 +123,28 @@ function AchievementsPageContent() {
     )
   }
 
-  const trackInteraction = (feature: string) => {
-    // Analytics removed - not configured yet
-    // try {
-    //   if (userId) {
-    //     analytics.track(AnalyticsEvent.FEATURE_DISCOVERED, {
-    //       feature: `achievements_${feature}`,
-    //       userId,
-    //     })
-    //   }
-    // } catch (e) {
-    //   console.error('Failed to track interaction:', e)
-    // }
-  }
-
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 achievements-main">
-      {/* Header */}
       <h1 className="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em] mb-8">
         {getGreeting(userName)}
       </h1>
 
-      {/* Sidebar: Top/Least/Best Value Lists */}
       <AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} bestValue={bestValue} />
 
-      {/* NEW: Grid Layout (main content + sidebar) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-16">
+      <div className="space-y-8 mt-16">
+        <FinancialInsights
+          totalValue={stats.totalValue}
+          totalWears={stats.totalWears}
+          averageCpw={stats.averageCpw}
+        />
 
-        {/* MAIN CONTENT COLUMN (spans 2 columns on lg) */}
-        <div className="lg:col-span-3 space-y-8">
-
-
-     
-          <FinancialInsights totalValue={2450} totalWears={142} averageCpw={17.25} />
-
-          {userId && (
-            <Suspense fallback={<GallerySkeleton />}>
-              <div className="achievement-gallery">
-                <AchievementsGallery userId={userId} />
-              </div>
-            </Suspense>
-          )}
-
-          {/* {userId && (
-            <Suspense fallback={<FactsSkeleton />}>
-              <FunFactsSection userId={userId} />
-            </Suspense>
-          )} */}
-
-        </div>
-
+        {userId && (
+          <Suspense fallback={<GallerySkeleton />}>
+            <div className="achievement-gallery">
+              <AchievementsGallery userId={userId} />
+            </div>
+          </Suspense>
+        )}
       </div>
     </main>
   )

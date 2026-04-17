@@ -90,7 +90,7 @@ export function AchievementsPreview({ userId }: { userId?: string }) {
           <div className="flex items-center gap-2">
             <Trophy className="h-4 w-4 text-primary" />
             <span className="font-semibold">
-              {unlockedCount} of {totalCount} Portfolio Insights
+              {unlockedCount} of {totalCount} Sneaker Insights
             </span>
           </div>
           <div className="w-full bg-muted rounded-full h-2 overflow-hidden">

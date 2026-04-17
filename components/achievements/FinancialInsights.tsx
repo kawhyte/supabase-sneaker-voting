@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { DollarSign, Activity, TrendingDown } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
@@ -34,10 +33,10 @@ export function FinancialInsights({
       <div className="relative z-10 flex flex-col gap-6 p-6 md:p-8">
         <div className="text-left">
           <h3 className="text-[22px] font-semibold tracking-tight text-gray-900">
-            Portfolio Insights
+            Sneaker Insights
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            The overall value and utility of your wardrobe.
+            The overall value and utility of your sneakers.
           </p>
         </div>
 
