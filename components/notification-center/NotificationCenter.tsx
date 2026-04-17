@@ -444,7 +444,7 @@ export function NotificationCenter({ isOpen, onClose, userId }: NotificationCent
                       { type: 'price_alert', label: 'Price Alerts' },
                       { type: 'wear_reminder', label: 'Wear Reminders' },
                       { type: 'seasonal_tip', label: 'Seasonal Tips' },
-                      { type: 'cost_per_wear_milestone', label: 'Milestones' },
+                      { type: 'cost_per_wear_milestone', label: 'Benchmarks' },
                     ].map(({ type, label }) => (
                       <button
                         key={type}

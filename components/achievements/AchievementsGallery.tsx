@@ -302,7 +302,7 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
           aria-hidden="true"
         />
         <h3 id="achievements-gallery-title" className="text-2xl font-bold text-foreground">
-          Achievements
+          Portfolio Insights
         </h3>
       </div>
 
