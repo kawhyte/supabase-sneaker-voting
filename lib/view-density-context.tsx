@@ -5,8 +5,7 @@
  * Provides global access via useDensity() hook
  *
  * View Modes:
- * - comfortable: 3-4 cards per row (grid) - DEFAULT
- * - detailed: 2-3 cards per row (grid)
+ * - detailed: 2-3 cards per row (grid) - DEFAULT
  * - list: Horizontal rows (list/table view)
  */
 
@@ -14,7 +13,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-export type ViewDensity = "comfortable" | "detailed" | "list";
+export type ViewDensity = "detailed" | "list";
 
 interface ViewDensityContextType {
 	density: ViewDensity;
@@ -26,7 +25,7 @@ const ViewDensityContext = createContext<ViewDensityContextType | undefined>(
 );
 
 const STORAGE_KEY = "purrview_density";
-const DEFAULT_DENSITY: ViewDensity = "comfortable";
+const DEFAULT_DENSITY: ViewDensity = "detailed";
 
 /**
  * Provider component - wrap your app with this
@@ -42,12 +41,12 @@ export function ViewDensityProvider({
 	useEffect(() => {
 		try {
 			const stored = localStorage.getItem(STORAGE_KEY);
-			if (stored && ["comfortable", "detailed", "list"].includes(stored)) {
+			if (stored && ["detailed", "list"].includes(stored)) {
 				setDensityState(stored as ViewDensity);
-			} else if (stored === "compact") {
-				// Migrate old "compact" preference to "comfortable"
-				setDensityState("comfortable");
-				localStorage.setItem(STORAGE_KEY, "comfortable");
+			} else if (stored === "comfortable" || stored === "compact") {
+				// Migrate old preferences to "detailed"
+				setDensityState("detailed");
+				localStorage.setItem(STORAGE_KEY, "detailed");
 			}
 		} catch (error) {
 			console.warn("Failed to read density from localStorage:", error);
@@ -89,8 +88,6 @@ export function useDensity(): ViewDensityContextType {
  */
 export function getDensityGridClasses(density: ViewDensity): string {
 	switch (density) {
-		case "comfortable":
-			return "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4";
 		case "detailed":
 			return "grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6";
 		case "list":
@@ -105,10 +102,8 @@ export function getDensityImageAspect(
 	density: ViewDensity
 ): "square" | "portrait" | "landscape" {
 	switch (density) {
-		case "comfortable":
-			return "portrait"; // 3:4
 		case "detailed":
-			return "landscape"; // 4:3
+			return "square"; // 1:1 square - matches card image styling
 		case "list":
 			return "square"; // 1:1 for list thumbnails
 	}

@@ -14,7 +14,7 @@ import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { ItemPhoto } from '@/components/types/WardrobeItem';
 import { getImageAltText } from "@/lib/wardrobe-item-utils";
 import { ViewDensity } from "@/lib/view-density-context";
-import { buildCloudinaryUrlWithSize, extractPublicIdFromUrl, IMAGE_SIZES } from '@/lib/cloudinary-url-builder';
+import { extractPublicIdFromUrl } from '@/lib/cloudinary-url-builder';
 import { CldImage } from "next-cloudinary";
 
 interface ItemCardImageProps {
@@ -25,14 +25,6 @@ interface ItemCardImageProps {
 	density?: ViewDensity;
 }
 
-/**
- * Get aspect ratio - ALWAYS square (1:1) for visual consistency
- * Density affects grid layout & metadata, NOT image size
- */
-function getAspectRatio(): string {
-	return "aspect-square"; // 1:1 square - consistent across all density modes
-}
-
 export function ItemCardImage({
 	photos,
 	brand,
@@ -41,12 +33,11 @@ export function ItemCardImage({
 	density,
 }: ItemCardImageProps) {
 	const altText = getImageAltText(brand, model, color);
-	const aspectClass = getAspectRatio();
 
 	if (photos.length === 0) {
 		return (
 			<div className='relative w-full overflow-hidden'>
-				<div className={`w-full ${aspectClass} bg-gradient-to-b from-white via-white to-slate-50/30 flex items-center justify-center transition-all duration-200 card-image-container`}>
+				<div className='w-full aspect-[4/3] bg-slate-100 flex items-center justify-center card-image-container'>
 					<ImageIcon className='h-12 w-12 text-muted-foreground' />
 				</div>
 			</div>
@@ -55,43 +46,27 @@ export function ItemCardImage({
 
 	return (
 		<div className='relative w-full overflow-hidden'>
-			<div className={`relative w-full ${aspectClass} bg-gradient-to-b from-white via-white to-slate-50/30 flex items-center justify-center p-2 sm:p-4 lg:p-5 transition-all duration-200 card-image-container group`}>
+			<div className='relative w-full aspect-[4/3] overflow-hidden bg-slate-100 flex items-center justify-center transition-all duration-200 card-image-container group'>
 				{photos.length === 1 ? (
 					<CldImage
-                        src={extractPublicIdFromUrl(photos[0].image_url) || '/images/placeholder.svg'}
-                        alt={altText}
-                        width={IMAGE_SIZES['card']}
-                        height={IMAGE_SIZES['card']}
-                        crop="fill"
-                        gravity="auto"
-                        className='w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105'
-                        onError={(e: any) => {
-                            e.currentTarget.src = '/images/placeholder.svg';
-                        }}
-                    />
-					// <img
-					// 	src={buildCloudinaryUrlWithSize(
-					// 		extractPublicIdFromUrl(photos[0].image_url),
-					// 		'card'
-					// 	)}
-					// 	alt={altText}
-					// 	className='w-full h-full object-contain object-center transition-transform duration-300 group-hover:scale-105'
-					// 	loading='lazy'
-					// 	decoding='async'
-					// 	onError={(e) => {
-					// 		e.currentTarget.src = '/images/placeholder.svg';
-					// 	}}
-					// />
+						src={extractPublicIdFromUrl(photos[0].image_url) || '/images/placeholder.svg'}
+						alt={altText}
+						fill
+						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+						className='object-contain p-4 mix-blend-multiply drop-shadow-xl transition-transform duration-300 group-hover:scale-105'
+						onError={(e: any) => {
+							e.currentTarget.src = '/images/placeholder.svg';
+						}}
+					/>
 				) : (
-					<div className='w-full h-full transition-transform duration-300 group-hover:scale-105'>
+					<div className='w-full h-full'>
 						<PhotoCarousel
 							photos={photos}
 							showControls={true}
 							showIndicators={true}
 							autoHeight={false}
 							size="card"
-                            crop="fill"
-                            gravity="auto"
+							crop="fit"
 						/>
 					</div>
 				)}

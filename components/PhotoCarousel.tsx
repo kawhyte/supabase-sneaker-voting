@@ -132,7 +132,7 @@ export function PhotoCarousel({
               height={IMAGE_SIZES[size]}
               crop={crop}
               gravity={gravity}
-              className={`w-full h-full ${crop === 'fill' ? 'object-cover' : 'object-contain'} rounded-lg`}
+              className={`w-full h-full ${crop === 'fill' ? 'object-cover' : 'object-contain mix-blend-multiply'} rounded-lg`}
               style={{ aspectRatio: autoHeight ? 'auto' : '1 / 1' }}
               onError={(e: any) => {
                 e.currentTarget.src = '/images/placeholder.svg';
@@ -195,7 +195,7 @@ export function PhotoCarousel({
                       height={IMAGE_SIZES[size]}
                       crop={crop}
                       gravity={gravity}
-                      className={`w-full h-full ${crop === 'fill' ? 'object-cover' : 'object-contain'}`}
+                      className={`w-full h-full ${crop === 'fill' ? 'object-cover' : 'object-contain mix-blend-multiply'}`}
                       onError={(e: any) => {
                         e.currentTarget.src = '/images/placeholder.svg';
                       }}

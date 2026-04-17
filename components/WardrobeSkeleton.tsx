@@ -22,8 +22,7 @@ export function WardrobeSkeleton({ viewMode = 'collection', count = 6 }: Wardrob
   const aspectRatioValue = aspectRatio === 'square' ? '1/1' : aspectRatio === 'portrait' ? '3/4' : '4/3'
   return (
     <div className={`grid ${
-      density === 'comfortable' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4' :
-      density === 'detailed' ? 'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6' :
+      density !== 'list' ? 'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6' :
       '' // List view doesn't use skeleton (renders list items)
     }`}>
       {[...Array(count)].map((_, i) => (
