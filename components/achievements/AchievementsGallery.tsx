@@ -75,7 +75,7 @@ export function AchievementsGallery({ userId }: AchievementsGalleryProps) {
   }, [focusedIndex])
 
   useEffect(() => {
-    badgeRefs.current[focusedIndex]?.focus()
+    badgeRefs.current[focusedIndex]?.focus({ preventScroll: true })
   }, [focusedIndex])
 
   async function loadUnlockedAchievements() {
