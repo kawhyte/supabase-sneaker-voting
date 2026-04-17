@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef, useTransition } from 'react'
+import React, { useState, useEffect, useRef, useTransition } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { SneakerPaletteCard } from '@/components/sneaker-inspo/SneakerPaletteCard'
 import { StyleGuideDialog } from '@/components/sneaker-inspo/StyleGuideDialog'
@@ -57,6 +59,25 @@ const FIT_FORMULAS = [
  * Can be used in dashboard tabs or standalone pages.
  * Shows responsive grid of OWNED sneakers (not wishlisted) with generated color palettes.
  */
+function AutoSelectHandler({
+  currentSelectedId,
+  onSelect,
+}: {
+  currentSelectedId: string | null
+  onSelect: (id: string) => void
+}) {
+  const searchParams = useSearchParams()
+
+  React.useEffect(() => {
+    const inspoItemId = searchParams?.get('inspoItemId')
+    if (inspoItemId && inspoItemId !== currentSelectedId) {
+      onSelect(inspoItemId)
+    }
+  }, [searchParams, currentSelectedId, onSelect])
+
+  return null
+}
+
 export function SneakerInspirationView({
   showHeader = true,
   className = ''
@@ -288,6 +309,13 @@ export function SneakerInspirationView({
 
   return (
     <div className={className}>
+      <Suspense fallback={null}>
+        <AutoSelectHandler
+          currentSelectedId={selectedItemId}
+          onSelect={handleSelectItem}
+        />
+      </Suspense>
+
       {/* Header */}
       {showHeader && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">

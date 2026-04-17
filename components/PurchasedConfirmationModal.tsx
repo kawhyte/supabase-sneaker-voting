@@ -144,9 +144,8 @@ export function PurchasedConfirmationModal({
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal min-h-10 px-3 py-2",
-                    !purchaseDate && "text-muted-foreground",
-                    "focus-ring"
+                    "w-full justify-start text-left font-normal",
+                    !purchaseDate && "text-muted-foreground"
                   )}
                   disabled={isSubmitting}
                   aria-label={`Purchase date: ${purchaseDate ? format(purchaseDate, 'PPPP') : 'Pick a date'}`}
@@ -181,7 +180,6 @@ export function PurchasedConfirmationModal({
             variant="outline"
             onClick={handleCancel}
             disabled={isSubmitting}
-            className="min-h-11"
           >
             Cancel
           </Button>
@@ -189,7 +187,7 @@ export function PurchasedConfirmationModal({
             type="button"
             onClick={handleConfirm}
             disabled={!purchasePrice || !isPriceValid || isSubmitting}
-            className="min-h-11 bg-emerald-500 hover:bg-emerald-500 text-white focus-ring"
+            className="bg-emerald-500 hover:bg-emerald-600 text-white"
             aria-busy={isSubmitting}
           >
             {isSubmitting ? (

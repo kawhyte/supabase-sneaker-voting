@@ -1,7 +1,8 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import { ViewDensityToggle } from '@/components/ViewDensityToggle'
@@ -106,8 +107,24 @@ import Link from "next/link";
 
 function DashboardContent() {
 	const searchParams = useSearchParams();
-	// Default to 'rotation' (shoe-first) if no tab is specified in the URL
-	const defaultTab = searchParams.get("tab") || "rotation";
+	const router = useRouter();
+	const pathname = usePathname();
+
+	const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "rotation");
+
+	useEffect(() => {
+		const tabParam = searchParams.get("tab");
+		if (tabParam && tabParam !== activeTab) {
+			setActiveTab(tabParam);
+		}
+	}, [searchParams, activeTab]);
+
+	const handleTabChange = (value: string) => {
+		setActiveTab(value);
+		const params = new URLSearchParams(searchParams.toString());
+		params.set("tab", value);
+		router.replace(`${pathname}?${params.toString()}`);
+	};
 
 	return (
 		<div className='w-full min-h-screen'>
@@ -144,7 +161,8 @@ function DashboardContent() {
 				<div className='mt-12 mb-6'>
 					{/* Tabs Container with ultra-wide optimization */}
 					<Tabs
-						defaultValue={defaultTab}
+						value={activeTab}
+						onValueChange={handleTabChange}
 						className='w-full max-w-[1920px] mx-auto rounded-lg '>
 						{/* Header with Tabs and Density Toggle */}
 						<div className='flex flex-col sm:flex-row justify-between sm:items-center gap-6 '>

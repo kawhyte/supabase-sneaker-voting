@@ -71,10 +71,7 @@ export function ItemPricingDisplay({
 									<span className='text-base font-bold text-emerald-500'>
 										${item.sale_price}
 									</span>
-									<Badge
-										variant='outline'
-										className='text-xs px-1.5 py-0 rounded-md border-emerald-500 bg-emerald-500 text-white font-bold transition-all duration-200'
-									>
+									<Badge variant='success'>
 										On Sale!
 									</Badge>
 								</>

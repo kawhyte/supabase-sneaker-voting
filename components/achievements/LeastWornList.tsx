@@ -1,12 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, AlertCircle, Shirt } from 'lucide-react'
+import { Heart, AlertCircle, Shirt, Sparkles } from 'lucide-react'
 import { LeastWornItem } from '@/lib/achievements-stats'
 import { CATEGORY_CONFIGS } from '@/components/types/item-category'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ItemNameDisplay } from '@/components/shared/ItemNameDisplay'
+import { useRouter } from 'next/navigation'
 
 interface LeastWornListProps {
   items: LeastWornItem[]
@@ -14,6 +15,8 @@ interface LeastWornListProps {
 }
 
 export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
+  const router = useRouter()
+
   if (items.length === 0) {
     return null // Don't show section if no data
   }
@@ -34,10 +37,9 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
 
         <div className="space-y-2">
           {items.slice(0, 5).map((item, index) => (
-            <Link
+            <div
               key={item.id}
-              href="/dashboard?tab=owned"
-              className={`flex items-center gap-4 p-2 rounded-lg hover:bg-muted/50 -m-2 transition-colors opacity-75 group ${index >= 3 ? 'hidden lg:flex' : ''}`}
+              className={`flex items-center gap-4 p-2 rounded-lg -m-2 ${index >= 3 ? 'hidden lg:flex' : ''}`}
             >
               {/* Thumbnail */}
               <div className="w-14 h-14 rounded-lg bg-cover bg-center flex-shrink-0 relative">
@@ -65,7 +67,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
                   brand={item.brand}
                   model={item.model}
                   color={item.color}
-                  className="mb-1"
+                  className="mb-1 truncate"
                   maxLength={35}
                 />
                 <p className="text-xs text-muted-foreground">
@@ -73,11 +75,15 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
                 </p>
               </div>
 
-              {/* Rank Badge (matches TopWornList pattern) */}
-              <p className="font-bold text-primary flex-shrink-0" aria-label={`Ranked number ${index + 1}`}>
-                #{index + 1}
-              </p>
-            </Link>
+              {/* Style This Button */}
+              <button
+                onClick={() => router.push(`/dashboard?tab=inspo&inspoItemId=${item.id}`)}
+                className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 text-xs font-semibold text-gray-900 shadow-sm backdrop-blur-md border border-gray-200/60 hover:bg-white/90 active:scale-[0.98] transition-all"
+              >
+                <Sparkles className="h-3 w-3" />
+                Style This
+              </button>
+            </div>
           ))}
         </div>
       </section>
@@ -107,10 +113,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.3 }}
           >
-            <Link
-              href="/dashboard?tab=owned"
-              className="block bg-card border-2 border-amber-300 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-amber-500 transition-all"
-            >
+            <div className="bg-card border-2 border-amber-300 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-amber-500 transition-all">
               {/* Image */}
               {item.image_url ? (
                 <div className="relative aspect-square bg-muted">
@@ -137,12 +140,12 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
                   brand={item.brand}
                   model={item.model}
                   color={item.color}
-                  className="mb-2"
+                  className="mb-2 truncate"
                   maxLength={30}
                 />
 
                 {/* Wear Info */}
-                <div className="text-xs text-amber-700 font-medium">
+                <div className="text-xs text-amber-700 font-medium mb-3">
                   {item.wears === 0 ? (
                     'Never worn'
                   ) : item.daysSinceLastWorn !== null ? (
@@ -151,8 +154,17 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
                     `${item.wears} wears`
                   )}
                 </div>
+
+                {/* Style This Button */}
+                <button
+                  onClick={() => router.push(`/dashboard?tab=inspo&inspoItemId=${item.id}`)}
+                  className="w-full flex items-center justify-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 text-xs font-semibold text-gray-900 shadow-sm backdrop-blur-md border border-gray-200/60 hover:bg-white/90 active:scale-[0.98] transition-all"
+                >
+                  <Sparkles className="h-3 w-3 shrink-0" />
+                  Style This
+                </button>
               </div>
-            </Link>
+            </div>
           </motion.div>
         ))}
       </div>
