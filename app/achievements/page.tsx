@@ -25,12 +25,9 @@ import {
 // TODO: Re-add when Google Analytics 4 is set up
 // import analytics, { AnalyticsEvent } from '@/lib/analytics'
 
+import { FinancialInsights } from '@/components/achievements/FinancialInsights'
+
 // Lazy load heavy components
-const FinancialInsights = lazy(() =>
-  import('@/components/achievements/FinancialInsights').then((mod) => ({
-    default: mod.FinancialInsights,
-  }))
-)
 const AchievementsGallery = lazy(() =>
   import('@/components/achievements/AchievementsGallery').then((mod) => ({
     default: mod.AchievementsGallery,
@@ -191,13 +188,7 @@ function AchievementsPageContent() {
 
 
      
-          {/* {userId && (
-            <Suspense fallback={<FinancialInsightsSkeleton />}>
-              <div className="charts-grid">
-                <FinancialInsights userId={userId} />
-              </div>
-            </Suspense>
-          )} */}
+          <FinancialInsights totalValue={2450} totalWears={142} averageCpw={17.25} />
 
           {userId && (
             <Suspense fallback={<GallerySkeleton />}>

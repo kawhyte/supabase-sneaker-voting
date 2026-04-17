@@ -77,7 +77,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
 
               {/* Style This Button */}
               <button
-                onClick={() => router.push(`/dashboard?tab=inspo&inspoItemId=${item.id}`)}
+                onClick={() => router.push('/dashboard?tab=inspo')}
                 className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 text-xs font-semibold text-gray-900 shadow-sm backdrop-blur-md border border-gray-200/60 hover:bg-white/90 active:scale-[0.98] transition-all"
               >
                 <Sparkles className="h-3 w-3" />
@@ -157,7 +157,7 @@ export function LeastWornList({ items, variant = 'full' }: LeastWornListProps) {
 
                 {/* Style This Button */}
                 <button
-                  onClick={() => router.push(`/dashboard?tab=inspo&inspoItemId=${item.id}`)}
+                  onClick={() => router.push('/dashboard?tab=inspo')}
                   className="w-full flex items-center justify-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 text-xs font-semibold text-gray-900 shadow-sm backdrop-blur-md border border-gray-200/60 hover:bg-white/90 active:scale-[0.98] transition-all"
                 >
                   <Sparkles className="h-3 w-3 shrink-0" />
