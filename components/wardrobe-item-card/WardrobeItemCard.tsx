@@ -16,7 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Archive, Pin } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
-import { prepareItemPhotos, isItemOnSale, formatDate } from "@/lib/wardrobe-item-utils";
+import { prepareItemPhotos, formatDate } from "@/lib/wardrobe-item-utils";
 import { useItemDisplayLogic } from "@/hooks/useItemDisplayLogic";
 import { useItemPermissions } from "@/hooks/useItemPermissions";
 import { useDensity } from "@/lib/view-density-context";
@@ -27,7 +27,6 @@ import { ItemPricingDisplay } from "./WardrobeItemPricing";
 import { ItemSizeComfortWears } from "./WardrobeItemMetadata";
 import { ItemStoreAndDate } from "./WardrobeItemPurchaseInfo";
 import { ItemFooterBadges } from "./WardrobeItemFooter";
-import { CostPerWearProgress } from "./CostPerWearProgress";
 import { WishlistDetailsDrawer } from "./WishlistDetailsDrawer";
 
 /**
@@ -51,7 +50,7 @@ interface WardrobeItemCardProps {
 		onDelete: (item: WardrobeItem) => void;
 		onIncrementWear?: (item: WardrobeItem) => void;
 		onDecrementWear?: (item: WardrobeItem) => void;
-		onMoveToWatchlist?: (item: WardrobeItem) => void;
+		onMoveToWishlist?: (item: WardrobeItem) => void;
 		onArchive?: (item: WardrobeItem) => void;
 		onUnarchive?: (item: WardrobeItem) => void;
 		onMarkAsPurchased?: (item: WardrobeItem) => void;
@@ -112,7 +111,7 @@ function WardrobeItemCardComponent({
 						onDelete={actions.onDelete}
 						onUnarchive={actions.onUnarchive}
 						onMarkAsPurchased={actions.onMarkAsPurchased}
-						onMoveToWatchlist={actions.onMoveToWatchlist}
+						onMoveToWishlist={actions.onMoveToWishlist}
 						onArchive={actions.onArchive}
 						onTogglePinned={actions.onTogglePinned}
 					/>
@@ -169,14 +168,6 @@ function WardrobeItemCardComponent({
 								{item.brands?.name || item.brand}
 							</div>
 						</div>
-
-						{/* Archive Reason - Archive page only */}
-						{/* {isArchivePage && item.archive_reason && (
-							<div className='text-xs text-muted-foreground flex items-center gap-2'>
-								<Archive className='h-3 w-3 text-muted-foreground' />
-								<span>Reason: {item.archive_reason}</span>
-							</div>
-						)} */}
 
 						{/* Title */}
 						<h3 className='text-base sm:text-lg font-semibold leading-tight line-clamp-2 font-heading'>
@@ -236,12 +227,6 @@ function WardrobeItemCardComponent({
 							)}
 
 
-						{/* Cost Per Wear Progress - Only show for owned items in collection/archive views */}
-						{/* {displayLogic.isOwned && (viewMode === 'collection' || viewMode === 'archive') && (
-							<div className='mt-2'>
-								<CostPerWearProgress item={item} />jj
-							</div>
-						)} */}
 						</div>
 
 						{/* Notes - Only show if not compact and has meaningful content */}

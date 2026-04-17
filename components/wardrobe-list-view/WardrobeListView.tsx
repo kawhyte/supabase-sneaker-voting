@@ -25,7 +25,7 @@ interface WardrobeListViewProps {
 	onDelete: (entry: WardrobeItem) => void;
 	onIncrementWear?: (entry: WardrobeItem) => void;
 	onDecrementWear?: (entry: WardrobeItem) => void;
-	onMoveToWatchlist?: (entry: WardrobeItem) => void;
+	onMoveToWishlist?: (entry: WardrobeItem) => void;
 	onArchive?: (entry: WardrobeItem) => void;
 	onMarkAsPurchased?: (entry: WardrobeItem) => void;
 	onCreateOutfit?: (entry: WardrobeItem) => void;
@@ -35,7 +35,6 @@ interface WardrobeListViewProps {
 	emptyState?: ReactNode;
 	viewMode?: "journal" | "collection" | "archive" | "wishlist";
 	isArchivePage?: boolean;
-	userWardrobe?: WardrobeItem[];
 }
 
 export function WardrobeListView({
@@ -44,7 +43,7 @@ export function WardrobeListView({
 	onDelete,
 	onIncrementWear,
 	onDecrementWear,
-	onMoveToWatchlist,
+	onMoveToWishlist,
 	onArchive,
 	onMarkAsPurchased,
 	onCreateOutfit,
@@ -54,7 +53,6 @@ export function WardrobeListView({
 	emptyState,
 	viewMode = "journal",
 	isArchivePage = false,
-	userWardrobe = [],
 }: WardrobeListViewProps) {
 	if (entries.length === 0) {
 		return emptyState || null;
@@ -90,7 +88,7 @@ export function WardrobeListView({
 							onDelete,
 							onIncrementWear,
 							onDecrementWear,
-							onMoveToWatchlist,
+							onMoveToWishlist,
 							onArchive,
 							onMarkAsPurchased,
 							onCreateOutfit,

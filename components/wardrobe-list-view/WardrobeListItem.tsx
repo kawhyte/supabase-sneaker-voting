@@ -30,7 +30,7 @@ interface WardrobeListItemProps {
 		onDelete: (item: WardrobeItem) => void;
 		onIncrementWear?: (item: WardrobeItem) => void;
 		onDecrementWear?: (item: WardrobeItem) => void;
-		onMoveToWatchlist?: (item: WardrobeItem) => void;
+		onMoveToWishlist?: (item: WardrobeItem) => void;
 		onArchive?: (item: WardrobeItem) => void;
 		onUnarchive?: (item: WardrobeItem) => void;
 		onMarkAsPurchased?: (item: WardrobeItem) => void;
@@ -280,7 +280,7 @@ export function WardrobeListItem({
 						onDelete={actions.onDelete}
 						onUnarchive={actions.onUnarchive}
 						onMarkAsPurchased={actions.onMarkAsPurchased}
-						onMoveToWatchlist={actions.onMoveToWatchlist}
+						onMoveToWishlist={actions.onMoveToWishlist}
 						onArchive={actions.onArchive}
 						onTogglePinned={actions.onTogglePinned}
 					/>

@@ -23,7 +23,7 @@ interface DashboardGridProps {
 	onDelete: (entry: WardrobeItem) => void;
 	onIncrementWear?: (entry: WardrobeItem) => void;
 	onDecrementWear?: (entry: WardrobeItem) => void;
-	onMoveToWatchlist?: (entry: WardrobeItem) => void;
+	onMoveToWishlist?: (entry: WardrobeItem) => void;
 	onArchive?: (entry: WardrobeItem) => void;
 	onMarkAsPurchased?: (entry: WardrobeItem) => void;
 	onCreateOutfit?: (entry: WardrobeItem) => void;
@@ -42,7 +42,7 @@ export function DashboardGrid({
 	onDelete,
 	onIncrementWear,
 	onDecrementWear,
-	onMoveToWatchlist,
+	onMoveToWishlist,
 	onArchive,
 	onMarkAsPurchased,
 	onCreateOutfit,
@@ -73,7 +73,7 @@ export function DashboardGrid({
 						onDelete={onDelete}
 						onIncrementWear={onIncrementWear}
 						onDecrementWear={onDecrementWear}
-						onMoveToWatchlist={onMoveToWatchlist}
+						onMoveToWishlist={onMoveToWishlist}
 						onArchive={onArchive}
 						onMarkAsPurchased={onMarkAsPurchased}
 						onCreateOutfit={onCreateOutfit}
@@ -83,7 +83,6 @@ export function DashboardGrid({
 						emptyState={emptyState}
 						viewMode={viewMode}
 						isArchivePage={isArchivePage}
-						userWardrobe={userWardrobe}
 					/>
 				</div>
 
@@ -103,7 +102,7 @@ export function DashboardGrid({
 							onDelete={onDelete}
 							onIncrementWear={onIncrementWear}
 							onDecrementWear={onDecrementWear}
-							onMoveToWatchlist={onMoveToWatchlist}
+							onMoveToWishlist={onMoveToWishlist}
 							onArchive={onArchive}
 							onMarkAsPurchased={onMarkAsPurchased}
 							onCreateOutfit={onCreateOutfit}
@@ -135,7 +134,7 @@ export function DashboardGrid({
 					onDelete={onDelete}
 					onIncrementWear={onIncrementWear}
 					onDecrementWear={onDecrementWear}
-					onMoveToWatchlist={onMoveToWatchlist}
+					onMoveToWishlist={onMoveToWishlist}
 					onArchive={onArchive}
 					onMarkAsPurchased={onMarkAsPurchased}
 					onCreateOutfit={onCreateOutfit}

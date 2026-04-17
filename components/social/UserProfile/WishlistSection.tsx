@@ -7,10 +7,10 @@ interface WishlistSectionProps {
   items: WardrobeItem[];
 }
 
+const noopHandler = () => {};
+const noopAsyncHandler = async () => {};
+
 export function WishlistSection({ items }: WishlistSectionProps) {
-  // No-op handlers for read-only mode
-  const noopHandler = () => {};
-  const noopAsyncHandler = async () => {};
 
   if (items.length === 0) {
     return null;
@@ -32,7 +32,7 @@ export function WishlistSection({ items }: WishlistSectionProps) {
               onDelete: noopHandler,
               onIncrementWear: noopHandler,
               onDecrementWear: noopHandler,
-              onMoveToWatchlist: noopHandler,
+              onMoveToWishlist: noopHandler,
               onArchive: noopHandler,
               onUnarchive: noopHandler,
               onMarkAsPurchased: noopHandler,

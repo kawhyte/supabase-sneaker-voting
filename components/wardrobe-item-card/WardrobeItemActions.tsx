@@ -21,8 +21,6 @@ import {
 	MoreVertical,
 	ArchiveRestore,
 	Bookmark,
-	ShoppingBag,
-	Archive,
 	Pin,
 	PinOff,
 } from "lucide-react";
@@ -38,7 +36,7 @@ interface ItemCardActionsProps {
 	onDelete: (item: WardrobeItem) => void;
 	onUnarchive?: (item: WardrobeItem) => void;
 	onMarkAsPurchased?: (item: WardrobeItem) => void;
-	onMoveToWatchlist?: (item: WardrobeItem) => void;
+	onMoveToWishlist?: (item: WardrobeItem) => void;
 	onArchive?: (item: WardrobeItem) => void;
 	onTogglePinned?: (item: WardrobeItem) => void; // Toggle is_pinned status (featured items)
 }
@@ -52,7 +50,7 @@ export function ItemCardActions({
 	onDelete,
 	onUnarchive,
 	onMarkAsPurchased,
-	onMoveToWatchlist,
+	onMoveToWishlist,
 	onArchive,
 	onTogglePinned,
 }: ItemCardActionsProps) {
@@ -119,18 +117,9 @@ export function ItemCardActions({
 								</DropdownMenuItem>
 							)}
 
-							{/* {!isReadOnly && isWishlisted && onMarkAsPurchased && (
+							{!isReadOnly && isOwned && onMoveToWishlist && (
 								<DropdownMenuItem
-									onSelect={() => onMarkAsPurchased(item)}
-									className='cursor-pointer'>
-									<ShoppingBag className='h-3 w-3 mr-2' />
-									Purchased...
-								</DropdownMenuItem>
-							)} */}
-
-							{!isReadOnly && isOwned && onMoveToWatchlist && (
-								<DropdownMenuItem
-									onSelect={() => onMoveToWatchlist(item)}
+									onSelect={() => onMoveToWishlist(item)}
 									className='cursor-pointer'>
 									<Bookmark className='h-3 w-3 mr-2' />
 									Move to Wishlist
@@ -145,15 +134,6 @@ export function ItemCardActions({
 									Edit
 								</DropdownMenuItem>
 							)}
-
-							{/* {!isReadOnly && onArchive && (
-								<DropdownMenuItem
-									onSelect={() => onArchive(item)}
-									className='cursor-pointer'>
-									<Archive className='h-3 w-3 mr-2' />
-									Archive...
-								</DropdownMenuItem>
-							)} */}
 
 							{!isReadOnly && (
 								<DropdownMenuItem

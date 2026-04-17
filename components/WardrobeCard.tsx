@@ -23,7 +23,7 @@ export interface WardrobeItemCardProps {
 	viewMode?: 'journal' | 'collection' | 'archive' | 'wishlist';
 	onIncrementWear?: (entry: WardrobeItem) => void;
 	onDecrementWear?: (entry: WardrobeItem) => void;
-	onMoveToWatchlist?: (entry: WardrobeItem) => void;
+	onMoveToWishlist?: (entry: WardrobeItem) => void;
 	onArchive?: (entry: WardrobeItem) => void;
 	onRestore?: (entry: WardrobeItem) => void;
 	onMarkAsPurchased?: (entry: WardrobeItem) => void;
@@ -69,7 +69,7 @@ export function WardrobeCard({
 	viewMode = 'journal',
 	onIncrementWear,
 	onDecrementWear,
-	onMoveToWatchlist,
+	onMoveToWishlist,
 	onArchive,
 	onRestore,
 	onMarkAsPurchased,
@@ -91,7 +91,7 @@ export function WardrobeCard({
 				onDelete,
 				onIncrementWear,
 				onDecrementWear,
-				onMoveToWatchlist,
+				onMoveToWishlist,
 				onArchive,
 				onUnarchive,
 				onMarkAsPurchased,

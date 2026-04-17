@@ -9,7 +9,6 @@ import { trackEvent, AnalyticsEvent } from "@/lib/analytics";
 import { DashboardGrid } from "./DashboardGrid";
 import { EditItemModal } from "./EditItemModal";
 import { WardrobeFilters } from "./WardrobeFilters";
-import { WardrobeStats } from "./WardrobeStats";
 import { WardrobeSkeleton } from "./WardrobeSkeleton";
 import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
 import { PurchasedConfirmationModal } from "./PurchasedConfirmationModal";
@@ -885,8 +884,6 @@ export function WardrobeDashboard({
 				</div>
 			</div>
 
-			{/* <WardrobeStats journalEntries={journalEntries} /> */}
-
 			<DashboardGrid
 				entries={filteredAndSortedEntries}
 				viewMode={viewMode}
@@ -895,7 +892,7 @@ export function WardrobeDashboard({
 				onDelete={handleDeleteEntry}
 				onIncrementWear={handleIncrementWear}
 				onDecrementWear={handleDecrementWear}
-				onMoveToWatchlist={moveItemToWishlist}
+				onMoveToWishlist={moveItemToWishlist}
 				onMarkAsPurchased={handleOpenPurchasedModal}
 				onArchive={handleOpenArchiveDialog}
 				onRefreshPrice={handleRefreshPrice}
