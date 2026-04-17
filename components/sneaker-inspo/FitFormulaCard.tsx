@@ -11,6 +11,8 @@ export interface FitFormulaCardProps {
   doodleItems: { name: string; icon: React.ElementType; isTinted?: boolean }[]
   sneakerName: string
   projectedCPW: number
+  onLogWear: () => void
+  isPending?: boolean
 }
 
 export function FitFormulaCard({
@@ -20,6 +22,8 @@ export function FitFormulaCard({
   doodleItems,
   sneakerName,
   projectedCPW,
+  onLogWear,
+  isPending = false,
 }: FitFormulaCardProps) {
   const ambientBackgroundStyle = {
     backgroundImage: `radial-gradient(circle at 0% 0%, ${extractedColors[0]}40 0%, transparent 50%), radial-gradient(circle at 100% 100%, ${extractedColors[1]}40 0%, transparent 50%), radial-gradient(circle at 50% 50%, ${extractedColors[2]}20 0%, transparent 50%)`,
@@ -84,14 +88,15 @@ export function FitFormulaCard({
             </div>
           </div>
           <button
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3.5 text-sm font-medium text-white transition-transform active:scale-[0.98]"
+            disabled={isPending}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3.5 text-sm font-medium text-white transition-transform active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={(e) => {
               e.stopPropagation()
-              // TODO: Wear Logic
+              onLogWear()
             }}
           >
             <CheckCircle2 className="h-4 w-4" />
-            Log Wear with this Fit
+            {isPending ? 'Logging...' : 'Log Wear with this Fit'}
           </button>
         </div>
       </div>

@@ -67,6 +67,7 @@ export function SneakerInspirationView({
   const [isMigratingLegacy, setIsMigratingLegacy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+  const [isLoggingId, setIsLoggingId] = useState<string | null>(null)
   const fitFormulaSectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -213,6 +214,32 @@ export function SneakerInspirationView({
   const hasLegacyPalette = (item: WardrobeItem): boolean => {
     if (!item.color_palette) return false
     return Array.isArray(item.color_palette)
+  }
+
+  const handleLogWear = async (item: WardrobeItem) => {
+    setIsLoggingId(item.id)
+    const newWears = (item.wears ?? 0) + 1
+
+    // Optimistic update
+    setItems(prev => prev.map(i => i.id === item.id ? { ...i, wears: newWears } : i))
+
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('items')
+        .update({ wears: newWears })
+        .eq('id', item.id)
+
+      if (error) throw error
+
+      toast({ title: 'Wear logged!', description: 'CPW updated.' })
+    } catch (err) {
+      // Revert optimistic update
+      setItems(prev => prev.map(i => i.id === item.id ? { ...i, wears: item.wears } : i))
+      toast({ title: 'Failed to log wear', description: 'Please try again.', variant: 'destructive' })
+    } finally {
+      setIsLoggingId(null)
+    }
   }
 
   const handleSelectItem = (itemId: string) => {
@@ -449,6 +476,8 @@ export function SneakerInspirationView({
                     doodleItems={formula.doodleItems.map(d => ({ ...d }))}
                     sneakerName={`${selectedItem.brand} ${selectedItem.model}`}
                     projectedCPW={getProjectedCPW(selectedItem)}
+                    onLogWear={() => handleLogWear(selectedItem)}
+                    isPending={isLoggingId === selectedItem.id}
                   />
                 ))}
               </div>
