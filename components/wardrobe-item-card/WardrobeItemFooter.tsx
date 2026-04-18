@@ -1,17 +1,10 @@
-/**
- * ItemFooterBadges - Footer section with action buttons
- *
- * Displays:
- * - Create Outfit button (for owned items - launch Outfit Studio)
- * - View Cost Per Wear button (collection mode with wears tracking)
- */
-
 "use client";
 
 import { useState } from "react";
+import { Minus, Plus } from "lucide-react";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { WearStatsDrawer } from "./WearStatsDrawer";
-import { TrendingDown } from "lucide-react";
+import { calculateCostPerWear } from "@/lib/wardrobe-item-utils";
 
 interface ItemFooterBadgesProps {
 	item: WardrobeItem;
@@ -28,36 +21,60 @@ export function ItemFooterBadges({
 	canTrackWears = false,
 	onIncrementWear,
 	onDecrementWear,
-	userWardrobe = [],
 }: ItemFooterBadgesProps) {
 	const [wearDrawerOpen, setWearDrawerOpen] = useState(false);
-	const showWearButton = viewMode === 'collection' && canTrackWears && onIncrementWear && onDecrementWear;
+	const showWearRow = viewMode === 'collection' && canTrackWears && onIncrementWear && onDecrementWear;
+
+	const cpw = (item.purchase_price || item.retail_price) && (item.wears ?? 0) > 0
+		? calculateCostPerWear(item.purchase_price, item.retail_price, item.wears)
+		: null;
+
+	if (!showWearRow) return null;
 
 	return (
 		<>
-			<div className='dense flex items-center gap-2 flex-wrap'>
-				{/* View Cost Per Wear Button - Collection View Only */}
-				{showWearButton && (
+			{/* Unified editorial footer row */}
+			<div className="dense flex items-center justify-between w-full">
+
+				{/* Quick +/− with inline wear count */}
+				<div className="flex items-center gap-0.5">
 					<button
-						onClick={() => setWearDrawerOpen(true)}
-						className='h-9 w-9 flex items-center justify-center rounded-full text-muted-foreground hover:text-accent transition-colors'
-						type='button'
-						aria-label='View wear statistics'>
-						<TrendingDown className='h-4 w-4' />
+						onClick={(e) => { e.stopPropagation(); onDecrementWear(item); }}
+						disabled={!item.wears || item.wears === 0}
+						className="h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-accent transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+						type="button"
+						aria-label="Decrease wear count">
+						<Minus className="h-3.5 w-3.5" />
 					</button>
-				)}
+					<span className="font-mono text-xs text-muted-foreground tabular-nums min-w-[4.5rem] text-center select-none">
+						{item.wears ?? 0} {(item.wears ?? 0) === 1 ? 'wear' : 'wears'}
+					</span>
+					<button
+						onClick={(e) => { e.stopPropagation(); onIncrementWear(item); }}
+						className="h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-accent transition-colors"
+						type="button"
+						aria-label="Increase wear count">
+						<Plus className="h-3.5 w-3.5" />
+					</button>
+				</div>
+
+				{/* CPW text — opens drawer */}
+				<button
+					onClick={(e) => { e.stopPropagation(); setWearDrawerOpen(true); }}
+					className="font-mono text-xs text-muted-foreground hover:text-accent transition-colors"
+					type="button"
+					aria-label="View wear statistics">
+					{cpw ? `$${cpw} / wear` : '— / wear'}
+				</button>
 			</div>
 
-			{/* Wear Stats Drawer */}
-			{showWearButton && (
-				<WearStatsDrawer
-					item={item}
-					isOpen={wearDrawerOpen}
-					onOpenChange={setWearDrawerOpen}
-					onIncrementWear={onIncrementWear}
-					onDecrementWear={onDecrementWear}
-				/>
-			)}
+			<WearStatsDrawer
+				item={item}
+				isOpen={wearDrawerOpen}
+				onOpenChange={setWearDrawerOpen}
+				onIncrementWear={onIncrementWear}
+				onDecrementWear={onDecrementWear}
+			/>
 		</>
 	);
 }

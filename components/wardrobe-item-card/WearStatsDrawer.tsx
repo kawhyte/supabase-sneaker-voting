@@ -106,10 +106,6 @@ export function WearStatsDrawer({
 									</TooltipContent>
 								</Tooltip>
 							</div>
-
-							<p className="text-xs text-muted-foreground">
-								Track how many times you've worn this item to calculate cost per wear.
-							</p>
 						</div>
 
 						{/* Cost Per Wear Section */}
@@ -117,7 +113,7 @@ export function WearStatsDrawer({
 							<div className="flex flex-col gap-4">
 								<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Cost Per Wear</span>
 
-								{/* CPW Value Display */}
+								{/* CPW Value + formula */}
 								<div className="flex flex-col gap-1">
 									<span className="font-sans font-bold text-4xl text-foreground">
 										${calculateCostPerWear(item.purchase_price, item.retail_price, item.wears)}
@@ -125,18 +121,12 @@ export function WearStatsDrawer({
 									<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">per wear</span>
 								</div>
 
-								{/* Calculation formula */}
 								<p className="font-mono text-xs text-muted-foreground">
 									${item.purchase_price || item.retail_price} ÷ {item.wears || 0}{" "}
 									{item.wears === 1 ? "wear" : "wears"}
 								</p>
 
-								{/* Progress Section */}
 								<CostPerWearProgress item={item} />
-
-								<p className="text-xs text-muted-foreground">
-									Add more wears to improve your cost per wear value and justify the purchase!
-								</p>
 							</div>
 						)}
 
