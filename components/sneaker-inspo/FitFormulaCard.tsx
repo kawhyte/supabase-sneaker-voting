@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils'
 export interface FitFormulaCardProps {
   title: string
   description: string
+  colorAdvice?: string
+  recommendedSwatches?: [string, string, string]
   extractedColors: [string, string, string] // [primary, secondary, accent]
   doodleItems: { name: string; icon: React.ElementType; isTinted?: boolean }[]
   sneakerName: string
@@ -18,6 +20,8 @@ export interface FitFormulaCardProps {
 export function FitFormulaCard({
   title,
   description,
+  colorAdvice,
+  recommendedSwatches,
   extractedColors,
   doodleItems,
   sneakerName,
@@ -37,7 +41,22 @@ export function FitFormulaCard({
       <div className="relative z-10 flex flex-col gap-6 p-6">
         <div className="text-left">
           <h3 className="text-[22px] font-semibold tracking-tight text-gray-900">{title}</h3>
-          <p className="mt-1 text-sm text-gray-500">{description}</p>
+          <p className="mt-1 text-sm text-gray-500">{colorAdvice ?? description}</p>
+          {recommendedSwatches && (
+            <div className="flex items-center gap-2 mt-3">
+              <span className="text-[10px] font-medium uppercase tracking-widest text-gray-400 shrink-0">Wear</span>
+              <div className="flex gap-1.5">
+                {recommendedSwatches.map((hex, i) => (
+                  <div
+                    key={i}
+                    className="h-4 w-4 rounded-full border border-white shadow-sm ring-1 ring-gray-200/60"
+                    style={{ backgroundColor: hex }}
+                    title={hex}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-center gap-3 rounded-2xl bg-white/40 border border-white/60 py-5 px-2">

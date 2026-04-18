@@ -15,6 +15,7 @@ import { Palette, Loader2, AlertCircle, RefreshCw, X, Shirt, Wind, Layers, Watch
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ColorWithRole } from '@/lib/color-utils'
 import { Pagination } from '@/components/ui/pagination'
+import { buildFormulaAdvice } from '@/lib/fit-formula-utils'
 
 const ITEMS_PER_PAGE = 12
 
@@ -517,19 +518,25 @@ export function SneakerInspirationView({
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {FIT_FORMULAS.map(formula => (
-                  <FitFormulaCard
-                    key={formula.id}
-                    title={formula.title}
-                    description={formula.description}
-                    extractedColors={getExtractedColors(selectedItem)}
-                    doodleItems={[...formula.doodleItems]}
-                    sneakerName={`${selectedItem.brand} ${selectedItem.model}`}
-                    projectedCPW={getProjectedCPW(selectedItem)}
-                    onLogWear={() => handleLogWear(selectedItem)}
-                    isPending={isLoggingId === selectedItem.id}
-                  />
-                ))}
+                {FIT_FORMULAS.map(formula => {
+                  const colors = getExtractedColors(selectedItem)
+                  const { advice, swatches } = buildFormulaAdvice(formula.id, colors)
+                  return (
+                    <FitFormulaCard
+                      key={formula.id}
+                      title={formula.title}
+                      description={formula.description}
+                      colorAdvice={advice}
+                      recommendedSwatches={swatches}
+                      extractedColors={colors}
+                      doodleItems={[...formula.doodleItems]}
+                      sneakerName={`${selectedItem.brand} ${selectedItem.model}`}
+                      projectedCPW={getProjectedCPW(selectedItem)}
+                      onLogWear={() => handleLogWear(selectedItem)}
+                      isPending={isLoggingId === selectedItem.id}
+                    />
+                  )
+                })}
               </div>
             </div>
           )}

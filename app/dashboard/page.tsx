@@ -96,7 +96,7 @@ function DashboardContent() {
 										data-variant='underline'
 										className='relative py-2 px-4 rounded-xl  pb-4 bg-transparent flex items-center gap-2'>
 										<Sparkles className='h-4 w-4' />
-										Inspo
+										Styling
 									</TabsTrigger>
 								</TabsList>
 							</div>
