@@ -49,22 +49,22 @@ export function WearStatsDrawer({
 		<Sheet open={isOpen} onOpenChange={onOpenChange}>
 			<SheetContent side="right" className="w-full sm:w-96 p-0 flex flex-col">
 				{/* Header */}
-				<SheetHeader className="px-6 pt-6 pb-4 border-b border-slate-200">
+				<SheetHeader className="px-6 pt-6 pb-4">
 					<SheetTitle className="text-lg font-semibold">Wear Statistics</SheetTitle>
 					<SheetDescription className="text-xs text-muted-foreground">
-						 {item.model}
+						{item.model}
 					</SheetDescription>
 				</SheetHeader>
 
 				{/* Content */}
 				<div className="flex-1 overflow-y-auto px-6 py-6">
-					<div className="flex flex-col gap-6">
+					<div className="flex flex-col gap-8">
 						{/* Wear Counter Section */}
-						<div className="flex flex-col gap-3">
-							<h3 className="text-sm font-semibold text-foreground">Wear Count</h3>
+						<div className="flex flex-col gap-4">
+							<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Wear Count</span>
 
 							{/* Counter Controls */}
-							<div className="dense flex items-center justify-between gap-4 bg-slate-50 p-4 rounded-lg">
+							<div className="dense flex items-center justify-between gap-4 p-4 rounded-lg bg-card">
 								{/* Decrement Button */}
 								<Tooltip delayDuration={200}>
 									<TooltipTrigger asChild>
@@ -84,8 +84,8 @@ export function WearStatsDrawer({
 
 								{/* Count Display */}
 								<div className="flex-1 text-center">
-									<div className="text-3xl font-bold text-foreground">{item.wears || 0}</div>
-									<div className="text-xs text-muted-foreground mt-1">
+									<div className="font-sans font-bold text-4xl text-foreground">{item.wears || 0}</div>
+									<div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mt-1">
 										{item.wears === 1 ? "wear" : "wears"}
 									</div>
 								</div>
@@ -95,7 +95,7 @@ export function WearStatsDrawer({
 									<TooltipTrigger asChild>
 										<button
 											onClick={() => onIncrementWear?.(item)}
-											className="h-10 w-10 rounded-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 bg-primary text-white font-semibold shadow-sm"
+											className="h-10 w-10 rounded-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 bg-primary hover:bg-accent text-white hover:text-accent-foreground font-semibold shadow-sm"
 											type="button"
 											aria-label="Increase wear count">
 											<Plus className="h-5 w-5" />
@@ -107,42 +107,32 @@ export function WearStatsDrawer({
 								</Tooltip>
 							</div>
 
-							{/* Info text */}
 							<p className="text-xs text-muted-foreground">
 								Track how many times you've worn this item to calculate cost per wear.
 							</p>
 						</div>
 
-						{/* Divider */}
-						<div className="h-px bg-slate-200" />
-
 						{/* Cost Per Wear Section */}
 						{hasWearPrice && (
-							<div className="flex flex-col gap-3">
-								<h3 className="text-sm font-semibold text-foreground">Actual Cost Per Wear</h3>
+							<div className="flex flex-col gap-4">
+								<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Cost Per Wear</span>
 
 								{/* CPW Value Display */}
-								<div className="bg-gradient-to-br from-primary to-emerald-500 p-4 rounded-lg border border-primary">
-									<div className="flex items-baseline gap-1">
-										<span className="text-2xl font-bold text-foreground">
-											${calculateCostPerWear(item.purchase_price, item.retail_price, item.wears)}
-										</span>
-										<span className="text-sm text-muted-foreground">/wear</span>
-									</div>
-
-									{/* Calculation explanation */}
-									<div className="text-xs text-muted-foreground mt-3 pt-3 border-t border-primary">
-										<p>
-											${item.purchase_price || item.retail_price} ÷ {item.wears || 0}{" "}
-											{item.wears === 1 ? "wear" : "wears"}
-										</p>
-									</div>
+								<div className="flex flex-col gap-1">
+									<span className="font-sans font-bold text-4xl text-foreground">
+										${calculateCostPerWear(item.purchase_price, item.retail_price, item.wears)}
+									</span>
+									<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">per wear</span>
 								</div>
+
+								{/* Calculation formula */}
+								<p className="font-mono text-xs text-muted-foreground">
+									${item.purchase_price || item.retail_price} ÷ {item.wears || 0}{" "}
+									{item.wears === 1 ? "wear" : "wears"}
+								</p>
 
 								{/* Progress Section */}
-								<div className="mt-2">
-									<CostPerWearProgress item={item} />
-								</div>
+								<CostPerWearProgress item={item} />
 
 								<p className="text-xs text-muted-foreground">
 									Add more wears to improve your cost per wear value and justify the purchase!
@@ -150,40 +140,43 @@ export function WearStatsDrawer({
 							</div>
 						)}
 
-						{/* Size & Comfort Info */}
-						{(item.size_tried || comfortInfo) && (
-							<>
-								<div className="h-px bg-slate-200" />
+						{/* Item Details Section */}
+						{(item.size_tried || comfortInfo || item.purchase_price || item.store_name) && (
+							<div className="flex flex-col gap-4">
+								<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Item Details</span>
 
-								<div className="flex flex-col gap-2">
-									<h3 className="text-sm font-semibold text-foreground">Item Details</h3>
+								<div className="space-y-3">
+									{item.purchase_price && (
+										<div className="flex items-center justify-between">
+											<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Purchase Price</span>
+											<span className="font-sans font-bold text-foreground">${item.purchase_price}</span>
+										</div>
+									)}
 
-									<div className="space-y-2">
-										{item.size_tried && (
-											<div className="flex items-center justify-between text-sm">
-												<span className="text-muted-foreground">Size</span>
-												<span className="font-medium">{item.size_tried}</span>
-											</div>
-										)}
+									{item.size_tried && (
+										<div className="flex items-center justify-between">
+											<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Size</span>
+											<span className="font-sans font-bold text-foreground">{item.size_tried}</span>
+										</div>
+									)}
 
-										{comfortInfo && (
-											<div className="flex items-center justify-between text-sm">
-												<span className="text-muted-foreground">Comfort</span>
-												<span className={`font-medium ${comfortInfo.color}`}>
-													{comfortInfo.label}
-												</span>
-											</div>
-										)}
+									{comfortInfo && (
+										<div className="flex items-center justify-between">
+											<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Comfort</span>
+											<span className={`font-sans font-bold ${comfortInfo.color}`}>
+												{comfortInfo.label}
+											</span>
+										</div>
+									)}
 
-										{item.store_name && (
-											<div className="flex items-center justify-between text-sm">
-												<span className="text-muted-foreground">Store</span>
-												<span className="font-medium text-xs">{item.store_name}</span>
-											</div>
-										)}
-									</div>
+									{item.store_name && (
+										<div className="flex items-center justify-between">
+											<span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Store</span>
+											<span className="font-sans font-bold text-foreground text-sm">{item.store_name}</span>
+										</div>
+									)}
 								</div>
-							</>
+							</div>
 						)}
 					</div>
 				</div>

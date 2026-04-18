@@ -89,7 +89,7 @@ export function useDensity(): ViewDensityContextType {
 export function getDensityGridClasses(density: ViewDensity): string {
 	switch (density) {
 		case "detailed":
-			return "grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6";
+			return "grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8";
 		case "list":
 			return ""; // List view doesn't use grid layout
 	}

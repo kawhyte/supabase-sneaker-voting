@@ -13,7 +13,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Archive, Pin } from "lucide-react";
+import { Pin } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { prepareItemPhotos, formatDate } from "@/lib/wardrobe-item-utils";
@@ -24,8 +24,6 @@ import { memo, useState } from "react";
 import { ItemCardActions } from "./WardrobeItemActions";
 import { ItemCardImage } from "./WardrobeItemImage";
 import { ItemPricingDisplay } from "./WardrobeItemPricing";
-import { ItemSizeComfortWears } from "./WardrobeItemMetadata";
-import { ItemStoreAndDate } from "./WardrobeItemPurchaseInfo";
 import { ItemFooterBadges } from "./WardrobeItemFooter";
 import { WishlistDetailsDrawer } from "./WishlistDetailsDrawer";
 
@@ -70,7 +68,6 @@ function WardrobeItemCardComponent({
 	actions,
 	isArchivePage = false,
 	isReadOnly = false,
-	purchaseDate,
 	userWardrobe = [],
 }: WardrobeItemCardProps) {
 	// Drawer state for wishlist items
@@ -84,20 +81,15 @@ function WardrobeItemCardComponent({
 
 	// Compute display values
 	const hasBeenTriedOn = item.has_been_tried;
-	const purchasedDate = item.purchase_date || purchaseDate;
 
-	// Show metadata based on density and privacy
 	// Public view: Hide personal info (dates, notes, store, size, wears)
 	const isPublicView = isReadOnly && viewMode === 'wishlist';
-	const showDates = density === 'detailed' && !isPublicView;
-	const showNotes = density !== 'list' && !isPublicView && viewMode !== 'wishlist'; // Hide notes on wishlist cards (shown in drawer); list view shows in expansion
-	const showStore = density !== 'list' && !isPublicView;
-	const showSizeAndWears = !isPublicView && viewMode !== 'wishlist'; // Hide on wishlist cards (shown in drawer)
+	const showNotes = density !== 'list' && !isPublicView && viewMode !== 'wishlist';
 
 	return (
 		<TooltipProvider delayDuration={300}>
 			<Card
-				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full min-h-[420px] border border-slate-200 hover:border-primary/40 will-change-transform focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+				className='overflow-hidden hover-lift-subtle card-interactive transition-all duration-300 group relative rounded-xl w-full min-h-[420px] will-change-transform focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
 				tabIndex={0}
 				role='article'
 				aria-label={`${item.brand} ${item.model}`}>
@@ -115,14 +107,6 @@ function WardrobeItemCardComponent({
 						onArchive={actions.onArchive}
 						onTogglePinned={actions.onTogglePinned}
 					/>
-
-					{/* Archived Badge - Show when archived but not in archive view */}
-					{item.is_archived && viewMode !== 'archive' && (
-						<div className='absolute top-2 left-2 z-40 px-2 py-1 rounded-md text-xs font-semibold shadow-sm flex items-center gap-1 bg-slate-100 text-slate-600'>
-							<Archive className='h-3 w-3' />
-							Archived
-						</div>
-					)}
 
 					{/* Pin Button — always visible when not archived and toggle is available */}
 					{!isReadOnly && !item.is_archived && actions.onTogglePinned && (
@@ -152,7 +136,7 @@ function WardrobeItemCardComponent({
 					/>
 
 					{/* Content Section */}
-					<CardContent className='flex-1 p-4 flex flex-col gap-3 md:border-l md:border-slate-200'>
+					<CardContent className='flex-1 p-4 flex flex-col gap-3'>
 						{/* Brand - With Logo if Available */}
 						<div className='flex items-center gap-2'>
 							{item.brands?.brand_logo && (
@@ -164,13 +148,16 @@ function WardrobeItemCardComponent({
 									/>
 								</div>
 							)}
-							<div className='text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
+							<span className='font-mono uppercase tracking-[0.1em] text-muted-foreground text-xs'>
 								{item.brands?.name || item.brand}
-							</div>
+							</span>
+							{item.is_archived && viewMode !== 'archive' && (
+								<span className='font-mono text-[10px] text-muted-foreground'>· ARCHIVED</span>
+							)}
 						</div>
 
 						{/* Title */}
-						<h3 className='text-base sm:text-lg font-semibold leading-tight line-clamp-2 font-heading'>
+						<h3 className='font-sans font-bold text-lg text-foreground leading-tight line-clamp-2'>
 							{item.model}
 							{item.color !== "Standard" && (
 								<span className='block text-sm font-normal text-muted-foreground mt-1'>
@@ -181,52 +168,26 @@ function WardrobeItemCardComponent({
 
 						{/* Metadata Grid */}
 						<div className='flex flex-col gap-2.5 mt-1'>
-							{/* Date Display - Only show in detailed mode and not in public view */}
-							{showDates && (
-								<div className='text-sm text-muted-foreground flex items-center gap-1'>
-									{displayLogic.isOwned && purchasedDate ? (
-										<span>Purchased on: {formatDate(purchasedDate)}</span>
-									) : (
-										<span>Tracked since: {formatDate(item.created_at)}</span>
-									)}
-								</div>
-							)}
-
-							{/* Pricing - Always show, but hide target price and tracking in public view */}
-							<ItemPricingDisplay
-								item={item}
-								isOwned={displayLogic.isOwned}
-								isOnSale={displayLogic.isOnSale}
-								onRefreshPrice={actions.onRefreshPrice}
-								onManualEntrySuccess={actions.onManualEntrySuccess}
-								isPublicView={isPublicView}
-								useDrawer={viewMode === 'wishlist' && !isPublicView}
-								onOpenDrawer={() => setIsDrawerOpen(true)}
-							/>
-
-							{/* Size, Comfort, Wears - Hide in public view */}
-							{showSizeAndWears && (
-								<ItemSizeComfortWears
+							{/* Pricing - Wishlist only (renders a "View Details" drawer button) */}
+							{viewMode === 'wishlist' && !isPublicView && (
+								<ItemPricingDisplay
 									item={item}
-									viewMode={viewMode}
-									canTrackWears={permissions.canTrackWearCount}
-									onIncrementWear={actions.onIncrementWear}
-									onDecrementWear={actions.onDecrementWear}
+									isOwned={displayLogic.isOwned}
+									isOnSale={displayLogic.isOnSale}
+									onRefreshPrice={actions.onRefreshPrice}
+									onManualEntrySuccess={actions.onManualEntrySuccess}
+									isPublicView={isPublicView}
+									useDrawer={true}
+									onOpenDrawer={() => setIsDrawerOpen(true)}
 								/>
 							)}
 
-							{/* Store and Last Worn - Hide in public view and compact mode */}
-							{showStore && (
-								<ItemStoreAndDate
-									storeName={item.store_name}
-									storeUrl={item.store_url}
-									lastWornDate={item.last_worn_date}
-									viewMode={viewMode}
-									canTrackWears={permissions.canTrackWearCount}
-								/>
+							{/* Last Worn - Collection view only */}
+							{item.last_worn_date && viewMode === 'collection' && permissions.canTrackWearCount && (
+								<span className='font-mono uppercase tracking-[0.1em] text-xs text-muted-foreground'>
+									LAST WORN: {formatDate(item.last_worn_date)}
+								</span>
 							)}
-
-
 						</div>
 
 						{/* Notes - Only show if not compact and has meaningful content */}
@@ -276,7 +237,7 @@ function WardrobeItemCardComponent({
 
 						{/* Footer - Cost Per Wear Button */}
 						{viewMode === 'collection'  && (
-						<div className='flex items-center border-t gap-2 flex-wrap mt-auto pt-4 border-slate-200'>
+						<div className='flex items-center gap-2 flex-wrap mt-auto pt-4'>
 							<ItemFooterBadges
 								item={item}
 								viewMode={viewMode}

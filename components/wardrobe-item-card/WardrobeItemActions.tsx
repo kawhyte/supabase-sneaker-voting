@@ -67,7 +67,7 @@ export function ItemCardActions({
 			<DropdownMenu modal={false}>
 				<DropdownMenuTrigger asChild>
 					<button
-						className='min-h-[44px] min-w-[44px] rounded-full flex items-center justify-center transition-all hover:bg-slate-100 active:bg-slate-200 text-foreground hover:text-primary will-change-transform'
+						className='min-h-[44px] min-w-[44px] rounded-full flex items-center justify-center transition-all text-muted-foreground hover:text-accent active:bg-accent/5 will-change-transform'
 						type='button'
 						aria-label='Card actions'>
 						<MoreVertical className='h-5 w-5' />

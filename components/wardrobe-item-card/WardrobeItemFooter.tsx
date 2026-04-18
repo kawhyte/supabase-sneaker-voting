@@ -11,7 +11,6 @@
 import { useState } from "react";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { WearStatsDrawer } from "./WearStatsDrawer";
-import { Button } from "@/components/ui/button";
 import { TrendingDown } from "lucide-react";
 
 interface ItemFooterBadgesProps {
@@ -39,15 +38,13 @@ export function ItemFooterBadges({
 			<div className='dense flex items-center gap-2 flex-wrap'>
 				{/* View Cost Per Wear Button - Collection View Only */}
 				{showWearButton && (
-					<Button
+					<button
 						onClick={() => setWearDrawerOpen(true)}
-						variant='outline'
-						className='flex items-center gap-2 bg-foreground text-white transition-all duration-200 hover:scale-105 active:scale-95'
-						size='sm'
-						aria-label='View cost per wear statistics'>
-						{/* <TrendingDown className='h-4 w-4' /> */}
-						<span>Cost Per Wear</span>
-					</Button>
+						className='h-9 w-9 flex items-center justify-center rounded-full text-muted-foreground hover:text-accent transition-colors'
+						type='button'
+						aria-label='View wear statistics'>
+						<TrendingDown className='h-4 w-4' />
+					</button>
 				)}
 			</div>
 
