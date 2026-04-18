@@ -15,6 +15,7 @@ import { useDensity, getDensityGridClasses } from "@/lib/view-density-context";
 import { WardrobeItem } from './types/WardrobeItem';
 import { WardrobeCard } from "./WardrobeCard";
 import { WardrobeListView } from "./wardrobe-list-view/WardrobeListView";
+import { Pagination } from "./ui/pagination";
 import { ReactNode } from "react";
 
 interface DashboardGridProps {
@@ -34,6 +35,11 @@ interface DashboardGridProps {
 	viewMode?: "journal" | "collection" | "archive" | "wishlist";
 	isArchivePage?: boolean;
 	userWardrobe?: WardrobeItem[];
+	totalCount?: number;
+	currentPage?: number;
+	pageSize?: number;
+	totalPages?: number;
+	buildPageUrl?: (page: number) => string;
 }
 
 export function DashboardGrid({
@@ -53,6 +59,9 @@ export function DashboardGrid({
 	viewMode = "journal",
 	isArchivePage = false,
 	userWardrobe = [],
+	totalPages = 1,
+	currentPage = 1,
+	buildPageUrl,
 }: DashboardGridProps) {
 	const { density } = useDensity();
 	const gridClasses = getDensityGridClasses(density);
@@ -60,6 +69,15 @@ export function DashboardGrid({
 	if (entries.length === 0) {
 		return emptyState || null;
 	}
+
+	const paginationNode =
+		totalPages > 1 && buildPageUrl ? (
+			<Pagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				buildPageUrl={buildPageUrl}
+			/>
+		) : null;
 
 	// List View: Show on desktop/tablet (≥768px), fall back to compact grid on mobile
 	if (density === "list") {
@@ -114,37 +132,43 @@ export function DashboardGrid({
 						/>
 					))}
 				</motion.div>
+
+				{paginationNode}
 			</>
 		);
 	}
 
 	// Grid View: Compact, Comfortable, Detailed
 	return (
-		<motion.div
-			className={`grid ${gridClasses}`}
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			transition={{ duration: 0.3 }}>
-			{entries.map((entry) => (
-				<WardrobeCard
-					key={entry.id}
-					entry={entry}
-					viewMode={viewMode}
-					onEdit={onEdit}
-					onDelete={onDelete}
-					onIncrementWear={onIncrementWear}
-					onDecrementWear={onDecrementWear}
-					onMoveToWishlist={onMoveToWishlist}
-					onArchive={onArchive}
-					onMarkAsPurchased={onMarkAsPurchased}
-					onCreateOutfit={onCreateOutfit}
-					onRefreshPrice={onRefreshPrice}
-					onManualEntrySuccess={onManualEntrySuccess}
-					onTogglePinned={onTogglePinned}
-					isArchivePage={isArchivePage}
-					userWardrobe={userWardrobe}
-				/>
-			))}
-		</motion.div>
+		<>
+			<motion.div
+				className={`grid ${gridClasses}`}
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ duration: 0.3 }}>
+				{entries.map((entry) => (
+					<WardrobeCard
+						key={entry.id}
+						entry={entry}
+						viewMode={viewMode}
+						onEdit={onEdit}
+						onDelete={onDelete}
+						onIncrementWear={onIncrementWear}
+						onDecrementWear={onDecrementWear}
+						onMoveToWishlist={onMoveToWishlist}
+						onArchive={onArchive}
+						onMarkAsPurchased={onMarkAsPurchased}
+						onCreateOutfit={onCreateOutfit}
+						onRefreshPrice={onRefreshPrice}
+						onManualEntrySuccess={onManualEntrySuccess}
+						onTogglePinned={onTogglePinned}
+						isArchivePage={isArchivePage}
+						userWardrobe={userWardrobe}
+					/>
+				))}
+			</motion.div>
+
+			{paginationNode}
+		</>
 	);
 }

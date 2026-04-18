@@ -28,6 +28,7 @@ export function ItemFooterBadges({
 	const cpw = (item.purchase_price || item.retail_price) && (item.wears ?? 0) > 0
 		? calculateCostPerWear(item.purchase_price, item.retail_price, item.wears)
 		: null;
+	const isWorthIt = calculateWorthItMetrics(item).isWorthIt;
 
 	if (!showWearRow) return null;
 
@@ -58,7 +59,14 @@ export function ItemFooterBadges({
 					</button>
 				</div>
 
-				{/* CPW text — opens drawer */}
+				{/* CPW row — Worth It dot + drawer trigger */}
+				<div className="flex items-center gap-1">
+				{isWorthIt && (
+					<span
+						className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0"
+						aria-label="Worth It milestone reached"
+					/>
+				)}
 				<button
 					onClick={(e) => { e.stopPropagation(); setWearDrawerOpen(true); }}
 					className="group font-mono text-xs text-muted-foreground hover:text-accent transition-colors flex items-center gap-0.5"
@@ -67,6 +75,7 @@ export function ItemFooterBadges({
 					<span>{cpw ? `$${cpw} / wear` : '— / wear'}</span>
 					<ArrowUpRight className="w-3 h-3 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
 				</button>
+				</div>
 			</div>
 
 			<WearStatsDrawer

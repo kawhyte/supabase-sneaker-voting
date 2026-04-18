@@ -24,11 +24,19 @@ function DashboardContent() {
 	const pathname = usePathname();
 
 	const activeTab = searchParams.get("tab") ?? "rotation";
+	const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
 
 	const handleTabChange = (value: string) => {
 		const params = new URLSearchParams(searchParams.toString());
 		params.set("tab", value);
+		params.set("page", "1");
 		router.replace(`${pathname}?${params.toString()}`);
+	};
+
+	const buildPageUrl = (p: number) => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.set("page", String(p));
+		return `${pathname}?${params.toString()}`;
 	};
 
 	return (
@@ -103,6 +111,8 @@ function DashboardContent() {
 								<WardrobeDashboard
 									status={[ItemStatus.OWNED]}
 									categoryFilter={["shoes"]}
+									page={page}
+									buildPageUrl={buildPageUrl}
 								/>
 							</motion.div>
 						</TabsContent>
@@ -113,7 +123,11 @@ function DashboardContent() {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: 8 }}
 								transition={{ duration: 0.3 }}>
-								<WardrobeDashboard status={[ItemStatus.WISHLISTED]} />
+								<WardrobeDashboard
+									status={[ItemStatus.WISHLISTED]}
+									page={page}
+									buildPageUrl={buildPageUrl}
+								/>
 							</motion.div>
 						</TabsContent>
 
@@ -136,6 +150,8 @@ function DashboardContent() {
 								<WardrobeDashboard
 									status={[ItemStatus.OWNED, ItemStatus.WISHLISTED]}
 									isArchivePage={true}
+									page={page}
+									buildPageUrl={buildPageUrl}
 								/>
 							</motion.div>
 						</TabsContent>

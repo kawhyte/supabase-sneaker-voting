@@ -14,10 +14,6 @@ import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
 import { PurchasedConfirmationModal } from "./PurchasedConfirmationModal";
 import { ArchiveReasonDialog } from "./ArchiveReasonDialog";
 import { WardrobeItem } from "./types/WardrobeItem";
-import {
-	filterJournalEntries,
-	sortJournalEntries,
-} from "@/lib/wardrobe-item-utils";
 import { type ItemCategory } from "@/components/types/item-category";
 import {
 	Empty,
@@ -36,11 +32,15 @@ import { ItemStatus } from "@/types/ItemStatus";
 import { ViewDensityToggle } from "./ViewDensityToggle";
 import { DashboardHeader } from "./DashboardHeader";
 
+const ITEMS_PER_PAGE = 12;
+
 interface WardrobeDashboardProps {
 	onAddNew?: () => void;
 	status: ItemStatus[];
 	isArchivePage?: boolean;
-	categoryFilter?: ItemCategory[]; // NEW: Filter by specific categories (e.g., ['shoes'] for Sneakers)
+	categoryFilter?: ItemCategory[];
+	page?: number;
+	buildPageUrl?: (page: number) => string;
 }
 
 export function WardrobeDashboard({
@@ -48,13 +48,17 @@ export function WardrobeDashboard({
 	status = [ItemStatus.WISHLISTED],
 	isArchivePage = false,
 	categoryFilter,
+	page = 1,
+	buildPageUrl,
 }: WardrobeDashboardProps) {
 	// State - Data
 	const [journalEntries, setJournalEntries] = useState<WardrobeItem[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [totalCount, setTotalCount] = useState(0);
 
 	// State - Filters
 	const [searchTerm, setSearchTerm] = useState("");
+	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 	const [selectedBrands, setSelectedBrands] = useState(new Set<string>());
 	const [sortBy, setSortBy] = useState<string>("date-desc");
 	const [selectedCategories, setSelectedCategories] = useState<ItemCategory[]>(
@@ -78,16 +82,25 @@ export function WardrobeDashboard({
 
 	const supabase = createClient();
 
+	// Debounce search input to avoid excessive Supabase requests per keystroke
+	useEffect(() => {
+		const timer = setTimeout(() => setDebouncedSearchTerm(searchTerm), 300);
+		return () => clearTimeout(timer);
+	}, [searchTerm]);
+
+	// Stable serialized keys for Set/array deps
+	const selectedBrandsKey = [...selectedBrands].sort().join(",");
+	const selectedCategoriesKey = selectedCategories.join(",");
+
 	useEffect(() => {
 		loadJournalEntries();
-	}, [status, isArchivePage, categoryFilter]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [status, isArchivePage, categoryFilter, page, debouncedSearchTerm, sortBy, selectedBrandsKey, selectedCategoriesKey]);
 
 	const loadJournalEntries = async () => {
 		try {
 			setIsLoading(true);
 
-			// CRITICAL: Get current user to filter by user_id
-			// This prevents showing other users' items in the personal dashboard
 			const { data: { user } } = await supabase.auth.getUser();
 			if (!user) {
 				console.error("No authenticated user");
@@ -96,52 +109,77 @@ export function WardrobeDashboard({
 				return;
 			}
 
-			let query = supabase
-				.from("items")
-				.select(
-					`*, item_photos (id, image_url, image_order, is_main_image), brands (id, name, brand_logo)`
-				)
-				.eq("user_id", user.id) // SECURITY FIX: Only show current user's items
-				.eq("is_archived", isArchivePage)
-				.in("status", status)
-				.order("is_main_image", { foreignTable: "item_photos", ascending: false })
-				.order("image_order", { foreignTable: "item_photos", ascending: true });
+			const from = (page - 1) * ITEMS_PER_PAGE;
+			const to = from + ITEMS_PER_PAGE - 1;
 
-			// Apply category filter if provided (for shoe-first tabs)
-			if (categoryFilter && categoryFilter.length > 0) {
-				query = query.in("category", categoryFilter);
-			}
-
-			let { data, error } = await query.order("created_at", {
-				ascending: false,
-			});
-
-			if (error && error.message?.includes("item_photos")) {
-				let basicQuery = supabase
+			const buildBaseQuery = (selectStr: string) => {
+				let q = supabase
 					.from("items")
-					.select(`*, brands (id, name, brand_logo)`)
-					.eq("user_id", user.id) // SECURITY FIX: Only show current user's items
+					.select(selectStr, { count: "exact" })
+					.eq("user_id", user.id)
 					.eq("is_archived", isArchivePage)
 					.in("status", status);
 
-				// Apply category filter to fallback query as well
 				if (categoryFilter && categoryFilter.length > 0) {
-					basicQuery = basicQuery.in("category", categoryFilter);
+					q = q.in("category", categoryFilter);
+				}
+				if (selectedCategories.length > 0) {
+					q = q.in("category", selectedCategories);
+				}
+				if (selectedBrands.size > 0) {
+					q = q.in("brand", [...selectedBrands]);
+				}
+				if (debouncedSearchTerm.trim()) {
+					const term = debouncedSearchTerm.trim();
+					q = q.or(`brand.ilike.%${term}%,model.ilike.%${term}%,color.ilike.%${term}%`);
 				}
 
-				const basicResult = await basicQuery.order("created_at", {
-					ascending: false,
-				});
-				data = basicResult.data;
-				error = basicResult.error;
+				// Server-side sort (pinned items always first)
+				q = q.order("is_pinned", { ascending: false });
+				switch (sortBy) {
+					case "date-asc":
+						q = q.order("created_at", { ascending: true });
+						break;
+					case "brand":
+						q = q.order("brand", { ascending: true });
+						break;
+					case "fit-rating":
+					case "comfort-rating":
+						q = q.order("comfort_rating", { ascending: false, nullsFirst: false });
+						break;
+					default: // date-desc
+						q = q.order("created_at", { ascending: false });
+				}
+
+				return q;
+			};
+
+			let query = buildBaseQuery(
+				`*, item_photos (id, image_url, image_order, is_main_image), brands (id, name, brand_logo)`
+			)
+				.order("is_main_image", { foreignTable: "item_photos", ascending: false })
+				.order("image_order", { foreignTable: "item_photos", ascending: true })
+				.range(from, to);
+
+			const result = await query;
+			let items: WardrobeItem[] | null = result.data as unknown as WardrobeItem[] | null;
+			let fetchError = result.error;
+			let fetchCount = result.count;
+
+			if (fetchError && fetchError.message?.includes("item_photos")) {
+				const fallbackResult = await buildBaseQuery(`*, brands (id, name, brand_logo)`).range(from, to);
+				items = fallbackResult.data as unknown as WardrobeItem[] | null;
+				fetchError = fallbackResult.error;
+				fetchCount = fallbackResult.count;
 			}
 
-			if (error) {
-				console.error("Error loading journal entries:", error);
+			if (fetchError) {
+				console.error("Error loading journal entries:", fetchError);
 				toast.error("Failed to load items");
 				return;
 			}
-			setJournalEntries(data || []);
+			setJournalEntries(items || []);
+			setTotalCount(fetchCount ?? 0);
 		} catch (error) {
 			console.error("Error:", error);
 			toast.error("An error occurred while loading items");
@@ -806,16 +844,12 @@ export function WardrobeDashboard({
 	};
 
 	// Computed values
-	const filteredAndSortedEntries = sortJournalEntries(
-		filterJournalEntries(
-			journalEntries,
-			searchTerm,
-			new Set<string>(),
-			selectedBrands,
-			selectedCategories
-		),
-		sortBy
-	);
+	const hasActiveFilters =
+		debouncedSearchTerm.trim() !== "" ||
+		selectedBrands.size > 0 ||
+		selectedCategories.length > 0;
+
+	const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
 	const displayStatus = status.includes(ItemStatus.WISHLISTED)
 		? ItemStatus.WISHLISTED
@@ -885,7 +919,7 @@ export function WardrobeDashboard({
 			</div>
 
 			<DashboardGrid
-				entries={filteredAndSortedEntries}
+				entries={journalEntries}
 				viewMode={viewMode}
 				isArchivePage={isArchivePage}
 				onEdit={handleEditEntry}
@@ -901,9 +935,14 @@ export function WardrobeDashboard({
 				userWardrobe={journalEntries.filter(
 					(e) => e.status === ItemStatus.OWNED
 				)}
+				totalCount={totalCount}
+				currentPage={page}
+				pageSize={ITEMS_PER_PAGE}
+				totalPages={totalPages}
+				buildPageUrl={buildPageUrl}
 				emptyState={
 					<EmptyState
-						hasEntries={journalEntries.length > 0}
+						hasEntries={hasActiveFilters}
 						displayStatus={displayStatus}
 						isArchivePage={isArchivePage}
 						onAddNew={onAddNew}
