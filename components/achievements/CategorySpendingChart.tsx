@@ -52,20 +52,20 @@ export function CategorySpendingChart({ data }: CategorySpendingChartProps) {
 
   // Fallback colors if category colors missing
   const FALLBACK_COLORS = [
-    '#10b981', // green
-    '#3b82f6', // blue
-    '#f59e0b', // amber
-    '#ef4444', // red
-    '#8b5cf6', // purple
-    '#ec4899', // pink
-    '#06b6d4', // cyan
+    '#64748b', // slate
+    '#c07a5a', // terra cotta
+    '#374151', // charcoal
+    '#FFC700', // brand yellow
+    '#10b981', // emerald
+    '#7c3aed', // violet
+    '#0ea5e9', // sky
   ]
 
   return (
     <div
       className="relative w-full h-[240px]"
       role="img"
-      aria-label={`Spending by category pie chart. Total spent: $${total.toLocaleString()}`}
+      aria-label={`Spending by silhouette pie chart. Total spent: $${total.toLocaleString()}`}
     >
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>

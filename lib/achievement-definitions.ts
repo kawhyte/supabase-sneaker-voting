@@ -1,4 +1,4 @@
-import { LucideIcon, Package, Shirt, Sparkles, Gem, TrendingUp, RefreshCw, Compass, Globe, Target } from 'lucide-react'
+import { LucideIcon, Package, Footprints, Sparkles, Gem, TrendingUp, RefreshCw, Compass, Globe, Target, Flame, Star, Repeat2 } from 'lucide-react'
 
 export interface AchievementDefinition {
   id: string
@@ -38,9 +38,9 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
   },
   {
     id: 'wardrobe_curator',
-    name: 'Wardrobe Curator',
+    name: 'Collection Architect',
     description: 'Catalog 25 items in your collection',
-    icon: Shirt,
+    icon: Footprints,
     tier: 'Silver',
     category: 'wardrobe',
     points: 25,
@@ -82,8 +82,8 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
   // Wardrobe Utilization (Sustainable Behavior)
   {
     id: 'wardrobe_maximizer',
-    name: 'Wardrobe Maximizer',
-    description: 'Wear 80% of your items at least once this month',
+    name: 'Heavy Rotation',
+    description: 'Rock 80% of your rotation at least once this month',
     icon: RefreshCw,
     tier: 'Gold',
     category: 'efficiency',
@@ -94,8 +94,8 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
   // Discovery (Exploration)
   {
     id: 'category_explorer',
-    name: 'Category Explorer',
-    description: 'Have items in 5 different categories',
+    name: 'Silhouette Explorer',
+    description: 'Have shoes across 5 different silhouettes',
     icon: Compass,
     tier: 'Bronze',
     category: 'discovery',
@@ -123,6 +123,38 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     category: 'efficiency',
     points: 30,
     criteria: { type: 'count', threshold: 50, metric: 'total_saved_dollars' },
+  },
+
+  // Sneaker Culture Achievements
+  {
+    id: 'the_beater',
+    name: 'The Beater',
+    description: 'Get a pair past 50 wears with under $1.00 CPW',
+    icon: Flame,
+    tier: 'Gold',
+    category: 'efficiency',
+    points: 75,
+    criteria: { type: 'custom', threshold: 1, metric: 'beater_pair' },
+  },
+  {
+    id: 'brand_loyalist',
+    name: 'Brand Loyalist',
+    description: 'Own 5 or more pairs from the same brand',
+    icon: Star,
+    tier: 'Silver',
+    category: 'discovery',
+    points: 30,
+    criteria: { type: 'count', threshold: 5, metric: 'pairs_from_top_brand' },
+  },
+  {
+    id: 'rotation_architect',
+    name: 'Rotation Architect',
+    description: 'Log wears for 5 different pairs in a single week',
+    icon: Repeat2,
+    tier: 'Gold',
+    category: 'efficiency',
+    points: 60,
+    criteria: { type: 'custom', threshold: 5, metric: 'unique_pairs_worn_this_week' },
   },
 ]
 

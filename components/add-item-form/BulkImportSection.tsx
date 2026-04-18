@@ -201,7 +201,7 @@ export function BulkImportSection({ onBack }: BulkImportSectionProps) {
 			}
 
 			toast.success(
-				`${itemsToSave.length} item${itemsToSave.length > 1 ? 's' : ''} added to your wardrobe!`
+				`${itemsToSave.length} item${itemsToSave.length > 1 ? 's' : ''} added to your collection!`
 			)
 			router.push('/dashboard?tab=rotation')
 			router.refresh()

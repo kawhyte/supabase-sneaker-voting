@@ -409,8 +409,8 @@ function getComparativeStatsFacts(items: any[], avgStats: AverageUserStats): Fun
   if (wardrobeSize > avgStats.avg_wardrobe_size) {
     facts.push({
       id: 'comparative-wardrobe-size',
-      title: 'Curator Extraordinaire',
-      message: `Your wardrobe is ${wardrobePercent}% larger than the average PurrView user! You've got options! 🎨`,
+      title: 'Grail Keeper',
+      message: `Your collection is ${wardrobePercent}% larger than the average PurrView user! You've got options! 🎨`,
       emoji: '📊',
       category: 'personality',
     })

@@ -30,7 +30,7 @@ interface WardrobeItem {
  */
 export function shouldShowWearCounter(item: WardrobeItem): boolean {
 	const wearableCategories: ItemCategory[] = [
-		'shoes',
+		'lifestyle', 'running', 'basketball', 'skate', 'training', 'boots', 'other',
 	]
 
 	return (

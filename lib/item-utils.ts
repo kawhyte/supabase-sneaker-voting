@@ -129,9 +129,8 @@ export function detectCategoryFromUrl(url: string): ItemCategory | null {
 			urlLower.includes("/sneakers/") ||
 			urlLower.includes("/footwear/")
 		) {
-			return "shoes";
+			return "lifestyle";
 		}
-
 
 		// No match found
 		return null;
@@ -150,7 +149,13 @@ export function detectCategoryFromUrl(url: string): ItemCategory | null {
  */
 export function formatCategory(category: ItemCategory): string {
 	const labels: Record<ItemCategory, string> = {
-		shoes: "Shoes",
+		lifestyle: "Lifestyle",
+		running: "Running",
+		basketball: "Basketball",
+		skate: "Skate",
+		training: "Training",
+		boots: "Boots",
+		other: "Other",
 	};
 	return labels[category] || category;
 }
@@ -160,7 +165,13 @@ export function formatCategory(category: ItemCategory): string {
  */
 export function formatCategoryPlural(category: ItemCategory): string {
 	const labels: Record<ItemCategory, string> = {
-		shoes: "Shoes",
+		lifestyle: "Lifestyle",
+		running: "Running",
+		basketball: "Basketball",
+		skate: "Skate",
+		training: "Training",
+		boots: "Boots",
+		other: "Other",
 	};
 	return labels[category] || category;
 }
@@ -171,7 +182,13 @@ export function formatCategoryPlural(category: ItemCategory): string {
  */
 export function getCategoryIcon(category: ItemCategory): string {
 	const icons: Record<ItemCategory, string> = {
-		shoes: "Footprints",
+		lifestyle: "Footprints",
+		running: "Activity",
+		basketball: "Trophy",
+		skate: "Wind",
+		training: "Dumbbell",
+		boots: "Mountain",
+		other: "Package",
 	};
 	return icons[category] || "Footprints";
 }

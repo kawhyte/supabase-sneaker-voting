@@ -110,7 +110,7 @@ function DashboardContent() {
 								transition={{ duration: 0.3 }}>
 								<WardrobeDashboard
 									status={[ItemStatus.OWNED]}
-									categoryFilter={["shoes"]}
+									categoryFilter={["lifestyle", "running", "basketball", "skate", "training", "boots", "other"]}
 									page={page}
 									buildPageUrl={buildPageUrl}
 								/>

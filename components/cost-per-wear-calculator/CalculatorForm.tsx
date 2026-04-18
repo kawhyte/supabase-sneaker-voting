@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 
 const smartCalculatorSchema = z.object({
   price: z.coerce.number().min(1, "Price is required"),
-  category: z.enum(['shoes']),
+  category: z.enum(['lifestyle', 'running', 'basketball', 'skate', 'training', 'boots', 'other']),
   wearFrequency: z.enum(['rarely', 'monthly', 'weekly', 'daily']),
   resalePotential: z.enum(['none', 'low', 'medium', 'high']),
   wardrobeRole: z.enum(['gap_fill', 'upgrade', 'variety', 'duplicate']),
@@ -327,7 +327,7 @@ export function CalculatorForm() {
                     />
 
                     {/* Resale Potential */}
-                    {(category === 'shoes' || category === 'accessories' || category === 'outerwear') && (
+                    {category !== undefined && (
                         <FormField
                         control={form.control}
                         name="resalePotential"

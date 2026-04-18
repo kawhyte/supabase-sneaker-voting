@@ -54,11 +54,11 @@ function detectCategoryFromShopify(
     combined.includes('slipper') ||
     combined.includes('footwear')
   ) {
-    return 'shoes'
+    return 'lifestyle'
   }
 
-  // Default to shoes
-  return 'shoes'
+  // Default to lifestyle
+  return 'lifestyle'
 }
 
 /**

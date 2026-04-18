@@ -22,7 +22,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FileText, Store, Ruler } from "lucide-react";
 import { SizeCombobox } from "@/components/SizeCombobox";
-import { ClothingSizeCombobox } from "@/components/ClothingSizeCombobox";
 import { ComfortRating } from "@/components/ComfortRating";
 import {
 	isSizeRequired,
@@ -75,21 +74,12 @@ export function SizingSection({
 							Target Size{" "}
 							<span className="font-normal text-muted-foreground">(Optional)</span>
 						</Label>
-						{watchedCategory === "shoes" ? (
-							<SizeCombobox
-								value={watch("sizeTried")}
-								onChange={(v) =>
-									setValue("sizeTried", v, { shouldValidate: true })
-								}
-							/>
-						) : (
-							<ClothingSizeCombobox
-								value={watch("sizeTried")}
-								onChange={(v) =>
-									setValue("sizeTried", v, { shouldValidate: true })
-								}
-							/>
-						)}
+						<SizeCombobox
+							value={watch("sizeTried")}
+							onChange={(v) =>
+								setValue("sizeTried", v, { shouldValidate: true })
+							}
+						/>
 						<p className="text-xs text-muted-foreground mt-1">
 							Selecting a size helps us find better price matches later.
 						</p>
@@ -174,21 +164,12 @@ export function SizingSection({
 						<Label className="text-sm font-medium text-slate-900">
 							Size <span className="text-red-500">*</span>
 						</Label>
-						{watchedCategory === "shoes" ? (
-							<SizeCombobox
-								value={watch("sizeTried")}
-								onChange={(v) =>
-									setValue("sizeTried", v, { shouldValidate: true })
-								}
-							/>
-						) : (
-							<ClothingSizeCombobox
-								value={watch("sizeTried")}
-								onChange={(v) =>
-									setValue("sizeTried", v, { shouldValidate: true })
-								}
-							/>
-						)}
+						<SizeCombobox
+						value={watch("sizeTried")}
+						onChange={(v) =>
+							setValue("sizeTried", v, { shouldValidate: true })
+						}
+					/>
 						{errors.sizeTried && (
 							<p className="text-sm text-red-600 mt-1">
 								{String(errors.sizeTried.message || "Size is required")}

@@ -143,7 +143,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
               </div>
               <div className="dense flex items-center justify-between">
                 <Label htmlFor="category-spending" className="flex-1">
-                  Show Category Breakdown
+                  Show Silhouette Breakdown
                 </Label>
                 <Switch
                   id="category-spending"
@@ -183,7 +183,7 @@ export function StatsPreferences({ userId, onPreferencesChange }: StatsPreferenc
             <div className="space-y-4">
               <div className="dense flex items-center justify-between">
                 <Label htmlFor="wardrobe-size" className="flex-1">
-                  Show Wardrobe Growth
+                  Show Collection Growth
                 </Label>
                 <Switch
                   id="wardrobe-size"

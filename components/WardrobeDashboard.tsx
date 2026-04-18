@@ -290,7 +290,6 @@ export function WardrobeDashboard({
 
 		if (
 			newStatus === ItemStatus.OWNED &&
-			entry.category === "shoes" &&
 			!entry.purchase_price &&
 			!entry.retail_price
 		) {

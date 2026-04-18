@@ -48,7 +48,7 @@ export function CoreStatsGrid({ stats }: CoreStatsGridProps) {
           >
             <div className="flex items-center gap-3 mb-3">
               <Trophy className="h-6 w-6 text-primary" />
-              <h3 className="font-semibold text-foreground">Wardrobe MVP</h3>
+              <h3 className="font-semibold text-foreground">Collection MVP</h3>
             </div>
 
             {stats.mostWornItem ? (

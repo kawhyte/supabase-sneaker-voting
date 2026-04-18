@@ -276,7 +276,7 @@ export default function AddItemForm({
 			shouldValidate: true,
 			shouldDirty: true,
 		})
-		form.setValue('category', 'shoes', { shouldValidate: true, shouldDirty: true })
+		form.setValue('category', 'lifestyle', { shouldValidate: true, shouldDirty: true })
 		if (result.brand) {
 			form.setValue('brand', result.brand, { shouldValidate: true, shouldDirty: true })
 		}
@@ -601,7 +601,7 @@ export default function AddItemForm({
 								<div className="rounded-xl border-2 border-dashed border-slate-300 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
 									<div>
 										<p className="text-sm font-semibold text-slate-900">Ready to buy?</p>
-										<p className="text-xs text-muted-foreground mt-0.5">Move this item into your wardrobe and start tracking wears.</p>
+										<p className="text-xs text-muted-foreground mt-0.5">Move this item into your collection and start tracking wears.</p>
 									</div>
 									<Button
 										type="button"
@@ -613,7 +613,7 @@ export default function AddItemForm({
 										}}
 									>
 										<Shirt className="h-4 w-4 mr-2" />
-										Move to Wardrobe
+										Move to Collection
 									</Button>
 								</div>
 							)}

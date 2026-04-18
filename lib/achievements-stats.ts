@@ -67,6 +67,7 @@ export interface LeastWornItem {
   wears: number
   lastWorn: string | null
   daysSinceLastWorn: number | null
+  daysSinceAdded: number | null
   image_url: string | null
 }
 
@@ -305,21 +306,23 @@ export async function getLeastWornItems(userId: string, limit: number = 3): Prom
       return true
     })
 
-    // Map with fallback chains and calculate days since last worn
+    // Map with fallback chains and calculate days since last worn / days since added
     return filtered.slice(0, limit).map((item) => {
       let daysSinceLastWorn: number | null = null
+      let daysSinceAdded: number | null = null
 
       if (item.last_worn_date) {
         const lastWornDate = new Date(item.last_worn_date)
         const today = new Date()
         const diffTime = Math.abs(today.getTime() - lastWornDate.getTime())
         daysSinceLastWorn = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-      } else if (item.created_at) {
-        // Never worn - calculate days since added
+      }
+
+      if (item.created_at) {
         const createdDate = new Date(item.created_at)
         const today = new Date()
         const diffTime = Math.abs(today.getTime() - createdDate.getTime())
-        daysSinceLastWorn = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+        daysSinceAdded = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
       }
 
       return {
@@ -331,6 +334,7 @@ export async function getLeastWornItems(userId: string, limit: number = 3): Prom
         wears: item.wears || 0,
         lastWorn: item.last_worn_date || null,
         daysSinceLastWorn,
+        daysSinceAdded,
         image_url: getMainImage(item),
       }
     })

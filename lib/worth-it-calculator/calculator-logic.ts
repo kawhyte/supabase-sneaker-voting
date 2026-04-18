@@ -82,7 +82,7 @@ export function calculateSmartMetrics(input: CalculatorInput): CalculatorMetrics
 
   // 1. Calculate Lifespan based on Quality & Category
   // Shoes generally last less time than jackets. High quality extends life.
-  const baseLifespanYears = category === 'shoes' ? 2 : category === 'outerwear' ? 5 : 3; 
+  const baseLifespanYears = category === 'boots' ? 4 : 2;
   const qualityMultiplier = qualityRating === 'high' ? 1.5 : qualityRating === 'low' ? 0.6 : 1.0;
   const estimatedLifespanYears = Math.max(1, parseFloat((baseLifespanYears * qualityMultiplier).toFixed(1)));
   

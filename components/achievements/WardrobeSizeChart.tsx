@@ -24,7 +24,7 @@ interface WardrobeSizeChartProps {
 }
 
 /**
- * Wardrobe Growth Chart
+ * Collection Growth Chart
  * Shows cumulative wardrobe growth over time
  * Includes time range toggle (6mo/12mo/All)
  * Latest month highlighted in green, previous months in gray
@@ -69,7 +69,7 @@ export function WardrobeSizeChart({
     return (
       <div className="w-full bg-card rounded-lg border border-border p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold">Wardrobe Growth</h3>
+          <h3 className="text-lg font-semibold">Collection Growth</h3>
           <TimeRangeToggle
             value={timeRange}
             onChange={onTimeRangeChange}
@@ -91,7 +91,7 @@ export function WardrobeSizeChart({
     <div className="w-full bg-card rounded-lg border border-border p-6">
       {/* Header with Time Toggle */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Wardrobe Growth</h3>
+        <h3 className="text-lg font-semibold">Collection Growth</h3>
         <TimeRangeToggle
           value={timeRange}
           onChange={onTimeRangeChange}
@@ -148,7 +148,7 @@ export function WardrobeSizeChart({
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
             <AlertCircle className="w-8 h-8 mb-2" />
-            <p className="text-sm">No wardrobe growth data for this period</p>
+            <p className="text-sm">No rotation growth data for this period</p>
           </div>
         )}
       </div>

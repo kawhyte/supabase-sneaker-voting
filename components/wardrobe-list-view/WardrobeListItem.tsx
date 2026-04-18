@@ -61,7 +61,7 @@ export function WardrobeListItem({
 
 	const mainImage = itemPhotos[0]?.image_url || "/images/placeholder.svg";
 
-	const categoryConfig = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS] || CATEGORY_CONFIGS.shoes;
+	const categoryConfig = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS] || CATEGORY_CONFIGS.lifestyle;
 	const CategoryIcon = categoryConfig.icon;
 
 	const getPriceDisplay = () => {

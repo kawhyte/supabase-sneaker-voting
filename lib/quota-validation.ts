@@ -183,7 +183,7 @@ export function getQuotaMessage(
 ): string {
 	const config =
 		CANONICAL_CATEGORIES[canonicalKey as CanonicalCategoryKey] ||
-		CANONICAL_CATEGORIES.ACCESSORIES;
+		CANONICAL_CATEGORIES.SNEAKERS;
 
 	if (max === null) {
 		return current === 0

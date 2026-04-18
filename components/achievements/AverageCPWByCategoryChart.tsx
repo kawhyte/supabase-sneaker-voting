@@ -17,7 +17,7 @@ export function AverageCPWByCategoryChart({ data }: AverageCPWByCategoryChartPro
     return (
       <div className="flex flex-col gap-2">
         <p className="text-text-light dark:text-text-dark text-base font-medium leading-normal">
-          Avg Cost Per Wear by Category
+          Avg CPW by Silhouette
         </p>
         <div className="flex items-center justify-center h-[148px] bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">No cost-per-wear data available</p>
@@ -29,7 +29,7 @@ export function AverageCPWByCategoryChart({ data }: AverageCPWByCategoryChartPro
   return (
     <div className="flex flex-col gap-2">
       <p className="text-text-light dark:text-text-dark text-base font-medium leading-normal">
-        Avg Cost Per Wear by Category
+        Avg CPW by Silhouette
       </p>
       <div className="flex flex-col justify-end flex-1 min-h-[148px]">
         <div className="grid gap-2">

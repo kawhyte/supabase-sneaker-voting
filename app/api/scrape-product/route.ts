@@ -66,11 +66,11 @@ function detectCategory(url: string, title: string, breadcrumbs: string = ''): I
     combined.includes('heel') ||
     combined.includes('footwear')
   ) {
-    return 'shoes'
+    return 'lifestyle'
   }
 
-  // Default to shoes for all other items
-  return 'shoes'
+  // Default to lifestyle for all other items
+  return 'lifestyle'
 }
 
 // Helper to retry scraping with Browserless if initial attempt fails
@@ -536,7 +536,7 @@ export async function POST(request: NextRequest) {
                 retailPrice: geminiData.retailPrice || productData.retailPrice,
                 salePrice: geminiData.salePrice || productData.salePrice,
                 images: geminiData.imageUrl ? [geminiData.imageUrl] : productData.images,
-                category: productData.category || 'shoes',
+                category: productData.category || 'lifestyle',
                 success: true,
                 error: 'Data extracted via Gemini AI fallback (CSS selectors failed)'
               }

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { TrendingDown, Shirt } from 'lucide-react'
+import { TrendingDown, Footprints } from 'lucide-react'
 import { BestValueItem } from '@/lib/achievements-stats'
 import { CATEGORY_CONFIGS } from '@/components/types/item-category'
 import Link from 'next/link'
@@ -20,7 +20,7 @@ export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
         <div className="flex items-center gap-3 mb-6">
           <TrendingDown className="h-6 w-6 text-primary" aria-hidden="true" />
           <h2 id="best-value-title" className="text-2xl font-bold text-foreground">
-            Top 5 Best Value
+            Top ROI Investments
           </h2>
         </div>
         <div className="bg-card border border-border rounded-xl p-12 text-center shadow-sm">
@@ -42,7 +42,7 @@ export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
             aria-hidden="true"
           />
           <h3 id="best-value-sidebar-title" className="text-lg font-bold text-foreground">
-            Best Value
+            Top ROI
           </h3>
         </div>
 
@@ -67,7 +67,7 @@ export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
                   <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center">
                     {(() => {
                       const CategoryIcon = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS]?.icon
-                      return CategoryIcon ? <CategoryIcon className="h-5 w-5" /> : <Shirt className="h-5 w-5 text-muted-foreground" />
+                      return CategoryIcon ? <CategoryIcon className="h-5 w-5" /> : <Footprints className="h-5 w-5 text-muted-foreground" />
                     })()}
                   </div>
                 )}
@@ -103,7 +103,7 @@ export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
       <div className="flex items-center gap-3 mb-6">
         <TrendingDown className="h-6 w-6 text-primary" aria-hidden="true" />
         <h2 id="best-value-title" className="text-2xl font-bold text-foreground">
-          Top 5 Best Value
+          Top ROI Investments
         </h2>
       </div>
 
@@ -121,8 +121,8 @@ export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
             >
               {/* Value Badge */}
               <div className="relative">
-                <div className="absolute top-2 left-2 bg-green-600 text-white font-bold rounded-full px-3 py-1 text-xs z-10">
-                  {Math.round(item.percentOfTarget)}% of target
+                <div className={`absolute top-2 left-2 font-bold rounded-full px-3 py-1 text-xs z-10 ${item.percentOfTarget >= 100 ? 'bg-accent text-accent-foreground' : 'bg-green-600 text-white'}`}>
+                  {item.percentOfTarget >= 100 ? 'Paid off' : `${Math.round(item.percentOfTarget)}% to goal`}
                 </div>
 
                 {/* Image */}
@@ -140,7 +140,7 @@ export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
                   <div className="aspect-square bg-muted flex items-center justify-center">
                     {(() => {
                       const CategoryIcon = CATEGORY_CONFIGS[item.category as keyof typeof CATEGORY_CONFIGS]?.icon
-                      return CategoryIcon ? <CategoryIcon className="h-16 w-16" /> : <Shirt className="h-16 w-16 text-muted-foreground" />
+                      return CategoryIcon ? <CategoryIcon className="h-16 w-16" /> : <Footprints className="h-16 w-16 text-muted-foreground" />
                     })()}
                   </div>
                 )}
@@ -170,9 +170,9 @@ export function BestValueList({ items, variant = 'full' }: BestValueListProps) {
                       ${item.targetCostPerWear.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex-1 bg-green-100 rounded-full h-2 overflow-hidden">
+                  <div className={`flex-1 rounded-full h-2 overflow-hidden ${item.percentOfTarget >= 100 ? 'bg-accent/20' : 'bg-green-100'}`}>
                     <div
-                      className="bg-green-600 h-full"
+                      className={`h-full ${item.percentOfTarget >= 100 ? 'bg-accent' : 'bg-green-600'}`}
                       style={{ width: `${Math.min(100, item.percentOfTarget)}%` }}
                     />
                   </div>

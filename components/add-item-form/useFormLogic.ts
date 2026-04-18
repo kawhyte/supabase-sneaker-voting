@@ -25,7 +25,7 @@ export const itemFormSchema = z
 	.object({
 		intent: z.enum(['own', 'wishlist']).optional().default('own'),
 		triedOn: z.boolean().default(false),
-		category: z.literal('shoes').default('shoes'),
+		category: z.enum(['lifestyle', 'running', 'basketball', 'skate', 'training', 'boots', 'other']).default('lifestyle'),
 		productUrl: z
 			.string()
 			.url('Please enter a valid URL')
@@ -173,7 +173,7 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 				? {
 						intent: initialData?.status === 'wishlisted' ? 'wishlist' : 'own',
 						triedOn: initialData.has_been_tried || false,
-						category: 'shoes',
+						category: (initialData.category as import('@/components/types/item-category').ItemCategory) || 'lifestyle',
 						brandId: initialData.brand_id ?? initialData.brands?.id ?? undefined,
 						brand: initialData.brand || initialData.brands?.name || '',
 						model: initialData.model || '',
@@ -196,7 +196,7 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 				: {
 						intent: intent || 'own',
 						triedOn: false,
-						category: 'shoes' as const,
+						category: 'lifestyle' as const,
 						wears: 0,
 				  },
 	})
@@ -479,7 +479,7 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 			}
 
 			toast.success('Success', {
-				description: mode === 'edit' ? 'Item updated!' : 'Item added to your wardrobe!',
+				description: mode === 'edit' ? 'Item updated!' : 'Item added to your collection!',
 			})
 
 			// Check for new achievements (stats auto-updated via DB trigger)
