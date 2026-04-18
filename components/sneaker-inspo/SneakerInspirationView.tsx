@@ -465,10 +465,10 @@ export function SneakerInspirationView({
           <Palette className="h-16 w-16 text-muted-foreground" />
           <h2 className="text-2xl font-semibold">No Sneakers Yet</h2>
           <p className="text-muted-foreground text-center max-w-md">
-            Add some sneakers to your wardrobe to see their color palettes and get outfit inspiration!
+            Add some sneakers to your collection to see their color palettes and get styling inspiration!
           </p>
           <Button asChild>
-            <a href="/dashboard/add-product">Add Your First Sneaker</a>
+            <a href="/add-new-item">Add Your First Sneaker</a>
           </Button>
         </div>
       ) : (
