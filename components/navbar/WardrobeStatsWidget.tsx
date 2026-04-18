@@ -114,7 +114,7 @@ export function WardrobeStatsWidget({ userId }: { userId?: string }) {
     if (costPerWear < 7) return { label: 'Great', color: 'text-green-500', icon: Star };
     if (costPerWear < 12) return { label: 'Good', color: 'text-yellow-600', icon: Check };
     if (costPerWear < 20) return { label: 'Fair', color: 'text-orange-600', icon: Minus };
-    return { label: 'Needs Work', color: 'text-red-600', icon: XCircle };
+    return { label: 'Needs Work', color: 'text-muted-foreground', icon: XCircle };
   };
 
   const getCostPerWearLabel = (costPerWear: number | null) => {

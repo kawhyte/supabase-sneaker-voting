@@ -347,9 +347,9 @@ export function NotificationPreferences() {
 								<div className='flex gap-x-4'>
 									<Sparkles className='h-4 w-4 text-muted-foreground' />
 									<div className=''>
-										<Label htmlFor='seasonal-tips'>Seasonal Tips</Label>
+										<Label htmlFor='seasonal-tips'>Rotation Tips</Label>
 										<p className='text-xs text-muted-foreground'>
-											Wardrobe suggestions for each season
+											Seasonal styling for your sneakers
 										</p>
 									</div>
 								</div>

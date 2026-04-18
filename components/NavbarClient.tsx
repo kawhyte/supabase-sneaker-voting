@@ -141,6 +141,21 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 	const isActive = (path: string) => pathname === path;
 
+	// Resync unread count from authoritative notifications table whenever the
+	// notification center opens or closes — prevents stale user_stats drift.
+	useEffect(() => {
+		if (!isAuthenticated || !user?.id) return;
+		const resync = async () => {
+			const { count } = await supabase
+				.from('notifications')
+				.select('id', { count: 'exact', head: true })
+				.eq('user_id', user.id)
+				.eq('is_read', false);
+			setUnreadCount(count ?? 0);
+		};
+		resync();
+	}, [isNotificationCenterOpen, isAuthenticated, user?.id]);
+
 	// Fetch unread notification count
 	useEffect(() => {
 		if (!isAuthenticated || !user?.id) return;

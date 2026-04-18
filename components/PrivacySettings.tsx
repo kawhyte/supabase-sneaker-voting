@@ -228,7 +228,7 @@ export function PrivacySettings() {
 									setting
 								</li>
 								<li>
-									Your <strong>owned items</strong> (Sneakers & Apparel)
+									Your <strong>owned items</strong> (Your Rotation)
 									remain private
 								</li>
 								<li>
