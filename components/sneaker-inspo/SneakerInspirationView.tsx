@@ -12,11 +12,17 @@ import { Button } from '@/components/ui/button'
 import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'
 import { toast } from 'sonner'
 import { Palette, Loader2, AlertCircle, RefreshCw, X, Shirt, Wind, Layers, Watch, ShoppingBag } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { ColorWithRole } from '@/lib/color-utils'
+import { Pagination } from '@/components/ui/pagination'
+
+const ITEMS_PER_PAGE = 12
 
 interface SneakerInspirationViewProps {
   showHeader?: boolean
   className?: string
+  page?: number
+  buildPageUrl?: (page: number) => string
 }
 
 const FIT_FORMULAS = [
@@ -79,7 +85,9 @@ function AutoSelectHandler({
 
 export function SneakerInspirationView({
   showHeader = true,
-  className = ''
+  className = '',
+  page = 1,
+  buildPageUrl,
 }: SneakerInspirationViewProps) {
   const [items, setItems] = useState<WardrobeItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -88,11 +96,20 @@ export function SneakerInspirationView({
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [isLoggingId, setIsLoggingId] = useState<string | null>(null)
+  const [totalCount, setTotalCount] = useState(0)
   const fitFormulaSectionRef = useRef<HTMLDivElement>(null)
 
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
+
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [page])
+
+  useEffect(() => {
+    setSelectedItemId(null)
     loadSneakers()
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page])
 
   const loadSneakers = async () => {
     try {
@@ -110,28 +127,27 @@ export function SneakerInspirationView({
         return
       }
 
-      // Fetch all footwear items (sneakers, shoes, footwear categories)
-      const { data, error: fetchError } = await supabase
+      // Fetch paginated footwear items (sneakers, shoes, footwear categories)
+      const from = (page - 1) * ITEMS_PER_PAGE
+      const to = from + ITEMS_PER_PAGE - 1
+
+      const { data, error: fetchError, count } = await supabase
         .from('items')
-        .select(`
-          *,
-          item_photos (
-            id,
-            image_url,
-            image_order,
-            is_main_image,
-            cloudinary_id
-          )
-        `)
+        .select(
+          `*, item_photos (id, image_url, image_order, is_main_image, cloudinary_id)`,
+          { count: 'exact' }
+        )
         .eq('user_id', user.id)
         .in('category', ['sneakers', 'shoes', 'footwear'])
         .eq('status', 'owned')
         .eq('is_archived', false)
         .order('created_at', { ascending: false })
+        .range(from, to)
 
       if (fetchError) throw fetchError
 
       setItems(data || [])
+      setTotalCount(count ?? 0)
     } catch (err) {
       console.error('Error loading sneakers:', err)
       setError(err instanceof Error ? err.message : 'Failed to load sneakers')
@@ -286,9 +302,26 @@ export function SneakerInspirationView({
 
   if (isLoading) {
     return (
-      <div className={`flex flex-col items-center justify-center min-h-[400px] space-y-4 ${className}`}>
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Loading your sneakers...</p>
+      <div className={className}>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="overflow-hidden">
+              <Skeleton className="w-full aspect-[4/3] rounded-lg" />
+              <div className="flex gap-1.5 mt-3">
+                {Array.from({ length: 5 }).map((__, j) => (
+                  <Skeleton key={j} className="h-5 w-5 rounded-full" />
+                ))}
+              </div>
+              <div className="space-y-2 mt-3">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-16 flex justify-center w-full">
+          <Skeleton className="h-10 w-64" />
+        </div>
       </div>
     )
   }
@@ -452,6 +485,17 @@ export function SneakerInspirationView({
             ))}
           </div>
 
+          {/* Pagination */}
+          {totalPages > 1 && buildPageUrl && (
+            <div className="mt-16">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                buildPageUrl={buildPageUrl}
+              />
+            </div>
+          )}
+
           {/* Fit Formulas Section */}
           {selectedItem && selectedHasBoldPalette && (
             <div ref={fitFormulaSectionRef} className="mt-10 scroll-mt-6">
@@ -495,7 +539,7 @@ export function SneakerInspirationView({
             <div className="mt-12 pt-6 border-t border-border">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-muted-foreground">
                 <p>
-                  Showing {items.length} {items.length === 1 ? 'sneaker' : 'sneakers'}
+                  Showing {items.length} of {totalCount} {totalCount === 1 ? 'sneaker' : 'sneakers'}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   {itemsWithLegacyPalettes > 0 && (
