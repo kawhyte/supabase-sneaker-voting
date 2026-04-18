@@ -11,13 +11,11 @@ import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Button } from '@/components/ui/button'
 import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'
 import { toast } from 'sonner'
-import { Palette, Loader2, AlertCircle, RefreshCw, X, Shirt, Wind, Layers, Watch, ShoppingBag } from 'lucide-react'
+import { Palette, Loader2, AlertCircle, RefreshCw, X, Shirt, Wind, Layers, Watch, ShoppingBag, Sparkles } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ColorWithRole } from '@/lib/color-utils'
-import { Pagination } from '@/components/ui/pagination'
 import { buildFormulaAdvice } from '@/lib/fit-formula-utils'
-
-const ITEMS_PER_PAGE = 12
+import { cn } from '@/lib/utils'
 
 interface SneakerInspirationViewProps {
   showHeader?: boolean
@@ -59,12 +57,14 @@ const FIT_FORMULAS = [
   },
 ] as const
 
-/**
- * SneakerInspirationView - Shared component for displaying owned sneaker grid with color palettes
- *
- * Can be used in dashboard tabs or standalone pages.
- * Shows responsive grid of OWNED sneakers (not wishlisted) with generated color palettes.
- */
+function getCarouselImage(item: WardrobeItem): string {
+  const mainPhoto = item.item_photos?.find(p => p.is_main_image)
+  if (mainPhoto?.image_url) return mainPhoto.image_url
+  const firstPhoto = item.item_photos?.[0]
+  if (firstPhoto?.image_url) return firstPhoto.image_url
+  return item.image_url ?? '/placeholder.jpg'
+}
+
 function AutoSelectHandler({
   currentSelectedId,
   onSelect,
@@ -87,8 +87,6 @@ function AutoSelectHandler({
 export function SneakerInspirationView({
   showHeader = true,
   className = '',
-  page = 1,
-  buildPageUrl,
 }: SneakerInspirationViewProps) {
   const [items, setItems] = useState<WardrobeItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -97,20 +95,12 @@ export function SneakerInspirationView({
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [isLoggingId, setIsLoggingId] = useState<string | null>(null)
-  const [totalCount, setTotalCount] = useState(0)
   const fitFormulaSectionRef = useRef<HTMLDivElement>(null)
 
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
-
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [page])
-
-  useEffect(() => {
-    setSelectedItemId(null)
     loadSneakers()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
+  }, [])
 
   const loadSneakers = async () => {
     try {
@@ -119,7 +109,6 @@ export function SneakerInspirationView({
 
       const supabase = createClient()
 
-      // Get authenticated user
       const { data: { user }, error: authError } = await supabase.auth.getUser()
       if (authError) throw authError
 
@@ -128,27 +117,19 @@ export function SneakerInspirationView({
         return
       }
 
-      // Fetch paginated footwear items (sneakers, shoes, footwear categories)
-      const from = (page - 1) * ITEMS_PER_PAGE
-      const to = from + ITEMS_PER_PAGE - 1
-
-      const { data, error: fetchError, count } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('items')
         .select(
-          `*, item_photos (id, image_url, image_order, is_main_image, cloudinary_id)`,
-          { count: 'exact' }
+          `*, item_photos (id, image_url, image_order, is_main_image, cloudinary_id)`
         )
         .eq('user_id', user.id)
-        .in('category', ['sneakers', 'shoes', 'footwear'])
         .eq('status', 'owned')
         .eq('is_archived', false)
         .order('created_at', { ascending: false })
-        .range(from, to)
 
       if (fetchError) throw fetchError
 
       setItems(data || [])
-      setTotalCount(count ?? 0)
     } catch (err) {
       console.error('Error loading sneakers:', err)
       setError(err instanceof Error ? err.message : 'Failed to load sneakers')
@@ -202,7 +183,6 @@ export function SneakerInspirationView({
   }
 
   const handlePaletteGenerated = (itemId: string, palette: { bold: ColorWithRole[]; muted: ColorWithRole[] }) => {
-    // Update local state with the newly generated palette
     setItems(prevItems =>
       prevItems.map(item =>
         item.id === itemId
@@ -212,20 +192,14 @@ export function SneakerInspirationView({
     )
   }
 
-  // Helper: Check if item has a valid palette (either format)
   const hasPalette = (item: WardrobeItem): boolean => {
     if (!item.color_palette) return false
-
-    // Check if it's the new object format
     if (typeof item.color_palette === 'object' && 'bold' in item.color_palette) {
       return item.color_palette.bold.length > 0 && item.color_palette.muted.length > 0
     }
-
-    // Check if it's the legacy array format
     return Array.isArray(item.color_palette) && item.color_palette.length > 0
   }
 
-  // Helper: Check if item has legacy palette format (array instead of object)
   const hasLegacyPalette = (item: WardrobeItem): boolean => {
     if (!item.color_palette) return false
     return Array.isArray(item.color_palette)
@@ -235,7 +209,6 @@ export function SneakerInspirationView({
     setIsLoggingId(item.id)
     const newWears = (item.wears ?? 0) + 1
 
-    // Optimistic update
     setItems(prev => prev.map(i => i.id === item.id ? { ...i, wears: newWears } : i))
 
     try {
@@ -266,7 +239,6 @@ export function SneakerInspirationView({
     }
   }
 
-  // Derive extracted colors + projected CPW for the selected item
   const selectedItem = items.find(item => item.id === selectedItemId) ?? null
 
   const getExtractedColors = (item: WardrobeItem): [string, string, string] => {
@@ -295,33 +267,26 @@ export function SneakerInspirationView({
         'bold' in selectedItem.color_palette)
     : false
 
-  // Count items without palettes
   const itemsWithoutPalettes = items.filter(item => !hasPalette(item)).length
-
-  // Count items with legacy palette format that need upgrade
   const itemsWithLegacyPalettes = items.filter(item => hasLegacyPalette(item)).length
 
   if (isLoading) {
     return (
       <div className={className}>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="overflow-hidden">
-              <Skeleton className="w-full aspect-[4/3] rounded-lg" />
-              <div className="flex gap-1.5 mt-3">
-                {Array.from({ length: 5 }).map((__, j) => (
-                  <Skeleton key={j} className="h-5 w-5 rounded-full" />
-                ))}
-              </div>
-              <div className="space-y-2 mt-3">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-3 w-1/2" />
-              </div>
+        {/* Carousel skeleton */}
+        <div className="flex gap-4 overflow-hidden mb-8">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex-shrink-0 flex flex-col items-center gap-1.5">
+              <Skeleton className="w-24 h-24 rounded-2xl" />
+              <Skeleton className="h-3 w-16" />
             </div>
           ))}
         </div>
-        <div className="mt-16 flex justify-center w-full">
-          <Skeleton className="h-10 w-64" />
+        {/* Prompt area skeleton */}
+        <div className="flex flex-col items-center justify-center min-h-[320px] gap-3">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <Skeleton className="h-6 w-64" />
+          <Skeleton className="h-4 w-48" />
         </div>
       </div>
     )
@@ -359,11 +324,8 @@ export function SneakerInspirationView({
             </p>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
-            {/* Style Guide Dialog Button */}
             <StyleGuideDialog />
-            {/* Upgrade Legacy Palettes Button */}
             {itemsWithLegacyPalettes > 0 && (
               <Button
                 onClick={handleMigrateLegacy}
@@ -385,7 +347,6 @@ export function SneakerInspirationView({
               </Button>
             )}
 
-            {/* Batch Migration Button */}
             {itemsWithoutPalettes > 0 && (
               <Button
                 onClick={handleGenerateMissing}
@@ -410,10 +371,9 @@ export function SneakerInspirationView({
         </div>
       )}
 
-      {/* Compact header for dashboard tab */}
+      {/* Compact action bar for dashboard tab */}
       {!showHeader && (itemsWithoutPalettes > 0 || itemsWithLegacyPalettes > 0) && (
         <div className="flex items-center justify-end gap-2 mb-6">
-          {/* Upgrade Legacy Palettes Button */}
           {itemsWithLegacyPalettes > 0 && (
             <Button
               onClick={handleMigrateLegacy}
@@ -435,7 +395,6 @@ export function SneakerInspirationView({
             </Button>
           )}
 
-          {/* Generate All Button */}
           {itemsWithoutPalettes > 0 && (
             <Button
               onClick={handleGenerateMissing}
@@ -459,7 +418,7 @@ export function SneakerInspirationView({
         </div>
       )}
 
-      {/* Empty State */}
+      {/* Empty state — no sneakers in collection */}
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 py-12">
           <Palette className="h-16 w-16 text-muted-foreground" />
@@ -473,94 +432,107 @@ export function SneakerInspirationView({
         </div>
       ) : (
         <>
-          {/* Grid of Sneaker Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {/* Sneaker selector carousel */}
+          <div
+            className="flex gap-4 overflow-x-auto pb-4 mb-8 -mx-1 px-1"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             {items.map(item => (
-              <SneakerPaletteCard
+              <button
                 key={item.id}
-                item={item}
-                onPaletteGenerated={handlePaletteGenerated}
-                isSelected={item.id === selectedItemId}
-                onSelect={() => handleSelectItem(item.id)}
-              />
+                onClick={() => handleSelectItem(item.id)}
+                className="flex-shrink-0 flex flex-col items-center gap-1.5 focus-visible:outline-none"
+                aria-label={`Select ${item.brand} ${item.model}`}
+              >
+                <div
+                  className={cn(
+                    'w-24 h-24 rounded-2xl bg-card overflow-hidden ring-offset-background transition-all duration-150',
+                    item.id === selectedItemId
+                      ? 'ring-2 ring-offset-2 ring-[var(--color-sun-400)]'
+                      : 'ring-1 ring-transparent hover:ring-border'
+                  )}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={getCarouselImage(item)}
+                    alt={`${item.brand} ${item.model}`}
+                    className="w-full h-full object-contain p-1.5"
+                  />
+                </div>
+                <span className="text-[11px] text-muted-foreground w-24 text-center truncate leading-tight">
+                  {item.brand}
+                </span>
+              </button>
             ))}
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && buildPageUrl && (
-            <div className="mt-16">
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                buildPageUrl={buildPageUrl}
-              />
+          {/* Selection prompt — items exist but nothing chosen yet */}
+          {!selectedItemId && (
+            <div className="flex flex-col items-center justify-center min-h-[320px] gap-3 py-12 text-center">
+              <Sparkles className="h-10 w-10 text-muted-foreground" />
+              <h2 className="text-xl font-semibold tracking-tight">Select a pair from your rotation</h2>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                Pick a sneaker above to generate your styling lookbook.
+              </p>
             </div>
           )}
 
-          {/* Fit Formulas Section */}
-          {selectedItem && selectedHasBoldPalette && (
-            <div ref={fitFormulaSectionRef} className="mt-10 scroll-mt-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-semibold tracking-tight text-gray-900">
-                    Fit Formulas
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    {selectedItem.brand} {selectedItem.model}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSelectedItemId(null)}
-                  className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                  aria-label="Dismiss fit formulas"
-                >
-                  <X className="h-4 w-4 text-gray-600" />
-                </button>
+          {/* Featured view — selected sneaker + fit formulas */}
+          {selectedItem && (
+            <div ref={fitFormulaSectionRef} className="scroll-mt-6">
+              {/* Featured palette card */}
+              <div className="max-w-xs mx-auto">
+                <SneakerPaletteCard
+                  item={selectedItem}
+                  onPaletteGenerated={handlePaletteGenerated}
+                  isSelected={true}
+                  onSelect={() => handleSelectItem(selectedItem.id)}
+                />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {FIT_FORMULAS.map(formula => {
-                  const colors = getExtractedColors(selectedItem)
-                  const { advice, swatches } = buildFormulaAdvice(formula.id, colors)
-                  return (
-                    <FitFormulaCard
-                      key={formula.id}
-                      title={formula.title}
-                      description={formula.description}
-                      colorAdvice={advice}
-                      recommendedSwatches={swatches}
-                      extractedColors={colors}
-                      doodleItems={[...formula.doodleItems]}
-                      sneakerName={`${selectedItem.brand} ${selectedItem.model}`}
-                      projectedCPW={getProjectedCPW(selectedItem)}
-                      onLogWear={() => handleLogWear(selectedItem)}
-                      isPending={isLoggingId === selectedItem.id}
-                    />
-                  )
-                })}
-              </div>
-            </div>
-          )}
 
-          {/* Stats Footer */}
-          {showHeader && (
-            <div className="mt-12 pt-6 border-t border-border">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-muted-foreground">
-                <p>
-                  Showing {items.length} of {totalCount} {totalCount === 1 ? 'sneaker' : 'sneakers'}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  {itemsWithLegacyPalettes > 0 && (
-                    <p>
-                      {itemsWithLegacyPalettes} {itemsWithLegacyPalettes === 1 ? 'palette can' : 'palettes can'} be upgraded to dual-vibe
-                    </p>
-                  )}
-                  {itemsWithoutPalettes > 0 && (
-                    <p>
-                      {itemsWithoutPalettes} {itemsWithoutPalettes === 1 ? 'sneaker needs' : 'sneakers need'} color palette generation
-                    </p>
-                  )}
+              {/* Fit formulas — only when palette has been generated */}
+              {selectedHasBoldPalette && (
+                <div className="mt-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-xl font-semibold tracking-tight text-gray-900">
+                        Fit Formulas
+                      </h2>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        {selectedItem.brand} {selectedItem.model}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedItemId(null)}
+                      className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                      aria-label="Dismiss fit formulas"
+                    >
+                      <X className="h-4 w-4 text-gray-600" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {FIT_FORMULAS.map(formula => {
+                      const colors = getExtractedColors(selectedItem)
+                      const { advice, swatches } = buildFormulaAdvice(formula.id, colors)
+                      return (
+                        <FitFormulaCard
+                          key={formula.id}
+                          title={formula.title}
+                          description={formula.description}
+                          colorAdvice={advice}
+                          recommendedSwatches={swatches}
+                          extractedColors={colors}
+                          doodleItems={[...formula.doodleItems]}
+                          sneakerName={`${selectedItem.brand} ${selectedItem.model}`}
+                          projectedCPW={getProjectedCPW(selectedItem)}
+                          onLogWear={() => handleLogWear(selectedItem)}
+                          isPending={isLoggingId === selectedItem.id}
+                        />
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </>
