@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus } from "lucide-react";
+import { ArrowUpRight, Minus, Plus } from "lucide-react";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { WearStatsDrawer } from "./WearStatsDrawer";
-import { calculateCostPerWear } from "@/lib/wardrobe-item-utils";
+import { calculateCostPerWear, calculateWorthItMetrics } from "@/lib/wardrobe-item-utils";
 
 interface ItemFooterBadgesProps {
 	item: WardrobeItem;
@@ -61,10 +61,11 @@ export function ItemFooterBadges({
 				{/* CPW text — opens drawer */}
 				<button
 					onClick={(e) => { e.stopPropagation(); setWearDrawerOpen(true); }}
-					className="font-mono text-xs text-muted-foreground hover:text-accent transition-colors"
+					className="group font-mono text-xs text-muted-foreground hover:text-accent transition-colors flex items-center gap-0.5"
 					type="button"
 					aria-label="View wear statistics">
-					{cpw ? `$${cpw} / wear` : '— / wear'}
+					<span>{cpw ? `$${cpw} / wear` : '— / wear'}</span>
+					<ArrowUpRight className="w-3 h-3 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
 				</button>
 			</div>
 
