@@ -1,5 +1,4 @@
-// import { Poppins } from "next/font/google";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Public_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -40,28 +39,23 @@ export const viewport = {
 };
 
 
-const fontSans = Plus_Jakarta_Sans({
+const fontSans = Public_Sans({
   subsets: ["latin"],
-  // Get all weights (200-800) and italics, as per your link
-  weight: ["200", "300", "400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
-  variable: "--font-sans", // We'll use this as the new base
-  display: "swap", // Prevent blocking - show fallback text while font loads
-  preload: true, // Explicitly enable preloading
-  adjustFontFallback: false, // Disable layout shift adjustments to reduce preload warnings
+  variable: "--font-sans",
+  display: "swap",
+  preload: true,
+  adjustFontFallback: false,
 });
 
-// const fontBody = Poppins({
-// 	subsets: ["latin"],
-// 	weight: ["400", "600"], // Regular and SemiBold for modern fintech aesthetic
-// 	variable: "--font-body",
-// });
-
-// const fontHeading = Poppins({
-// 	subsets: ["latin"],
-// 	weight: ["600", "700"], // SemiBold and Bold for headings
-// 	variable: "--font-heading",
-// });
+const fontMono = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-mono",
+  display: "swap",
+  preload: false,
+});
 
 export default function RootLayout({
 	children,
@@ -71,7 +65,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang='en'
-			className={cn("light", fontSans.variable)}
+			className={cn("light", fontSans.variable, fontMono.variable)}
 			suppressHydrationWarning>
 			{/*
     ✅ COLOR & SPACING SYSTEM v2.0 IMPLEMENTATION GUIDE

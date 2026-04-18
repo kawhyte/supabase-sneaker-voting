@@ -1,11 +1,12 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
+import { MAX_PINNED_ITEMS } from '@/lib/constants/WardrobeLimits'
 
 /**
  * POST /api/items/[id]/toggle-pin
  *
  * Toggle the is_pinned status of a wishlist item
- * - Max 5 pinned items per user
+ * - Max 20 pinned items per user
  * - Only wishlist items can be pinned
  * - RLS enforces user can only pin their own items
  */
@@ -51,7 +52,7 @@ export async function POST(
 
     const newPinnedStatus = !item.is_pinned
 
-    // If pinning, check limit (max 5)
+    // If pinning, check limit
     if (newPinnedStatus) {
       const { count, error: countError } = await supabase
         .from('items')
@@ -68,9 +69,9 @@ export async function POST(
         )
       }
 
-      if (count !== null && count >= 5) {
+      if (count !== null && count >= MAX_PINNED_ITEMS) {
         return NextResponse.json(
-          { error: 'Maximum 5 pinned items allowed. Unpin another item first.' },
+          { error: `Maximum ${MAX_PINNED_ITEMS} pinned items allowed. Unpin another item first.` },
           { status: 400 }
         )
       }

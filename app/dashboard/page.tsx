@@ -32,13 +32,13 @@ function DashboardContent() {
 	};
 
 	return (
-		<div className='w-full min-h-screen'>
+		<div className='w-full min-h-screen md:mt-6'>
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}>
 				<div className='flex justify-between items-center'>
-					<h3 className='text-3xl font-bold font-heading -mb-2'>My Collection</h3>
+					<h3 className='text-3xl font-bold font-sans -mb-2'>My Collection</h3>
 
 					<div className='flex items-center gap-3'>
 						<Link href='/dashboard?tab=archive'>
@@ -51,7 +51,7 @@ function DashboardContent() {
 						</Link>
 
 						<Link href='/add-new-item'>
-							<Button className='flex items-center gap-2 bg-primary text-slate-900 hover:bg-primary font-semibold px-4 py-2 rounded-lg transition-all motion-safe:hover:scale-105 will-change-transform'>
+							<Button className='flex items-center gap-2 bg-primary text-foreground hover:bg-primary/90 font-semibold px-4 py-2 rounded-lg transition-all motion-safe:hover:scale-105 will-change-transform'>
 								<Plus className='h-4 w-4' />
 								Add Item
 							</Button>
@@ -68,7 +68,7 @@ function DashboardContent() {
 							<div className='flex-1'>
 								<TabsList
 									data-variant='underline'
-									className='w-full justify-start border-b border-slate-200 bg-transparent p-0 gap-8 mb-8'>
+									className='w-full justify-start border-b border-border bg-transparent p-0 gap-8 mb-8'>
 									<TabsTrigger
 										value='rotation'
 										data-variant='underline'

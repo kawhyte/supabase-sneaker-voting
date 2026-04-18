@@ -61,3 +61,8 @@ export const OUTFIT_CATEGORY_LIMITS = {
   hats: 1,
   other: 1,
 } as const;
+
+/**
+ * Maximum number of items a user can pin to their public profile.
+ */
+export const MAX_PINNED_ITEMS = 20;

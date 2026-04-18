@@ -6,7 +6,7 @@ import { HowItWorksSection } from '@/components/cost-per-wear-calculator/HowItWo
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col items-center pb-20 relative overflow-hidden">
+    <main className="min-h-screen bg-background flex flex-col items-center pb-20 relative overflow-hidden">
 
       {/* Yellow ambient glow — sits behind everything */}
       <div
@@ -14,7 +14,7 @@ export default function HomePage() {
         className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full"
         style={{
           background:
-            'radial-gradient(ellipse 80% 70% at 50% 20%, #FFC70022 0%, transparent 70%)',
+            'radial-gradient(ellipse 80% 70% at 50% 20%, #A9563822 0%, transparent 70%)',
         }}
       />
 
@@ -26,7 +26,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tighter text-slate-950 leading-[1.0]"
+          className="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tighter text-foreground leading-[1.0]"
         >
           Is it worth{' '}
           <span className="text-primary">
@@ -38,7 +38,7 @@ export default function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.18 }}
-          className="mt-6 text-lg text-slate-500 font-medium"
+          className="mt-6 text-lg text-muted-foreground font-medium"
         >
           Stop guessing. Start knowing.
         </motion.p>
@@ -55,7 +55,7 @@ export default function HomePage() {
       </motion.div>
 
       {/* ─── STAT STRIP ─── */}
-      <div className="w-full bg-muted/30 border-t border-border py-16 px-6 text-center relative z-10">
+      <div className="w-full bg-muted/50 py-16 px-6 text-center relative z-10">
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
