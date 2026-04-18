@@ -159,13 +159,18 @@ export function SneakerPaletteCard({ item, onPaletteGenerated, isSelected, onSel
             <div className="space-y-3">
               {/* Toggle between Bold and Muted (only for new format) */}
               {showToggle && (
-                <Tabs value={mode} onValueChange={(value) => setMode(value as PaletteMode)} className="w-full">
+                <Tabs
+                  value={mode}
+                  onValueChange={(value) => setMode(value as PaletteMode)}
+                  className="w-full"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <TabsList className="grid w-full grid-cols-2 h-8">
-                    <TabsTrigger value="bold" className="text-xs flex items-center gap-1">
+                    <TabsTrigger value="bold" type="button" className="text-xs flex items-center gap-1">
                       <Zap className="h-3 w-3" />
                       Bold
                     </TabsTrigger>
-                    <TabsTrigger value="muted" className="text-xs flex items-center gap-1">
+                    <TabsTrigger value="muted" type="button" className="text-xs flex items-center gap-1">
                       <Coffee className="h-3 w-3" />
                       Muted
                     </TabsTrigger>

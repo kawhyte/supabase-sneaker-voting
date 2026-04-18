@@ -1,16 +1,13 @@
 'use client'
 
-import React from 'react'
-import { Plus, CheckCircle2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Plus } from 'lucide-react'
 
 export interface FitFormulaCardProps {
   title: string
   description: string
   colorAdvice?: string
   recommendedSwatches?: [string, string, string]
-  extractedColors: [string, string, string] // [primary, secondary, accent]
-  doodleItems: { name: string; icon: React.ElementType; isTinted?: boolean }[]
+  extractedColors: [string, string, string]
   sneakerName: string
   projectedCPW: number
   onLogWear: () => void
@@ -23,8 +20,6 @@ export function FitFormulaCard({
   colorAdvice,
   recommendedSwatches,
   extractedColors,
-  doodleItems,
-  sneakerName,
   projectedCPW,
   onLogWear,
   isPending = false,
@@ -41,9 +36,9 @@ export function FitFormulaCard({
       <div className="relative z-10 flex flex-col gap-6 p-6">
         <div className="text-left">
           <h3 className="text-[22px] font-semibold tracking-tight text-gray-900">{title}</h3>
-          <p className="mt-1 text-sm text-gray-500">{colorAdvice ?? description}</p>
+          <p className="mt-2 text-sm leading-relaxed text-gray-500">{colorAdvice ?? description}</p>
           {recommendedSwatches && (
-            <div className="flex items-center gap-2 mt-3">
+            <div className="flex items-center gap-2 mt-4">
               <span className="text-[10px] font-medium uppercase tracking-widest text-gray-400 shrink-0">Wear</span>
               <div className="flex gap-1.5">
                 {recommendedSwatches.map((hex, i) => (
@@ -59,64 +54,32 @@ export function FitFormulaCard({
           )}
         </div>
 
-        <div className="flex items-center justify-center gap-3 rounded-2xl bg-white/40 border border-white/60 py-5 px-2">
-          {doodleItems.map((item, index) => (
-            <React.Fragment key={index}>
-              <div className="flex flex-col items-center gap-2">
-                <div
-                  className={cn(
-                    'flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm',
-                    !item.isTinted && 'text-gray-800'
-                  )}
-                  style={item.isTinted ? { color: extractedColors[0] } : undefined}
-                >
-                  <item.icon strokeWidth={1.5} className="h-6 w-6" />
-                </div>
-                <span className="text-xs font-medium text-gray-600">{item.name}</span>
-              </div>
-              <Plus className="h-4 w-4 text-gray-300 shrink-0" strokeWidth={2} />
-            </React.Fragment>
-          ))}
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm">
-              <div
-                className="h-6 w-6 rounded-full border-2 border-white shadow-sm"
-                style={{ backgroundImage: `linear-gradient(135deg, ${extractedColors[0]}, ${extractedColors[1]})` }}
-              />
-            </div>
-            <span className="text-xs font-medium text-gray-900 text-center leading-tight max-w-[56px] truncate">
-              {sneakerName}
-            </span>
-          </div>
-        </div>
-
         <hr className="border-gray-200/50" />
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-end justify-between">
-            <div className="text-left">
-              <span className="block text-xs font-medium uppercase tracking-wider text-gray-500">
-                Worth It Metric
-              </span>
-              <span className="block text-sm text-gray-600 mt-1">Wearing this drops CPW to</span>
-            </div>
-            <div className="text-right">
-              <span className="text-xl font-bold tracking-tight text-emerald-600">
-                ${projectedCPW.toFixed(2)}
-              </span>
-            </div>
+        <div className="flex items-end justify-between">
+          <div className="text-left">
+            <span className="block text-xs font-medium uppercase tracking-wider text-gray-500">
+              Worth It Metric
+            </span>
+            <span className="block text-sm text-gray-600 mt-1">Wearing this drops CPW to</span>
           </div>
-          <button
-            disabled={isPending}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3.5 text-sm font-medium text-white transition-transform active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-            onClick={(e) => {
-              e.stopPropagation()
-              onLogWear()
-            }}
-          >
-            <CheckCircle2 className="h-4 w-4" />
-            {isPending ? 'Logging...' : 'Log Wear with this Fit'}
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-xl font-bold tracking-tight text-emerald-600">
+              ${projectedCPW.toFixed(2)}
+            </span>
+            <button
+              type="button"
+              disabled={isPending}
+              className="flex items-center gap-1 font-mono uppercase text-[10px] tracking-widest text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              onClick={(e) => {
+                e.stopPropagation()
+                onLogWear()
+              }}
+            >
+              <Plus className="h-3 w-3" />
+              {isPending ? 'Logging...' : 'Log Wear'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

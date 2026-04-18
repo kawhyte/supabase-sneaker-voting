@@ -11,7 +11,7 @@ import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Button } from '@/components/ui/button'
 import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'
 import { toast } from 'sonner'
-import { Palette, Loader2, AlertCircle, RefreshCw, X, Shirt, Wind, Layers, Watch, ShoppingBag, Sparkles } from 'lucide-react'
+import { Palette, Loader2, AlertCircle, RefreshCw, X, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ColorWithRole } from '@/lib/color-utils'
 import { buildFormulaAdvice } from '@/lib/fit-formula-utils'
@@ -29,31 +29,16 @@ const FIT_FORMULAS = [
     id: 'monochromatic',
     title: 'Monochromatic / Tonal',
     description: 'One color family, head to toe. Let texture and silhouette do the talking.',
-    doodleItems: [
-      { name: 'Tee', icon: Shirt },
-      { name: 'Trousers', icon: Layers },
-      { name: 'Jacket', icon: Wind },
-    ],
   },
   {
     id: 'high-contrast',
     title: 'High-Contrast',
     description: "Opposites attract. Use the shoe's boldest color as a graphic accent.",
-    doodleItems: [
-      { name: 'Graphic Tee', icon: Shirt, isTinted: true },
-      { name: 'Dark Bottoms', icon: Layers },
-      { name: 'Accessory', icon: Watch },
-    ],
   },
   {
     id: 'anchor',
     title: 'The Anchor',
     description: 'Neutral base — let the shoe be the star. Everything else steps back.',
-    doodleItems: [
-      { name: 'White Tee', icon: Shirt },
-      { name: 'Khakis', icon: Layers },
-      { name: 'Bag', icon: ShoppingBag },
-    ],
   },
 ] as const
 
@@ -95,12 +80,38 @@ export function SneakerInspirationView({
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [isLoggingId, setIsLoggingId] = useState<string | null>(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
   const fitFormulaSectionRef = useRef<HTMLDivElement>(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
+
+  const updateScrollState = () => {
+    const el = carouselRef.current
+    if (!el) return
+    setCanScrollLeft(el.scrollLeft > 0)
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1)
+  }
+
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    const el = carouselRef.current
+    if (!el) return
+    el.scrollBy({ left: direction === 'left' ? -280 : 280, behavior: 'smooth' })
+  }
 
   useEffect(() => {
     loadSneakers()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    updateScrollState()
+    const el = carouselRef.current
+    if (!el) return
+    const ro = new ResizeObserver(updateScrollState)
+    ro.observe(el)
+    return () => ro.disconnect()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items])
 
   const loadSneakers = async () => {
     try {
@@ -433,37 +444,60 @@ export function SneakerInspirationView({
       ) : (
         <>
           {/* Sneaker selector carousel */}
-          <div
-            className="flex gap-4 overflow-x-auto pb-4 mb-8 -mx-1 px-1"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {items.map(item => (
+          <div className="relative mb-8">
+            {canScrollLeft && (
               <button
-                key={item.id}
-                onClick={() => handleSelectItem(item.id)}
-                className="flex-shrink-0 flex flex-col items-center gap-1.5 focus-visible:outline-none"
-                aria-label={`Select ${item.brand} ${item.model}`}
+                onClick={() => scrollCarousel('left')}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-gray-200/80 text-gray-600 hover:text-gray-900 transition-colors"
+                aria-label="Scroll left"
               >
-                <div
-                  className={cn(
-                    'w-24 h-24 rounded-2xl bg-card overflow-hidden ring-offset-background transition-all duration-150',
-                    item.id === selectedItemId
-                      ? 'ring-2 ring-offset-2 ring-[var(--color-sun-400)]'
-                      : 'ring-1 ring-transparent hover:ring-border'
-                  )}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={getCarouselImage(item)}
-                    alt={`${item.brand} ${item.model}`}
-                    className="w-full h-full object-contain p-1.5"
-                  />
-                </div>
-                <span className="text-[11px] text-muted-foreground w-24 text-center truncate leading-tight">
-                  {item.brand}
-                </span>
+                <ChevronLeft className="h-4 w-4" />
               </button>
-            ))}
+            )}
+            <div
+              ref={carouselRef}
+              onScroll={updateScrollState}
+              className="flex gap-4 overflow-x-auto pb-4 -mx-1 px-1"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              onLoad={updateScrollState}
+            >
+              {items.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => handleSelectItem(item.id)}
+                  className="flex-shrink-0 flex flex-col items-center gap-1.5 focus-visible:outline-none"
+                  aria-label={`Select ${item.brand} ${item.model}`}
+                >
+                  <div
+                    className={cn(
+                      'w-24 h-24 rounded-2xl bg-card overflow-hidden ring-offset-background transition-all duration-150',
+                      item.id === selectedItemId
+                        ? 'ring-2 ring-offset-2 ring-[var(--color-sun-400)]'
+                        : 'ring-1 ring-transparent hover:ring-border'
+                    )}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getCarouselImage(item)}
+                      alt={`${item.brand} ${item.model}`}
+                      className="w-full h-full object-contain p-1.5"
+                    />
+                  </div>
+                  <span className="text-[11px] text-muted-foreground w-24 text-center truncate leading-tight">
+                    {item.brand}
+                  </span>
+                </button>
+              ))}
+            </div>
+            {canScrollRight && (
+              <button
+                onClick={() => scrollCarousel('right')}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-gray-200/80 text-gray-600 hover:text-gray-900 transition-colors"
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
           {/* Selection prompt — items exist but nothing chosen yet */}
@@ -522,7 +556,6 @@ export function SneakerInspirationView({
                           colorAdvice={advice}
                           recommendedSwatches={swatches}
                           extractedColors={colors}
-                          doodleItems={[...formula.doodleItems]}
                           sneakerName={`${selectedItem.brand} ${selectedItem.model}`}
                           projectedCPW={getProjectedCPW(selectedItem)}
                           onLogWear={() => handleLogWear(selectedItem)}
