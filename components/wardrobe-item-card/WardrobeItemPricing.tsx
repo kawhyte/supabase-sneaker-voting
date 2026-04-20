@@ -95,16 +95,6 @@ export function ItemPricingDisplay({
 				</div>
 			)}
 
-			{/* Target price - Hide in public view */}
-			{!isPublicView && item.target_price && (
-				<div className='flex items-center gap-1.5 px-2 py-1 -mx-2 rounded-md transition-colors hover:bg-slate-50/50'>
-					<span className='text-sm text-muted-foreground'>Target:</span>
-					<span className='text-base font-semibold text-foreground'>
-						${item.target_price}
-					</span>
-				</div>
-			)}
-
 			{/* Price tracking controls - Hide in public view */}
 			{!isPublicView && (
 				useDrawer ? (
