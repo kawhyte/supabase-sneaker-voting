@@ -10,7 +10,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RefreshCw, Edit3, ShoppingBag, Archive, AlertCircle, XCircle, CheckCircle2 } from "lucide-react";
 import {
 	Sheet,
@@ -29,7 +29,19 @@ import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { getComfortLabel } from "@/lib/wardrobe-item-utils";
 import { isPriceStale, getDaysSincePriceCheck } from '@/lib/price-tracking-utils';
 import { ManualPriceEntryDialog } from './ManualPriceEntryDialog';
+import { PricingHighlights } from './PricingHighlights';
+import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
+
+interface PriceCheckLogRow {
+  id: string;
+  item_id: string;
+  price: number | null;
+  checked_at: string;
+  retailer: string | null;
+  source: string;
+  success: boolean;
+}
 
 interface WishlistDetailsDrawerProps {
 	item: WardrobeItem;
@@ -52,7 +64,25 @@ export function WishlistDetailsDrawer({
 }: WishlistDetailsDrawerProps) {
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [isManualEntryOpen, setIsManualEntryOpen] = useState(false);
+	const [priceHistory, setPriceHistory] = useState<PriceCheckLogRow[]>([]);
+	const [loadedItemId, setLoadedItemId] = useState<string | null>(null);
 	const comfortInfo = item.comfort_rating ? getComfortLabel(item.comfort_rating) : null;
+
+	useEffect(() => {
+		if (!isOpen || loadedItemId === item.id) return;
+
+		const supabase = createClient();
+		supabase
+			.from('price_check_log')
+			.select('id, item_id, price, checked_at, retailer, source, success')
+			.eq('item_id', item.id)
+			.eq('success', true)
+			.order('checked_at', { ascending: true })
+			.then(({ data }) => {
+				setPriceHistory(data ?? []);
+				setLoadedItemId(item.id);
+			});
+	}, [isOpen, item.id, loadedItemId]);
 
 	// Price status calculations
 	const daysSince = getDaysSincePriceCheck(item.last_price_check_at || null);
@@ -158,6 +188,12 @@ export function WishlistDetailsDrawer({
 							{/* Price Monitoring Section */}
 							<div className="flex flex-col gap-3">
 								<h3 className="text-sm font-semibold text-foreground">Price Monitoring</h3>
+
+								<PricingHighlights
+									priceHistory={priceHistory}
+									currentPrice={item.sale_price ?? null}
+									targetPrice={item.target_price ?? null}
+								/>
 
 								{/* Status Display */}
 								<div className={`p-4 rounded-lg border ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
