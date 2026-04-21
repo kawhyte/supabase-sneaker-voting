@@ -24,16 +24,10 @@ import {
 	type UrlValidationResult,
 } from '@/lib/retailer-url-validator'
 import { detectCategoryFromUrl } from '@/lib/item-utils'
-import { Loader2, Search, Sparkles, Shirt, Star } from 'lucide-react'
+import { Loader2, Search, Sparkles, Shirt, Star, ChevronDown, CheckCircle2 } from 'lucide-react'
 import { type PhotoItem } from '@/components/types/photo-item'
 import { type ItemCategory } from '@/components/types/item-category'
-
-interface MagicSearchResult {
-	title: string
-	price: number
-	imageUrl: string
-	brand: string
-}
+import { SneakerSearch, type SneakerSearchResult } from './SneakerSearch'
 
 export interface AddItemFormProps {
 	mode: 'add' | 'edit' | 'create'
@@ -106,11 +100,11 @@ export default function AddItemForm({
 	// Bulk Import mode
 	const [isBulkMode, setIsBulkMode] = useState(false)
 
-	// Magic Search state
-	const [magicSearchQuery, setMagicSearchQuery] = useState('')
-	const [isMagicSearching, setIsMagicSearching] = useState(false)
-	const [magicSearchResults, setMagicSearchResults] = useState<MagicSearchResult[]>([])
-	const [hasSearched, setHasSearched] = useState(false)
+	// URL section toggle — hidden by default; revealed via "Add manually or via URL"
+	const [showUrlSection, setShowUrlSection] = useState(false)
+
+	// Auto-fill badge — shown briefly after a search result populates the form
+	const [autoFillActive, setAutoFillActive] = useState(false)
 
 	const formRef = useRef<HTMLFormElement>(null)
 
@@ -240,51 +234,34 @@ export default function AddItemForm({
 	}
 
 	/**
-	 * Search eBay for products matching the query
+	 * Populate form fields from a SneakerSearch result, then show the full form.
+	 * Image is proxied in the background so the form appears instantly.
 	 */
-	const handleMagicSearch = async () => {
-		if (!magicSearchQuery.trim()) return
-		setIsMagicSearching(true)
-		setMagicSearchResults([])
-		try {
-			const response = await fetch('/api/magic-search', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query: magicSearchQuery }),
-			})
-			if (!response.ok) throw new Error('Search failed')
-			const data = await response.json()
-			if (data.success) {
-				setMagicSearchResults(data.results)
-			}
-		} catch (error) {
-			console.error('Magic search error:', error)
-		} finally {
-			setIsMagicSearching(false)
-			setHasSearched(true)
-		}
-	}
-
-	/**
-	 * Instantly fill the form from a Magic Search result card.
-	 * Shows the form immediately; proxies the image in the background.
-	 */
-	const handleMagicResultSelect = (result: MagicSearchResult) => {
-		// Sync: populate form fields instantly
+	const handleSearchSelect = (result: SneakerSearchResult) => {
 		form.setValue('model', result.title, { shouldValidate: true, shouldDirty: true })
-		form.setValue('retailPrice', result.price.toString(), {
-			shouldValidate: true,
-			shouldDirty: true,
-		})
 		form.setValue('category', 'lifestyle', { shouldValidate: true, shouldDirty: true })
+
 		if (result.brand) {
 			form.setValue('brand', result.brand, { shouldValidate: true, shouldDirty: true })
 		}
+		if (result.sku) {
+			form.setValue('sku', result.sku, { shouldValidate: true, shouldDirty: true })
+		}
+		if (result.price) {
+			// Strip currency symbol and whitespace, keep only the numeric portion
+			const numeric = result.price.replace(/[^0-9.]/g, '')
+			if (numeric) {
+				form.setValue('retailPrice', numeric, { shouldValidate: true, shouldDirty: true })
+			}
+		}
 
-		// Show the full form immediately — don't wait for the image
 		setIsFormVisible(true)
 
-		// Async: proxy the eBay image in the background (fire-and-forget)
+		// Brief auto-fill badge
+		setAutoFillActive(true)
+		setTimeout(() => setAutoFillActive(false), 3000)
+
+		// Proxy image in background — silently no-ops on failure
 		if (result.imageUrl) {
 			fetch('/api/proxy-image', {
 				method: 'POST',
@@ -296,20 +273,20 @@ export default function AddItemForm({
 					return res.blob()
 				})
 				.then((blob) => {
-					const file = new File([blob], 'magic-search-import.jpg', {
+					const file = new File([blob], 'search-import.jpg', {
 						type: blob.type || 'image/jpeg',
 					})
-					const photoItem: PhotoItem = {
-						id: `new-${Date.now()}-0`,
-						file,
-						preview: URL.createObjectURL(file),
-						isMain: true,
-						order: 0,
-					}
-					handlePhotosChange([photoItem])
+					handlePhotosChange([
+						{
+							id: `new-${Date.now()}-0`,
+							file,
+							preview: URL.createObjectURL(file),
+							isMain: true,
+							order: 0,
+						},
+					])
 				})
-				.catch((err) => {
-					console.warn('Background image proxy failed:', err)
+				.catch(() => {
 					// Silently fail — user can upload a photo manually
 				})
 		}
@@ -391,133 +368,75 @@ export default function AddItemForm({
 						isBulkMode ? (
 							<BulkImportSection onBack={() => setIsBulkMode(false)} />
 						) : (
-						<div className="space-y-6">
-							{/* === MAGIC SEARCH SECTION === */}
-							<div className="bg-muted/40 rounded-xl p-6 border border-border">
-								<h3 className="text-base font-semibold text-foreground mb-1 font-heading flex items-center gap-2">
+						<div className="space-y-5">
+							{/* === SNEAKER SEARCH (primary entry point) === */}
+							<div className="space-y-2">
+								<div className="flex items-center gap-2">
 									<Sparkles className="h-4 w-4 text-primary" />
-									Magic Search
-								</h3>
-								<p className="text-xs text-muted-foreground mb-4">
-									Search eBay to instantly fill in product details.
-								</p>
-								<div className="flex flex-col sm:flex-row gap-2">
-									<Input
-										placeholder="e.g. Nike Air Max 90, Jordan 1 Bred..."
-										value={magicSearchQuery}
-										onChange={(e) => setMagicSearchQuery(e.target.value)}
-										onKeyDown={(e) => {
-											if (e.key === 'Enter') {
-												e.preventDefault()
-												handleMagicSearch()
-											}
-										}}
-										disabled={isMagicSearching}
-										className="flex-1"
-									/>
+									<h3 className="text-sm font-semibold text-foreground font-heading">
+										Search to auto-fill
+									</h3>
+								</div>
+								<SneakerSearch onSelect={handleSearchSelect} />
+							</div>
+
+							{/* === SECONDARY: Manual / URL section toggle === */}
+							<button
+								type="button"
+								onClick={() => setShowUrlSection((v) => !v)}
+								className="flex w-full items-center justify-center gap-1.5 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+							>
+								Add manually or via URL
+								<ChevronDown
+									className={`h-3.5 w-3.5 transition-transform duration-200 ${showUrlSection ? 'rotate-180' : ''}`}
+								/>
+							</button>
+
+							{showUrlSection && (
+								<div className="space-y-4">
+									<div className="bg-muted/40 rounded-xl p-5 border border-border">
+										<h3 className="text-sm font-semibold text-foreground mb-3 font-heading">
+											Auto-fill from URL
+										</h3>
+										<div className="space-y-2">
+											<Label htmlFor="productUrl" className="text-xs text-muted-foreground">
+												Paste product URL from a supported retailer.
+											</Label>
+											<div className="flex flex-col sm:flex-row gap-2">
+												<Input
+													id="productUrl"
+													{...form.register('productUrl')}
+													placeholder="https://..."
+													className="flex-1"
+													disabled={isScrapingUrl}
+												/>
+												<Button
+													type="button"
+													onClick={() => handleUrlScrape(form.watch('productUrl') || '')}
+													disabled={isScrapingUrl || !form.watch('productUrl')}
+												>
+													{isScrapingUrl && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+													Import
+												</Button>
+											</div>
+											{uploadProgress && (
+												<p className="text-sm text-muted-foreground mt-2">{uploadProgress}</p>
+											)}
+										</div>
+									</div>
+
 									<Button
-										type="button"
-										onClick={handleMagicSearch}
-										disabled={isMagicSearching || !magicSearchQuery.trim()}
+										variant="outline"
+										onClick={() => setIsFormVisible(true)}
+										className="w-full"
 									>
-										{isMagicSearching ? (
-											<Loader2 className="h-4 w-4 mr-2 animate-spin" />
-										) : (
-											<Search className="h-4 w-4 mr-2" />
-										)}
-										Search
+										Enter Details Manually
 									</Button>
 								</div>
+							)}
 
-								{/* Results grid — shown after a successful search */}
-								{magicSearchResults.length > 0 && (
-									<div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-										{magicSearchResults.map((result, index) => (
-											<button
-												key={index}
-												type="button"
-												onClick={() => handleMagicResultSelect(result)}
-												className="group text-left rounded-lg border border-border bg-background overflow-hidden hover:border-primary hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-											>
-												<div className="aspect-square w-full overflow-hidden bg-muted">
-													{/* Plain img tag — eBay images load directly, no remotePatterns needed */}
-													<img
-														src={result.imageUrl}
-														alt={result.title}
-														className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-														loading="lazy"
-													/>
-												</div>
-												<div className="p-2">
-													<p className="text-xs font-medium text-foreground line-clamp-2 leading-snug">
-														{result.title}
-													</p>
-													<p className="text-xs text-primary font-semibold mt-1">
-														${result.price.toFixed(2)}
-													</p>
-												</div>
-											</button>
-										))}
-									</div>
-								)}
-
-								{/* Empty state — only shown after a search returns nothing */}
-								{hasSearched && !isMagicSearching && magicSearchResults.length === 0 && (
-									<p className="mt-3 text-xs text-muted-foreground">
-										No results found. Try a different search term.
-									</p>
-								)}
-							</div>
-
-							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-background px-2 text-muted-foreground font-bold">Or</span>
-							</div>
-
-							{/* === EXISTING URL IMPORT SECTION (unchanged) === */}
-							<div className="bg-muted/40 rounded-xl p-6 border border-border">
-								<h3 className="text-base font-semibold text-foreground mb-4 font-heading">
-									Auto-fill from URL
-								</h3>
-								<div className="space-y-2">
-									<Label htmlFor="productUrl" className="text-xs text-muted-foreground">
-										Paste product URL from a supported retailer.
-									</Label>
-									<div className="flex flex-col sm:flex-row gap-2">
-										<Input
-											id="productUrl"
-											{...form.register('productUrl')}
-											placeholder="https://..."
-											className="flex-1"
-											disabled={isScrapingUrl}
-										/>
-										<Button
-											type="button"
-											onClick={() => handleUrlScrape(form.watch('productUrl') || '')}
-											disabled={isScrapingUrl || !form.watch('productUrl')}
-										>
-											{isScrapingUrl && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-											Import
-										</Button>
-									</div>
-									{uploadProgress && (
-										<p className="text-sm text-muted-foreground mt-2">{uploadProgress}</p>
-									)}
-								</div>
-							</div>
-
-							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-background px-2 text-muted-foreground font-bold">Or</span>
-							</div>
-
-							<Button
-								variant="outline"
-								onClick={() => setIsFormVisible(true)}
-								className="w-full"
-							>
-								Enter Details Manually
-							</Button>
-
-							<p className="text-sm text-slate-500 hover:text-slate-800 underline-offset-4 hover:underline cursor-pointer text-center mt-4 transition-colors"
+							<p
+								className="cursor-pointer text-center text-sm text-slate-500 underline-offset-4 transition-colors hover:text-slate-800 hover:underline"
 								onClick={() => setIsBulkMode(true)}
 							>
 								Adding your whole collection? Try Bulk Import
@@ -526,6 +445,25 @@ export default function AddItemForm({
 						)
 					) : (
 						<form onSubmit={handleFormSubmit} className="space-y-8" ref={formRef}>
+							{/* === SNEAKER SEARCH — always available at the top of the form === */}
+							<div className="space-y-2">
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-2">
+										<Search className="h-4 w-4 text-muted-foreground" />
+										<span className="text-sm font-medium text-foreground">
+											Search to update fields
+										</span>
+									</div>
+									{autoFillActive && (
+										<span className="flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-medium text-green-700 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300">
+											<CheckCircle2 className="h-3 w-3" />
+											Auto-filled from eBay
+										</span>
+									)}
+								</div>
+								<SneakerSearch onSelect={handleSearchSelect} />
+							</div>
+
 							{/* Validation Status Card - Smart floating sidebar */}
 							<ValidationStatusCard
 								errors={form.formState.errors}
@@ -631,18 +569,35 @@ export default function AddItemForm({
 								errors={form.formState.errors}
 							/>
 
-							{/* Product URL & Price Tracking */}
-							<ProductURLSection
-								form={form}
-								isScrapingUrl={isScrapingUrl}
-								uploadProgress={uploadProgress}
-								urlValidation={urlValidation}
-								onUrlScrape={handleUrlScrape}
-								onShowRetailersDialog={() => setShowRetailersDialog(true)}
-								mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
-								initialData={initialData}
-								intent={intent}
-							/>
+							{/* Product URL & Price Tracking — hidden by default, toggled in */}
+							<div>
+								<button
+									type="button"
+									onClick={() => setShowUrlSection((v) => !v)}
+									className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+								>
+									<ChevronDown
+										className={`h-3.5 w-3.5 transition-transform duration-200 ${showUrlSection ? 'rotate-180' : ''}`}
+									/>
+									{showUrlSection ? 'Hide' : 'Add'} product URL &amp; price tracking
+								</button>
+
+								{showUrlSection && (
+									<div className="mt-4">
+										<ProductURLSection
+											form={form}
+											isScrapingUrl={isScrapingUrl}
+											uploadProgress={uploadProgress}
+											urlValidation={urlValidation}
+											onUrlScrape={handleUrlScrape}
+											onShowRetailersDialog={() => setShowRetailersDialog(true)}
+											mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
+											initialData={initialData}
+											intent={intent}
+										/>
+									</div>
+								)}
+							</div>
 
 							{/* Sizing & Additional Details — morphs based on intent */}
 							<SizingSection
