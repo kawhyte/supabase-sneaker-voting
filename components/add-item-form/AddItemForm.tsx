@@ -352,13 +352,13 @@ export default function AddItemForm({
 			<Card className="bg-card">
 				{/* Header - Create Mode Only */}
 				{!isFormVisible && (mode === 'create' || mode === 'add') && (
-					<CardHeader className="text-left pb-6">
-						<CardTitle className="text-3xl flex flex-col justify-start font-heading">
-							<p className="-mb-2">Add a New Item</p>
-							<p className="text-sm text-muted-foreground">
-								Start by entering a URL or adding details manually.
-							</p>
+					<CardHeader className="text-left pb-0 mb-8">
+						<CardTitle className="text-3xl font-bold tracking-tight text-foreground">
+							Add a New Item
 						</CardTitle>
+						<p className="text-muted-foreground mt-2">
+							Start by entering a URL or adding details manually.
+						</p>
 					</CardHeader>
 				)}
 
