@@ -681,8 +681,22 @@ class EbayApiStrategy implements IPriceStrategy {
     try {
       const token = await this.getToken()
 
-      // Prefer SKU for precision; fall back to brand + model
-      const baseQuery = item.sku?.trim() || `${item.brand} ${item.model}`
+      // Prefer SKU for precision; fall back to cleaned brand + model
+      let baseQuery: string
+      if (item.sku?.trim()) {
+        baseQuery = item.sku.trim()
+      } else {
+        // Strip noise: release dates, retailer suffixes, size mentions, parentheticals
+        const cleanModel = item.model
+          .replace(/\b(releases?|fall|spring|summer|winter)\s+\d{4}\b/gi, '')
+          .replace(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}\b/gi, '')
+          .replace(/\([^)]*\)/g, '')
+          .replace(/\b(men'?s?|women'?s?|unisex|kids?)\b/gi, '')
+          .replace(/\b(size\s+\d[\w.]*)\b/gi, '')
+          .replace(/\s{2,}/g, ' ')
+          .trim()
+        baseQuery = `${item.brand} ${cleanModel}`
+      }
       const query = item.size_tried?.trim()
         ? `${baseQuery} size ${item.size_tried.trim()}`
         : baseQuery
@@ -842,8 +856,9 @@ serve(async (req) => {
     const breaker = new CircuitBreaker()
     const tracker = new PriceTrackerService(scraper, ebay, breaker)
 
-    // TEST MODE: single URL probe
     const body = await req.json().catch(() => ({}))
+
+    // TEST MODE: single URL probe
     if (body.testUrl && body.testUrl.trim()) {
       console.log('TEST MODE: Testing single URL')
       console.log(`URL: ${body.testUrl}`)
@@ -887,6 +902,38 @@ serve(async (req) => {
             strategy: testResult.strategy,
             retailer: retailerName
           },
+          timestamp: new Date().toISOString()
+        }),
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // TEST MODE: eBay query probe (brand/model/SKU — no DB writes)
+    if (body.testEbay) {
+      console.log('TEST MODE: eBay query probe')
+
+      const testItem: PriceCheckItem = {
+        id: 'test',
+        product_url: null,
+        retail_price: body.retailPrice ?? null,
+        target_price: null,
+        brand: body.brand ?? 'Unknown',
+        model: body.model ?? 'Unknown',
+        price_check_failures: 0,
+        user_id: 'test',
+        sku: body.sku ?? null,
+        size_tried: body.size_tried ?? null
+      }
+
+      const testResult = await ebay.getPrice(testItem)
+
+      return new Response(
+        JSON.stringify({
+          success: testResult.success,
+          price: testResult.price ?? null,
+          error: testResult.error ?? null,
+          strategy: testResult.strategy,
+          query: testItem.sku?.trim() || `${testItem.brand} ${testItem.model}`,
           timestamp: new Date().toISOString()
         }),
         { headers: { 'Content-Type': 'application/json' } }
@@ -1103,7 +1150,12 @@ serve(async (req) => {
           http_status_code: result.statusCode
         })
 
-        const newFailureCount = (item.price_check_failures || 0) + 1
+        // "No listings found" is a data gap, not an API failure — don't count toward auto-disable
+        const isDataGap = result.error === 'No eBay listings found' ||
+          result.error === 'Insufficient eBay listings after outlier rejection'
+        const newFailureCount = isDataGap
+          ? (item.price_check_failures || 0)
+          : (item.price_check_failures || 0) + 1
 
         await supabase
           .from('items')
