@@ -50,7 +50,7 @@ interface CircuitBreakerState {
 
 interface PriceCheckItem {
   id: string
-  product_url: string
+  product_url: string | null
   retail_price: number | null
   target_price: number | null
   brand: string
@@ -552,6 +552,9 @@ class ScraperStrategy implements IPriceStrategy {
 
   async getPrice(item: PriceCheckItem, maxRetries = 3): Promise<PriceResult> {
     const url = item.product_url
+    if (!url) {
+      return { success: false, error: 'No product URL — SKU-only item, use eBay strategy', errorCategory: 'unknown', strategy: 'scraper' }
+    }
     const config = getRetailerConfig(url)
 
     if (config) {
@@ -762,6 +765,12 @@ class PriceTrackerService {
   ) {}
 
   async checkPrice(item: PriceCheckItem): Promise<PriceResult> {
+    // SKU-only items (no product URL) go directly to eBay — no scraper involved
+    if (!item.product_url) {
+      console.log(`SKU-only item — eBay API direct for ${item.brand} ${item.model} (SKU: ${item.sku ?? 'none'})`)
+      return await this.ebay.getPrice(item)
+    }
+
     const domain = this.breaker.getDomain(item.product_url)
 
     if (!this.breaker.isOpen(domain)) {
@@ -890,7 +899,6 @@ serve(async (req) => {
       .from('items')
       .select('id, product_url, retail_price, target_price, brand, model, price_check_failures, user_id, sku, size_tried')
       .eq('status', 'wishlisted')
-      .not('product_url', 'is', null)
       .eq('auto_price_tracking_enabled', true)
       .lt('price_check_failures', 3)
       .limit(60) // Keep under 150s timeout: 60 items × 2s = 120s
@@ -916,12 +924,12 @@ serve(async (req) => {
       const item = items[i] as PriceCheckItem
       console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
       console.log(`${i + 1}/${items.length}: ${item.brand} ${item.model}`)
-      console.log(`URL: ${item.product_url}`)
+      console.log(item.product_url ? `URL: ${item.product_url}` : `SKU: ${item.sku ?? 'none'} (no URL)`)
 
       const result = await tracker.checkPrice(item)
 
-      const config = getRetailerConfig(item.product_url)
-      const retailerKey = config?.name || 'Unknown'
+      const config = item.product_url ? getRetailerConfig(item.product_url) : null
+      const retailerKey = config?.name || (item.product_url ? 'Unknown' : 'eBay')
       if (!retailerStats[retailerKey]) {
         retailerStats[retailerKey] = { success: 0, failure: 0 }
       }

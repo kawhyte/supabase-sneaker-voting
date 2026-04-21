@@ -39,9 +39,15 @@ ALTER TABLE sneakers ADD CONSTRAINT wears_shoes_only
 ALTER TABLE sneakers ADD CONSTRAINT purchased_non_shoes_only
   CHECK (is_purchased = false OR (is_purchased = true AND category != 'shoes'));
 
--- Business rule: Fit rating only for shoes
-ALTER TABLE sneakers ADD CONSTRAINT fit_rating_shoes_only
-  CHECK (fit_rating IS NULL OR (fit_rating IS NOT NULL AND category = 'shoes'));
+-- Business rule: Fit rating only for shoes (guarded: column is dropped in migration 007)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_name = 'sneakers' AND column_name = 'fit_rating') THEN
+    ALTER TABLE sneakers ADD CONSTRAINT fit_rating_shoes_only
+      CHECK (fit_rating IS NULL OR (fit_rating IS NOT NULL AND category = 'shoes'));
+  END IF;
+END $$;
 
 -- Business rule: Size type must match category
 ALTER TABLE sneakers ADD CONSTRAINT size_type_category_match

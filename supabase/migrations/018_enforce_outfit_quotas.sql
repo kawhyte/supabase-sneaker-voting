@@ -36,7 +36,7 @@ BEGIN
         i.model,
         i.category
       FROM outfit_items oi
-      JOIN sneakers i ON oi.item_id = i.id
+      JOIN items i ON oi.item_id = i.id
       WHERE oi.outfit_id = outfit_record.id
       ORDER BY oi.created_at ASC  -- Keep earliest items
     LOOP
