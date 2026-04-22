@@ -447,24 +447,26 @@ export default function AddItemForm({
 						)
 					) : (
 						<form onSubmit={handleFormSubmit} className="space-y-8" ref={formRef}>
-							{/* === SNEAKER SEARCH — always available at the top of the form === */}
-							<div className="space-y-2">
-								<div className="flex items-center justify-between">
-									<div className="flex items-center gap-2">
-										<Search className="h-4 w-4 text-muted-foreground" />
-										<span className="text-sm font-medium text-foreground">
-											Search to update fields
-										</span>
+							{/* === SNEAKER SEARCH — only available in create mode === */}
+							{mode !== 'edit' && (
+								<div className="space-y-2">
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-2">
+											<Search className="h-4 w-4 text-muted-foreground" />
+											<span className="text-sm font-medium text-foreground">
+												Search to update fields
+											</span>
+										</div>
+										{autoFillActive && (
+											<span className="flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-medium text-green-700 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300">
+												<CheckCircle2 className="h-3 w-3" />
+												Auto-filled from eBay
+											</span>
+										)}
 									</div>
-									{autoFillActive && (
-										<span className="flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-medium text-green-700 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300">
-											<CheckCircle2 className="h-3 w-3" />
-											Auto-filled from eBay
-										</span>
-									)}
+									<SneakerSearch onSelect={handleSearchSelect} />
 								</div>
-								<SneakerSearch onSelect={handleSearchSelect} />
-							</div>
+							)}
 
 							{/* Validation Status Card - Smart floating sidebar */}
 							<ValidationStatusCard
