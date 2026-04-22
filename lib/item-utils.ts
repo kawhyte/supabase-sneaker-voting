@@ -104,6 +104,48 @@ export const SHOE_SIZE_GROUPS: SizeGroup[] = [
 ];
 
 // ============================================================================
+// SHOPPING URL HELPER
+// ============================================================================
+
+/**
+ * Returns the best external link for purchasing a wishlisted item.
+ * - Returns product_url directly if set (scraper-tracked items).
+ * - For eBay-tracked items (product_url is null), builds a filtered eBay search
+ *   URL matching the Edge Function's query logic.
+ */
+export function getShoppingUrl(item: {
+	product_url?: string | null;
+	status?: string;
+	auto_price_tracking_enabled?: boolean;
+	brand?: string;
+	model?: string;
+	size_tried?: string | null;
+}): string | null {
+	if (item.product_url) return item.product_url;
+
+	if (
+		item.status === 'wishlisted' &&
+		item.auto_price_tracking_enabled === true &&
+		item.brand &&
+		item.model
+	) {
+		const rawQuery = `${item.brand} ${item.model}`;
+		const cleanQuery = rawQuery
+			.replace(/\b(men|women|mens|womens|size|grade\s+school|gs|preschool|ps|infant|toddler)\b/gi, '')
+			.replace(/\b(19|20)\d{2}\b/g, '')
+			.replace(/\s{2,}/g, ' ')
+			.trim();
+
+		const sizeStr = item.size_tried?.trim();
+		const finalQuery = sizeStr ? `${cleanQuery} size ${sizeStr}`.trim() : cleanQuery;
+
+		return `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(finalQuery)}&_sacat=15709&LH_ItemCondition=1000&LH_BIN=1`;
+	}
+
+	return null;
+}
+
+// ============================================================================
 // URL CATEGORY DETECTION
 // ============================================================================
 

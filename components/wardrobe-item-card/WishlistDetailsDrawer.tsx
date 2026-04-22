@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { WardrobeItem } from '@/components/types/WardrobeItem';
 import { getComfortLabel } from "@/lib/wardrobe-item-utils";
 import { isPriceStale, getDaysSincePriceCheck } from '@/lib/price-tracking-utils';
+import { getShoppingUrl } from '@/lib/item-utils';
 import { ManualPriceEntryDialog } from './ManualPriceEntryDialog';
 import { PricingHighlights } from './PricingHighlights';
 import { createClient } from '@/utils/supabase/client';
@@ -334,19 +335,25 @@ export function WishlistDetailsDrawer({
 									</span>
 								</div>
 
-								{item.product_url && (
-									<div className="flex items-center justify-between text-xs">
-										<span className="text-muted-foreground">Product URL</span>
-										<a
-											href={item.product_url}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="font-medium text-primary hover:text-primary hover:underline max-w-[180px] truncate"
-										>
-											View Product
-										</a>
-									</div>
-								)}
+								{(() => {
+									const shoppingUrl = getShoppingUrl(item);
+									const isEbayUrl = !item.product_url && !!shoppingUrl;
+									return shoppingUrl ? (
+										<div className="flex items-center justify-between text-xs">
+											<span className="text-muted-foreground">
+												{isEbayUrl ? 'Find on eBay' : 'Product URL'}
+											</span>
+											<a
+												href={shoppingUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="font-medium text-primary hover:text-primary hover:underline max-w-[180px] truncate"
+											>
+												{isEbayUrl ? 'Shop on eBay' : 'View Product'}
+											</a>
+										</div>
+									) : null;
+								})()}
 							</div>
 						</div>
 					</div>
