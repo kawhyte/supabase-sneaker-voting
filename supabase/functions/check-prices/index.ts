@@ -653,13 +653,14 @@ class EbayApiStrategy implements IPriceStrategy {
   }
 
   /**
-   * Outlier Rejection Algorithm:
+   * Outlier Rejection Algorithm (IQR method):
    * - 0 prices: return null
-   * - 1-3 prices: median of all (naturally handles single items and pairs without outlier bias)
-   * - 4+ prices: drop bottom/top 15%, then return the median of the full trimmed window
+   * - 1-3 prices: median of all (sparse — IQR needs ≥4 points to be meaningful)
+   * - 4+ prices: IQR fence filter (Q1 - 1.5×IQR, Q3 + 1.5×IQR), then median of survivors
    *
-   * Using median instead of "average of lowest 3" avoids structural low-bias:
-   * for 20 listings the old approach used only the 4th–6th cheapest prices overall.
+   * IQR adapts to the actual spread of the data, unlike a fixed 15% slice which
+   * removes the same proportion regardless of how tight or spread the distribution is.
+   * Median resists any remaining outliers that slip through the fence.
    */
   private aggregatePrice(prices: number[]): number | null {
     if (prices.length === 0) return null
@@ -677,15 +678,25 @@ class EbayApiStrategy implements IPriceStrategy {
       return result
     }
 
-    const n = sorted.length
-    const low = Math.floor(n * 0.15)
-    const high = Math.ceil(n * 0.85)
-    const middle = sorted.slice(low, high)
+    // Linear-interpolation quantile (standard method, accurate for small n)
+    const quantile = (arr: number[], q: number): number => {
+      const pos = q * (arr.length - 1)
+      const lo = Math.floor(pos)
+      const hi = Math.ceil(pos)
+      return arr[lo] + (arr[hi] - arr[lo]) * (pos - lo)
+    }
 
-    if (middle.length === 0) return null
+    const q1 = quantile(sorted, 0.25)
+    const q3 = quantile(sorted, 0.75)
+    const iqr = q3 - q1
+    const lowerFence = q1 - 1.5 * iqr
+    const upperFence = q3 + 1.5 * iqr
 
-    const result = median(middle)
-    console.log(`eBay: ${n} listings -> trimmed to ${middle.length} -> median: $${result}`)
+    const clean = sorted.filter(p => p >= lowerFence && p <= upperFence)
+    if (clean.length === 0) return null
+
+    const result = median(clean)
+    console.log(`eBay: ${sorted.length} listings -> IQR [$${lowerFence.toFixed(2)}, $${upperFence.toFixed(2)}] -> ${clean.length} clean -> median: $${result}`)
     return result
   }
 
@@ -723,7 +734,8 @@ class EbayApiStrategy implements IPriceStrategy {
         q: query,
         filter: 'buyingOptions:{FIXED_PRICE},condition:{NEW}',
         category_ids: '15709',
-        limit: '20'
+        limit: '20',
+        fieldgroups: 'EXTENDED' // includes shippingOptions per listing
       })
 
       console.log(`eBay: Searching "${query}"`)
@@ -754,6 +766,9 @@ class EbayApiStrategy implements IPriceStrategy {
         itemSummaries?: Array<{
           price?: { value?: string; currency?: string }
           authenticityVerification?: { status?: string }
+          shippingOptions?: Array<{
+            shippingCost?: { value?: string; currency?: string }
+          }>
         }>
       }
 
@@ -776,9 +791,14 @@ class EbayApiStrategy implements IPriceStrategy {
       const prices = workingSummaries
         // Guard against non-USD prices from international marketplaces
         .filter(s => !s.price?.currency || s.price.currency === 'USD')
-        .map(s => parseFloat(s.price?.value ?? ''))
+        .map(s => {
+          const itemPrice = parseFloat(s.price?.value ?? '')
+          // Add shipping to get true acquisition cost. Unknown shipping treated as free (0).
+          const shipping = parseFloat(s.shippingOptions?.[0]?.shippingCost?.value ?? '0') || 0
+          return itemPrice + shipping
+        })
         .filter(p => !isNaN(p) && p > 0)
-        // Reject listings priced below 30% of retail — almost certainly counterfeit or wrong item
+        // Retail floor applies to total acquisition cost — a $40 fake + $5 shipping = $45, still caught
         .filter(p => p >= retailFloor)
 
       const aggregatedPrice = this.aggregatePrice(prices)
