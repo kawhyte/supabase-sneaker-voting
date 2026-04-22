@@ -54,13 +54,17 @@ export async function POST(request: NextRequest) {
       product_url,
       store_name,
       target_price,
-      item_id
+      item_id,
+      tracking_provider
     } = body
 
+    // eBay tracking routes via the edge function using size_tried — product_url not required
+    const isEbayTracking = tracking_provider === 'ebay'
+
     // Validate required fields
-    if (!product_url || !store_name || !item_id) {
+    if ((!product_url && !isEbayTracking) || !item_id) {
       return NextResponse.json(
-        { success: false, error: 'Missing required fields: product_url, store_name, item_id' },
+        { success: false, error: 'Missing required fields: item_id (and product_url unless using eBay tracking)' },
         { status: 400 }
       )
     }
@@ -75,8 +79,8 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: user.id,
         item_id,
-        product_url,
-        store_name,
+        product_url: product_url || null,
+        store_name: store_name || null,
         target_price: target_price || null,
         is_active: true,
         notification_sent: false
@@ -88,8 +92,8 @@ export async function POST(request: NextRequest) {
       throw new Error(insertError.message)
     }
 
-    // Try to get initial price
-    try {
+    // Try to get initial price (scraper path — skipped for eBay tracking)
+    if (product_url) try {
       const priceResponse = await fetch(
         `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/scrape-price`,
         {

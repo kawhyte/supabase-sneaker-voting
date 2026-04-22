@@ -300,6 +300,7 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 			}
 
 			// Prepare item data
+			const isEbayTracking = data.intent === 'wishlist' && data.enableTracking
 			const itemData = {
 				user_id: user.id,
 				brand: data.brand,
@@ -309,14 +310,18 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 				sku: data.sku || null,
 				category: data.category,
 				size_type: getSizeType(data.category as ItemCategory),
-				size_tried: data.triedOn ? data.sizeTried : null,
+				size_tried: isEbayTracking
+					? (data.target_size || null)
+					: (data.triedOn ? data.sizeTried : null),
 				comfort_rating:
 					data.triedOn ? data.comfortRating : null,
 				retail_price: data.retailPrice ? parseFloat(data.retailPrice) : null,
 				sale_price: data.salePrice ? parseFloat(data.salePrice) : null,
 				target_price: data.targetPrice ? parseFloat(data.targetPrice) : null,
-				product_url: data.productUrl || null,
-				auto_price_tracking_enabled: data.auto_price_tracking_enabled || false,
+				product_url: (isEbayTracking && !initialData?.product_url)
+					? null
+					: (data.productUrl || null),
+				auto_price_tracking_enabled: data.enableTracking || data.auto_price_tracking_enabled || false,
 				notes: data.notes && data.notes.trim() ? data.notes : '',
 
 				// PHASE 2: Store & Purchase Fields
