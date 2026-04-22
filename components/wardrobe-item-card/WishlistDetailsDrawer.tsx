@@ -11,7 +11,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { RefreshCw, Edit3, ShoppingBag, Archive, AlertCircle, XCircle, CheckCircle2 } from "lucide-react";
+import { RefreshCw, Edit3, ShoppingBag, Archive, AlertCircle, AlertTriangle, XCircle, CheckCircle2 } from "lucide-react";
 import {
 	Sheet,
 	SheetContent,
@@ -195,6 +195,17 @@ export function WishlistDetailsDrawer({
 									currentPrice={item.sale_price ?? null}
 									targetPrice={item.target_price ?? null}
 								/>
+
+								{item.auto_price_tracking_enabled !== false && !item.size_tried && (
+									<div className="p-4 rounded-lg border bg-amber-50 border-amber-200">
+										<div className="flex items-start gap-3">
+											<AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+											<p className="text-sm text-amber-800">
+												<span className="font-medium">Missing Target Size.</span> Please edit this item and add a Target Size to enable accurate eBay market price calculations.
+											</p>
+										</div>
+									</div>
+								)}
 
 								{/* Status Display */}
 								<div className={`p-4 rounded-lg border ${statusInfo.bgColor} ${statusInfo.borderColor}`}>

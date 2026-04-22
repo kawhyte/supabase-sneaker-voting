@@ -35,9 +35,12 @@ export function isPriceStale(lastPriceCheckAt: string | null | undefined): boole
     return true; // No price data = stale
   }
 
-  const lastCheck = new Date(lastPriceCheckAt);
+  const normalized = /[Zz]$|[+-]\d{2}:\d{2}$/.test(lastPriceCheckAt)
+    ? lastPriceCheckAt
+    : `${lastPriceCheckAt}Z`;
+  const lastCheck = new Date(normalized);
   const now = new Date();
-  const daysSince = Math.floor((now.getTime() - lastCheck.getTime()) / (1000 * 60 * 60 * 24));
+  const daysSince = Math.max(0, Math.floor((now.getTime() - lastCheck.getTime()) / (1000 * 60 * 60 * 24)));
 
   return daysSince > 14;
 }
@@ -52,10 +55,15 @@ export function getDaysSincePriceCheck(lastPriceCheckAt: string | null | undefin
     return null;
   }
 
-  const lastCheck = new Date(lastPriceCheckAt);
+  // Ensure the timestamp is parsed as UTC (append Z if no timezone offset is present)
+  const normalized = /[Zz]$|[+-]\d{2}:\d{2}$/.test(lastPriceCheckAt)
+    ? lastPriceCheckAt
+    : `${lastPriceCheckAt}Z`;
+  const lastCheck = new Date(normalized);
   const now = new Date();
 
-  return Math.floor((now.getTime() - lastCheck.getTime()) / (1000 * 60 * 60 * 24));
+  // Clamp to 0 so clock skew or future timestamps never render as negative days
+  return Math.max(0, Math.floor((now.getTime() - lastCheck.getTime()) / (1000 * 60 * 60 * 24)));
 }
 
 /**

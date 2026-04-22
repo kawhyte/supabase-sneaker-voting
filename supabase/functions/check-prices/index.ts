@@ -669,10 +669,16 @@ class EbayApiStrategy implements IPriceStrategy {
     const high = Math.ceil(n * 0.85)
     const middle = sorted.slice(low, high)
 
-    const take = Math.min(3, middle.length)
-    const lowest = middle.slice(0, take)
-    console.log(`eBay: ${n} listings -> trimmed to ${middle.length} -> avg of lowest ${take}`)
-    return lowest.reduce((sum, p) => sum + p, 0) / take
+    if (middle.length < 3) {
+      if (middle.length === 0) return null
+      const avg = middle.reduce((sum, p) => sum + p, 0) / middle.length
+      console.log(`eBay: ${n} listings -> trimmed to ${middle.length} (sparse after trim) -> avg of all middle`)
+      return avg
+    }
+
+    const lowest = middle.slice(0, 3)
+    console.log(`eBay: ${n} listings -> trimmed to ${middle.length} -> avg of lowest 3`)
+    return lowest.reduce((sum, p) => sum + p, 0) / 3
   }
 
   async getPrice(item: PriceCheckItem): Promise<PriceResult> {
@@ -695,6 +701,7 @@ class EbayApiStrategy implements IPriceStrategy {
           .replace(/\([^)]*\)/g, '')
           .replace(/\b(men'?s?|women'?s?|unisex|kids?)\b/gi, '')
           .replace(/\b(size\s+\d[\w.]*)\b/gi, '')
+          .replace(/'/g, '')
           .replace(/\s{2,}/g, ' ')
           .trim()
         baseQuery = `${item.brand} ${cleanModel}`
