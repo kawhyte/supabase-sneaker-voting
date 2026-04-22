@@ -72,6 +72,7 @@ interface PriceResult {
   method?: 'fetch' | 'browserless' | 'ebay'
   strategy: 'scraper' | 'ebay'
   statusCode?: number
+  listingCount?: number // number of eBay listings that fed the aggregation
 }
 
 interface IPriceStrategy {
@@ -750,7 +751,10 @@ class EbayApiStrategy implements IPriceStrategy {
       }
 
       const data = await response.json() as {
-        itemSummaries?: Array<{ price?: { value?: string } }>
+        itemSummaries?: Array<{
+          price?: { value?: string; currency?: string }
+          authenticityVerification?: { status?: string }
+        }>
       }
 
       const summaries = data.itemSummaries
@@ -758,8 +762,20 @@ class EbayApiStrategy implements IPriceStrategy {
         return { success: false, error: 'No eBay listings found', errorCategory: 'parse_error', strategy: 'ebay' }
       }
 
+      // Prefer Authenticity Guarantee listings to exclude counterfeits.
+      // If fewer than 3 qualify (common for rare shoes), fall back to all listings.
+      const agSummaries = summaries.filter(
+        s => s.authenticityVerification?.status === 'AUTHENTICITY_GUARANTEE'
+      )
+      const workingSummaries = agSummaries.length >= 3 ? agSummaries : summaries
+      if (agSummaries.length >= 3) {
+        console.log(`eBay: ${agSummaries.length}/${summaries.length} listings have Authenticity Guarantee`)
+      }
+
       const retailFloor = item.retail_price ? item.retail_price * 0.30 : 0
-      const prices = summaries
+      const prices = workingSummaries
+        // Guard against non-USD prices from international marketplaces
+        .filter(s => !s.price?.currency || s.price.currency === 'USD')
         .map(s => parseFloat(s.price?.value ?? ''))
         .filter(p => !isNaN(p) && p > 0)
         // Reject listings priced below 30% of retail — almost certainly counterfeit or wrong item
@@ -777,8 +793,8 @@ class EbayApiStrategy implements IPriceStrategy {
       }
 
       const rounded = Math.round(aggregatedPrice * 100) / 100
-      console.log(`eBay: Aggregated Market Price $${rounded} from ${prices.length} listings`)
-      return { success: true, price: rounded, method: 'ebay', strategy: 'ebay' }
+      console.log(`eBay: Aggregated Market Price $${rounded} from ${prices.length} listings (${summaries.length} raw)`)
+      return { success: true, price: rounded, method: 'ebay', strategy: 'ebay', listingCount: summaries.length }
 
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error'
@@ -1024,16 +1040,9 @@ serve(async (req) => {
 
         const previousPrice = previousLog?.price || item.retail_price
 
-        // Log the successful check
-        await supabase.from('price_check_log').insert({
-          item_id: item.id,
-          user_id: item.user_id,
-          price: result.price,
-          checked_at: new Date().toISOString(),
-          source: priceCheckSource(result),
-          retailer: retailerKey,
-          success: true
-        })
+        // NOTE: price_check_log insert + items update are deferred to the single
+        // record_price_check_success RPC call below (after notifications are resolved),
+        // so both writes land atomically even if the function is killed mid-flight.
 
         // Check for price drop
         if (previousPrice && result.price < previousPrice) {
@@ -1146,35 +1155,22 @@ serve(async (req) => {
           }
         }
 
-        // Reset failure count and update last check
-        await supabase
-          .from('items')
-          .update({
-            price_check_failures: 0,
-            last_price_check_at: new Date().toISOString(),
-            sale_price: result.price,
-            // Compare against the stored historical minimum, not just the previous log entry
-            lowest_price_seen: Math.min(result.price, item.lowest_price_seen ?? Infinity),
-            target_alert_sent_at: newTargetAlertSentAt
-          })
-          .eq('id', item.id)
+        // Atomically log the successful check and update the item in one transaction
+        await supabase.rpc('record_price_check_success', {
+          p_item_id:              item.id,
+          p_user_id:              item.user_id,
+          p_price:                result.price,
+          p_source:               priceCheckSource(result),
+          p_retailer:             retailerKey,
+          p_lowest_price_seen:    Math.min(result.price, item.lowest_price_seen ?? Infinity),
+          p_target_alert_sent_at: newTargetAlertSentAt,
+          p_ebay_listing_count:   result.listingCount ?? null
+        })
 
       } else {
         failureCount++
         retailerStats[retailerKey].failure++
         console.log(`FAILURE: ${result.error} (${result.errorCategory})`)
-
-        await supabase.from('price_check_log').insert({
-          item_id: item.id,
-          user_id: item.user_id,
-          checked_at: new Date().toISOString(),
-          source: priceCheckSource(result),
-          retailer: retailerKey,
-          success: false,
-          error_message: result.error,
-          error_category: result.errorCategory,
-          http_status_code: result.statusCode
-        })
 
         // Transient infrastructure errors (rate limits, timeouts, server errors) and data gaps should
         // not count toward auto-disable — only genuine config/data issues (bad selector, invalid price)
@@ -1187,14 +1183,18 @@ serve(async (req) => {
           ? (item.price_check_failures || 0)
           : (item.price_check_failures || 0) + 1
 
-        await supabase
-          .from('items')
-          .update({
-            price_check_failures: newFailureCount,
-            last_price_check_at: new Date().toISOString(),
-            auto_price_tracking_enabled: newFailureCount < 3
-          })
-          .eq('id', item.id)
+        // Atomically log the failure and update the item in one transaction
+        await supabase.rpc('record_price_check_failure', {
+          p_item_id:                     item.id,
+          p_user_id:                     item.user_id,
+          p_source:                      priceCheckSource(result),
+          p_retailer:                    retailerKey,
+          p_error_message:               result.error ?? 'Unknown error',
+          p_error_category:              result.errorCategory ?? 'unknown',
+          p_http_status_code:            result.statusCode ?? null,
+          p_new_failure_count:           newFailureCount,
+          p_auto_price_tracking_enabled: newFailureCount < 3
+        })
 
         if (newFailureCount >= 3) {
           console.log(`DISABLED after 3 failures`)

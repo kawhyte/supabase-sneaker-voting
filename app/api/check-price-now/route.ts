@@ -503,33 +503,11 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    const updateData: any = {
-      sale_price: result.price,
-      last_price_check_at: new Date().toISOString(),
-      price_check_failures: 0 // Reset on success
-    }
+    const lowestPriceSeen = Math.min(result.price, item.lowest_price_seen ?? Infinity)
 
-    // Update lowest price if this is lower than the all-time low
-    const existingLowest = item.lowest_price_seen ?? null
-    if (existingLowest === null || result.price < existingLowest) {
-      updateData.lowest_price_seen = result.price
-    }
-
-    await supabase
-      .from('items')
-      .update(updateData)
-      .eq('id', item.id)
-
-    // Log successful check
-    await supabase.from('price_check_log').insert({
-      item_id: item.id,
-      user_id: user.id,
-      price: result.price,
-      checked_at: new Date().toISOString(),
-      source: 'manual_check',
-      retailer: result.storeName,
-      success: true
-    })
+    // NOTE: items update + price_check_log insert are deferred to the
+    // record_price_check_success RPC below (after notifications are resolved)
+    // so both writes land atomically even if this request is killed mid-flight.
 
     // Check if price dropped and create notification (with 7-day dedup to match Edge Function behaviour)
     const previousPrice = item.sale_price || item.retail_price
@@ -608,11 +586,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Persist the latch state
-    await supabase
-      .from('items')
-      .update({ target_alert_sent_at: newTargetAlertSentAt })
-      .eq('id', item.id)
+    // Atomically log the successful check and update the item in one transaction
+    await supabase.rpc('record_price_check_success', {
+      p_item_id:              item.id,
+      p_user_id:              user.id,
+      p_price:                result.price,
+      p_source:               'manual_check',
+      p_retailer:             result.storeName ?? null,
+      p_lowest_price_seen:    lowestPriceSeen,
+      p_target_alert_sent_at: newTargetAlertSentAt,
+      p_ebay_listing_count:   null // not available for manual scrape checks
+    })
 
     return NextResponse.json({
       success: true,
