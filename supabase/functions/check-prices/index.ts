@@ -850,13 +850,43 @@ serve(async (req) => {
     // Instantiate strategies once — circuit breaker state is shared across the entire run
     const scraper = new ScraperStrategy()
     const ebay = new EbayApiStrategy(
-      Deno.env.get('EBAY_CLIENT_ID') ?? '',
-      Deno.env.get('EBAY_CLIENT_SECRET') ?? ''
+      Deno.env.get('EBAY_CLIENT_ID') ?? Deno.env.get('EBAY_APP_ID') ?? '',
+      Deno.env.get('EBAY_CLIENT_SECRET') ?? Deno.env.get('EBAY_CERT_ID') ?? ''
     )
     const breaker = new CircuitBreaker()
     const tracker = new PriceTrackerService(scraper, ebay, breaker)
 
     const body = await req.json().catch(() => ({}))
+
+    // TEST MODE: eBay API direct probe (no DB, no URL needed)
+    if (body.testEbay) {
+      console.log('TEST MODE: eBay API direct probe')
+      const testItem: PriceCheckItem = {
+        id: 'test',
+        product_url: null,
+        retail_price: body.retailPrice ?? null,
+        target_price: null,
+        brand: body.brand ?? 'Nike',
+        model: body.model ?? 'Dunk Low',
+        price_check_failures: 0,
+        user_id: 'test',
+        sku: body.sku ?? null,
+        size_tried: body.size_tried ?? null
+      }
+      const testResult = await ebay.getPrice(testItem)
+      return new Response(
+        JSON.stringify({
+          success: testResult.success,
+          price: testResult.price,
+          error: testResult.error,
+          method: testResult.method,
+          strategy: testResult.strategy,
+          query: `${testItem.sku?.trim() || `${testItem.brand} ${testItem.model}`}${testItem.size_tried ? ` size ${testItem.size_tried}` : ''}`,
+          timestamp: new Date().toISOString()
+        }),
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+    }
 
     // TEST MODE: single URL probe
     if (body.testUrl && body.testUrl.trim()) {
@@ -902,38 +932,6 @@ serve(async (req) => {
             strategy: testResult.strategy,
             retailer: retailerName
           },
-          timestamp: new Date().toISOString()
-        }),
-        { headers: { 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // TEST MODE: eBay query probe (brand/model/SKU — no DB writes)
-    if (body.testEbay) {
-      console.log('TEST MODE: eBay query probe')
-
-      const testItem: PriceCheckItem = {
-        id: 'test',
-        product_url: null,
-        retail_price: body.retailPrice ?? null,
-        target_price: null,
-        brand: body.brand ?? 'Unknown',
-        model: body.model ?? 'Unknown',
-        price_check_failures: 0,
-        user_id: 'test',
-        sku: body.sku ?? null,
-        size_tried: body.size_tried ?? null
-      }
-
-      const testResult = await ebay.getPrice(testItem)
-
-      return new Response(
-        JSON.stringify({
-          success: testResult.success,
-          price: testResult.price ?? null,
-          error: testResult.error ?? null,
-          strategy: testResult.strategy,
-          query: testItem.sku?.trim() || `${testItem.brand} ${testItem.model}`,
           timestamp: new Date().toISOString()
         }),
         { headers: { 'Content-Type': 'application/json' } }

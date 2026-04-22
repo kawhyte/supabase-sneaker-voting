@@ -128,10 +128,10 @@ export function WishlistDetailsDrawer({
 			Icon: CheckCircle2,
 			text: `Checked ${daysSince === 0 ? 'today' : daysSince === 1 ? 'yesterday' : `${daysSince} days ago`}`,
 			description: 'Price is up to date. Prices are checked automatically every Sunday.',
-			color: 'text-emerald-500',
-			iconColor: 'text-emerald-500',
-			bgColor: 'bg-emerald-500',
-			borderColor: 'border-emerald-500',
+			color: 'text-green-700',
+			iconColor: 'text-green-700',
+			bgColor: 'bg-green-50',
+			borderColor: 'border-green-200',
 		};
 	};
 
@@ -300,7 +300,7 @@ export function WishlistDetailsDrawer({
 									{onMarkAsPurchased && (
 										<Button
 											onClick={handleMarkAsPurchased}
-											className="w-full justify-start gap-2 h-10 bg-emerald-500 hover:bg-emerald-500 text-white"
+											className="w-full justify-start gap-2 h-10 bg-slate-900 hover:bg-slate-800 text-white"
 											variant="default"
 										>
 											<ShoppingBag className="h-4 w-4" />

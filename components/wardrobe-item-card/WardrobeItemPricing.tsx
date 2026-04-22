@@ -68,10 +68,10 @@ export function ItemPricingDisplay({
 									<span className='text-sm line-through text-muted-foreground'>
 										${item.retail_price}
 									</span>
-									<span className='text-base font-bold text-emerald-500'>
+									<span className='text-base font-bold text-green-700'>
 										${item.sale_price}
 									</span>
-									<Badge variant='success'>
+									<Badge variant='outline' className='border-green-200 bg-green-50 text-green-700 text-xs'>
 										On Sale!
 									</Badge>
 								</>

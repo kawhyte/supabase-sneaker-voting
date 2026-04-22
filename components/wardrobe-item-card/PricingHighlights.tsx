@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingDown, Target } from "lucide-react";
+import { Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface PriceCheckLogRow {
@@ -87,26 +87,15 @@ export function PricingHighlights({
       </div>
 
       {/* Status badges */}
-      {(isTargetReached || isAllTimeLow) && (
+      {isTargetReached && (
         <div className="flex flex-wrap gap-2">
-          {isTargetReached && (
-            <Badge
-              variant="outline"
-              className="gap-1.5 border-emerald-300 bg-emerald-50 text-emerald-700"
-            >
-              <Target className="h-3 w-3" />
-              Target Reached
-            </Badge>
-          )}
-          {isAllTimeLow && !isTargetReached && (
-            <Badge
-              variant="outline"
-              className="gap-1.5 border-amber-300 bg-amber-50 text-amber-700"
-            >
-              <TrendingDown className="h-3 w-3" />
-              Happening Now
-            </Badge>
-          )}
+          <Badge
+            variant="outline"
+            className="gap-1.5 border-green-200 bg-green-50 text-green-700"
+          >
+            <Target className="h-3 w-3" />
+            Target Reached
+          </Badge>
         </div>
       )}
     </div>
