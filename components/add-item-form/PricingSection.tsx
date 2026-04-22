@@ -17,6 +17,7 @@ import { Sparkles } from "lucide-react";
 interface PricingSectionProps {
 	form: UseFormReturn<any>;
 	intent?: 'own' | 'wishlist';
+	enableTracking?: boolean;
 }
 
 /**
@@ -44,7 +45,7 @@ function calculateSuggestedTargetPrice(retailPrice: string | undefined): number 
  * - 'own': Retail Price + Sale Price (what you paid)
  * - 'wishlist': Maximum Budget / Target Price (what you'd pay)
  */
-export function PricingSection({ form, intent = 'own' }: PricingSectionProps) {
+export function PricingSection({ form, intent = 'own', enableTracking = false }: PricingSectionProps) {
 	const {
 		register,
 		watch,
@@ -155,10 +156,16 @@ export function PricingSection({ form, intent = 'own' }: PricingSectionProps) {
 			{intent === 'wishlist' && (
 				<div>
 					<Label className="text-sm font-medium text-slate-900">
-						Maximum Budget{" "}
-						<span className="text-xs text-muted-foreground font-normal">
-							(Optional — most you'd pay)
-						</span>
+						{enableTracking ? (
+							<>Alert Price <span className="text-red-500">*</span></>
+						) : (
+							<>
+								Maximum Budget{" "}
+								<span className="text-xs text-muted-foreground font-normal">
+									(Optional — most you'd pay)
+								</span>
+							</>
+						)}
 					</Label>
 					{suggestedTarget && (
 						<p className="text-xs text-blue-600 mt-1">

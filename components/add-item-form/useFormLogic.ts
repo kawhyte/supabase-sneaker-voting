@@ -33,7 +33,9 @@ export const itemFormSchema = z
 			.optional()
 			.or(z.literal('')),
 		auto_price_tracking_enabled: z.boolean().default(false),
+		enableTracking: z.boolean().default(false),
 		enableNotifications: z.boolean().default(false),
+		target_size: z.string().max(20).optional().or(z.literal('')),
 		brandId: z.number().int().positive('Brand is required'),
 		brand: z.string().min(1, 'Brand is required').max(50).trim(),
 		model: z.string().min(2, 'Item name is required').max(100).trim(),
@@ -126,7 +128,7 @@ export const itemFormSchema = z
 	)
 	.refine(
 		(data) => {
-			// If price tracking enabled, product URL must be provided
+			// Legacy scraper: product URL required when scraper tracking is enabled
 			if (data.auto_price_tracking_enabled) {
 				return data.productUrl && data.productUrl.trim().length > 0
 			}
@@ -135,6 +137,32 @@ export const itemFormSchema = z
 		{
 			message: 'Product URL is required when price tracking is enabled',
 			path: ['productUrl'],
+		}
+	)
+	.refine(
+		(data) => {
+			// eBay tracking: target size required
+			if (data.intent === 'wishlist' && data.enableTracking) {
+				return data.target_size && data.target_size.trim().length > 0
+			}
+			return true
+		},
+		{
+			message: 'Target size is required to enable price tracking',
+			path: ['target_size'],
+		}
+	)
+	.refine(
+		(data) => {
+			// eBay tracking: target price required
+			if (data.intent === 'wishlist' && data.enableTracking) {
+				return data.targetPrice && data.targetPrice.trim().length > 0
+			}
+			return true
+		},
+		{
+			message: 'Alert price is required to enable price tracking',
+			path: ['targetPrice'],
 		}
 	)
 

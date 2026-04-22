@@ -33,6 +33,7 @@ interface SizingSectionProps {
 	mode: "create" | "edit" | "add";
 	initialData?: any;
 	intent?: "own" | "wishlist";
+	enableTracking?: boolean;
 }
 
 export function SizingSection({
@@ -40,6 +41,7 @@ export function SizingSection({
 	mode,
 	initialData,
 	intent,
+	enableTracking = false,
 }: SizingSectionProps) {
 	const {
 		register,
@@ -63,7 +65,11 @@ export function SizingSection({
 					<Ruler className="h-5 w-5 text-slate-600 flex-shrink-0" />
 					<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
 						Sizing{" "}
-						<span className="font-normal text-muted-foreground">(Optional)</span>
+						{enableTracking ? (
+							<span className="font-normal text-red-500 text-sm">Required for tracking</span>
+						) : (
+							<span className="font-normal text-muted-foreground">(Optional)</span>
+						)}
 					</h3>
 				</div>
 
@@ -72,17 +78,28 @@ export function SizingSection({
 					<div>
 						<Label className="text-sm font-medium text-slate-900">
 							Target Size{" "}
-							<span className="font-normal text-muted-foreground">(Optional)</span>
+							{enableTracking ? (
+								<span className="text-red-500">*</span>
+							) : (
+								<span className="font-normal text-muted-foreground">(Optional)</span>
+							)}
 						</Label>
 						<SizeCombobox
-							value={watch("sizeTried")}
+							value={watch("target_size")}
 							onChange={(v) =>
-								setValue("sizeTried", v, { shouldValidate: true })
+								setValue("target_size", v, { shouldValidate: true })
 							}
 						/>
 						<p className="text-xs text-muted-foreground mt-1">
-							Selecting a size helps us find better price matches later.
+							{enableTracking
+								? "Required — used to find matching listings on eBay."
+								: "Selecting a size helps us find better price matches later."}
 						</p>
+						{errors.target_size && (
+							<p className="text-sm text-red-600 mt-1">
+								{String(errors.target_size.message || "Target size is required")}
+							</p>
+						)}
 					</div>
 				)}
 

@@ -24,7 +24,8 @@ import {
 	type UrlValidationResult,
 } from '@/lib/retailer-url-validator'
 import { detectCategoryFromUrl } from '@/lib/item-utils'
-import { Loader2, Search, Sparkles, Shirt, Star, ChevronDown, CheckCircle2 } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
+import { Loader2, Search, Sparkles, Shirt, Star, ChevronDown, CheckCircle2, TrendingDown } from 'lucide-react'
 import { type PhotoItem } from '@/components/types/photo-item'
 import { type ItemCategory } from '@/components/types/item-category'
 import { SneakerSearch, type SneakerSearchResult } from './SneakerSearch'
@@ -346,6 +347,7 @@ export default function AddItemForm({
 	const watchedTriedOn = form.watch('triedOn')
 	const watchedSizeTried = form.watch('sizeTried')
 	const watchedComfortRating = form.watch('comfortRating')
+	const watchedEnableTracking = form.watch('enableTracking')
 
 	return (
 		<div className="max-w-7xl mx-auto w-full p-4 md:p-6 lg:p-8">
@@ -556,11 +558,41 @@ export default function AddItemForm({
 								</div>
 							)}
 
+							{/* eBay Price Tracking Toggle — Wishlist only */}
+							{intent === 'wishlist' && (
+								<div className="rounded-xl border border-border bg-card p-4">
+									<div className="flex items-center justify-between gap-4">
+										<div className="flex items-center gap-3">
+											<div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+												<TrendingDown className="h-5 w-5 text-primary" />
+											</div>
+											<div>
+												<p className="text-sm font-semibold text-foreground">
+													Track Price on eBay
+												</p>
+												<p className="text-xs text-muted-foreground">
+													Get alerted when this item hits your target price.
+												</p>
+											</div>
+										</div>
+										<Switch
+											checked={watchedEnableTracking}
+											onCheckedChange={(checked) =>
+												form.setValue('enableTracking', checked, {
+													shouldValidate: true,
+													shouldDirty: true,
+												})
+											}
+										/>
+									</div>
+								</div>
+							)}
+
 							{/* Basic Info Section */}
 							<BasicInfoSection form={form} intent={intent} />
 
 							{/* Pricing Section */}
-							<PricingSection form={form} intent={intent} />
+							<PricingSection form={form} intent={intent} enableTracking={watchedEnableTracking} />
 
 							{/* Photos Section */}
 							<PhotoSection
@@ -569,35 +601,37 @@ export default function AddItemForm({
 								errors={form.formState.errors}
 							/>
 
-							{/* Product URL & Price Tracking — hidden by default, toggled in */}
-							<div>
-								<button
-									type="button"
-									onClick={() => setShowUrlSection((v) => !v)}
-									className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-								>
-									<ChevronDown
-										className={`h-3.5 w-3.5 transition-transform duration-200 ${showUrlSection ? 'rotate-180' : ''}`}
-									/>
-									{showUrlSection ? 'Hide' : 'Add'} product URL &amp; price tracking
-								</button>
-
-								{showUrlSection && (
-									<div className="mt-4">
-										<ProductURLSection
-											form={form}
-											isScrapingUrl={isScrapingUrl}
-											uploadProgress={uploadProgress}
-											urlValidation={urlValidation}
-											onUrlScrape={handleUrlScrape}
-											onShowRetailersDialog={() => setShowRetailersDialog(true)}
-											mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
-											initialData={initialData}
-											intent={intent}
+							{/* Product URL & Price Tracking — legacy scraper, hidden for wishlist */}
+							{intent !== 'wishlist' && (
+								<div>
+									<button
+										type="button"
+										onClick={() => setShowUrlSection((v) => !v)}
+										className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+									>
+										<ChevronDown
+											className={`h-3.5 w-3.5 transition-transform duration-200 ${showUrlSection ? 'rotate-180' : ''}`}
 										/>
-									</div>
-								)}
-							</div>
+										{showUrlSection ? 'Hide' : 'Add'} product URL &amp; price tracking
+									</button>
+
+									{showUrlSection && (
+										<div className="mt-4">
+											<ProductURLSection
+												form={form}
+												isScrapingUrl={isScrapingUrl}
+												uploadProgress={uploadProgress}
+												urlValidation={urlValidation}
+												onUrlScrape={handleUrlScrape}
+												onShowRetailersDialog={() => setShowRetailersDialog(true)}
+												mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
+												initialData={initialData}
+												intent={intent}
+											/>
+										</div>
+									)}
+								</div>
+							)}
 
 							{/* Sizing & Additional Details — morphs based on intent */}
 							<SizingSection
@@ -605,6 +639,7 @@ export default function AddItemForm({
 								mode={mode === 'create' || mode === 'add' ? 'create' : 'edit'}
 								initialData={initialData}
 								intent={intent}
+								enableTracking={watchedEnableTracking}
 							/>
 
 							{/* Form Actions */}
