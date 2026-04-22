@@ -66,6 +66,8 @@ export interface WardrobeItem {
   // Social Sharing (Pinned to Profile)
   is_pinned?: boolean // Featured items on user's public profile
 
+  sku?: string | null
+
   // Color Palette (Sneaker Inspiration)
   // Supports multiple formats:
   // - Legacy: string[] (5 hex colors)

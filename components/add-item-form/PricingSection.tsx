@@ -61,136 +61,131 @@ export function PricingSection({ form, intent = 'own', enableTracking = false }:
 
 	return (
 		<div className="space-y-6">
-			{intent === 'own' && (
-				<>
-					{/* Row 1: Retail Price & Sale Price */}
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div>
-							<Label className="text-sm font-medium text-slate-900">
-								Retail Price{" "}
-								<span className="text-xs text-muted-foreground font-normal">(Optional)</span>
-							</Label>
-							<div className="relative mt-2">
-								<span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-									$
-								</span>
-								<Input
-									{...register("retailPrice")}
-									placeholder="170.00"
-									type="number"
-									step="0.01"
-									className="pl-8"
-								/>
-							</div>
-							{errors.retailPrice && (
-								<p className="text-sm text-red-600 mt-1">
-									{String(errors.retailPrice.message || "Invalid price")}
-								</p>
-							)}
-						</div>
-
-						<div>
-							<Label className="text-sm font-medium text-slate-900">
-								Sale Price{" "}
-								<span className="text-xs text-muted-foreground font-normal">
-									(Optional)
-								</span>
-							</Label>
-							<div className="relative mt-2">
-								<span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-									$
-								</span>
-								<Input
-									{...register("salePrice")}
-									placeholder="150.00"
-									type="number"
-									step="0.01"
-									className="pl-8"
-								/>
-							</div>
-							{errors.salePrice && (
-								<p className="text-sm text-red-600 mt-1">
-									{String(errors.salePrice.message)}
-								</p>
-							)}
-						</div>
-					</div>
-
-					{/* Sale Alert - Shows when sale price is lower than retail */}
-					{watchedSalePrice &&
-						watchedRetailPrice &&
-						parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
-							<div
-								className="p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300 bg-emerald-500 border-emerald-500"
-								role="status"
-								aria-live="polite"
-							>
-								<Sparkles
-									className="h-4 w-4 flex-shrink-0 text-emerald-500 mt-0.5"
-									aria-hidden="true"
-								/>
-								<div className="flex-1 min-w-0">
-									<p className="text-sm font-semibold text-emerald-500">
-										Active sale: ${watchedSalePrice}
-									</p>
-									<p className="text-xs text-emerald-500">
-										Save $
-										{(
-											parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)
-										).toFixed(2)}{" "}
-										(
-										{Math.round(
-											((parseFloat(watchedRetailPrice) -
-												parseFloat(watchedSalePrice)) /
-												parseFloat(watchedRetailPrice)) *
-												100
-										)}
-										%)
-									</p>
-								</div>
-							</div>
-						)}
-				</>
-			)}
-
-			{intent === 'wishlist' && (
+			{/* Row 1: Retail Price + Sale Price (own) or Target Price (wishlist) */}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+				{/* Retail Price — always visible */}
 				<div>
 					<Label className="text-sm font-medium text-slate-900">
-						{enableTracking ? (
-							<>Alert Price <span className="text-red-500">*</span></>
-						) : (
-							<>
-								Maximum Budget{" "}
-								<span className="text-xs text-muted-foreground font-normal">
-									(Optional — most you'd pay)
-								</span>
-							</>
-						)}
+						Retail Price{" "}
+						<span className="text-xs text-muted-foreground font-normal">(Optional)</span>
 					</Label>
-					{suggestedTarget && (
-						<p className="text-xs text-blue-600 mt-1">
-							Suggested: ${suggestedTarget} (based on typical discounts)
-						</p>
-					)}
 					<div className="relative mt-2">
 						<span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
 							$
 						</span>
 						<Input
-							{...register("targetPrice")}
+							{...register("retailPrice")}
+							placeholder="170.00"
 							type="number"
 							step="0.01"
-							placeholder={suggestedTarget ? `${suggestedTarget}` : "0.00"}
 							className="pl-8"
 						/>
 					</div>
-					{errors.targetPrice && (
+					{errors.retailPrice && (
 						<p className="text-sm text-red-600 mt-1">
-							{String(errors.targetPrice.message)}
+							{String(errors.retailPrice.message || "Invalid price")}
 						</p>
 					)}
 				</div>
-			)}
+
+				{/* Sale Price (own) or Target / Alert Price (wishlist) */}
+				{intent === 'own' ? (
+					<div>
+						<Label className="text-sm font-medium text-slate-900">
+							Sale Price{" "}
+							<span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+						</Label>
+						<div className="relative mt-2">
+							<span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+								$
+							</span>
+							<Input
+								{...register("salePrice")}
+								placeholder="150.00"
+								type="number"
+								step="0.01"
+								className="pl-8"
+							/>
+						</div>
+						{errors.salePrice && (
+							<p className="text-sm text-red-600 mt-1">
+								{String(errors.salePrice.message)}
+							</p>
+						)}
+					</div>
+				) : (
+					<div>
+						<Label className="text-sm font-medium text-slate-900">
+							{enableTracking ? (
+								<>Alert Price <span className="text-red-500">*</span></>
+							) : (
+								<>
+									Max Budget{" "}
+									<span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+								</>
+							)}
+						</Label>
+						{suggestedTarget && (
+							<p className="text-xs text-blue-600 mt-1">
+								Suggested: ${suggestedTarget}
+							</p>
+						)}
+						<div className="relative mt-2">
+							<span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+								$
+							</span>
+							<Input
+								{...register("targetPrice")}
+								type="number"
+								step="0.01"
+								placeholder={suggestedTarget ? `${suggestedTarget}` : "0.00"}
+								className="pl-8"
+							/>
+						</div>
+						{errors.targetPrice && (
+							<p className="text-sm text-red-600 mt-1">
+								{String(errors.targetPrice.message)}
+							</p>
+						)}
+					</div>
+				)}
+			</div>
+
+			{/* Sale Alert - Shows when sale price is lower than retail (own only) */}
+			{intent === 'own' &&
+				watchedSalePrice &&
+				watchedRetailPrice &&
+				parseFloat(watchedSalePrice) < parseFloat(watchedRetailPrice) && (
+					<div
+						className="p-2.5 rounded-lg border flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300 bg-emerald-500 border-emerald-500"
+						role="status"
+						aria-live="polite"
+					>
+						<Sparkles
+							className="h-4 w-4 flex-shrink-0 text-emerald-500 mt-0.5"
+							aria-hidden="true"
+						/>
+						<div className="flex-1 min-w-0">
+							<p className="text-sm font-semibold text-emerald-500">
+								Active sale: ${watchedSalePrice}
+							</p>
+							<p className="text-xs text-emerald-500">
+								Save $
+								{(
+									parseFloat(watchedRetailPrice) - parseFloat(watchedSalePrice)
+								).toFixed(2)}{" "}
+								(
+								{Math.round(
+									((parseFloat(watchedRetailPrice) -
+										parseFloat(watchedSalePrice)) /
+										parseFloat(watchedRetailPrice)) *
+										100
+								)}
+								%)
+							</p>
+						</div>
+					</div>
+				)}
 		</div>
 	);
 }

@@ -149,7 +149,7 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 				</div>
 			</div>
 
-			{/* Row 3: Color (Required for duplicate detection) */}
+			{/* Row 3: Color + SKU */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div>
 					<Label className="text-sm font-medium text-slate-900">
@@ -163,6 +163,23 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 					{errors.color && (
 						<p className="text-sm text-red-600 mt-1">
 							{String(errors.color.message || "Color is required")}
+						</p>
+					)}
+				</div>
+
+				<div>
+					<Label className="text-sm font-medium text-slate-900">
+						SKU{" "}
+						<span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+					</Label>
+					<Input
+						{...register("sku")}
+						className="mt-2"
+						placeholder="e.g., DZ5485-010"
+					/>
+					{errors.sku && (
+						<p className="text-sm text-red-600 mt-1">
+							{String(errors.sku.message || "Invalid SKU")}
 						</p>
 					)}
 				</div>

@@ -335,6 +335,15 @@ export function WishlistDetailsDrawer({
 									</span>
 								</div>
 
+								<div className="flex items-center justify-between text-xs">
+									<span className="text-muted-foreground">SKU</span>
+									{item.sku ? (
+										<span className="font-medium font-mono">{item.sku}</span>
+									) : (
+										<span className="text-muted-foreground">Not specified</span>
+									)}
+								</div>
+
 								{(() => {
 									const shoppingUrl = getShoppingUrl(item);
 									const isEbayUrl = !item.product_url && !!shoppingUrl;
