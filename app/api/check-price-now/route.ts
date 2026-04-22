@@ -398,7 +398,7 @@ export async function POST(request: NextRequest) {
     // Fetch item from database
     const { data: item, error: fetchError } = await supabase
       .from('items')
-      .select('id, product_url, retail_price, sale_price, brand, model, user_id, auto_price_tracking_enabled, sku, size_tried')
+      .select('id, product_url, retail_price, sale_price, lowest_price_seen, brand, model, user_id, auto_price_tracking_enabled, sku, size_tried')
       .eq('id', itemId)
       .eq('user_id', user.id)
       .single()
@@ -509,8 +509,9 @@ export async function POST(request: NextRequest) {
       price_check_failures: 0 // Reset on success
     }
 
-    // Update lowest price if this is lower
-    if (!item.sale_price || result.price < item.sale_price) {
+    // Update lowest price if this is lower than the all-time low
+    const existingLowest = item.lowest_price_seen ?? null
+    if (existingLowest === null || result.price < existingLowest) {
       updateData.lowest_price_seen = result.price
     }
 

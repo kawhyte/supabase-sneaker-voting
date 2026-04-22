@@ -32,14 +32,12 @@ export function PricingHighlights({
   currentPrice,
   targetPrice,
 }: PricingHighlightsProps) {
-  if (priceHistory.length === 0) return null;
-
   const validRecords = priceHistory.filter((r) => r.price !== null);
-  if (validRecords.length === 0) return null;
+  if (currentPrice === null && validRecords.length === 0) return null;
 
-  const lowestRecord = validRecords.reduce((min, r) =>
-    r.price! < min.price! ? r : min
-  );
+  const lowestRecord = validRecords.length > 0
+    ? validRecords.reduce((min, r) => r.price! < min.price! ? r : min)
+    : null;
 
   const isTargetReached =
     currentPrice !== null && targetPrice !== null && currentPrice <= targetPrice;
@@ -77,12 +75,18 @@ export function PricingHighlights({
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
             All-Time Low
           </span>
-          <span className="text-xl font-bold text-foreground">
-            ${lowestRecord.price!.toFixed(2)}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {formatDate(lowestRecord.checked_at)}
-          </span>
+          {lowestRecord !== null ? (
+            <>
+              <span className="text-xl font-bold text-foreground">
+                ${lowestRecord.price!.toFixed(2)}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {formatDate(lowestRecord.checked_at)}
+              </span>
+            </>
+          ) : (
+            <span className="text-sm text-muted-foreground">—</span>
+          )}
         </div>
       </div>
 

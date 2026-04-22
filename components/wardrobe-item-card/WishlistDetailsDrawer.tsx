@@ -148,6 +148,7 @@ export function WishlistDetailsDrawer({
 		try {
 			setIsRefreshing(true);
 			await onRefreshPrice(item.id);
+			setLoadedItemId(null);
 			toast.success('Price updated');
 		} catch (error) {
 			console.error('Failed to refresh price:', error);
@@ -390,6 +391,7 @@ export function WishlistDetailsDrawer({
 				onClose={() => setIsManualEntryOpen(false)}
 				onSuccess={() => {
 					setIsManualEntryOpen(false);
+					setLoadedItemId(null);
 					onManualEntrySuccess?.();
 				}}
 			/>
