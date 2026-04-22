@@ -61,6 +61,7 @@ interface PriceCheckItem {
   size_tried: string | null
   lowest_price_seen: number | null
   sale_price: number | null
+  target_alert_sent_at: string | null
 }
 
 interface PriceResult {
@@ -653,34 +654,38 @@ class EbayApiStrategy implements IPriceStrategy {
   /**
    * Outlier Rejection Algorithm:
    * - 0 prices: return null
-   * - 1-3 prices: average all (sparse — trimming would discard everything)
-   * - 4+ prices: drop bottom/top 15%, average up to 3 of the lowest remaining
+   * - 1-3 prices: median of all (naturally handles single items and pairs without outlier bias)
+   * - 4+ prices: drop bottom/top 15%, then return the median of the full trimmed window
+   *
+   * Using median instead of "average of lowest 3" avoids structural low-bias:
+   * for 20 listings the old approach used only the 4th–6th cheapest prices overall.
    */
   private aggregatePrice(prices: number[]): number | null {
     if (prices.length === 0) return null
 
-    if (prices.length <= 3) {
-      const avg = prices.reduce((sum, p) => sum + p, 0) / prices.length
-      console.log(`eBay: ${prices.length} listings (sparse) -> avg of all (no trim)`)
-      return avg
+    const sorted = [...prices].sort((a, b) => a - b)
+
+    const median = (arr: number[]) => {
+      const mid = Math.floor(arr.length / 2)
+      return arr.length % 2 === 0 ? (arr[mid - 1] + arr[mid]) / 2 : arr[mid]
     }
 
-    const sorted = [...prices].sort((a, b) => a - b)
+    if (sorted.length <= 3) {
+      const result = median(sorted)
+      console.log(`eBay: ${sorted.length} listings (sparse) -> median: $${result}`)
+      return result
+    }
+
     const n = sorted.length
     const low = Math.floor(n * 0.15)
     const high = Math.ceil(n * 0.85)
     const middle = sorted.slice(low, high)
 
-    if (middle.length < 3) {
-      if (middle.length === 0) return null
-      const avg = middle.reduce((sum, p) => sum + p, 0) / middle.length
-      console.log(`eBay: ${n} listings -> trimmed to ${middle.length} (sparse after trim) -> avg of all middle`)
-      return avg
-    }
+    if (middle.length === 0) return null
 
-    const lowest = middle.slice(0, 3)
-    console.log(`eBay: ${n} listings -> trimmed to ${middle.length} -> avg of lowest 3`)
-    return lowest.reduce((sum, p) => sum + p, 0) / 3
+    const result = median(middle)
+    console.log(`eBay: ${n} listings -> trimmed to ${middle.length} -> median: $${result}`)
+    return result
   }
 
   async getPrice(item: PriceCheckItem): Promise<PriceResult> {
@@ -708,9 +713,10 @@ class EbayApiStrategy implements IPriceStrategy {
           .trim()
         baseQuery = `${item.brand} ${cleanModel}`
       }
-      const query = item.size_tried?.trim()
-        ? `${baseQuery} size ${item.size_tried.trim()}`
-        : baseQuery
+      const sizeClause = item.size_tried?.trim() ? ` size ${item.size_tried.trim()}` : ''
+      // Exclude kids/grade-school listings whose prices are 40-60% below adult prices
+      const kidsExclusion = ' -GS -"grade school" -PS -preschool -TD -toddler -kids -youth'
+      const query = `${baseQuery}${sizeClause}${kidsExclusion}`
 
       const params = new URLSearchParams({
         q: query,
@@ -752,9 +758,12 @@ class EbayApiStrategy implements IPriceStrategy {
         return { success: false, error: 'No eBay listings found', errorCategory: 'parse_error', strategy: 'ebay' }
       }
 
+      const retailFloor = item.retail_price ? item.retail_price * 0.30 : 0
       const prices = summaries
         .map(s => parseFloat(s.price?.value ?? ''))
         .filter(p => !isNaN(p) && p > 0)
+        // Reject listings priced below 30% of retail — almost certainly counterfeit or wrong item
+        .filter(p => p >= retailFloor)
 
       const aggregatedPrice = this.aggregatePrice(prices)
 
@@ -953,7 +962,7 @@ serve(async (req) => {
 
     const { data: items, error: fetchError } = await supabase
       .from('items')
-      .select('id, product_url, retail_price, sale_price, target_price, brand, model, price_check_failures, user_id, sku, size_tried, lowest_price_seen')
+      .select('id, product_url, retail_price, sale_price, target_price, brand, model, price_check_failures, user_id, sku, size_tried, lowest_price_seen, target_alert_sent_at')
       .eq('status', 'wishlisted')
       .eq('auto_price_tracking_enabled', true)
       .lt('price_check_failures', 3)
@@ -1090,52 +1099,50 @@ serve(async (req) => {
           }
         }
 
-        // Check if target price is met (independent of price drop)
-        if (item.target_price && result.price <= item.target_price) {
-          const sevenDaysAgo = new Date()
-          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+        // Check if target price is met (independent of price drop).
+        // target_alert_sent_at acts as a latch: set when alert fires, cleared when price rises
+        // above target. This prevents re-alerting every 7 days while price stays low.
+        let newTargetAlertSentAt = item.target_alert_sent_at
+        if (item.target_price) {
+          if (result.price <= item.target_price) {
+            if (!item.target_alert_sent_at) {
+              console.log(`TARGET REACHED: $${result.price} <= $${item.target_price}`)
 
-          const { data: existingTargetAlert } = await supabase
-            .from('notifications')
-            .select('id, created_at, is_read')
-            .eq('user_id', item.user_id)
-            .eq('notification_type', 'price_alert')
-            .contains('metadata', { item_id: item.id, target_reached: true })
-            .gte('created_at', sevenDaysAgo.toISOString())
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle()
+              const { data: targetNotification } = await supabase
+                .from('notifications')
+                .insert({
+                  user_id: item.user_id,
+                  notification_type: 'price_alert',
+                  title: 'Target Price Reached!',
+                  message: `${item.brand} ${item.model} is now $${result.price} (your target: $${item.target_price})`,
+                  severity: 'high',
+                  link_url: `/dashboard?tab=wishlist&item=${item.id}`,
+                  action_label: 'Buy Now',
+                  is_read: false,
+                  is_bundled: false,
+                  bundled_count: 0,
+                  metadata: {
+                    item_id: item.id,
+                    current_price: result.price,
+                    target_price: item.target_price,
+                    target_reached: true
+                  },
+                  created_at: new Date().toISOString()
+                })
+                .select()
+                .single()
 
-          if (existingTargetAlert) {
-            console.log(`Target price alert already sent recently (${new Date(existingTargetAlert.created_at).toLocaleDateString()}, read: ${existingTargetAlert.is_read}), skipping duplicate`)
+              if (targetNotification) alerts.push(targetNotification)
+              newTargetAlertSentAt = new Date().toISOString()
+            } else {
+              console.log(`Target alert already sent (${new Date(item.target_alert_sent_at).toLocaleDateString()}), price still below target — skipping`)
+            }
           } else {
-            console.log(`TARGET REACHED: $${result.price} <= $${item.target_price}`)
-
-            const { data: targetNotification } = await supabase
-              .from('notifications')
-              .insert({
-                user_id: item.user_id,
-                notification_type: 'price_alert',
-                title: 'Target Price Reached!',
-                message: `${item.brand} ${item.model} is now $${result.price} (your target: $${item.target_price})`,
-                severity: 'high',
-                link_url: `/dashboard?tab=wishlist&item=${item.id}`,
-                action_label: 'Buy Now',
-                is_read: false,
-                is_bundled: false,
-                bundled_count: 0,
-                metadata: {
-                  item_id: item.id,
-                  current_price: result.price,
-                  target_price: item.target_price,
-                  target_reached: true
-                },
-                created_at: new Date().toISOString()
-              })
-              .select()
-              .single()
-
-            if (targetNotification) alerts.push(targetNotification)
+            // Price is back above target — reset the latch so we alert again next time it drops
+            if (item.target_alert_sent_at) {
+              console.log(`Price $${result.price} rose above target $${item.target_price} — resetting target alert latch`)
+            }
+            newTargetAlertSentAt = null
           }
         }
 
@@ -1147,7 +1154,8 @@ serve(async (req) => {
             last_price_check_at: new Date().toISOString(),
             sale_price: result.price,
             // Compare against the stored historical minimum, not just the previous log entry
-            lowest_price_seen: Math.min(result.price, item.lowest_price_seen ?? Infinity)
+            lowest_price_seen: Math.min(result.price, item.lowest_price_seen ?? Infinity),
+            target_alert_sent_at: newTargetAlertSentAt
           })
           .eq('id', item.id)
 
