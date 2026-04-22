@@ -398,7 +398,7 @@ export async function POST(request: NextRequest) {
     // Fetch item from database
     const { data: item, error: fetchError } = await supabase
       .from('items')
-      .select('id, product_url, retail_price, sale_price, brand, model, user_id, auto_price_tracking_enabled')
+      .select('id, product_url, retail_price, sale_price, brand, model, user_id, auto_price_tracking_enabled, sku, size_tried')
       .eq('id', itemId)
       .eq('user_id', user.id)
       .single()
@@ -418,19 +418,42 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate product URL
+    // Route to eBay Edge Function for items without a product URL
+    let result: Awaited<ReturnType<typeof scrapePrice>>
+
     if (!item.product_url) {
-      return NextResponse.json(
-        { success: false, message: 'No product URL found. Add one in the edit form to enable price checking.' },
-        { status: 400 }
-      )
+      const edgeFnUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/check-prices`
+      let edgeData: { success: boolean; price?: number; error?: string } = { success: false }
+
+      try {
+        const edgeRes = await fetch(edgeFnUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            testEbay: true,
+            brand: item.brand,
+            model: item.model,
+            sku: item.sku ?? undefined,
+            size_tried: item.size_tried ?? undefined
+          }),
+          signal: AbortSignal.timeout(20000)
+        })
+        edgeData = await edgeRes.json()
+      } catch (err) {
+        edgeData = { success: false, error: err instanceof Error ? err.message : 'Edge Function unreachable' }
+      }
+
+      result = edgeData.success
+        ? { success: true, price: edgeData.price, storeName: 'eBay', supportLevel: 'high' }
+        : { success: false, error: edgeData.error || 'eBay price check failed', storeName: 'eBay', supportLevel: 'high' }
+    } else {
+      // Product URL present — scrape the retailer page
+      const config = getRetailerConfig(item.product_url)
+      result = await scrapePrice(item.product_url, config, item.retail_price)
     }
-
-    // Get retailer config and check support level
-    const config = getRetailerConfig(item.product_url)
-
-    // Scrape price
-    const result = await scrapePrice(item.product_url, config, item.retail_price)
 
     if (!result.success) {
       // Log failed check

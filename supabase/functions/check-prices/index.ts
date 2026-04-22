@@ -650,14 +650,18 @@ class EbayApiStrategy implements IPriceStrategy {
 
   /**
    * Outlier Rejection Algorithm:
-   * 1. Sort prices ascending
-   * 2. Drop bottom 15% and top 15% by index
-   * 3. From the remaining middle 70%, take the lowest 3
-   * 4. Return their average
-   * 5. Return null if fewer than 3 remain after trimming (insufficient data)
+   * - 0 prices: return null
+   * - 1-3 prices: average all (sparse — trimming would discard everything)
+   * - 4+ prices: drop bottom/top 15%, average up to 3 of the lowest remaining
    */
   private aggregatePrice(prices: number[]): number | null {
     if (prices.length === 0) return null
+
+    if (prices.length <= 3) {
+      const avg = prices.reduce((sum, p) => sum + p, 0) / prices.length
+      console.log(`eBay: ${prices.length} listings (sparse) -> avg of all (no trim)`)
+      return avg
+    }
 
     const sorted = [...prices].sort((a, b) => a - b)
     const n = sorted.length
@@ -665,12 +669,10 @@ class EbayApiStrategy implements IPriceStrategy {
     const high = Math.ceil(n * 0.85)
     const middle = sorted.slice(low, high)
 
-    console.log(`eBay: ${n} listings -> trimmed to ${middle.length} -> avg of lowest 3`)
-
-    if (middle.length < 3) return null
-
-    const lowest3 = middle.slice(0, 3)
-    return lowest3.reduce((sum, p) => sum + p, 0) / 3
+    const take = Math.min(3, middle.length)
+    const lowest = middle.slice(0, take)
+    console.log(`eBay: ${n} listings -> trimmed to ${middle.length} -> avg of lowest ${take}`)
+    return lowest.reduce((sum, p) => sum + p, 0) / take
   }
 
   async getPrice(item: PriceCheckItem): Promise<PriceResult> {
