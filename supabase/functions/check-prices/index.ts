@@ -59,6 +59,8 @@ interface PriceCheckItem {
   user_id: string
   sku: string | null
   size_tried: string | null
+  lowest_price_seen: number | null
+  sale_price: number | null
 }
 
 interface PriceResult {
@@ -951,11 +953,12 @@ serve(async (req) => {
 
     const { data: items, error: fetchError } = await supabase
       .from('items')
-      .select('id, product_url, retail_price, target_price, brand, model, price_check_failures, user_id, sku, size_tried')
+      .select('id, product_url, retail_price, sale_price, target_price, brand, model, price_check_failures, user_id, sku, size_tried, lowest_price_seen')
       .eq('status', 'wishlisted')
       .eq('auto_price_tracking_enabled', true)
       .lt('price_check_failures', 3)
-      .limit(60) // Keep under 150s timeout: 60 items × 2s = 120s
+      .order('last_price_check_at', { ascending: true, nullsFirst: true }) // oldest-checked items first for fairness
+      .limit(50) // 50 items × 2s delay + ~0.5s per check = ~125s, leaving margin before 150s limit
 
     if (fetchError) throw fetchError
 
@@ -973,8 +976,15 @@ serve(async (req) => {
     let failureCount = 0
     const alerts: unknown[] = []
     const retailerStats: Record<string, { success: number; failure: number }> = {}
+    const batchStartTime = Date.now()
+    const BUDGET_MS = 120_000 // hard stop at 120s, leaving 30s margin before Supabase's 150s limit
 
     for (let i = 0; i < items.length; i++) {
+      if (Date.now() - batchStartTime > BUDGET_MS) {
+        console.log(`Time budget (${BUDGET_MS / 1000}s) reached after ${i} items — stopping batch. Remaining items will be prioritised on next run.`)
+        break
+      }
+
       const item = items[i] as PriceCheckItem
       console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
       console.log(`${i + 1}/${items.length}: ${item.brand} ${item.model}`)
@@ -1136,7 +1146,8 @@ serve(async (req) => {
             price_check_failures: 0,
             last_price_check_at: new Date().toISOString(),
             sale_price: result.price,
-            lowest_price_seen: result.price < (previousPrice || Infinity) ? result.price : previousPrice
+            // Compare against the stored historical minimum, not just the previous log entry
+            lowest_price_seen: Math.min(result.price, item.lowest_price_seen ?? Infinity)
           })
           .eq('id', item.id)
 
@@ -1157,10 +1168,14 @@ serve(async (req) => {
           http_status_code: result.statusCode
         })
 
-        // "No listings found" is a data gap, not an API failure — don't count toward auto-disable
+        // Transient infrastructure errors (rate limits, timeouts, server errors) and data gaps should
+        // not count toward auto-disable — only genuine config/data issues (bad selector, invalid price)
+        const isTransient = result.errorCategory === 'network_error' ||
+          result.errorCategory === 'bot_detection' ||
+          result.errorCategory === 'timeout'
         const isDataGap = result.error === 'No eBay listings found' ||
           result.error === 'Insufficient eBay listings after outlier rejection'
-        const newFailureCount = isDataGap
+        const newFailureCount = (isTransient || isDataGap)
           ? (item.price_check_failures || 0)
           : (item.price_check_failures || 0) + 1
 

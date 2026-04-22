@@ -398,7 +398,7 @@ export async function POST(request: NextRequest) {
     // Fetch item from database
     const { data: item, error: fetchError } = await supabase
       .from('items')
-      .select('id, product_url, retail_price, sale_price, lowest_price_seen, brand, model, user_id, auto_price_tracking_enabled, sku, size_tried')
+      .select('id, product_url, retail_price, sale_price, lowest_price_seen, target_price, brand, model, user_id, auto_price_tracking_enabled, sku, size_tried')
       .eq('id', itemId)
       .eq('user_id', user.id)
       .single()
@@ -531,7 +531,7 @@ export async function POST(request: NextRequest) {
       success: true
     })
 
-    // Check if price dropped and create notification
+    // Check if price dropped and create notification (with 7-day dedup to match Edge Function behaviour)
     const previousPrice = item.sale_price || item.retail_price
     if (previousPrice && result.price < previousPrice) {
       const dropPercentage = ((previousPrice - result.price) / previousPrice) * 100
@@ -539,27 +539,78 @@ export async function POST(request: NextRequest) {
       if (dropPercentage >= 30) severity = 'high'
       else if (dropPercentage >= 15) severity = 'medium'
 
-      const notificationTitle =
-        severity === 'high' ? 'Big Price Drop! 🎉' :
-        severity === 'medium' ? 'Price Drop Alert 💰' :
-        'Small Price Drop 👀'
+      const sevenDaysAgo = new Date()
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
-      await supabase.from('notifications').insert({
-        user_id: user.id,
-        notification_type: 'price_alert',
-        title: notificationTitle,
-        message: `${item.brand} ${item.model} dropped to $${result.price} (${Math.round(dropPercentage)}% off)`,
-        severity,
-        link_url: `/dashboard?tab=wishlist&item=${item.id}`,
-        action_label: 'View Item',
-        is_read: false,
-        metadata: {
-          item_id: item.id,
-          current_price: result.price,
-          previous_price: previousPrice,
-          percentage_off: Math.round(dropPercentage)
-        }
-      })
+      const { data: recentAlert } = await supabase
+        .from('notifications')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('notification_type', 'price_alert')
+        .contains('metadata', { item_id: item.id })
+        .not('metadata', 'cs', JSON.stringify({ target_reached: true }))
+        .gte('created_at', sevenDaysAgo.toISOString())
+        .limit(1)
+        .maybeSingle()
+
+      if (!recentAlert) {
+        const notificationTitle =
+          severity === 'high' ? 'Big Price Drop!' :
+          severity === 'medium' ? 'Price Drop Alert' :
+          'Small Price Drop'
+
+        await supabase.from('notifications').insert({
+          user_id: user.id,
+          notification_type: 'price_alert',
+          title: notificationTitle,
+          message: `${item.brand} ${item.model} dropped to $${result.price} (${Math.round(dropPercentage)}% off)`,
+          severity,
+          link_url: `/dashboard?tab=wishlist&item=${item.id}`,
+          action_label: 'View Item',
+          is_read: false,
+          metadata: {
+            item_id: item.id,
+            current_price: result.price,
+            previous_price: previousPrice,
+            percentage_off: Math.round(dropPercentage)
+          }
+        })
+      }
+    }
+
+    // Check if target price reached (manual checks should fire this too)
+    if (item.target_price && result.price <= item.target_price) {
+      const sevenDaysAgo = new Date()
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+      const { data: recentTargetAlert } = await supabase
+        .from('notifications')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('notification_type', 'price_alert')
+        .contains('metadata', { item_id: item.id, target_reached: true })
+        .gte('created_at', sevenDaysAgo.toISOString())
+        .limit(1)
+        .maybeSingle()
+
+      if (!recentTargetAlert) {
+        await supabase.from('notifications').insert({
+          user_id: user.id,
+          notification_type: 'price_alert',
+          title: 'Target Price Reached!',
+          message: `${item.brand} ${item.model} is now $${result.price} (your target: $${item.target_price})`,
+          severity: 'high',
+          link_url: `/dashboard?tab=wishlist&item=${item.id}`,
+          action_label: 'Buy Now',
+          is_read: false,
+          metadata: {
+            item_id: item.id,
+            current_price: result.price,
+            target_price: item.target_price,
+            target_reached: true
+          }
+        })
+      }
     }
 
     return NextResponse.json({
