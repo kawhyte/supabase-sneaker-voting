@@ -253,21 +253,22 @@ export function WardrobeListItem({
 							<button
 								onClick={handleDecrementWear}
 								disabled={!item.wears || item.wears <= 0}
-								className="text-xs px-2 py-1 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed"
-								aria-label="Decrement wear count"
+								className="h-7 w-7 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-600 hover:text-slate-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+								aria-label="Remove a wear"
 								title="Remove a wear"
 							>
-								<Minus size={12} />
-								Wear
+								<Minus className="h-3.5 w-3.5" />
 							</button>
+							<span className="font-mono text-xs text-slate-600 tabular-nums min-w-[2rem] text-center select-none">
+								{item.wears ?? 0}×
+							</span>
 							<button
 								onClick={handleIncrementWear}
-								className="text-xs px-2 py-1 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1"
-								aria-label="Increment wear count"
+								className="h-7 w-7 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-600 hover:text-slate-900 transition-all"
+								aria-label="Log a wear"
 								title="Log a wear"
 							>
-								<Plus size={12} />
-								Wear
+								<Plus className="h-3.5 w-3.5" />
 							</button>
 						</div>
 					)}

@@ -109,7 +109,7 @@ export function ItemPricingDisplay({
 							onClick={onOpenDrawer}
 							variant='outline'
 							size='sm'
-							className='w-full justify-center gap-2 h-9 bg-white hover:bg-slate-50 border-slate-300 text-foreground'
+							className='w-full justify-center gap-2 h-9 bg-slate-50 hover:bg-slate-100 border-slate-200 hover:border-slate-300 text-slate-700 font-medium'
 						>
 							<Info className='h-4 w-4' />
 							View Details

@@ -184,9 +184,10 @@ function WardrobeItemCardComponent({
 
 							{/* Last Worn - Collection view only */}
 							{item.last_worn_date && viewMode === 'collection' && permissions.canTrackWearCount && (
-								<span className='font-mono uppercase tracking-[0.1em] text-xs text-muted-foreground'>
-									LAST WORN: {formatDate(item.last_worn_date)}
-								</span>
+								<div className='flex items-baseline gap-1.5'>
+									<span className='font-mono uppercase tracking-[0.1em] text-xs text-slate-400'>LAST WORN:</span>
+									<span className='font-mono text-xs text-slate-700 font-medium'>{formatDate(item.last_worn_date)}</span>
+								</div>
 							)}
 						</div>
 
@@ -237,7 +238,7 @@ function WardrobeItemCardComponent({
 
 						{/* Footer - Cost Per Wear Button */}
 						{viewMode === 'collection'  && (
-						<div className='flex items-center gap-2 flex-wrap mt-auto pt-4'>
+						<div className='flex items-center gap-2 flex-wrap mt-auto pt-4 border-t border-slate-100'>
 							<ItemFooterBadges
 								item={item}
 								viewMode={viewMode}
