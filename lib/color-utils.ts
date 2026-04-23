@@ -96,9 +96,16 @@ export async function generateSneakerPalette(imageUrl: string): Promise<ColorPal
       lightMuted: palette.LightMuted
     };
 
-    // Filter out null swatches and sort by population (most prominent colors first)
+    // Filter out null swatches and background colors (near-white / light-grey pixels
+    // that dominate images with plain product-photo backgrounds), then sort by population.
     const availableSwatches = Object.entries(swatches)
-      .filter(([_, swatch]) => swatch !== null && swatch !== undefined)
+      .filter(([_, swatch]) => {
+        if (!swatch) return false;
+        const { s, l } = tinycolor(swatch.hex).toHsl();
+        const isBackground = l > 0.88 && s < 0.20;
+        if (isBackground) console.log(`🚫 Skipping background swatch: ${swatch.hex} (l=${(l*100).toFixed(0)}%, s=${(s*100).toFixed(0)}%)`);
+        return !isBackground;
+      })
       .sort((a, b) => (b[1]?.population || 0) - (a[1]?.population || 0));
 
     if (availableSwatches.length === 0) {

@@ -139,8 +139,6 @@ function DashboardContent() {
 								transition={{ duration: 0.3 }}>
 								<SneakerInspirationView
 									showHeader={true}
-									page={page}
-									buildPageUrl={buildPageUrl}
 								/>
 							</motion.div>
 						</TabsContent>

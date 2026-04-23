@@ -69,18 +69,18 @@ export function ItemFooterBadges({
 				)}
 				<button
 					onClick={(e) => { e.stopPropagation(); setWearDrawerOpen(true); }}
-					className="group font-mono text-xs hover:text-accent transition-colors flex items-center gap-0.5"
+					className="group font-mono text-xs flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 active:scale-95 transition-all"
 					type="button"
 					aria-label="View wear statistics">
 					{cpw ? (
 						<>
 							<span className="text-slate-800 font-medium tabular-nums">${cpw}</span>
-							<span className="text-slate-400"> / wear</span>
+							<span className="text-slate-500"> / wear</span>
 						</>
 					) : (
-						<span className="text-slate-400 italic text-xs">Unworn</span>
+						<span className="text-slate-500 italic">Unworn</span>
 					)}
-					<ArrowUpRight className="w-3 h-3 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 text-slate-400" />
+					<ArrowUpRight className="w-3 h-3 text-slate-500 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
 				</button>
 				</div>
 			</div>

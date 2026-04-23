@@ -1,17 +1,18 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useTransition } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { SneakerPaletteCard } from '@/components/sneaker-inspo/SneakerPaletteCard'
 import { StyleGuideDialog } from '@/components/sneaker-inspo/StyleGuideDialog'
 import { FitFormulaCard } from '@/components/sneaker-inspo/FitFormulaCard'
+import { SneakerSelectorDrawer } from '@/components/sneaker-inspo/SneakerSelectorDrawer'
 import { WardrobeItem } from '@/components/types/WardrobeItem'
 import { Button } from '@/components/ui/button'
-import { migrateAllSneakers, migrateLegacyPalettes } from '@/app/actions/color-analysis'
+import { analyzeAndSaveColors } from '@/app/actions/color-analysis'
 import { toast } from 'sonner'
-import { Palette, Loader2, AlertCircle, RefreshCw, X, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Palette, Loader2, AlertCircle, X, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ColorWithRole } from '@/lib/color-utils'
 import { buildFormulaAdvice } from '@/lib/fit-formula-utils'
@@ -20,8 +21,6 @@ import { cn } from '@/lib/utils'
 interface SneakerInspirationViewProps {
   showHeader?: boolean
   className?: string
-  page?: number
-  buildPageUrl?: (page: number) => string
 }
 
 const FIT_FORMULAS = [
@@ -75,11 +74,9 @@ export function SneakerInspirationView({
 }: SneakerInspirationViewProps) {
   const [items, setItems] = useState<WardrobeItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isMigratingLegacy, setIsMigratingLegacy] = useState(false)
-  const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
-  const [isLoggingId, setIsLoggingId] = useState<string | null>(null)
+  const [generatingPaletteFor, setGeneratingPaletteFor] = useState<string | null>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
   const fitFormulaSectionRef = useRef<HTMLDivElement>(null)
@@ -149,50 +146,6 @@ export function SneakerInspirationView({
     }
   }
 
-  const handleGenerateMissing = () => {
-    startTransition(async () => {
-      try {
-        const [newResult, legacyResult] = await Promise.all([
-          migrateAllSneakers(),
-          migrateLegacyPalettes()
-        ])
-
-        const totalProcessed = newResult.succeeded + legacyResult.succeeded
-
-        if (newResult.success && legacyResult.success) {
-          toast.success(`Successfully generated formulas for ${totalProcessed} items!`)
-        } else {
-          toast.error('Migration finished, but some formulas failed. Check console.')
-        }
-
-        await loadSneakers()
-      } catch (error) {
-        console.error('Migration error:', error)
-        toast.error('An unexpected error occurred during generation')
-      }
-    })
-  }
-
-  const handleMigrateLegacy = async () => {
-    setIsMigratingLegacy(true)
-
-    try {
-      const result = await migrateLegacyPalettes()
-
-      if (result.success) {
-        toast.success(result.message || 'Legacy palettes upgraded')
-        await loadSneakers()
-      } else {
-        toast.error(result.message || 'Upgrade failed')
-      }
-    } catch (error) {
-      console.error('Legacy migration error:', error)
-      toast.error('An unexpected error occurred during upgrade.')
-    } finally {
-      setIsMigratingLegacy(false)
-    }
-  }
-
   const handlePaletteGenerated = (itemId: string, palette: { bold: ColorWithRole[]; muted: ColorWithRole[] }) => {
     setItems(prevItems =>
       prevItems.map(item =>
@@ -211,39 +164,34 @@ export function SneakerInspirationView({
     return Array.isArray(item.color_palette) && item.color_palette.length > 0
   }
 
-  const hasLegacyPalette = (item: WardrobeItem): boolean => {
-    if (!item.color_palette) return false
-    return Array.isArray(item.color_palette)
-  }
-
-  const handleLogWear = async (item: WardrobeItem) => {
-    setIsLoggingId(item.id)
-    const newWears = (item.wears ?? 0) + 1
-
-    setItems(prev => prev.map(i => i.id === item.id ? { ...i, wears: newWears } : i))
-
-    try {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('items')
-        .update({ wears: newWears })
-        .eq('id', item.id)
-
-      if (error) throw error
-
-      toast.success('Wear logged! CPW updated.')
-    } catch (err) {
-      setItems(prev => prev.map(i => i.id === item.id ? { ...i, wears: item.wears } : i))
-      toast.error('Failed to log wear. Please try again.')
-    } finally {
-      setIsLoggingId(null)
-    }
-  }
-
-  const handleSelectItem = (itemId: string) => {
+  const handleSelectItem = async (itemId: string) => {
     const next = selectedItemId === itemId ? null : itemId
     setSelectedItemId(next)
-    if (next) {
+    if (!next) return
+
+    const item = items.find(i => i.id === itemId)
+
+    if (!item || hasPalette(item)) {
+      setTimeout(() => {
+        fitFormulaSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 50)
+      return
+    }
+
+    // No palette — generate on the fly
+    setGeneratingPaletteFor(itemId)
+    try {
+      const imageUrl = getCarouselImage(item)
+      const result = await analyzeAndSaveColors(itemId, imageUrl)
+      if (result.success && result.palette) {
+        handlePaletteGenerated(itemId, result.palette)
+      } else {
+        toast.error('Could not generate palette for this sneaker.')
+      }
+    } catch {
+      toast.error('Could not generate palette for this sneaker.')
+    } finally {
+      setGeneratingPaletteFor(null)
       setTimeout(() => {
         fitFormulaSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 50)
@@ -253,23 +201,15 @@ export function SneakerInspirationView({
   const selectedItem = items.find(item => item.id === selectedItemId) ?? null
 
   const getExtractedColors = (item: WardrobeItem): [string, string, string] => {
+    // Use the raw primary_color for formula math — it's the unmodified vibrant primary.
+    // bold[4] = "Shoe Accent" (secondary with slight sat boost), bold[1] = ambient accent.
+    const primary = item.primary_color ?? '#888888'
     const palette = item.color_palette
     if (palette && typeof palette === 'object' && 'bold' in palette) {
       const bold = (palette as { bold: ColorWithRole[] }).bold
-      return [
-        bold[0]?.hex ?? '#888888',
-        bold[1]?.hex ?? '#888888',
-        bold[2]?.hex ?? '#888888',
-      ]
+      return [primary, bold[4]?.hex ?? '#888888', bold[1]?.hex ?? '#888888']
     }
-    return ['#888888', '#888888', '#888888']
-  }
-
-  const getProjectedCPW = (item: WardrobeItem): number => {
-    const price = item.purchase_price ?? item.retail_price ?? 0
-    if (!price) return 0
-    const wears = (item.wears ?? 0) + 1
-    return price / wears
+    return [primary, '#888888', '#888888']
   }
 
   const selectedHasBoldPalette = selectedItem
@@ -278,13 +218,9 @@ export function SneakerInspirationView({
         'bold' in selectedItem.color_palette)
     : false
 
-  const itemsWithoutPalettes = items.filter(item => !hasPalette(item)).length
-  const itemsWithLegacyPalettes = items.filter(item => hasLegacyPalette(item)).length
-
   if (isLoading) {
     return (
       <div className={className}>
-        {/* Carousel skeleton */}
         <div className="flex gap-4 overflow-hidden mb-8">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex-shrink-0 flex flex-col items-center gap-1.5">
@@ -293,7 +229,6 @@ export function SneakerInspirationView({
             </div>
           ))}
         </div>
-        {/* Prompt area skeleton */}
         <div className="flex flex-col items-center justify-center min-h-[320px] gap-3">
           <Skeleton className="h-10 w-10 rounded-full" />
           <Skeleton className="h-6 w-64" />
@@ -334,102 +269,11 @@ export function SneakerInspirationView({
               Discover harmonious color palettes from your sneakers to inspire your next outfit
             </p>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            <StyleGuideDialog />
-            {itemsWithLegacyPalettes > 0 && (
-              <Button
-                onClick={handleMigrateLegacy}
-                disabled={isMigratingLegacy}
-                size="lg"
-                variant="outline"
-              >
-                {isMigratingLegacy ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Upgrading...
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Upgrade to Dual-Vibe ({itemsWithLegacyPalettes})
-                  </>
-                )}
-              </Button>
-            )}
-
-            {itemsWithoutPalettes > 0 && (
-              <Button
-                onClick={handleGenerateMissing}
-                disabled={isPending}
-                size="lg"
-                variant="outline"
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Palette className="h-4 w-4 mr-2" />
-                    Generate Missing Formulas ({itemsWithoutPalettes})
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
+          <StyleGuideDialog />
         </div>
       )}
 
-      {/* Compact action bar for dashboard tab */}
-      {!showHeader && (itemsWithoutPalettes > 0 || itemsWithLegacyPalettes > 0) && (
-        <div className="flex items-center justify-end gap-2 mb-6">
-          {itemsWithLegacyPalettes > 0 && (
-            <Button
-              onClick={handleMigrateLegacy}
-              disabled={isMigratingLegacy}
-              size="sm"
-              variant="outline"
-            >
-              {isMigratingLegacy ? (
-                <>
-                  <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                  Upgrading...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-3 w-3 mr-2" />
-                  Upgrade ({itemsWithLegacyPalettes})
-                </>
-              )}
-            </Button>
-          )}
-
-          {itemsWithoutPalettes > 0 && (
-            <Button
-              onClick={handleGenerateMissing}
-              disabled={isPending}
-              size="sm"
-              variant="outline"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Palette className="h-3 w-3 mr-2" />
-                  Generate Missing ({itemsWithoutPalettes})
-                </>
-              )}
-            </Button>
-          )}
-        </div>
-      )}
-
-      {/* Empty state — no sneakers in collection */}
+      {/* Empty state */}
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 py-12">
           <Palette className="h-16 w-16 text-muted-foreground" />
@@ -443,8 +287,18 @@ export function SneakerInspirationView({
         </div>
       ) : (
         <>
-          {/* Sneaker selector carousel */}
-          <div className="relative mb-8">
+          {/* ── Mobile: bottom-sheet sneaker picker ── */}
+          <div className="sm:hidden mb-6">
+            <SneakerSelectorDrawer
+              items={items}
+              selectedItemId={selectedItemId}
+              selectedItem={selectedItem}
+              onSelect={handleSelectItem}
+            />
+          </div>
+
+          {/* ── Desktop: horizontal scroll carousel ── */}
+          <div className="hidden sm:block relative mb-8">
             {canScrollLeft && (
               <button
                 onClick={() => scrollCarousel('left')}
@@ -500,7 +354,7 @@ export function SneakerInspirationView({
             )}
           </div>
 
-          {/* Selection prompt — items exist but nothing chosen yet */}
+          {/* Selection prompt */}
           {!selectedItemId && (
             <div className="flex flex-col items-center justify-center min-h-[320px] gap-3 py-12 text-center">
               <Sparkles className="h-10 w-10 text-muted-foreground" />
@@ -524,8 +378,17 @@ export function SneakerInspirationView({
                 />
               </div>
 
+              {/* Generating skeleton */}
+              {generatingPaletteFor === selectedItem.id && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
+                  {[0, 1, 2].map(i => (
+                    <Skeleton key={i} className="h-48 rounded-[2rem]" />
+                  ))}
+                </div>
+              )}
+
               {/* Fit formulas — only when palette has been generated */}
-              {selectedHasBoldPalette && (
+              {generatingPaletteFor !== selectedItem.id && selectedHasBoldPalette && (
                 <div className="mt-10">
                   <div className="flex items-center justify-between mb-6">
                     <div>
@@ -557,9 +420,6 @@ export function SneakerInspirationView({
                           recommendedSwatches={swatches}
                           extractedColors={colors}
                           sneakerName={`${selectedItem.brand} ${selectedItem.model}`}
-                          projectedCPW={getProjectedCPW(selectedItem)}
-                          onLogWear={() => handleLogWear(selectedItem)}
-                          isPending={isLoggingId === selectedItem.id}
                         />
                       )
                     })}

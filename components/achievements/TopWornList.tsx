@@ -89,8 +89,8 @@ export function TopWornList({ items, variant = 'full' }: TopWornListProps) {
                 </p>
               </div>
 
-              {/* Rank Badge */}
-              <p className="font-bold text-primary flex-shrink-0">
+              {/* Rank Badge — muted so shoe name typography reads first */}
+              <p className="text-xs text-muted-foreground font-normal flex-shrink-0 tabular-nums">
                 #{index + 1}
               </p>
             </Link>

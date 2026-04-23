@@ -425,6 +425,108 @@ export async function getBestValueItems(userId: string, limit: number = 5): Prom
   }
 }
 
+export interface PriceTrendPoint {
+  date: string
+  value: number
+}
+
+export interface PortfolioPriceTrend {
+  points: PriceTrendPoint[]
+  deltaAmount: number
+  deltaPct: number
+}
+
+/**
+ * Fetch total earned achievement points for a user
+ */
+export async function getUserTotalPoints(userId: string): Promise<number> {
+  const supabase = createClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('user_achievements')
+      .select('achievements!inner(points)')
+      .eq('user_id', userId)
+
+    if (error || !data) return 0
+
+    return data.reduce((sum: number, row: any) => {
+      const pts = row.achievements?.points ?? 0
+      return sum + pts
+    }, 0)
+  } catch {
+    return 0
+  }
+}
+
+/**
+ * Fetch 30-day portfolio price trend from price_history for owned items.
+ * Groups rows into weekly buckets and sums latest price per item per bucket.
+ * Returns empty points[] with delta=0 when price_history is sparse.
+ */
+export async function getPortfolioPriceTrend(userId: string): Promise<PortfolioPriceTrend> {
+  const supabase = createClient()
+
+  const empty: PortfolioPriceTrend = { points: [], deltaAmount: 0, deltaPct: 0 }
+
+  try {
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+    const { data, error } = await supabase
+      .from('price_history')
+      .select('item_id, price, checked_at')
+      .eq('user_id', userId)
+      .gte('checked_at', thirtyDaysAgo.toISOString())
+      .order('checked_at', { ascending: true })
+
+    if (error || !data || data.length === 0) return empty
+
+    // Bucket rows into ~5 weekly slots
+    const bucketCount = 5
+    const now = Date.now()
+    const windowMs = 30 * 24 * 60 * 60 * 1000
+
+    const buckets: Map<number, Map<string, number>> = new Map()
+    for (let i = 0; i < bucketCount; i++) {
+      buckets.set(i, new Map())
+    }
+
+    for (const row of data) {
+      const age = now - new Date(row.checked_at).getTime()
+      const bucketIdx = Math.min(
+        bucketCount - 1,
+        Math.floor(((windowMs - age) / windowMs) * bucketCount),
+      )
+      const bucket = buckets.get(bucketIdx)!
+      // Keep latest price per item in each bucket (rows are ordered asc, so later overwrites)
+      bucket.set(row.item_id, row.price)
+    }
+
+    // Build ordered points array — only include buckets that have data
+    const points: PriceTrendPoint[] = []
+    const weekLabels = ['4w ago', '3w ago', '2w ago', '1w ago', 'Now']
+
+    for (let i = 0; i < bucketCount; i++) {
+      const bucket = buckets.get(i)!
+      if (bucket.size === 0) continue
+      const sum = Array.from(bucket.values()).reduce((a, b) => a + b, 0)
+      points.push({ date: weekLabels[i], value: Math.round(sum * 100) / 100 })
+    }
+
+    if (points.length < 2) return empty
+
+    const first = points[0].value
+    const last = points[points.length - 1].value
+    const deltaAmount = Math.round((last - first) * 100) / 100
+    const deltaPct = first > 0 ? Math.round((deltaAmount / first) * 1000) / 10 : 0
+
+    return { points, deltaAmount, deltaPct }
+  } catch {
+    return empty
+  }
+}
+
 /**
  * Helper to get main image from item or item_photos
  */

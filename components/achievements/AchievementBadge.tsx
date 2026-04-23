@@ -38,7 +38,7 @@ export const AchievementBadge = forwardRef<HTMLButtonElement, AchievementBadgePr
           hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
           ${isUnlocked
             ? 'bg-primary/20'
-            : 'bg-gray-200 dark:bg-gray-800 opacity-50'
+            : 'bg-gray-200 dark:bg-gray-800 opacity-40 grayscale'
           }
         `}
         aria-label={`${name} achievement ${isUnlocked ? 'unlocked' : 'locked'}`}

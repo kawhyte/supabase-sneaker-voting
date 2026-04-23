@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase/client'
 import './achievements.css'
 import { AchievementsSidebar } from '@/components/achievements/AchievementsSidebar'
 import { AchievementsErrorBoundary } from '@/components/achievements/AchievementsErrorBoundary'
+import { PlayerCard } from '@/components/achievements/PlayerCard'
 import {
   SidebarSkeleton,
   FinancialInsightsSkeleton,
@@ -15,10 +16,13 @@ import {
   getTopWornItems,
   getLeastWornItems,
   getBestValueItems,
+  getUserTotalPoints,
+  getPortfolioPriceTrend,
   type WardrobeStats,
   type TopWornItem,
   type LeastWornItem,
   type BestValueItem,
+  type PortfolioPriceTrend,
 } from '@/lib/achievements-stats'
 import { FinancialInsights } from '@/components/achievements/FinancialInsights'
 
@@ -42,6 +46,8 @@ function AchievementsPageContent() {
   const [topWorn, setTopWorn] = useState<TopWornItem[]>([])
   const [leastWorn, setLeastWorn] = useState<LeastWornItem[]>([])
   const [bestValue, setBestValue] = useState<BestValueItem[]>([])
+  const [totalPoints, setTotalPoints] = useState<number>(0)
+  const [priceTrend, setPriceTrend] = useState<PortfolioPriceTrend | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
@@ -75,17 +81,22 @@ function AchievementsPageContent() {
         }
 
         // Fetch 5 items; components slice to 3 on mobile
-        const [statsData, topWornData, leastWornData, bestValueData] = await Promise.all([
-          getWardrobeStats(user.id),
-          getTopWornItems(user.id, 5),
-          getLeastWornItems(user.id, 5),
-          getBestValueItems(user.id, 5),
-        ])
+        const [statsData, topWornData, leastWornData, bestValueData, totalPts, trend] =
+          await Promise.all([
+            getWardrobeStats(user.id),
+            getTopWornItems(user.id, 5),
+            getLeastWornItems(user.id, 5),
+            getBestValueItems(user.id, 5),
+            getUserTotalPoints(user.id),
+            getPortfolioPriceTrend(user.id),
+          ])
 
         setStats(statsData)
         setTopWorn(topWornData)
         setLeastWorn(leastWornData)
         setBestValue(bestValueData)
+        setTotalPoints(totalPts)
+        setPriceTrend(trend)
       } catch (err) {
         console.error('Error loading achievements:', err)
         setError('Failed to load achievements. Please try again.')
@@ -125,17 +136,25 @@ function AchievementsPageContent() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 achievements-main">
-      <h1 className="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em] mb-8">
+      <h1 className="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em] mb-6">
         {getGreeting(userName)}
       </h1>
 
-      <AchievementsSidebar topWorn={topWorn} leastWorn={leastWorn} bestValue={bestValue} />
+      <PlayerCard totalPoints={totalPoints} />
+
+      <AchievementsSidebar
+        topWorn={topWorn}
+        leastWorn={leastWorn}
+        bestValue={bestValue}
+        userId={userId}
+      />
 
       <div className="space-y-8 mt-16">
         <FinancialInsights
           totalValue={stats.totalValue}
           totalWears={stats.totalWears}
           averageCpw={stats.averageCpw}
+          priceTrend={priceTrend}
         />
 
         {userId && (

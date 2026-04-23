@@ -169,6 +169,59 @@ async function checkCustomMetric(userId: string, metric: string, threshold: numb
         return (data?.length ?? 0) >= threshold
       }
 
+      case 'daily_driver_pair': {
+        // Any single owned pair with >= threshold wears AND worn within the last 7 days
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+        const { data } = await supabase
+          .from('items')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('status', 'owned')
+          .eq('is_archived', false)
+          .gte('wears', threshold)
+          .gte('last_worn_date', sevenDaysAgo.toISOString().split('T')[0])
+
+        return (data?.length ?? 0) > 0
+      }
+
+      case 'rotation_god': {
+        // >= threshold distinct categories worn in the trailing 7 days
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+        const { data } = await supabase
+          .from('items')
+          .select('category')
+          .eq('user_id', userId)
+          .eq('status', 'owned')
+          .eq('is_archived', false)
+          .gte('last_worn_date', sevenDaysAgo.toISOString().split('T')[0])
+
+        if (!data || data.length === 0) return false
+        const distinctCategories = new Set(data.map((item) => item.category)).size
+        return distinctCategories >= threshold
+      }
+
+      case 'diamond_hands': {
+        // Any owned item where lowest_price_seen <= retail_price * 0.90 (value dropped ≥10%)
+        const { data } = await supabase
+          .from('items')
+          .select('id, retail_price, lowest_price_seen')
+          .eq('user_id', userId)
+          .eq('status', 'owned')
+          .eq('is_archived', false)
+          .not('lowest_price_seen', 'is', null)
+          .not('retail_price', 'is', null)
+
+        if (!data || data.length === 0) return false
+        return data.some((item) => {
+          if (!item.retail_price || !item.lowest_price_seen) return false
+          return item.lowest_price_seen <= item.retail_price * 0.90
+        })
+      }
+
       default:
         return false
     }

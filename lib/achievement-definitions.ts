@@ -1,4 +1,4 @@
-import { LucideIcon, Package, Footprints, Sparkles, Gem, TrendingUp, RefreshCw, Compass, Globe, Target, Flame, Star, Repeat2 } from 'lucide-react'
+import { LucideIcon, Package, Footprints, Sparkles, Gem, TrendingUp, RefreshCw, Compass, Globe, Target, Flame, Star, Repeat2, Zap, Shuffle, Shield } from 'lucide-react'
 
 export interface AchievementDefinition {
   id: string
@@ -25,7 +25,7 @@ export interface AchievementDefinition {
  * - Positive framing only
  */
 export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
-  // Wardrobe Size Milestones (Natural Growth)
+  // Wardrobe Size Milestones (Natural Growth) — lower points so engagement achievements rank higher
   {
     id: 'wardrobe_starter',
     name: 'Collection Starter',
@@ -33,7 +33,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     icon: Package,
     tier: 'Bronze',
     category: 'wardrobe',
-    points: 10,
+    points: 5,
     criteria: { type: 'count', threshold: 10, metric: 'total_items' },
   },
   {
@@ -43,7 +43,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     icon: Footprints,
     tier: 'Silver',
     category: 'wardrobe',
-    points: 25,
+    points: 15,
     criteria: { type: 'count', threshold: 25, metric: 'total_items' },
   },
   {
@@ -53,7 +53,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     icon: Sparkles,
     tier: 'Gold',
     category: 'wardrobe',
-    points: 50,
+    points: 30,
     criteria: { type: 'count', threshold: 50, metric: 'total_items' },
   },
 
@@ -156,9 +156,36 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     points: 60,
     criteria: { type: 'custom', threshold: 5, metric: 'unique_pairs_worn_this_week' },
   },
-]
 
-/**
- * IMPORTANT: No streak-based achievements in this list!
- * Philosophy: We want engagement, not anxiety about breaking streaks.
- */
+  // Recurring Engagement Achievements
+  {
+    id: 'daily_driver',
+    name: 'Daily Driver',
+    description: 'Wear the same pair 10+ times and rock it within the last 7 days',
+    icon: Zap,
+    tier: 'Gold',
+    category: 'efficiency',
+    points: 40,
+    criteria: { type: 'custom', threshold: 10, metric: 'daily_driver_pair' },
+  },
+  {
+    id: 'rotation_god',
+    name: 'Rotation God',
+    description: 'Wear 5 different silhouette categories in a single week',
+    icon: Shuffle,
+    tier: 'Gold',
+    category: 'discovery',
+    points: 50,
+    criteria: { type: 'custom', threshold: 5, metric: 'rotation_god' },
+  },
+  {
+    id: 'diamond_hands',
+    name: 'Diamond Hands',
+    description: "A shoe's market value dropped 10%+ but you kept it anyway",
+    icon: Shield,
+    tier: 'Platinum',
+    category: 'discovery',
+    points: 75,
+    criteria: { type: 'custom', threshold: 1, metric: 'diamond_hands' },
+  },
+]
