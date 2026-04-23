@@ -1,24 +1,17 @@
-/**
- * Basic Info Section - Brand, Model, Color, Category, Tried On toggle
- *
- * Contains the essential product identification fields:
- * - Brand selection (combobox with logos)
- * - Item name/model (required)
- * - Category selection (shoes, tops, bottoms, etc.)
- * - "Tried On" toggle switch with visual feedback
- */
-
 "use client";
 
 import { UseFormReturn } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import {
 	CheckCircle,
 	Eye,
 	Package,
+	RefreshCw,
+	Lightbulb,
 } from "lucide-react";
 import { BrandCombobox } from "@/components/BrandCombobox";
 import { useBrands } from "@/hooks/useBrands";
@@ -26,16 +19,20 @@ import { useBrands } from "@/hooks/useBrands";
 interface BasicInfoSectionProps {
 	form: UseFormReturn<any>;
 	intent?: "own" | "wishlist";
+	mode?: "create" | "edit" | "add";
+	catalogSuggestion?: string;
+	onCatalogSuggestionUsed?: () => void;
+	onSyncWithEbay?: () => Promise<void>;
 }
 
-/**
- * BasicInfoSection Component
- *
- * Renders the core product information fields including brand, model, category,
- * and tried-on status. This section appears first in the form and contains
- * all required fields for basic item identification.
- */
-export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
+export function BasicInfoSection({
+	form,
+	intent,
+	mode,
+	catalogSuggestion,
+	onCatalogSuggestionUsed,
+	onSyncWithEbay,
+}: BasicInfoSectionProps) {
 	const {
 		register,
 		setValue,
@@ -47,6 +44,10 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 	const watchedTriedOn = watch("triedOn");
 	const watchedBrandId = watch("brandId");
 	const watchedBrandName = watch("brand");
+	const watchedModel = watch("model");
+	const watchedSku = watch("sku");
+
+	const [isSyncing, setIsSyncing] = useState(false);
 
 	// When editing an item whose brand_id is null (legacy data), resolve it from
 	// the stored brand name once the brands list has loaded.
@@ -60,6 +61,22 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 			}
 		}
 	}, [brands, watchedBrandName, watchedBrandId, setValue]);
+
+	// Clear catalog suggestion once user manually edits the model field away from it
+	const showSuggestion =
+		catalogSuggestion &&
+		catalogSuggestion !== watchedModel &&
+		catalogSuggestion.length > 0;
+
+	const handleSync = async () => {
+		if (!onSyncWithEbay) return;
+		setIsSyncing(true);
+		try {
+			await onSyncWithEbay();
+		} finally {
+			setIsSyncing(false);
+		}
+	};
 
 	return (
 		<div className="space-y-6">
@@ -113,7 +130,7 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 				</div>
 			)}
 
-			{/* Row 2: Brand & Item Name */}
+			{/* Row: Brand & Item Name */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div>
 					<Label className="text-sm font-medium text-slate-900">
@@ -123,7 +140,6 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 						value={watchedBrandId}
 						onChange={(brandId) => {
 							setValue("brandId", brandId, { shouldValidate: true });
-							// Also set the brand name for display/scraping purposes
 							const selectedBrand = brands.find((b) => b.id === brandId);
 							if (selectedBrand?.name) {
 								setValue("brand", selectedBrand.name, { shouldValidate: true });
@@ -146,10 +162,27 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 							{String(errors.model.message || "Item name is required")}
 						</p>
 					)}
+					{/* Catalog suggestion hint */}
+					{showSuggestion && (
+						<div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+							<Lightbulb className="h-3.5 w-3.5 flex-shrink-0 text-amber-500" />
+							<span>Catalog: &ldquo;{catalogSuggestion}&rdquo;</span>
+							<button
+								type="button"
+								onClick={() => {
+									setValue("model", catalogSuggestion, { shouldValidate: true, shouldDirty: true });
+									onCatalogSuggestionUsed?.();
+								}}
+								className="ml-1 text-primary hover:underline font-medium"
+							>
+								Use this
+							</button>
+						</div>
+					)}
 				</div>
 			</div>
 
-			{/* Row 3: Color + SKU */}
+			{/* Row: Color + SKU */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div>
 					<Label className="text-sm font-medium text-slate-900">
@@ -168,10 +201,24 @@ export function BasicInfoSection({ form, intent }: BasicInfoSectionProps) {
 				</div>
 
 				<div>
-					<Label className="text-sm font-medium text-slate-900">
-						SKU{" "}
-						<span className="text-xs text-muted-foreground font-normal">(Optional)</span>
-					</Label>
+					<div className="flex items-center justify-between">
+						<Label className="text-sm font-medium text-slate-900">
+							SKU{" "}
+							<span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+						</Label>
+						{/* Sync with eBay — edit mode only, shown when SKU is present */}
+						{mode === "edit" && watchedSku && onSyncWithEbay && (
+							<button
+								type="button"
+								onClick={handleSync}
+								disabled={isSyncing}
+								className="dense flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+							>
+								<RefreshCw className={`h-3 w-3 ${isSyncing ? "animate-spin" : ""}`} />
+								{isSyncing ? "Syncing…" : "Sync eBay"}
+							</button>
+						)}
+					</div>
 					<Input
 						{...register("sku")}
 						className="mt-2"

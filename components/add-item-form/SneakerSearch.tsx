@@ -1,15 +1,19 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Search, Loader2, X, Sparkles } from 'lucide-react'
+import { Search, Loader2, X, Sparkles, BadgeCheck } from 'lucide-react'
 import { useDebounce } from '@/hooks/useDebounce'
 
 export interface SneakerSearchResult {
   title: string
+  cleanModelName: string
   brand: string
   sku: string
+  color: string
+  releaseYear: string
   imageUrl: string
   price: string
+  hasEpid: boolean
 }
 
 interface SneakerSearchProps {
@@ -204,17 +208,25 @@ export function SneakerSearch({ onSelect }: SneakerSearchProps) {
                       {/* Title + badges */}
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium leading-snug text-foreground">
-                          {result.title}
+                          {result.cleanModelName || result.title}
                         </p>
-                        <div className="mt-0.5 flex items-center gap-1.5">
+                        <div className="mt-0.5 flex items-center gap-1.5 flex-wrap">
                           {result.brand && (
                             <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                               {result.brand}
                             </span>
                           )}
                           {result.sku && (
-                            <span className="font-mono text-[10px] text-muted-foreground/70">
+                            <span className={`font-mono text-[10px] ${result.hasEpid ? 'text-primary font-semibold' : 'text-muted-foreground/70'}`}>
                               {result.sku}
+                            </span>
+                          )}
+                          {result.hasEpid && (
+                            <BadgeCheck className="h-3 w-3 text-primary flex-shrink-0" />
+                          )}
+                          {result.color && (
+                            <span className="text-[10px] text-muted-foreground/60 truncate max-w-[80px]">
+                              {result.color}
                             </span>
                           )}
                         </div>

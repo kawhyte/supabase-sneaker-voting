@@ -83,12 +83,62 @@ function extractSku(epid?: string, title?: string, aspects?: LocalizedAspect[]):
   return code?.[1] ?? ''
 }
 
+function extractColor(aspects?: LocalizedAspect[]): string {
+  if (!aspects) return ''
+  const match = aspects.find((a) =>
+    ['color', 'colorway', 'primary color'].includes(a.name.toLowerCase())
+  )
+  return match?.value?.[0] ?? ''
+}
+
+function extractReleaseYear(aspects?: LocalizedAspect[], title?: string): string {
+  if (aspects) {
+    const match = aspects.find((a) =>
+      ['release year', 'year', 'model year'].includes(a.name.toLowerCase())
+    )
+    if (match?.value?.[0]) return match.value[0]
+  }
+  // Fallback: find a plausible release year (2000–2029) in the title
+  const year = title?.match(/\b(20[0-2]\d)\b/)
+  return year?.[1] ?? ''
+}
+
+function cleanModelName(title: string, brand: string, sku: string): string {
+  let name = title
+  // Strip leading brand prefix
+  if (brand) {
+    const escaped = brand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    name = name.replace(new RegExp(`^${escaped}\\s*`, 'i'), '')
+  }
+  // Strip the specific SKU if present
+  if (sku) {
+    const skuEscaped = sku.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    name = name.replace(new RegExp(`\\s*${skuEscaped}\\b`, 'gi'), '')
+  }
+  // Strip generic trailing SKU codes like CU8591-100 or FZ5558
+  name = name.replace(/\s+\b[A-Z]{2,4}\d{4,6}[-/]?\d{0,3}\b/gi, '')
+  // Strip trailing size/gender tokens: Men's 10, W8, GS, Size 9.5
+  name = name.replace(/\s+(men'?s?|women'?s?|kids'?|gs|td|ps|bg|w|m)\s*[\d.]+.*$/i, '')
+  name = name.replace(/\s+size\s+[\d.]+.*$/i, '')
+  name = name.replace(/\s+[\d.]+[mw]\b.*$/i, '')
+  name = name.trim()
+  // Fall back to full title if stripping left too little
+  return name.length >= 5 ? name : title
+}
+
+// Matches typical standalone SKU queries like "555088-023", "CU8591-100", "FZ5558"
+const SKU_QUERY_PATTERN = /^[A-Z]{2,6}[-_]?\d{3,6}[-/]?\d{0,3}$/i
+
 export interface SneakerSearchResult {
   title: string
+  cleanModelName: string
   brand: string
   sku: string
+  color: string
+  releaseYear: string
   imageUrl: string
   price: string
+  hasEpid: boolean
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -99,13 +149,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ results: [] })
   }
 
+  const isSkuQuery = SKU_QUERY_PATTERN.test(query)
+
   try {
     const accessToken = await getEbayAccessToken()
 
     const ebayUrl = new URL('https://api.ebay.com/buy/browse/v1/item_summary/search')
     ebayUrl.searchParams.set('q', query)
     ebayUrl.searchParams.set('category_ids', '15709') // Sneakers & Athletic Shoes
-    ebayUrl.searchParams.set('limit', '5')
+    // Fetch more results for SKU queries so we can re-rank by exact match
+    ebayUrl.searchParams.set('limit', isSkuQuery ? '10' : '5')
 
     const ebayRes = await fetch(ebayUrl.toString(), {
       headers: {
@@ -132,15 +185,33 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }>
     }
 
-    const results: SneakerSearchResult[] = (data.itemSummaries ?? []).map((item) => ({
-      title: item.title,
-      brand: extractBrand(item.title, item.localizedAspects),
-      sku: extractSku(item.epid, item.title, item.localizedAspects),
-      imageUrl: item.image?.imageUrl ?? '',
-      price: item.price
-        ? `$${parseFloat(item.price.value).toFixed(2)}`
-        : '',
-    }))
+    let mapped: SneakerSearchResult[] = (data.itemSummaries ?? []).map((item) => {
+      const brand = extractBrand(item.title, item.localizedAspects)
+      const sku = extractSku(item.epid, item.title, item.localizedAspects)
+      return {
+        title: item.title,
+        cleanModelName: cleanModelName(item.title, brand, sku),
+        brand,
+        sku,
+        color: extractColor(item.localizedAspects),
+        releaseYear: extractReleaseYear(item.localizedAspects, item.title),
+        imageUrl: item.image?.imageUrl ?? '',
+        price: item.price ? `$${parseFloat(item.price.value).toFixed(2)}` : '',
+        hasEpid: !!item.epid,
+      }
+    })
+
+    // For SKU queries, promote exact SKU matches to the top
+    if (isSkuQuery) {
+      const queryLower = query.toLowerCase()
+      mapped.sort((a, b) => {
+        const aScore = a.sku.toLowerCase() === queryLower ? 0 : 1
+        const bScore = b.sku.toLowerCase() === queryLower ? 0 : 1
+        return aScore - bScore
+      })
+    }
+
+    const results = mapped.slice(0, 5)
 
     return NextResponse.json(
       { results },

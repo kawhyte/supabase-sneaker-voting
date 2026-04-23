@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useFormLogic } from './useFormLogic'
 import { BasicInfoSection } from './BasicInfoSection'
 import { PricingSection } from './PricingSection'
@@ -25,10 +25,11 @@ import {
 } from '@/lib/retailer-url-validator'
 import { detectCategoryFromUrl } from '@/lib/item-utils'
 import { Switch } from '@/components/ui/switch'
-import { Loader2, Search, Sparkles, Shirt, Star, ChevronDown, CheckCircle2, TrendingDown } from 'lucide-react'
+import { Loader2, Search, Sparkles, Shirt, Star, ChevronDown, CheckCircle2, TrendingDown, ArrowLeft, BadgeCheck, RefreshCw } from 'lucide-react'
 import { type PhotoItem } from '@/components/types/photo-item'
 import { type ItemCategory } from '@/components/types/item-category'
 import { SneakerSearch, type SneakerSearchResult } from './SneakerSearch'
+import { toast } from 'sonner'
 
 export interface AddItemFormProps {
 	mode: 'add' | 'edit' | 'create'
@@ -107,7 +108,22 @@ export default function AddItemForm({
 	// Auto-fill badge — shown briefly after a search result populates the form
 	const [autoFillActive, setAutoFillActive] = useState(false)
 
+	// Quick Confirm Card — holds result pending user confirmation before form fill
+	const [pendingResult, setPendingResult] = useState<SneakerSearchResult | null>(null)
+	const [pendingSizeInput, setPendingSizeInput] = useState('')
+	const confirmSizeRef = useRef<HTMLInputElement>(null)
+
+	// Catalog suggestion for the model name field (shown after eBay auto-fill)
+	const [catalogSuggestion, setCatalogSuggestion] = useState('')
+
 	const formRef = useRef<HTMLFormElement>(null)
+
+	// Auto-focus the size input when Quick Confirm card mounts
+	useEffect(() => {
+		if (pendingResult) {
+			setTimeout(() => confirmSizeRef.current?.focus(), 50)
+		}
+	}, [pendingResult])
 
 	// Validation card visibility hook
 	const { shouldShowCard, isSticky, isMobile } = useValidationVisibility({
@@ -235,11 +251,29 @@ export default function AddItemForm({
 	}
 
 	/**
-	 * Populate form fields from a SneakerSearch result, then show the full form.
-	 * Image is proxied in the background so the form appears instantly.
+	 * Step 1: User picks a search result — show the Quick Confirm card instead of
+	 * immediately dumping everything into the form. Gives them a chance to review
+	 * the key details (clean name, SKU, color) and set their target size before
+	 * the full form opens.
 	 */
 	const handleSearchSelect = (result: SneakerSearchResult) => {
-		form.setValue('model', result.title, { shouldValidate: true, shouldDirty: true })
+		setPendingResult(result)
+		setPendingSizeInput('')
+	}
+
+	/**
+	 * Step 2: User confirms the selection from the Quick Confirm card.
+	 * Now we populate the form and proxy the image.
+	 */
+	const handleConfirmResult = useCallback(() => {
+		if (!pendingResult) return
+
+		const result = pendingResult
+
+		// Use clean model name as the default; catalog suggestion is stored
+		// separately so the user can see it as a hint if they change the field.
+		const modelName = result.cleanModelName || result.title
+		form.setValue('model', modelName, { shouldValidate: true, shouldDirty: true })
 		form.setValue('category', 'lifestyle', { shouldValidate: true, shouldDirty: true })
 
 		if (result.brand) {
@@ -248,14 +282,26 @@ export default function AddItemForm({
 		if (result.sku) {
 			form.setValue('sku', result.sku, { shouldValidate: true, shouldDirty: true })
 		}
+		if (result.color) {
+			form.setValue('color', result.color, { shouldValidate: true, shouldDirty: true })
+		}
 		if (result.price) {
-			// Strip currency symbol and whitespace, keep only the numeric portion
 			const numeric = result.price.replace(/[^0-9.]/g, '')
 			if (numeric) {
 				form.setValue('retailPrice', numeric, { shouldValidate: true, shouldDirty: true })
 			}
 		}
+		if (pendingSizeInput.trim()) {
+			form.setValue('target_size', pendingSizeInput.trim(), { shouldValidate: true, shouldDirty: true })
+		}
 
+		// Store catalog suggestion so BasicInfoSection can show a hint
+		if (result.cleanModelName && result.cleanModelName !== result.title) {
+			setCatalogSuggestion(result.cleanModelName)
+		}
+
+		setPendingResult(null)
+		setPendingSizeInput('')
 		setIsFormVisible(true)
 
 		// Brief auto-fill badge
@@ -291,7 +337,52 @@ export default function AddItemForm({
 					// Silently fail — user can upload a photo manually
 				})
 		}
-	}
+	}, [pendingResult, pendingSizeInput, form, handlePhotosChange])
+
+	/**
+	 * Sync with eBay — called from BasicInfoSection in edit mode when user clicks
+	 * the Sync button. Searches by SKU and back-fills any missing metadata.
+	 */
+	const handleSyncWithEbay = useCallback(async () => {
+		const sku = form.getValues('sku')
+		if (!sku) return
+
+		try {
+			const res = await fetch(`/api/sneaker-search?q=${encodeURIComponent(sku)}`)
+			if (!res.ok) throw new Error('Search failed')
+			const data = await res.json()
+			const results: SneakerSearchResult[] = data.results ?? []
+
+			if (results.length === 0) {
+				toast.warning('No eBay match found for this SKU')
+				return
+			}
+
+			const best = results[0]
+			const updated: string[] = []
+
+			if (best.brand && !form.getValues('brand')) {
+				form.setValue('brand', best.brand, { shouldValidate: true, shouldDirty: true })
+				updated.push('Brand')
+			}
+			if (best.cleanModelName) {
+				setCatalogSuggestion(best.cleanModelName)
+				updated.push('Model suggestion')
+			}
+			if (best.color && !form.getValues('color')) {
+				form.setValue('color', best.color, { shouldValidate: true, shouldDirty: true })
+				updated.push('Color')
+			}
+
+			if (updated.length > 0) {
+				toast.success(`Synced from eBay: ${updated.join(', ')}`)
+			} else {
+				toast.info('Fields already filled — catalog matches current data')
+			}
+		} catch {
+			toast.error('eBay sync failed. Try again.')
+		}
+	}, [form])
 
 	/**
 	 * Handle image confirmation from scraping
@@ -372,6 +463,7 @@ export default function AddItemForm({
 						) : (
 						<div className="space-y-5">
 							{/* === SNEAKER SEARCH (primary entry point) === */}
+							{!pendingResult ? (
 							<div className="space-y-2">
 								<div className="flex items-center gap-2">
 									<Sparkles className="h-4 w-4 text-primary" />
@@ -381,6 +473,87 @@ export default function AddItemForm({
 								</div>
 								<SneakerSearch onSelect={handleSearchSelect} />
 							</div>
+							) : (
+							/* === QUICK CONFIRM CARD === */
+							<div className="rounded-xl border border-primary/20 bg-card p-4 space-y-4 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200">
+								<div className="flex items-start gap-3">
+									{/* Product image */}
+									<div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
+										{pendingResult.imageUrl ? (
+											<img
+												src={pendingResult.imageUrl}
+												alt=""
+												className="h-full w-full object-cover"
+											/>
+										) : (
+											<div className="flex h-full w-full items-center justify-center">
+												<Sparkles className="h-5 w-5 text-muted-foreground/30" />
+											</div>
+										)}
+									</div>
+
+									{/* Details */}
+									<div className="min-w-0 flex-1">
+										<p className="text-base font-semibold leading-snug text-foreground line-clamp-2">
+											{pendingResult.cleanModelName || pendingResult.title}
+										</p>
+										<div className="mt-1.5 flex items-center gap-2 flex-wrap">
+											{pendingResult.sku && (
+												<span className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-mono text-[11px] font-semibold ${pendingResult.hasEpid ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+													{pendingResult.hasEpid && <BadgeCheck className="h-3 w-3" />}
+													{pendingResult.sku}
+												</span>
+											)}
+											{pendingResult.color && (
+												<span className="rounded-md bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
+													{pendingResult.color}
+												</span>
+											)}
+											{pendingResult.price && (
+												<span className="text-[11px] font-semibold text-foreground tabular-nums">
+													{pendingResult.price}
+												</span>
+											)}
+										</div>
+									</div>
+								</div>
+
+								{/* Target Size input — auto-focused */}
+								<div className="space-y-1.5">
+									<label className="text-xs font-medium text-muted-foreground">
+										Target Size <span className="text-muted-foreground/50">(optional — set it now to save a step)</span>
+									</label>
+									<input
+										ref={confirmSizeRef}
+										type="text"
+										value={pendingSizeInput}
+										onChange={(e) => setPendingSizeInput(e.target.value)}
+										onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleConfirmResult() } }}
+										placeholder="e.g. 10, 10.5, 11"
+										className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+									/>
+								</div>
+
+								{/* Actions */}
+								<div className="flex items-center gap-2">
+									<Button
+										type="button"
+										className="flex-1"
+										onClick={handleConfirmResult}
+									>
+										Confirm &amp; Add Details
+									</Button>
+									<button
+										type="button"
+										onClick={() => { setPendingResult(null); setPendingSizeInput('') }}
+										className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+									>
+										<ArrowLeft className="h-3.5 w-3.5" />
+										Back
+									</button>
+								</div>
+							</div>
+							)}
 
 							{/* === SECONDARY: Manual / URL section toggle === */}
 							<button
@@ -591,7 +764,14 @@ export default function AddItemForm({
 							)}
 
 							{/* Basic Info Section */}
-							<BasicInfoSection form={form} intent={intent} />
+							<BasicInfoSection
+								form={form}
+								intent={intent}
+								mode={normalizedMode}
+								catalogSuggestion={catalogSuggestion}
+								onCatalogSuggestionUsed={() => setCatalogSuggestion('')}
+								onSyncWithEbay={normalizedMode === 'edit' ? handleSyncWithEbay : undefined}
+							/>
 
 							{/* Pricing Section */}
 							<PricingSection form={form} intent={intent} enableTracking={watchedEnableTracking} />
