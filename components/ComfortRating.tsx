@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { AlertTriangle, AlertCircle, Minus, Check, Star } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface ComfortRatingProps {
   value?: number | null
@@ -11,36 +11,11 @@ interface ComfortRatingProps {
 }
 
 const comfortLevels = [
-  {
-    id: 1,
-    label: 'Unwearable',
-    icon: AlertTriangle,
-    description: 'Too tight/loose, poor fit',
-  },
-  {
-    id: 2,
-    label: 'Uncomfortable',
-    icon: AlertCircle,
-    description: 'Some discomfort',
-  },
-  {
-    id: 3,
-    label: 'Neutral',
-    icon: Minus,
-    description: 'Acceptable but not ideal',
-  },
-  {
-    id: 4,
-    label: 'Comfortable',
-    icon: Check,
-    description: 'Good fit and feel',
-  },
-  {
-    id: 5,
-    label: 'Perfect',
-    icon: Star,
-    description: 'Excellent comfort',
-  },
+  { id: 1, label: 'Unwearable', icon: AlertTriangle },
+  { id: 2, label: 'Uncomfortable', icon: AlertCircle },
+  { id: 3, label: 'Neutral', icon: Minus },
+  { id: 4, label: 'Comfortable', icon: Check },
+  { id: 5, label: 'Perfect', icon: Star },
 ]
 
 export function ComfortRating({
@@ -49,96 +24,40 @@ export function ComfortRating({
   error,
   disabled = false,
 }: ComfortRatingProps) {
-  const [hoveredId, setHoveredId] = useState<number | null>(null)
-
   return (
-    <div className="space-y-3">
-      {/* Responsive Grid: 1 column on mobile, 5 columns on desktop */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-        {comfortLevels.map(level => {
+    <div className="space-y-2">
+      <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-1">
+        {comfortLevels.map((level) => {
           const Icon = level.icon
           const isSelected = value === level.id
-          const isHovered = hoveredId === level.id
 
           return (
             <button
-              type="button"
               key={level.id}
-              onClick={() => !disabled && onChange(level.id)}
-              onMouseEnter={() => !disabled && setHoveredId(level.id)}
-              onMouseLeave={() => setHoveredId(null)}
+              type="button"
               disabled={disabled}
+              onClick={() => !disabled && onChange(level.id)}
               aria-pressed={isSelected}
-              aria-label={`${level.label} - ${level.description}`}
-              className={`
-                relative flex flex-col items-center gap-2 p-3 rounded-lg
-                border-2 transition-all duration-300 ease-out
-                min-h-[80px] justify-center
-                ${
-                  disabled
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'cursor-pointer hover:bg-slate-50'
-                }
-                ${
-                  isSelected
-                    ? 'border-primary bg-primary'
-                    : 'border-slate-200 bg-white'
-                }
-                ${
-                  isHovered && !isSelected
-                    ? 'border-primary shadow-sm'
-                    : ''
-                }
-              `}
-            >
-              {/* Icon */}
-              <Icon
-                className={`w-6 h-6 transition-colors duration-300 ${
-                  isSelected
-                    ? 'text-primary'
-                    : isHovered
-                      ? 'text-slate-600'
-                      : 'text-slate-400'
-                }`}
-              />
-
-              {/* Label */}
-              <div className="text-center space-y-1">
-                <div
-                  className={`text-xs font-semibold transition-colors duration-300 ${
-                    isSelected
-                      ? 'text-primary'
-                      : isHovered
-                        ? 'text-slate-700'
-                        : 'text-slate-600'
-                  }`}
-                >
-                  {level.label}
-                </div>
-
-                {/* Description (hidden on mobile to save space) */}
-                <div className="hidden md:block text-[10px] text-slate-500 leading-tight">
-                  {level.description}
-                </div>
-              </div>
-
-              {/* Selected indicator ring */}
-              {isSelected && (
-                <div className="absolute inset-0 rounded-lg pointer-events-none border-2 border-primary opacity-20" />
+              aria-label={level.label}
+              className={cn(
+                'flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all',
+                disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+                isSelected
+                  ? 'bg-white text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
+            >
+              <Icon className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate hidden sm:inline">{level.label}</span>
             </button>
           )
         })}
       </div>
 
-      {/* Error message */}
       {error && (
-        <p className="text-sm font-medium text-destructive mt-2">
-          {error}
-        </p>
+        <p className="text-sm font-medium text-destructive">{error}</p>
       )}
 
-      {/* Helper text */}
       <p className="text-xs text-slate-500">
         Select how comfortable the item felt when you tried it on.
       </p>

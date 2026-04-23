@@ -15,8 +15,6 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ImageConfirmationModal } from '@/components/ImageConfirmationModal'
 import { SupportedRetailersDialog } from '@/components/SupportedRetailersDialog'
-import { ValidationStatusCard } from '@/components/ItemValidationStatusCard'
-import { useValidationVisibility } from '@/hooks/useValidationVisibility'
 import { useSmartDefaults } from '@/hooks/useSmartDefaults'
 import {
 	validateProductUrl,
@@ -97,7 +95,6 @@ export default function AddItemForm({
 		canSave: true,
 	})
 	const [showRetailersDialog, setShowRetailersDialog] = useState(false)
-	const [attemptedSubmit, setAttemptedSubmit] = useState(false)
 
 	// Bulk Import mode
 	const [isBulkMode, setIsBulkMode] = useState(false)
@@ -116,21 +113,12 @@ export default function AddItemForm({
 	// Catalog suggestion for the model name field (shown after eBay auto-fill)
 	const [catalogSuggestion, setCatalogSuggestion] = useState('')
 
-	const formRef = useRef<HTMLFormElement>(null)
-
 	// Auto-focus the size input when Quick Confirm card mounts
 	useEffect(() => {
 		if (pendingResult) {
 			setTimeout(() => confirmSizeRef.current?.focus(), 50)
 		}
 	}, [pendingResult])
-
-	// Validation card visibility hook
-	const { shouldShowCard, isSticky, isMobile } = useValidationVisibility({
-		formRef,
-		isDirty: form.formState.isDirty,
-		attemptedSubmit,
-	})
 
 	// Apply smart defaults on initial load (create mode only)
 	useEffect(() => {
@@ -422,22 +410,6 @@ export default function AddItemForm({
 		setUploadProgress('')
 	}
 
-	/**
-	 * Wrapper to handle form submission with validation card visibility
-	 */
-	const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		setAttemptedSubmit(true)
-		onSubmit(e)
-	}
-
-	const watchedBrand = form.watch('brand')
-	const watchedBrandId = form.watch('brandId')
-	const watchedModel = form.watch('model')
-	const watchedCategory = form.watch('category')
-	const watchedRetailPrice = form.watch('retailPrice')
-	const watchedTriedOn = form.watch('triedOn')
-	const watchedSizeTried = form.watch('sizeTried')
-	const watchedComfortRating = form.watch('comfortRating')
 	const watchedEnableTracking = form.watch('enableTracking')
 
 	return (
@@ -619,7 +591,7 @@ export default function AddItemForm({
 						</div>
 						)
 					) : (
-						<form onSubmit={handleFormSubmit} className="space-y-8" ref={formRef}>
+						<form onSubmit={onSubmit} className="space-y-8">
 							{/* === SNEAKER SEARCH — only available in create mode === */}
 							{mode !== 'edit' && (
 								<div className="space-y-2">
@@ -640,33 +612,6 @@ export default function AddItemForm({
 									<SneakerSearch onSelect={handleSearchSelect} />
 								</div>
 							)}
-
-							{/* Validation Status Card - Smart floating sidebar */}
-							<ValidationStatusCard
-								errors={form.formState.errors}
-								watchedValues={{
-									brand: watchedBrand,
-									brandId: watchedBrandId,
-									model: watchedModel,
-									category: watchedCategory,
-									retailPrice: watchedRetailPrice,
-									triedOn: watchedTriedOn,
-									sizeTried: watchedSizeTried,
-									comfortRating: watchedComfortRating ?? undefined,
-									photos: photos.length,
-								}}
-								intent={intent}
-								photosLength={photos.length}
-								isDirty={form.formState.isDirty}
-								isValid={form.formState.isValid}
-								mode={normalizedMode}
-								initialDataStatus={initialData?.status}
-								shouldShowCard={shouldShowCard}
-								isSticky={isSticky}
-								isMobile={isMobile}
-								attemptedSubmit={attemptedSubmit}
-								onDismiss={() => setAttemptedSubmit(false)}
-							/>
 
 							{/* Intent Toggle - Create Mode Only */}
 							{(mode === 'create' || mode === 'add') && (

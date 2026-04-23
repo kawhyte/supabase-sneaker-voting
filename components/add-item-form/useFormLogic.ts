@@ -86,12 +86,6 @@ export const itemFormSchema = z
 
 		// PHASE 2: Store & Purchase Fields (Optional)
 		storeName: z.string().max(100).trim().optional().or(z.literal('')),
-		storeUrl: z
-			.string()
-			.url('Please enter a valid store URL')
-			.max(500)
-			.optional()
-			.or(z.literal('')),
 		purchaseDate: z
 			.string()
 			.refine((val) => {
@@ -220,7 +214,6 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 
 						// PHASE 2: Store & Purchase Fields
 						storeName: initialData.store_name || '',
-						storeUrl: initialData.store_url || '',
 						purchaseDate: initialData.purchase_date || '',
 				  }
 				: {
@@ -328,7 +321,6 @@ export function useFormLogic({ mode, initialData, onSuccess, intent }: UseFormLo
 
 				// PHASE 2: Store & Purchase Fields
 				store_name: data.storeName && data.storeName.trim() ? data.storeName : null,
-				store_url: data.storeUrl && data.storeUrl.trim() ? data.storeUrl : null,
 				purchase_date: data.purchaseDate || null,
 
 				wears: data.wears || 0,

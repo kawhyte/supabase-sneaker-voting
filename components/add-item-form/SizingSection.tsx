@@ -216,7 +216,7 @@ export function SizingSection({
 				<div className="dense flex items-center gap-2 pb-2 border-b border-border">
 					<Store className="h-5 w-5 text-slate-600 flex-shrink-0" />
 					<h3 className="font-semibold font-heading text-base text-slate-900 leading-5">
-						Store & Purchase{" "}
+						Acquisition Details{" "}
 						<span className="font-normal text-muted-foreground">(Optional)</span>
 					</h3>
 				</div>
@@ -256,25 +256,6 @@ export function SizingSection({
 					</div>
 				</div>
 
-				<div>
-					<Label className="text-sm font-medium text-slate-900">
-						Store / Product URL
-					</Label>
-					<Input
-						{...register("storeUrl")}
-						type="url"
-						className="mt-2"
-						placeholder="https://www.shoepalace.com/products/..."
-					/>
-					{errors.storeUrl && (
-						<p className="text-sm text-red-600 mt-1">
-							{String(errors.storeUrl.message)}
-						</p>
-					)}
-					<p className="text-xs text-muted-foreground mt-1">
-						Link to the store page where you purchased this item
-					</p>
-				</div>
 			</div>
 
 			{/* Wears Counter — Edit mode, owned intent only */}
