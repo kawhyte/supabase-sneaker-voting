@@ -1,7 +1,7 @@
 // components/cost-per-wear-calculator/CalculatorForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,14 +13,31 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from '@/components/ui/separator';
-// NEW IMPORTS: Puzzle, Palette, Copy
+import { toast } from 'sonner';
 import {
   Sparkles, ArrowRight, TrendingDown, Shield, Gem,
   XCircle, Banknote, Flame, Coins, Puzzle, Palette, Copy,
-  Footprints, Shirt, Scissors, Wind, ShoppingBag
-} from 'lucide-react'; 
+  Footprints, Activity, Trophy, Wind, Dumbbell, Mountain, Package,
+  Search, X as XIcon, Loader2, Bell,
+} from 'lucide-react';
 import { ResultsDisplay } from './ResultsDisplay';
 import { cn } from '@/lib/utils';
+import { createClient } from '@/utils/supabase/client';
+
+interface EbayResult {
+  title: string;
+  cleanModelName: string;
+  brand: string;
+  sku: string;
+  color: string;
+  imageUrl: string;
+  price: string;
+}
+
+function parseEbayPrice(raw: string): number {
+  const num = parseFloat(raw.replace(/[^0-9.]/g, ''));
+  return isNaN(num) ? 0 : num;
+}
 
 const smartCalculatorSchema = z.object({
   price: z.coerce.number().min(1, "Price is required"),
@@ -35,7 +52,123 @@ type FormData = z.infer<typeof smartCalculatorSchema>;
 
 export function CalculatorForm() {
   const [results, setResults] = useState<CalculatorResults | null>(null);
-  const [step, setStep] = useState<1 | 2>(1); 
+  const [step, setStep] = useState<1 | 2>(1);
+
+  // eBay search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<EbayResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedSneaker, setSelectedSneaker] = useState<EbayResult | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Enrichment state for 3-factor score
+  const [marketValue, setMarketValue] = useState<number | undefined>();
+  const [ownedSameBrand, setOwnedSameBrand] = useState<number | undefined>();
+
+  // Wishlist CTA state
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  // Debounced eBay search
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleSearchInput = useCallback((val: string) => {
+    setSearchQuery(val);
+    setSelectedSneaker(null);
+    setMarketValue(undefined);
+    setOwnedSameBrand(undefined);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    if (val.length < 3) { setSearchResults([]); setShowDropdown(false); return; }
+    searchTimeout.current = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const res = await fetch(`/api/sneaker-search?q=${encodeURIComponent(val)}`);
+        const data = await res.json();
+        setSearchResults(data.results ?? []);
+        setShowDropdown(true);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 350);
+  }, []);
+
+  const handleSelectSneaker = useCallback(async (sneaker: EbayResult) => {
+    setSelectedSneaker(sneaker);
+    setSearchQuery(`${sneaker.brand} ${sneaker.cleanModelName}`);
+    setShowDropdown(false);
+    const mv = parseEbayPrice(sneaker.price);
+    if (mv > 0) setMarketValue(mv);
+
+    // Query collection overlap if authenticated
+    if (userId && sneaker.brand) {
+      const { count } = await supabase
+        .from('items')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('status', 'owned')
+        .eq('is_archived', false)
+        .ilike('brand', sneaker.brand);
+      setOwnedSameBrand(count ?? 0);
+    }
+  }, [userId, supabase]);
+
+  const handleAddToWishlist = useCallback(async () => {
+    if (!results || !selectedSneaker || !userId) return;
+    setIsSaving(true);
+    try {
+      // Create wishlisted item
+      const { data: item, error: itemErr } = await supabase
+        .from('items')
+        .insert({
+          user_id: userId,
+          brand: selectedSneaker.brand,
+          model: selectedSneaker.cleanModelName,
+          status: 'wishlisted',
+          retail_price: results.input.price,
+          category: results.input.category,
+          color: selectedSneaker.color || null,
+        })
+        .select('id')
+        .single();
+
+      if (itemErr || !item) throw itemErr;
+
+      // Create price monitor with target buy price
+      await supabase.from('price_monitors').insert({
+        user_id: userId,
+        item_id: item.id,
+        store_name: 'eBay',
+        tracking_provider: 'ebay',
+        target_price: results.metrics.targetBuyPrice,
+        is_active: true,
+      });
+
+      toast.success(`Added to wishlist. You'll be alerted if the price drops to $${results.metrics.targetBuyPrice}.`);
+    } catch {
+      toast.error('Failed to save. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [results, selectedSneaker, userId, supabase]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(smartCalculatorSchema),
@@ -49,14 +182,18 @@ export function CalculatorForm() {
   });
 
   const onSubmit = (data: FormData) => {
-    const input: CalculatorInput = { ...data }; 
+    const input: CalculatorInput = {
+      ...data,
+      marketValue,
+      ownedSameBrand,
+    };
     const metrics = calculateSmartMetrics(input);
     const recommendation = generateSmartRecommendation(metrics, input);
-    
-    setResults({ metrics, recommendation, input } as any);
-    
+
+    setResults({ metrics, recommendation, input });
+
     setTimeout(() => {
-        document.getElementById('results-view')?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('results-view')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
 
@@ -87,6 +224,65 @@ export function CalculatorForm() {
                   <p className="text-slate-500 text-sm ml-8">What are we looking at?</p>
                 </div>
 
+                {/* eBay Sneaker Search */}
+                <div ref={searchRef} className="relative mb-6">
+                  <p className="text-sm font-medium text-slate-700 mb-2">Search eBay for market value <span className="text-muted-foreground font-normal">(optional — boosts score accuracy)</span></p>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={e => handleSearchInput(e.target.value)}
+                      onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
+                      placeholder="e.g. Nike Air Max 90, Jordan 1 Retro…"
+                      className="w-full pl-9 pr-9 py-2 border border-border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    {isSearching && <Loader2 className="absolute right-3 top-2.5 h-4 w-4 text-slate-400 animate-spin" />}
+                    {searchQuery && !isSearching && (
+                      <button
+                        type="button"
+                        onClick={() => { setSearchQuery(''); setSelectedSneaker(null); setMarketValue(undefined); setOwnedSameBrand(undefined); setSearchResults([]); }}
+                        className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                      >
+                        <XIcon className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Search dropdown */}
+                  {showDropdown && searchResults.length > 0 && (
+                    <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                      {searchResults.map((r, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => handleSelectSneaker(r)}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted text-left transition-colors"
+                        >
+                          {r.imageUrl && (
+                            <img src={r.imageUrl} alt="" className="w-10 h-10 object-contain rounded bg-slate-100 flex-shrink-0" />
+                          )}
+                          <div className="min-w-0">
+                            <div className="font-medium text-sm text-foreground truncate">{r.brand} {r.cleanModelName}</div>
+                            <div className="text-xs text-muted-foreground">{r.color} · eBay avg {r.price}</div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Selected sneaker pill */}
+                  {selectedSneaker && (
+                    <div className="mt-2 flex items-center gap-2 text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                      <Footprints className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span>eBay market value set to <strong>${marketValue ?? '—'}</strong>. Score will include market delta.</span>
+                      {ownedSameBrand != null && (
+                        <span className="ml-1 text-slate-500">· {ownedSameBrand} {selectedSneaker.brand} pair{ownedSameBrand !== 1 ? 's' : ''} owned</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Category */}
                   <FormField
@@ -94,7 +290,7 @@ export function CalculatorForm() {
                     name="category"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Category</FormLabel>
+                        <FormLabel>Sneaker Type</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -102,29 +298,39 @@ export function CalculatorForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="shoes">
+                            <SelectItem value="lifestyle">
                               <div className="flex items-center gap-2">
-                                <Footprints className="h-4 w-4" /> Shoes / Sneakers
+                                <Footprints className="h-4 w-4" /> Lifestyle / Casual
                               </div>
                             </SelectItem>
-                            <SelectItem value="tops">
+                            <SelectItem value="running">
                               <div className="flex items-center gap-2">
-                                <Shirt className="h-4 w-4" /> Tops / Shirts
+                                <Activity className="h-4 w-4" /> Running
                               </div>
                             </SelectItem>
-                            <SelectItem value="bottoms">
+                            <SelectItem value="basketball">
                               <div className="flex items-center gap-2">
-                                <Scissors className="h-4 w-4" /> Bottoms / Pants
+                                <Trophy className="h-4 w-4" /> Basketball
                               </div>
                             </SelectItem>
-                            <SelectItem value="outerwear">
+                            <SelectItem value="skate">
                               <div className="flex items-center gap-2">
-                                <Wind className="h-4 w-4" /> Outerwear
+                                <Wind className="h-4 w-4" /> Skate
                               </div>
                             </SelectItem>
-                            <SelectItem value="accessories">
+                            <SelectItem value="training">
                               <div className="flex items-center gap-2">
-                                <ShoppingBag className="h-4 w-4" /> Accessories
+                                <Dumbbell className="h-4 w-4" /> Training
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="boots">
+                              <div className="flex items-center gap-2">
+                                <Mountain className="h-4 w-4" /> Boots
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="other">
+                              <div className="flex items-center gap-2">
+                                <Package className="h-4 w-4" /> Other
                               </div>
                             </SelectItem>
                           </SelectContent>
@@ -388,7 +594,42 @@ export function CalculatorForm() {
 
       {/* RESULTS SECTION */}
       <div id="results-view" className="pt-12">
-        {results && <ResultsDisplay results={results} />}
+        {results && (
+          <>
+            <ResultsDisplay results={results} />
+
+            {/* Wishlist + Price Alert CTA */}
+            {results.recommendation.verdict !== 'BUY_NOW' && (
+              <Card className="mt-6 border border-border bg-card rounded-2xl overflow-hidden">
+                <div className="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="flex-1">
+                    <p className="font-semibold text-foreground flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-primary" />
+                      Track this and get alerted when the price drops
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      We'll notify you when the market price hits your target of <strong>${results.metrics.targetBuyPrice}</strong>.
+                    </p>
+                  </div>
+                  {userId ? (
+                    <Button
+                      onClick={handleAddToWishlist}
+                      disabled={isSaving || !selectedSneaker}
+                      className="flex-shrink-0 bg-primary hover:bg-primary text-slate-900 font-bold"
+                    >
+                      {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Bell className="h-4 w-4 mr-2" />}
+                      {selectedSneaker ? 'Add to Wishlist & Set Alert' : 'Search a sneaker above to save'}
+                    </Button>
+                  ) : (
+                    <Button asChild variant="outline" className="flex-shrink-0">
+                      <a href="/login">Sign in to track price</a>
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

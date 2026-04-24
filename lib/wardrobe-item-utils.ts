@@ -107,16 +107,28 @@ export function getTargetCostPerWear(
 
 	// Category-aware thresholds for different wear patterns
 	const getThresholdForCategory = (p: number, cat?: string): number => {
-		const isShoes = cat === 'shoes';
+		// All sneaker subcategories (ItemCategory values) map to shoe thresholds
+		const SNEAKER_CATEGORIES = ['lifestyle', 'running', 'basketball', 'skate', 'training', 'other', 'shoes'];
+		const isShoes = SNEAKER_CATEGORIES.includes(cat ?? '');
+		// Boots are sneakers but worn seasonally — slightly higher CPW tolerance
+		const isBoots = cat === 'boots';
 		const isOuterwear = cat === 'outerwear';
 		const isAccessories = cat === 'accessories' || cat === 'jewelry' || cat === 'watches';
 
-		// Shoes: More reasonable to have low CPW (worn frequently)
+		// Sneakers: Worn frequently, low CPW expected
 		if (isShoes) {
 			if (p >= 300) return 8;
 			if (p >= 150) return 5;
 			if (p >= 75) return 3;
 			return 2;
+		}
+
+		// Boots: Sneaker-adjacent but seasonal — slightly more forgiving
+		if (isBoots) {
+			if (p >= 300) return 10;
+			if (p >= 150) return 7;
+			if (p >= 75) return 4;
+			return 2.5;
 		}
 
 		// Outerwear: Higher threshold (seasonal, fewer wears expected)

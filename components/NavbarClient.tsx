@@ -245,19 +245,19 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 	const publicNavLinks: NavLink[] = [
 		{ href: '/', label: 'Home' },
-		{ href: '/', label: 'Worth It?' },
-		// { href: '/discover', label: 'Discover' },
+		{ href: '/cop-score', label: 'Cop Score' },
 	];
 
 	const authenticatedNavLinks: NavLink[] = [
 		{ href: '/dashboard', label: 'My Collection' },
+		{ href: '/cop-score', label: 'Cop Score' },
 		{ href: '/explore', label: 'Explore' },
 		{ href: '/achievements', label: 'Sneaker Insights' },
-		// { href: '/add-new-item', label: 'Add Item', isAction: true },
 	];
 
+	// Authenticated: drop public-only "Home" link (logo serves as home); add authenticated links
 	const navLinks = isAuthenticated
-		? [...publicNavLinks.filter(l => l.href !== '/'), ...authenticatedNavLinks]
+		? authenticatedNavLinks
 		: publicNavLinks;
 
 	return (

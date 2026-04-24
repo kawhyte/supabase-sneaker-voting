@@ -16,6 +16,9 @@ export interface CalculatorInput {
   resalePotential: ResalePotential;
   wardrobeRole: WardrobeRole;
   qualityRating: QualityRating;
+  // Optional enrichment — from eBay search and authenticated collection query
+  marketValue?: number;    // eBay current market price
+  ownedSameBrand?: number; // Count of owned items from same brand
 }
 
 export interface CalculatorMetrics {
@@ -31,6 +34,13 @@ export interface CalculatorMetrics {
 
 export type Verdict = 'BUY_NOW' | 'WAIT_FOR_SALE' | 'PASS';
 
+export interface ScoreBreakdown {
+  cpwScore: number;      // 0–50
+  marketScore: number;   // 0–30
+  diversityScore: number; // 0–20
+  roleModifier: number;  // ±5
+}
+
 export interface Recommendation {
   verdict: Verdict;
   score: number; // 0-100
@@ -39,6 +49,7 @@ export interface Recommendation {
   description: string;
   actionPrompt?: string; // e.g., "Wait for a price under $120"
   color: string; // For UI styling
+  breakdown?: ScoreBreakdown;
 }
 
 export interface CalculatorResults {
@@ -126,44 +137,78 @@ export function calculateSmartMetrics(input: CalculatorInput): CalculatorMetrics
 }
 
 /**
- * RECOMMENDATION ENGINE
- * Generates a Score (0-100) and Verdict based on value & utility
+ * RECOMMENDATION ENGINE — 3-Factor Weighted Cop Score (0–100)
+ *
+ * Factor 1 — CPW (50 pts max):   How good is the cost-per-wear?
+ * Factor 2 — Market Delta (30 pts max): Are you paying below or above market?
+ * Factor 3 — Collection Diversity (20 pts max): Does your rotation need this brand?
+ * Modifier  — Wardrobe Role (±5 pts): Gap fill vs. duplicate.
  */
 export function generateSmartRecommendation(
-  metrics: CalculatorMetrics, 
+  metrics: CalculatorMetrics,
   input: CalculatorInput
 ): Recommendation {
   const { realCPW, targetCPW, targetBuyPrice } = metrics;
-  const { wardrobeRole } = input;
+  const { wardrobeRole, marketValue, ownedSameBrand } = input;
 
-  // --- Scoring Logic ---
-  
-  // Base Score: Ratio of Real CPW to Target CPW
-  // 1.0 (on target) = 75 pts
-  // 0.5 (great value) = 90 pts
-  // 2.0 (bad value) = 40 pts
-  const cpwRatio = realCPW / targetCPW;
-  let score = 100 - (cpwRatio * 25); 
+  // ── Factor 1: CPW Score (0–50) ──────────────────────────────────────────
+  const cpwRatio = realCPW / Math.max(targetCPW, 0.01);
+  // cpwRatio = 1.0 → 25 pts (neutral), 0.5 → 37.5 pts, 2.0 → 0 pts
+  const cpwScore = Math.min(50, Math.max(0, 50 * (2 - cpwRatio) / 2));
 
-  // Wardrobe Role Adjustments
-  if (wardrobeRole === 'duplicate') score -= 20; // Heavy penalty for clutter
-  if (wardrobeRole === 'gap_fill') score += 10;  // Bonus for utility
-  if (wardrobeRole === 'upgrade') score += 5;    // Small bonus for quality upgrade
-  // 'variety' is neutral
+  // ── Factor 2: Market Delta Score (0–30) ─────────────────────────────────
+  // 15 pts = neutral (no market data available)
+  let marketScore = 15;
+  if (marketValue != null && marketValue > 0) {
+    const delta = (marketValue - input.price) / marketValue;
+    // delta > 0 = asking below market (good), delta < 0 = above market (bad)
+    marketScore = Math.min(30, Math.max(0, 15 + delta * 30));
+  }
 
-  // Clamp Score
-  score = Math.min(100, Math.max(0, Math.round(score)));
+  // ── Factor 3: Collection Diversity Score (0–20) ──────────────────────────
+  // Rewards buying a brand you don't already own multiples of
+  let diversityScore: number;
+  if (ownedSameBrand == null) {
+    // Unauthenticated — award neutral 20 pts (no penalty for unknown state)
+    diversityScore = 20;
+  } else if (ownedSameBrand === 0) {
+    diversityScore = 20;
+  } else if (ownedSameBrand === 1) {
+    diversityScore = 16;
+  } else if (ownedSameBrand === 2) {
+    diversityScore = 10;
+  } else {
+    diversityScore = 4;
+  }
 
-  // --- Verdict Logic ---
+  // ── Wardrobe Role Modifier (±5) ──────────────────────────────────────────
+  const roleModifier =
+    wardrobeRole === 'gap_fill' ? 5 :
+    wardrobeRole === 'upgrade'  ? 3 :
+    wardrobeRole === 'duplicate' ? -5 :
+    0; // variety = neutral
+
+  const rawScore = cpwScore + marketScore + diversityScore + roleModifier;
+  const score = Math.min(100, Math.max(0, Math.round(rawScore)));
+
+  const breakdown: ScoreBreakdown = {
+    cpwScore: Math.round(cpwScore),
+    marketScore: Math.round(marketScore),
+    diversityScore: Math.round(diversityScore),
+    roleModifier,
+  };
+
+  // ── Verdict ──────────────────────────────────────────────────────────────
 
   if (score >= 80) {
     return {
       verdict: 'BUY_NOW',
       score,
       emoji: '🔥',
-      headline: 'Cop It. It\'s a Steal.',
-      description: `At an effective $${realCPW.toFixed(2)}/wear, this item provides exceptional value. It pays for itself in just ${metrics.breakEvenWears} wears.`,
-      color: 'green-500'
+      headline: "Cop It. It's a Steal.",
+      description: `At an effective $${realCPW.toFixed(2)}/wear, this is exceptional value. It pays for itself in just ${metrics.breakEvenWears} wears.`,
+      color: 'green-500',
+      breakdown,
     };
   } else if (score >= 50) {
     return {
@@ -171,9 +216,10 @@ export function generateSmartRecommendation(
       score,
       emoji: '👀',
       headline: 'Wait for a Sale.',
-      description: `It's a decent item, but overpriced right now relative to its utility. Buying it at full price pushes your cost-per-wear too high.`,
-      actionPrompt: `Set a price alert for $${targetBuyPrice}. If it drops below that, it becomes a smart buy.`,
-      color: 'sun-500' // yellow/orange
+      description: `Decent pick, but overpriced relative to its utility right now. Full price pushes your cost-per-wear above the target.`,
+      actionPrompt: `Set a price alert for $${targetBuyPrice}. At that price, the numbers make sense.`,
+      color: 'sun-500',
+      breakdown,
     };
   } else {
     return {
@@ -181,9 +227,10 @@ export function generateSmartRecommendation(
       score,
       emoji: '🛑',
       headline: 'Hard Pass.',
-      description: `This is an impulse buy that doesn't make financial sense. The cost-per-wear ($${realCPW.toFixed(2)}) is way above industry standards for this category.`,
-      actionPrompt: `Look for alternatives under $${targetBuyPrice} or invest in a higher quality version that lasts longer.`,
-      color: 'red-500'
+      description: `The cost-per-wear ($${realCPW.toFixed(2)}) is too high for this category. This is an impulse buy, not an investment.`,
+      actionPrompt: `Look for alternatives under $${targetBuyPrice}, or find a higher-quality version that outlasts the price.`,
+      color: 'red-500',
+      breakdown,
     };
   }
 }
@@ -198,7 +245,7 @@ export function getRecommendation(metrics: CalculatorMetrics, input: CalculatorI
  * Hardcoded so the public calculator only needs price + frequency.
  */
 export const SNEAKER_DEFAULTS = {
-  category: 'shoes' as ItemCategory,
+  category: 'lifestyle' as ItemCategory,
   qualityRating: 'average' as QualityRating,
   resalePotential: 'low' as ResalePotential,
   wardrobeRole: 'variety' as WardrobeRole,

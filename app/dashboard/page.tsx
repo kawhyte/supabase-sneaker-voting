@@ -14,7 +14,10 @@ import {
 	Sparkles,
 	Archive,
 	Plus,
+	BarChart2,
+	ArrowRight,
 } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { ItemStatus } from "@/types/ItemStatus";
 import Link from "next/link";
 
@@ -67,7 +70,28 @@ function DashboardContent() {
 					</div>
 				</div>
 
-				<div className='mt-12 mb-6'>
+				{/* Cop Score Quick Tool */}
+				<div className='mt-8'>
+					<Card className='border border-border bg-card rounded-2xl overflow-hidden'>
+						<div className='px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4'>
+							<div className='flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center'>
+								<BarChart2 className='h-5 w-5 text-primary' />
+							</div>
+							<div className='flex-1 min-w-0'>
+								<p className='font-semibold text-foreground text-sm'>Cop Score Calculator</p>
+								<p className='text-xs text-muted-foreground mt-0.5'>Get a data-driven verdict on your next cop — CPW, eBay market value, and rotation diversity.</p>
+							</div>
+							<Link href='/cop-score' className='flex-shrink-0'>
+								<Button variant='outline' size='sm' className='flex items-center gap-2 whitespace-nowrap'>
+									Open Calculator
+									<ArrowRight className='h-3.5 w-3.5' />
+								</Button>
+							</Link>
+						</div>
+					</Card>
+				</div>
+
+				<div className='mt-8 mb-6'>
 					<Tabs
 						value={activeTab}
 						onValueChange={handleTabChange}
