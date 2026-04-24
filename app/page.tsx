@@ -2,83 +2,37 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowRight, PawPrint } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-const ROW_1 = [
-  { name: 'Nike Air Force 1 Low',       src: '/images/sneaker-grid/sneaker-01.png' },
-  { name: 'Air Jordan 1 Retro High OG', src: '/images/sneaker-grid/sneaker-02.png' },
-  { name: 'Nike Dunk Low',              src: '/images/sneaker-grid/sneaker-03.png' },
-  { name: 'Adidas Samba OG',            src: '/images/sneaker-grid/sneaker-04.png' },
-  { name: 'New Balance 550',            src: '/images/sneaker-grid/sneaker-05.png' },
+const SNEAKERS = [
+  { name: 'Nike Air Force 1 Low',            src: '/images/sneaker-grid/sneaker-01.png' },
+  { name: 'Air Jordan 1 Retro High OG',      src: '/images/sneaker-grid/sneaker-02.png' },
+  { name: 'Nike Dunk Low',                   src: '/images/sneaker-grid/sneaker-03.png' },
+  { name: 'Adidas Samba OG',                 src: '/images/sneaker-grid/sneaker-04.png' },
+  { name: 'New Balance 550',                 src: '/images/sneaker-grid/sneaker-05.png' },
+  { name: 'Nike Air Max 1',                  src: '/images/sneaker-grid/sneaker-06.png' },
+  { name: 'Air Jordan 4 Retro',              src: '/images/sneaker-grid/sneaker-07.png' },
+  { name: 'Adidas Gazelle Indoor',           src: '/images/sneaker-grid/sneaker-08.png' },
+  { name: 'Nike Air Max 90',                 src: '/images/sneaker-grid/sneaker-09.png' },
+  { name: 'New Balance 9060',                src: '/images/sneaker-grid/sneaker-10.png' },
+  { name: 'Converse Chuck Taylor 70',        src: '/images/sneaker-grid/sneaker-11.png' },
+  { name: 'New Balance 574',                 src: '/images/sneaker-grid/sneaker-12.png' },
+  { name: 'Nike Cortez',                     src: '/images/sneaker-grid/sneaker-13.png' },
+  { name: 'Adidas Campus 00s',               src: '/images/sneaker-grid/sneaker-14.png' },
+  { name: 'Air Jordan 3 Retro',              src: '/images/sneaker-grid/sneaker-15.png' },
+  { name: 'Air Jordan 11 Retro',             src: '/images/sneaker-grid/sneaker-16.png' },
+  { name: 'Travis Scott x AF1',              src: '/images/sneaker-grid/sneaker-17.png' },
+  { name: 'New Balance 2002R',               src: '/images/sneaker-grid/sneaker-18.png' },
+  { name: 'Adidas Yeezy 350 V2',             src: '/images/sneaker-grid/sneaker-19.png' },
+  { name: 'Nike Air Max 95',                 src: '/images/sneaker-grid/sneaker-20.png' },
+  { name: 'Air Jordan 6 Retro',              src: '/images/sneaker-grid/sneaker-21.png' },
+  { name: 'Salehe Bembury x 574',            src: '/images/sneaker-grid/sneaker-22.png' },
+  { name: 'Nike SB Dunk High',               src: '/images/sneaker-grid/sneaker-23.png' },
+  { name: 'Adidas Stan Smith',               src: '/images/sneaker-grid/sneaker-24.png' },
 ]
-
-const ROW_2 = [
-  { name: 'Nike Air Max 1',             src: '/images/sneaker-grid/sneaker-06.png' },
-  { name: 'Air Jordan 4 Retro',         src: '/images/sneaker-grid/sneaker-07.png' },
-  { name: 'Adidas Gazelle Indoor',      src: '/images/sneaker-grid/sneaker-08.png' },
-  { name: 'Nike Air Max 90',            src: '/images/sneaker-grid/sneaker-09.png' },
-  { name: 'New Balance 9060',           src: '/images/sneaker-grid/sneaker-10.png' },
-]
-
-const ROW_3 = [
-  { name: 'Converse Chuck Taylor 70',   src: '/images/sneaker-grid/sneaker-11.png' },
-  { name: 'New Balance 574',            src: '/images/sneaker-grid/sneaker-12.png' },
-  { name: 'Nike Cortez',                src: '/images/sneaker-grid/sneaker-13.png' },
-  { name: 'Adidas Campus 00s',          src: '/images/sneaker-grid/sneaker-14.png' },
-  { name: 'Air Jordan 3 Retro',         src: '/images/sneaker-grid/sneaker-15.png' },
-]
-
-type RowItem = { name: string; src: string }
-
-function MarqueeRow({
-  items,
-  reverse = false,
-  duration = 25,
-}: {
-  items: RowItem[]
-  reverse?: boolean
-  duration?: number
-}) {
-  const prefersReducedMotion = useReducedMotion()
-  // 4× duplication: -25% = exactly one copy width → seamless loop
-  const track = [...items, ...items, ...items, ...items]
-
-  return (
-    <div className="overflow-hidden">
-      <motion.div
-        className="flex"
-        animate={
-          prefersReducedMotion
-            ? {}
-            : { x: reverse ? ['-25%', '0%'] : ['0%', '-25%'] }
-        }
-        transition={{ duration, ease: 'linear', repeat: Infinity, repeatType: 'loop' }}
-      >
-        {track.map((sneaker, idx) => (
-          <Tooltip key={`${sneaker.name}-${idx}`}>
-            <TooltipTrigger asChild>
-              <div className="relative w-[90px] h-[82px] flex-shrink-0 bg-zinc-900 hover:bg-zinc-800 transition-colors duration-150 cursor-pointer">
-                <Image
-                  src={sneaker.src}
-                  alt={sneaker.name}
-                  fill
-                  className="object-contain p-1"
-                  unoptimized
-                />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="text-xs font-medium">
-              {sneaker.name}
-            </TooltipContent>
-          </Tooltip>
-        ))}
-      </motion.div>
-    </div>
-  )
-}
 
 export default function HomePage() {
   return (
@@ -126,18 +80,33 @@ export default function HomePage() {
         </motion.p>
       </section>
 
-      {/* 2. Sneaker Marquee Grid */}
+      {/* 2. Sneaker Grid */}
       <motion.section
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="w-full bg-zinc-950 relative z-10 overflow-hidden"
+        className="w-full bg-zinc-950 relative z-10"
       >
-        <div className="flex flex-col gap-px py-px">
-          <MarqueeRow items={ROW_1} duration={28} />
-          <MarqueeRow items={ROW_2} reverse duration={34} />
-          <MarqueeRow items={ROW_3} duration={22} />
+        <div className="grid grid-cols-5 md:grid-cols-8 gap-px">
+          {SNEAKERS.map((sneaker, index) => (
+            <Tooltip key={sneaker.name}>
+              <TooltipTrigger asChild>
+                <div className={`relative h-[82px] bg-zinc-900 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-zinc-800 transition-colors duration-150${index >= 10 ? ' hidden md:flex' : ''}`}>
+                  <Image
+                    src={sneaker.src}
+                    alt={sneaker.name}
+                    fill
+                    className="object-contain p-1"
+                    unoptimized
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs font-medium">
+                {sneaker.name}
+              </TooltipContent>
+            </Tooltip>
+          ))}
         </div>
       </motion.section>
 
