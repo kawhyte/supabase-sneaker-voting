@@ -1,28 +1,84 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Footprints, BarChart2, Bell, ArrowRight, PawPrint } from 'lucide-react'
+import Image from 'next/image'
+import { motion, useReducedMotion } from 'framer-motion'
+import { ArrowRight, PawPrint } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-const features = [
-  {
-    icon: Footprints,
-    title: 'Collection Tracker',
-    description: 'Catalog every pair. Track wears, cost-per-wear, and when you last wore them.',
-  },
-  {
-    icon: BarChart2,
-    title: 'Value Index',
-    description: 'A weighted score that combines CPW, live eBay market data, and your rotation diversity.',
-  },
-  {
-    icon: Bell,
-    title: 'Price Alerts',
-    description: 'Add to wishlist and get notified the moment the market price hits your target.',
-  },
+const ROW_1 = [
+  { name: 'Nike Air Force 1 Low',       src: '/images/sneaker-grid/sneaker-01.png' },
+  { name: 'Air Jordan 1 Retro High OG', src: '/images/sneaker-grid/sneaker-02.png' },
+  { name: 'Nike Dunk Low',              src: '/images/sneaker-grid/sneaker-03.png' },
+  { name: 'Adidas Samba OG',            src: '/images/sneaker-grid/sneaker-04.png' },
+  { name: 'New Balance 550',            src: '/images/sneaker-grid/sneaker-05.png' },
 ]
+
+const ROW_2 = [
+  { name: 'Nike Air Max 1',             src: '/images/sneaker-grid/sneaker-06.png' },
+  { name: 'Air Jordan 4 Retro',         src: '/images/sneaker-grid/sneaker-07.png' },
+  { name: 'Adidas Gazelle Indoor',      src: '/images/sneaker-grid/sneaker-08.png' },
+  { name: 'Nike Air Max 90',            src: '/images/sneaker-grid/sneaker-09.png' },
+  { name: 'New Balance 9060',           src: '/images/sneaker-grid/sneaker-10.png' },
+]
+
+const ROW_3 = [
+  { name: 'Converse Chuck Taylor 70',   src: '/images/sneaker-grid/sneaker-11.png' },
+  { name: 'New Balance 574',            src: '/images/sneaker-grid/sneaker-12.png' },
+  { name: 'Nike Cortez',                src: '/images/sneaker-grid/sneaker-13.png' },
+  { name: 'Adidas Campus 00s',          src: '/images/sneaker-grid/sneaker-14.png' },
+  { name: 'Air Jordan 3 Retro',         src: '/images/sneaker-grid/sneaker-15.png' },
+]
+
+type RowItem = { name: string; src: string }
+
+function MarqueeRow({
+  items,
+  reverse = false,
+  duration = 25,
+}: {
+  items: RowItem[]
+  reverse?: boolean
+  duration?: number
+}) {
+  const prefersReducedMotion = useReducedMotion()
+  // 4× duplication: -25% = exactly one copy width → seamless loop
+  const track = [...items, ...items, ...items, ...items]
+
+  return (
+    <div className="overflow-hidden">
+      <motion.div
+        className="flex"
+        animate={
+          prefersReducedMotion
+            ? {}
+            : { x: reverse ? ['-25%', '0%'] : ['0%', '-25%'] }
+        }
+        transition={{ duration, ease: 'linear', repeat: Infinity, repeatType: 'loop' }}
+      >
+        {track.map((sneaker, idx) => (
+          <Tooltip key={`${sneaker.name}-${idx}`}>
+            <TooltipTrigger asChild>
+              <div className="relative w-[90px] h-[82px] flex-shrink-0 bg-zinc-900 hover:bg-zinc-800 transition-colors duration-150 cursor-pointer">
+                <Image
+                  src={sneaker.src}
+                  alt={sneaker.name}
+                  fill
+                  className="object-contain p-1"
+                  unoptimized
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="text-xs font-medium">
+              {sneaker.name}
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </motion.div>
+    </div>
+  )
+}
 
 export default function HomePage() {
   return (
@@ -38,7 +94,7 @@ export default function HomePage() {
         }}
       />
 
-      {/* Hero */}
+      {/* 1. Hero */}
       <section className="w-full max-w-3xl mx-auto px-6 pt-20 md:pt-32 pb-16 text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -68,97 +124,39 @@ export default function HomePage() {
         >
           Track every pair, calculate real value, and know exactly when to cop — all in one place.
         </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.28 }}
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          <Button asChild size="lg" className="bg-primary hover:bg-primary text-slate-900 font-bold h-12 px-8">
-            <Link href="/dashboard">
-              View My Collection
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="lg" className="h-12 px-8">
-            <Link href="/value-index">Try Value Index</Link>
-          </Button>
-        </motion.div>
       </section>
 
-      {/* Value Index CTA card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-3xl mx-auto px-6 relative z-10"
-      >
-        <Card className="border border-border bg-card rounded-2xl overflow-hidden">
-          <div className="p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-              <BarChart2 className="h-6 w-6 text-primary" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-foreground">Know the real value.</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Get a data-driven score that weighs cost-per-wear, live market data, and your collection diversity.
-              </p>
-            </div>
-            <Button asChild className="flex-shrink-0 bg-primary hover:bg-primary text-slate-900 font-bold">
-              <Link href="/value-index">
-                Open Calculator
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </Card>
-      </motion.div>
-
-      {/* Feature cards */}
-      <section className="w-full max-w-3xl mx-auto px-6 pt-16 relative z-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
-        >
-          {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.4 }}
-            >
-              <Card className="border border-border bg-card rounded-2xl p-6 h-full">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <f.icon className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="font-semibold text-foreground text-sm">{f.title}</h3>
-                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{f.description}</p>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* Footer CTA */}
-      <motion.div
+      {/* 2. Sneaker Marquee Grid */}
+      <motion.section
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-3xl mx-auto px-6 pt-16 text-center relative z-10"
+        transition={{ duration: 0.6 }}
+        className="w-full bg-zinc-950 relative z-10 overflow-hidden"
       >
-        <p className="text-sm text-muted-foreground">Ready to see what your collection is really worth?</p>
-        <Button asChild variant="link" className="mt-2 text-primary font-semibold">
-          <Link href="/dashboard">
-            Start tracking your collection
-            <ArrowRight className="ml-1 h-4 w-4" />
+        <div className="flex flex-col gap-px py-px">
+          <MarqueeRow items={ROW_1} duration={28} />
+          <MarqueeRow items={ROW_2} reverse duration={34} />
+          <MarqueeRow items={ROW_3} duration={22} />
+        </div>
+      </motion.section>
+
+      {/* 3. CTA Buttons */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10"
+      >
+        <Button asChild size="lg" className="bg-primary hover:bg-primary text-slate-900 font-bold h-12 px-8">
+          <Link href="/login">
+            Start Tracking
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
+        </Button>
+        <Button asChild variant="outline" size="lg" className="h-12 px-8">
+          <Link href="/value-index">Calculate Value Index</Link>
         </Button>
       </motion.div>
 

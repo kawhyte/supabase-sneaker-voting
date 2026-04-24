@@ -22,9 +22,10 @@ export const metadata = {
 		shortcut: "/icon-192x192.png",
 		apple: "/icon-192x192.png",
 	},
+	manifest: '/manifest.json',
 	appleWebApp: {
 		capable: true,
-		statusBarStyle: "default",
+		statusBarStyle: "black-translucent",
 		title: "PurrView",
 	},
 	formatDetection: {
