@@ -213,6 +213,7 @@ export type Database = {
           status: Database["public"]["Enums"]["item_status"]
           store_name: string | null
           store_url: string | null
+          target_alert_sent_at: string | null
           target_price: number | null
           try_on_date: string | null
           updated_at: string
@@ -257,6 +258,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["item_status"]
           store_name?: string | null
           store_url?: string | null
+          target_alert_sent_at?: string | null
           target_price?: number | null
           try_on_date?: string | null
           updated_at?: string
@@ -301,6 +303,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["item_status"]
           store_name?: string | null
           store_url?: string | null
+          target_alert_sent_at?: string | null
           target_price?: number | null
           try_on_date?: string | null
           updated_at?: string
@@ -730,6 +733,7 @@ export type Database = {
         Row: {
           checked_at: string
           created_at: string
+          ebay_listing_count: number | null
           error_category: string | null
           error_message: string | null
           http_status_code: number | null
@@ -744,6 +748,7 @@ export type Database = {
         Insert: {
           checked_at?: string
           created_at?: string
+          ebay_listing_count?: number | null
           error_category?: string | null
           error_message?: string | null
           http_status_code?: number | null
@@ -758,6 +763,7 @@ export type Database = {
         Update: {
           checked_at?: string
           created_at?: string
+          ebay_listing_count?: number | null
           error_category?: string | null
           error_message?: string | null
           http_status_code?: number | null
@@ -818,45 +824,54 @@ export type Database = {
         Row: {
           consecutive_failures: number
           created_at: string
+          ebay_search_params: Json | null
           id: string
           is_active: boolean
           item_id: string
           last_checked_at: string | null
           last_price: number | null
           notification_sent: boolean
-          product_url: string
+          product_url: string | null
           store_name: string
           target_price: number | null
+          target_size: string | null
+          tracking_provider: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           consecutive_failures?: number
           created_at?: string
+          ebay_search_params?: Json | null
           id?: string
           is_active?: boolean
           item_id: string
           last_checked_at?: string | null
           last_price?: number | null
           notification_sent?: boolean
-          product_url: string
+          product_url?: string | null
           store_name: string
           target_price?: number | null
+          target_size?: string | null
+          tracking_provider?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           consecutive_failures?: number
           created_at?: string
+          ebay_search_params?: Json | null
           id?: string
           is_active?: boolean
           item_id?: string
           last_checked_at?: string | null
           last_price?: number | null
           notification_sent?: boolean
-          product_url?: string
+          product_url?: string | null
           store_name?: string
           target_price?: number | null
+          target_size?: string | null
+          tracking_provider?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -870,57 +885,13 @@ export type Database = {
           },
         ]
       }
-      price_monitors_backup: {
-        Row: {
-          created_at: string | null
-          id: string | null
-          is_active: boolean | null
-          last_checked_at: string | null
-          last_price: number | null
-          notification_sent: boolean | null
-          product_url: string | null
-          sneaker_id: string | null
-          store_name: string | null
-          target_price: number | null
-          updated_at: string | null
-          user_name: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          last_checked_at?: string | null
-          last_price?: number | null
-          notification_sent?: boolean | null
-          product_url?: string | null
-          sneaker_id?: string | null
-          store_name?: string | null
-          target_price?: number | null
-          updated_at?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          last_checked_at?: string | null
-          last_price?: number | null
-          notification_sent?: boolean | null
-          product_url?: string | null
-          sneaker_id?: string | null
-          store_name?: string | null
-          target_price?: number | null
-          updated_at?: string | null
-          user_name?: string | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_type: Database["public"]["Enums"]["avatar_type"] | null
           avatar_updated_at: string | null
           avatar_url: string | null
           avatar_version: number
+          collection_privacy: string | null
           display_name: string | null
           enable_duplication_warnings: boolean | null
           enable_similar_item_warnings: boolean | null
@@ -936,6 +907,7 @@ export type Database = {
           avatar_updated_at?: string | null
           avatar_url?: string | null
           avatar_version?: number
+          collection_privacy?: string | null
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
           enable_similar_item_warnings?: boolean | null
@@ -951,6 +923,7 @@ export type Database = {
           avatar_updated_at?: string | null
           avatar_url?: string | null
           avatar_version?: number
+          collection_privacy?: string | null
           display_name?: string | null
           enable_duplication_warnings?: boolean | null
           enable_similar_item_warnings?: boolean | null
@@ -1073,6 +1046,75 @@ export type Database = {
           id?: string
           notes?: string | null
           preferred_size?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      sneakers: {
+        Row: {
+          brand: string
+          cloudinary_id: string | null
+          color: string | null
+          comfort_rating: number | null
+          created_at: string
+          fit_rating: number | null
+          has_been_tried: boolean
+          id: string
+          image_url: string | null
+          in_collection: boolean
+          model: string
+          notes: string | null
+          product_url: string | null
+          retail_price: number | null
+          size_tried: string | null
+          sku: string | null
+          status: string
+          try_on_date: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          brand: string
+          cloudinary_id?: string | null
+          color?: string | null
+          comfort_rating?: number | null
+          created_at?: string
+          fit_rating?: number | null
+          has_been_tried?: boolean
+          id?: string
+          image_url?: string | null
+          in_collection?: boolean
+          model: string
+          notes?: string | null
+          product_url?: string | null
+          retail_price?: number | null
+          size_tried?: string | null
+          sku?: string | null
+          status?: string
+          try_on_date?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          brand?: string
+          cloudinary_id?: string | null
+          color?: string | null
+          comfort_rating?: number | null
+          created_at?: string
+          fit_rating?: number | null
+          has_been_tried?: boolean
+          id?: string
+          image_url?: string | null
+          in_collection?: boolean
+          model?: string
+          notes?: string | null
+          product_url?: string | null
+          retail_price?: number | null
+          size_tried?: string | null
+          sku?: string | null
+          status?: string
+          try_on_date?: string | null
+          updated_at?: string
           user_id?: string | null
         }
         Relationships: []
@@ -1269,6 +1311,33 @@ export type Database = {
       is_following: { Args: { target_user_id: string }; Returns: boolean }
       recalculate_user_stats: {
         Args: { target_user_id: string }
+        Returns: undefined
+      }
+      record_price_check_failure: {
+        Args: {
+          p_auto_price_tracking_enabled: boolean
+          p_error_category: string
+          p_error_message: string
+          p_http_status_code: number
+          p_item_id: string
+          p_new_failure_count: number
+          p_retailer: string
+          p_source: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      record_price_check_success: {
+        Args: {
+          p_ebay_listing_count?: number
+          p_item_id: string
+          p_lowest_price_seen: number
+          p_price: number
+          p_retailer: string
+          p_source: string
+          p_target_alert_sent_at: string
+          p_user_id: string
+        }
         Returns: undefined
       }
       sync_total_achievements: { Args: never; Returns: undefined }

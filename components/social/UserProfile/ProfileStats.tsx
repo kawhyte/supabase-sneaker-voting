@@ -7,16 +7,16 @@ import { trackEvent, AnalyticsEvent } from "@/lib/analytics";
 
 interface ProfileStatsProps {
   userId: string;
+  sneakerCount: number;
   followerCount: number;
   followingCount: number;
-  wishlistCount: number;
 }
 
 export function ProfileStats({
   userId,
+  sneakerCount,
   followerCount,
   followingCount,
-  wishlistCount,
 }: ProfileStatsProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<DrawerMode>("followers");
@@ -39,54 +39,49 @@ export function ProfileStats({
     });
   };
 
-  const stats = [
-    { label: "Wishlist", value: wishlistCount, clickable: false },
-    {
-      label: followerCount === 1 ? "Follower" : "Followers",
-      value: followerCount,
-      clickable: true,
-      onClick: openFollowersDrawer,
-    },
-    {
-      label: "Following",
-      value: followingCount,
-      clickable: true,
-      onClick: openFollowingDrawer,
-    },
-  ];
-
   return (
     <>
-      <div className="flex items-center justify-center gap-4 py-6 sm:justify-start">
-        {stats.map((stat) => (
-          <button
-            key={stat.label}
-            className={`flex flex-col items-center gap-1 sm:items-start bg-muted/30 rounded-xl border border-border px-6 py-3 ${
-              stat.clickable
-                ? "cursor-pointer hover:opacity-75 transition-opacity group"
-                : "cursor-default"
-            }`}
-            onClick={stat.clickable ? stat.onClick : undefined}
-            disabled={!stat.clickable}
-            type="button"
-          >
-            <span className="text-2xl font-bold text-foreground">
-              {stat.value}
-            </span>
-            <span
-              className={`text-sm ${
-                stat.clickable
-                  ? "text-muted-foreground group-hover:text-primary transition-colors"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {stat.label}
-            </span>
-          </button>
-        ))}
+      <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
+        <span className="font-medium text-foreground">
+          {sneakerCount}
+        </span>
+        <span>{sneakerCount === 1 ? "sneaker" : "sneakers"}</span>
+
+        <span className="select-none mx-1">·</span>
+
+        <button
+          type="button"
+          className="font-medium text-foreground hover:text-primary transition-colors hover:underline underline-offset-2"
+          onClick={openFollowersDrawer}
+        >
+          {followerCount}
+        </button>
+        <button
+          type="button"
+          className="hover:text-primary transition-colors hover:underline underline-offset-2"
+          onClick={openFollowersDrawer}
+        >
+          {followerCount === 1 ? "follower" : "followers"}
+        </button>
+
+        <span className="select-none mx-1">·</span>
+
+        <button
+          type="button"
+          className="font-medium text-foreground hover:text-primary transition-colors hover:underline underline-offset-2"
+          onClick={openFollowingDrawer}
+        >
+          {followingCount}
+        </button>
+        <button
+          type="button"
+          className="hover:text-primary transition-colors hover:underline underline-offset-2"
+          onClick={openFollowingDrawer}
+        >
+          following
+        </button>
       </div>
 
-      {/* Followers/Following Drawer */}
       <FollowersDrawer
         open={drawerOpen}
         onOpenChange={setDrawerOpen}

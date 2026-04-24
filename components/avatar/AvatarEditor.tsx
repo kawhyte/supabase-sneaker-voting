@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
+import { Camera } from 'lucide-react'
 import { AvatarDisplay } from './AvatarDisplay'
 import { AvatarPicker } from './AvatarPicker'
 import { User } from '@supabase/supabase-js'
@@ -48,9 +48,16 @@ export function AvatarEditor({ profile, user, onAvatarChange }: AvatarEditorProp
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 pb-8 border-b border-slate-200/50">
-      {/* Current Avatar Display */}
-      <div className="group relative motion-safe:transition-all motion-safe:duration-300">
+    <div className="flex flex-col items-center gap-3 pb-8 border-b border-slate-200/50">
+      {/* Current Avatar Display — clickable with camera overlay */}
+      <div
+        className="group relative motion-safe:transition-all motion-safe:duration-300 cursor-pointer"
+        onClick={() => setIsPickerOpen(true)}
+        role="button"
+        tabIndex={0}
+        aria-label="Change avatar"
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsPickerOpen(true) }}
+      >
         <AvatarDisplay
           key={currentProfile.preset_avatar_id || 'default'}
           avatarType={currentProfile.avatar_type}
@@ -62,18 +69,19 @@ export function AvatarEditor({ profile, user, onAvatarChange }: AvatarEditorProp
           size="xl"
           className="ring-2 ring-slate-300/40"
         />
-        <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/10 motion-safe:transition-colors motion-safe:duration-300"></div>
+        <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/0 group-hover:bg-black/30 motion-safe:transition-all motion-safe:duration-300">
+          <Camera className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 motion-safe:transition-opacity motion-safe:duration-300" aria-hidden="true" />
+        </div>
       </div>
 
-      {/* Change Avatar Button */}
-      <Button
+      {/* Minimal text link */}
+      <button
         type="button"
-        variant="outline"
         onClick={() => setIsPickerOpen(true)}
-        className="motion-safe:transition-all motion-safe:duration-200 motion-safe:hover:scale-105"
+        className="text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground motion-safe:transition-colors motion-safe:duration-150"
       >
-        Change Avatar
-      </Button>
+        Edit photo
+      </button>
 
       {/* Avatar Picker Modal */}
       <AvatarPicker

@@ -8,6 +8,7 @@ interface ProfileHeaderProps {
   name: string;
   avatarUrl: string | null;
   isOwnProfile: boolean;
+  statsSlot?: React.ReactNode;
 }
 
 export function ProfileHeader({
@@ -15,8 +16,8 @@ export function ProfileHeader({
   name,
   avatarUrl,
   isOwnProfile,
+  statsSlot,
 }: ProfileHeaderProps) {
-  // Get initials for avatar fallback
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -25,25 +26,22 @@ export function ProfileHeader({
     .slice(0, 2);
 
   return (
-    <div className="flex flex-col items-center gap-6 py-8 sm:flex-row sm:items-start">
+    <div className="flex items-start gap-5 py-8">
       {/* Avatar */}
-      <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
+      <Avatar className="h-20 w-20 shrink-0">
         <AvatarImage src={avatarUrl || undefined} alt={name} />
-        <AvatarFallback className="text-2xl font-semibold sm:text-3xl">
-          {initials}
-        </AvatarFallback>
+        <AvatarFallback className="text-xl font-semibold">{initials}</AvatarFallback>
       </Avatar>
 
-      {/* User Info */}
-      <div className="flex flex-1 flex-col items-center gap-6 sm:items-start">
-        <div className="flex flex-col items-center gap-2 sm:items-start">
-          <h1 className="text-3xl font-bold text-foreground">{name}</h1>
+      {/* Right column: name + follow + stats */}
+      <div className="flex-1 min-w-0 pt-1">
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold text-foreground truncate">{name}</h1>
+          {!isOwnProfile && (
+            <FollowButton targetUserId={userId} source="profile" className="shrink-0" />
+          )}
         </div>
-
-        {/* Follow Button (only show if not own profile) */}
-        {!isOwnProfile && (
-          <FollowButton targetUserId={userId} source="profile" />
-        )}
+        {statsSlot}
       </div>
     </div>
   );

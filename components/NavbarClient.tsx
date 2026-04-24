@@ -112,8 +112,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationCenter } from "@/components/notification-center/NotificationCenter";
-import { WardrobeStatsWidget } from "@/components/navbar/WardrobeStatsWidget";
-import { AchievementsPreview } from "@/components/navbar/AchievementsPreview";
+import { MiniPlayerCard } from "@/components/navbar/MiniPlayerCard";
 import { AvatarDisplay } from "@/components/avatar/AvatarDisplay";
 import { useProfile } from "@/contexts/ProfileContext";
 
@@ -381,15 +380,10 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 										</div>
 									</DropdownMenuLabel>
 
-									<DropdownMenuSeparator />
-
-									{/* Wardrobe Stats */}
-									<WardrobeStatsWidget userId={user?.id} />
-
-									<DropdownMenuSeparator />
-
-									{/* Achievements */}
-									<AchievementsPreview userId={user?.id} />
+									{/* Mini Player Card */}
+									<DropdownMenuItem asChild className="p-0 cursor-pointer focus:bg-transparent">
+										<MiniPlayerCard userId={user?.id} />
+									</DropdownMenuItem>
 
 									<DropdownMenuSeparator />
 

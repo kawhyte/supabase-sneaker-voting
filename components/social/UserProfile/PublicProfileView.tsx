@@ -4,12 +4,13 @@ import { useEffect } from "react";
 import { WardrobeItem } from "@/components/types/WardrobeItem";
 import { ProfileHeader } from "./ProfileHeader";
 import { ProfileStats } from "./ProfileStats";
-import { WishlistSection } from "./WishlistSection";
+import { ItemGrid } from "./ItemGrid";
 import { EmptyWishlist } from "./EmptyWishlist";
 import { FollowButton } from "@/components/social/FollowButton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackEvent, AnalyticsEvent } from "@/lib/analytics";
 
-interface PublicProfileData {
+export interface PublicProfileData {
   profile: {
     id: string;
     name: string;
@@ -17,9 +18,13 @@ interface PublicProfileData {
     follower_count: number;
     following_count: number;
   };
-  items: WardrobeItem[];
-  canView: boolean;
-  reason?: "private" | "public" | "followers_only";
+  collectionItems: WardrobeItem[];
+  wishlistItems: WardrobeItem[];
+  sneakerCount: number;
+  collectionCanView: boolean;
+  wishlistCanView: boolean;
+  collectionReason?: "private" | "followers_only";
+  wishlistReason?: "private" | "followers_only";
   isFollowing?: boolean;
   isOwnProfile: boolean;
 }
@@ -29,89 +34,101 @@ interface PublicProfileViewProps {
 }
 
 export function PublicProfileView({ data }: PublicProfileViewProps) {
-  const { profile, items, canView, reason, isFollowing, isOwnProfile } = data;
-
-  // Debug logging
-  console.log("[PublicProfileView] Received data:", {
-    profileId: profile.id,
-    profileName: profile.name,
-    itemCount: items.length,
-    canView,
-    reason,
+  const {
+    profile,
+    collectionItems,
+    wishlistItems,
+    sneakerCount,
+    collectionCanView,
+    wishlistCanView,
+    collectionReason,
+    wishlistReason,
+    isFollowing,
     isOwnProfile,
-    hasItems: items && items.length > 0,
-  });
+  } = data;
 
-  // Debug first item's photo structure
-  if (items && items.length > 0) {
-    console.log("[PublicProfileView] First item sample:", {
-      id: items[0].id,
-      brand: items[0].brand,
-      model: items[0].model,
-      hasItemPhotos: !!items[0].item_photos,
-      itemPhotosLength: items[0].item_photos?.length || 0,
-      itemPhotos: items[0].item_photos,
-      hasImageUrl: !!items[0].image_url,
-    });
-  }
-
-  // Track profile view on mount
   useEffect(() => {
     if (!isOwnProfile) {
       trackEvent(AnalyticsEvent.PUBLIC_PROFILE_VIEWED, {
         profile_user_id: profile.id,
-        can_view: canView,
-        privacy_reason: reason,
-        item_count: items.length,
+        collection_can_view: collectionCanView,
+        wishlist_can_view: wishlistCanView,
+        collection_count: collectionItems.length,
+        wishlist_count: wishlistItems.length,
       });
     }
-  }, [profile.id, canView, reason, items.length, isOwnProfile]);
+  }, [profile.id, collectionCanView, wishlistCanView, collectionItems.length, wishlistItems.length, isOwnProfile]);
+
+  const followAction =
+    !isFollowing && !isOwnProfile ? (
+      <FollowButton targetUserId={profile.id} source="profile" variant="default" />
+    ) : undefined;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      {/* Profile Header */}
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Instagram-style header: avatar left, name + stats right */}
       <ProfileHeader
         userId={profile.id}
         name={profile.name}
         avatarUrl={profile.avatar_url}
         isOwnProfile={isOwnProfile}
+        statsSlot={
+          <ProfileStats
+            userId={profile.id}
+            sneakerCount={sneakerCount}
+            followerCount={profile.follower_count || 0}
+            followingCount={profile.following_count || 0}
+          />
+        }
       />
 
-      {/* Profile Stats */}
-      <ProfileStats
-        userId={profile.id}
-        followerCount={profile.follower_count || 0}
-        followingCount={profile.following_count || 0}
-        wishlistCount={items.length}
-      />
+      {/* Collection / Wishlist tabs */}
+      <Tabs defaultValue="collection" className="mt-2">
+        <TabsList className="w-full justify-start rounded-none bg-transparent border-b border-border h-auto p-0 gap-0">
+          <TabsTrigger
+            value="collection"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-6 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground transition-colors"
+          >
+            Collection
+          </TabsTrigger>
+          <TabsTrigger
+            value="wishlist"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-6 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground transition-colors"
+          >
+            Wishlist
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Wishlist Content */}
-      <div className="mt-8">
-        {canView ? (
-          items.length > 0 ? (
-            <WishlistSection items={items} />
+        <TabsContent value="collection" className="mt-8">
+          {collectionCanView && collectionItems.length > 0 ? (
+            <ItemGrid items={collectionItems} viewMode="collection" />
           ) : (
             <EmptyWishlist
-              reason="empty"
+              reason={collectionReason ?? "empty"}
               userName={isOwnProfile ? "You" : profile.name}
+              context="collection"
+              action={
+                collectionReason === "followers_only" ? followAction : undefined
+              }
             />
-          )
-        ) : (
-          <EmptyWishlist
-            reason={reason === "private" ? "private" : "followers_only"}
-            userName={profile.name}
-            action={
-              reason === "followers_only" && !isFollowing ? (
-                <FollowButton
-                  targetUserId={profile.id}
-                  source="profile"
-                  variant="default"
-                />
-              ) : undefined
-            }
-          />
-        )}
-      </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="wishlist" className="mt-8">
+          {wishlistCanView && wishlistItems.length > 0 ? (
+            <ItemGrid items={wishlistItems} viewMode="wishlist" />
+          ) : (
+            <EmptyWishlist
+              reason={wishlistReason ?? "empty"}
+              userName={isOwnProfile ? "You" : profile.name}
+              context="wishlist"
+              action={
+                wishlistReason === "followers_only" ? followAction : undefined
+              }
+            />
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

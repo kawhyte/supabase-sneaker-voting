@@ -11,6 +11,8 @@ import { AvatarEditor } from '@/components/avatar/AvatarEditor'
 import { AvatarErrorBoundary } from '@/components/avatar/AvatarErrorBoundary'
 import { useAutoSave } from '@/hooks/useAutoSave'
 import { useProfile } from '@/contexts/ProfileContext'
+import { createClient } from '@/utils/supabase/client'
+import { getPointsProgress } from '@/lib/level-system'
 
 interface ProfileFormProps {
   onProfileUpdate?: () => void
@@ -21,6 +23,7 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
   const [displayName, setDisplayName] = useState(profile?.display_name || '')
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(profile?.preset_avatar_id || null)
   const [isSaving, setIsSaving] = useState(false)
+  const [totalPoints, setTotalPoints] = useState<number | null>(null)
 
   // Sync local state when profile changes from context
   useEffect(() => {
@@ -29,6 +32,27 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
       setSelectedAvatarId(profile.preset_avatar_id)
     }
   }, [profile])
+
+  // Fetch achievement points for Collector Tier display
+  useEffect(() => {
+    if (!user?.id) return
+    const supabase = createClient()
+    async function fetchPoints() {
+      try {
+        const { data, error } = await supabase
+          .from('user_achievements')
+          .select('achievements!inner(points)')
+          .eq('user_id', user!.id)
+        if (error || !data) { setTotalPoints(0); return }
+        setTotalPoints(
+          data.reduce((sum: number, row: any) => sum + (row.achievements?.points ?? 0), 0)
+        )
+      } catch {
+        setTotalPoints(0)
+      }
+    }
+    fetchPoints()
+  }, [user?.id])
 
   if (!profile || !user) {
     return null
@@ -79,22 +103,7 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
     showToasts: false
   })
 
-  // Format the last sign in date
-  const formatLastSignIn = (date: string | undefined) => {
-    if (!date) return 'Never'
-
-    const signInDate = new Date(date)
-    const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    }
-
-    return signInDate.toLocaleDateString('en-US', options)
-  }
+  const tierProgress = totalPoints !== null ? getPointsProgress(totalPoints) : null
 
   return (
     <Card className="bg-card border border-border rounded-2xl px-8 py-8">
@@ -104,6 +113,30 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
           <AvatarErrorBoundary>
             <AvatarEditor profile={profile} user={user} onAvatarChange={setSelectedAvatarId} />
           </AvatarErrorBoundary>
+
+          {/* Collector Tier */}
+          <div className="flex flex-col items-center gap-2 pb-2">
+            {tierProgress === null ? (
+              <div className="h-4 w-28 rounded bg-muted animate-pulse" />
+            ) : (
+              <>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Collector Tier</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Level {tierProgress.level} · {tierProgress.tierName}
+                </p>
+                <div className="w-32 h-0.5 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full motion-safe:transition-all motion-safe:duration-700"
+                    style={{ width: `${tierProgress.progressPct}%` }}
+                    role="progressbar"
+                    aria-valuenow={tierProgress.progressPct}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  />
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Form Fields Section */}
           <div className="space-y-6">
@@ -124,27 +157,11 @@ export function ProfileForm({ onProfileUpdate }: ProfileFormProps) {
               />
             </div>
 
-            {/* Email (Read-only) */}
-            <div className="space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700">
-              <div>
-                <Label htmlFor="email" className="text-base font-semibold text-foreground">Email Address</Label>
-                <p className="text-xs text-muted-foreground mt-1">Your account email cannot be changed</p>
-              </div>
-              <Input
-                id="email"
-                type="email"
-                value={user.email || ''}
-                disabled
-                className="bg-muted/50 text-muted-foreground cursor-not-allowed border-border/50"
-              />
-            </div>
-
-            {/* Last Sign In */}
-            <div className="space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-900">
-              <Label className="text-base font-semibold text-foreground">Last Signed In</Label>
-              <div className="text-sm text-muted-foreground/50 bg-muted/50 border border-border/50 px-4 py-3 rounded-lg cursor-not-allowed ">
-                {formatLastSignIn(user.last_sign_in_at)}
-              </div>
+            {/* Email (Read-only typography) */}
+            <div className="space-y-1 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700">
+              <Label className="text-base font-semibold text-foreground">Email Address</Label>
+              <p className="text-xs text-muted-foreground">Your account email cannot be changed</p>
+              <p className="text-sm text-muted-foreground pt-1">{user.email || '—'}</p>
             </div>
           </div>
 

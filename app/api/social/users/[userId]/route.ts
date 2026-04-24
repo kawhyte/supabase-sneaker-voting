@@ -1,11 +1,49 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
+const ITEM_SELECT = `
+  *,
+  item_photos (
+    id,
+    image_url,
+    image_order,
+    is_main_image
+  ),
+  brands (
+    id,
+    name,
+    brand_logo
+  )
+`;
+
+async function queryItems(
+  supabase: SupabaseClient,
+  userId: string,
+  status: "owned" | "wishlisted"
+) {
+  const { data, error } = await supabase
+    .from("items")
+    .select(ITEM_SELECT)
+    .eq("user_id", userId)
+    .eq("status", status)
+    .eq("is_archived", false)
+    .eq("category", "sneakers")
+    .order("is_pinned", { ascending: false })
+    .order("created_at", { ascending: false })
+    .order("is_main_image", { foreignTable: "item_photos", ascending: false })
+    .order("image_order", { foreignTable: "item_photos", ascending: true });
+
+  if (error) console.error(`[API /social/users] Error fetching ${status} items:`, error);
+  return data || [];
+}
+
 /**
  * GET /api/social/users/[userId]
- * Fetch public profile data for a user with privacy enforcement
+ * Returns collectionItems + wishlistItems with per-type privacy enforcement.
+ * RLS is the authoritative gate; this is the application-level UX layer.
  */
 export async function GET(
   request: NextRequest,
@@ -15,209 +53,103 @@ export async function GET(
     const { userId: targetUserId } = await params;
     const supabase = await createClient();
 
-    // Get current user (may be null for unauthenticated requests)
     const {
       data: { user: currentUser },
     } = await supabase.auth.getUser();
 
-    // Fetch target user's profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("id, display_name, avatar_url, wishlist_privacy, follower_count, following_count")
+      .select("id, display_name, avatar_url, wishlist_privacy, collection_privacy, follower_count, following_count")
       .eq("id", targetUserId)
       .single();
 
     if (profileError || !profile) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Transform profile to match expected interface (display_name → name)
     const transformedProfile = {
       id: profile.id,
-      name: profile.display_name || 'Anonymous',
+      name: profile.display_name || "Anonymous",
       avatar_url: profile.avatar_url,
       follower_count: profile.follower_count || 0,
       following_count: profile.following_count || 0,
     };
 
-    // Check if current user is viewing their own profile
     const isOwnProfile = currentUser?.id === targetUserId;
 
-    // If viewing own profile, return full data
     if (isOwnProfile) {
-      const { data: items, error: itemsError } = await supabase
-        .from("items")
-        .select(`
-          *,
-          item_photos (
-            id,
-            image_url,
-            image_order,
-            is_main_image
-          )
-        `)
-        .eq("user_id", targetUserId)
-        .eq("status", "wishlisted")
-        .eq("is_archived", false)
-        .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false })
-        .order("is_main_image", { foreignTable: "item_photos", ascending: false })
-        .order("image_order", { foreignTable: "item_photos", ascending: true });
-
-      if (itemsError) {
-        console.error("Error fetching own items:", itemsError);
-        return NextResponse.json(
-          { error: "Failed to fetch items" },
-          { status: 500 }
-        );
-      }
-
+      const [collectionItems, wishlistItems] = await Promise.all([
+        queryItems(supabase, targetUserId, "owned"),
+        queryItems(supabase, targetUserId, "wishlisted"),
+      ]);
       return NextResponse.json({
         profile: transformedProfile,
-        items: items || [],
-        canView: true,
+        collectionItems,
+        wishlistItems,
+        sneakerCount: collectionItems.length,
+        collectionCanView: true,
+        wishlistCanView: true,
         isOwnProfile: true,
       });
     }
 
-    // Check privacy settings for other users
-    const privacy = profile.wishlist_privacy || "private";
+    // Resolve follow status once for both privacy checks
+    let isFollowing = false;
+    const needsFollowCheck =
+      profile.wishlist_privacy === "followers_only" ||
+      profile.collection_privacy === "followers_only";
 
-    // Private wishlist - no one can view
-    if (privacy === "private") {
-      return NextResponse.json({
-        profile: transformedProfile,
-        items: [],
-        canView: false,
-        reason: "private",
-        isOwnProfile: false,
-      });
+    if (needsFollowCheck && currentUser) {
+      const { data } = await supabase.rpc("is_following", { target_user_id: targetUserId });
+      isFollowing = data === true;
     }
 
-    // Public wishlist - anyone can view
-    if (privacy === "public") {
-      const { data: items, error: itemsError } = await supabase
-        .from("items")
-        .select(`
-          *,
-          item_photos (
-            id,
-            image_url,
-            image_order,
-            is_main_image
-          )
-        `)
-        .eq("user_id", targetUserId)
-        .eq("status", "wishlisted")
-        .eq("is_archived", false)
-        .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false })
-        .order("is_main_image", { foreignTable: "item_photos", ascending: false })
-        .order("image_order", { foreignTable: "item_photos", ascending: true });
+    // Collection access
+    const collectionPrivacy = profile.collection_privacy || "private";
+    let collectionCanView = false;
+    let collectionItems: Awaited<ReturnType<typeof queryItems>> = [];
+    let collectionReason: "private" | "followers_only" | undefined;
 
-      if (itemsError) {
-        console.error("Error fetching public items:", itemsError);
-        return NextResponse.json(
-          { error: "Failed to fetch items" },
-          { status: 500 }
-        );
-      }
-
-      return NextResponse.json({
-        profile: transformedProfile,
-        items: items || [],
-        canView: true,
-        reason: "public",
-        isOwnProfile: false,
-      });
+    if (collectionPrivacy === "public") {
+      collectionCanView = true;
+      collectionItems = await queryItems(supabase, targetUserId, "owned");
+    } else if (collectionPrivacy === "followers_only" && currentUser && isFollowing) {
+      collectionCanView = true;
+      collectionItems = await queryItems(supabase, targetUserId, "owned");
+    } else {
+      collectionReason = collectionPrivacy === "followers_only" ? "followers_only" : "private";
     }
 
-    // Followers-only wishlist - check follow status
-    if (privacy === "followers_only") {
-      if (!currentUser) {
-        // Not authenticated - can't view followers-only
-        return NextResponse.json({
-          profile: transformedProfile,
-          items: [],
-          canView: false,
-          reason: "followers_only",
-          isFollowing: false,
-          isOwnProfile: false,
-        });
-      }
+    // Wishlist access
+    const wishlistPrivacy = profile.wishlist_privacy || "private";
+    let wishlistCanView = false;
+    let wishlistItems: Awaited<ReturnType<typeof queryItems>> = [];
+    let wishlistReason: "private" | "followers_only" | undefined;
 
-      // Check if current user is following target user
-      const { data: isFollowingData } = await supabase
-        .rpc("is_following", { target_user_id: targetUserId });
-
-      const isFollowing = isFollowingData === true;
-
-      if (!isFollowing) {
-        // Not following - can't view
-        return NextResponse.json({
-          profile: transformedProfile,
-          items: [],
-          canView: false,
-          reason: "followers_only",
-          isFollowing: false,
-          isOwnProfile: false,
-        });
-      }
-
-      // Following - can view
-      const { data: items, error: itemsError } = await supabase
-        .from("items")
-        .select(`
-          *,
-          item_photos (
-            id,
-            image_url,
-            image_order,
-            is_main_image
-          )
-        `)
-        .eq("user_id", targetUserId)
-        .eq("status", "wishlisted")
-        .eq("is_archived", false)
-        .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false })
-        .order("is_main_image", { foreignTable: "item_photos", ascending: false })
-        .order("image_order", { foreignTable: "item_photos", ascending: true });
-
-      if (itemsError) {
-        console.error("Error fetching followers-only items:", itemsError);
-        return NextResponse.json(
-          { error: "Failed to fetch items" },
-          { status: 500 }
-        );
-      }
-
-      return NextResponse.json({
-        profile: transformedProfile,
-        items: items || [],
-        canView: true,
-        reason: "followers_only",
-        isFollowing: true,
-        isOwnProfile: false,
-      });
+    if (wishlistPrivacy === "public") {
+      wishlistCanView = true;
+      wishlistItems = await queryItems(supabase, targetUserId, "wishlisted");
+    } else if (wishlistPrivacy === "followers_only" && currentUser && isFollowing) {
+      wishlistCanView = true;
+      wishlistItems = await queryItems(supabase, targetUserId, "wishlisted");
+    } else {
+      wishlistReason = wishlistPrivacy === "followers_only" ? "followers_only" : "private";
     }
 
-    // Fallback - treat as private
     return NextResponse.json({
       profile: transformedProfile,
-      items: [],
-      canView: false,
-      reason: "private",
+      collectionItems,
+      wishlistItems,
+      sneakerCount: collectionItems.length,
+      collectionCanView,
+      wishlistCanView,
+      collectionReason,
+      wishlistReason,
+      isFollowing,
       isOwnProfile: false,
     });
   } catch (error) {
     console.error("Error in GET /api/social/users/[userId]:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
