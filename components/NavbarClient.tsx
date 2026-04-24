@@ -307,22 +307,18 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 							{/* Bell Icon with new notification animation */}
 							<button
 								onClick={() => setIsNotificationCenterOpen(true)}
-								className={`dense relative flex items-center justify-center p-2 rounded-full bg-muted hover:bg-muted/60 motion-safe:transition-colors ${
-									hasNewNotification ? 'motion-safe:animate-bounce' : ''
-								}`}
-								aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
+								className="dense relative flex items-center justify-center p-2 rounded-full bg-muted hover:bg-muted/60 motion-safe:transition-colors"
+								aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
 								title="Notifications (Shift+N)"
 							>
 								<Bell className={`h-5 w-5 text-foreground ${hasNewNotification ? 'text-primary' : ''}`} />
 								{unreadCount > 0 && (
-									<span className={`absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-xs font-bold ${
-										hasNewNotification ? 'motion-safe:animate-pulse motion-safe:scale-110' : 'motion-safe:animate-pulse'
-									}`}>
-										{unreadCount > 99 ? '99+' : unreadCount}
+									<span className="absolute -top-0.5 -right-0.5 h-2 w-2">
+										{hasNewNotification && (
+											<span className="absolute inset-0 rounded-full bg-red-400 motion-safe:animate-ping opacity-75" />
+										)}
+										<span className="relative block h-2 w-2 rounded-full bg-red-500" />
 									</span>
-								)}
-								{hasNewNotification && (
-									<span className="absolute inset-0 rounded-full bg-primary/20 motion-safe:animate-ping" />
 								)}
 							</button>
 
@@ -465,9 +461,7 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 										<span className="text-sm font-medium">Notifications</span>
 									</div>
 									{unreadCount > 0 && (
-										<span className="flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-red-500 text-white text-xs font-bold">
-											{unreadCount > 99 ? '99+' : unreadCount}
-										</span>
+										<span className="h-2 w-2 rounded-full bg-red-500 flex-shrink-0" />
 									)}
 								</button>
 							)}
