@@ -1,10 +1,16 @@
 // components/cost-per-wear-calculator/RecommendationCard.tsx
 import Link from 'next/link';
-import { Recommendation } from '@/lib/worth-it-calculator/calculator-logic';
+import { Recommendation, Verdict } from '@/lib/worth-it-calculator/calculator-logic';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { AlertTriangle, ArrowRight, CheckCircle, Tag } from 'lucide-react';
+
+const verdictLabels: Record<Verdict, string> = {
+  BUY_NOW: 'BUY NOW',
+  WAIT_FOR_SALE: 'WAIT FOR MARKET DROP',
+  PASS: 'PASS',
+};
 
 interface Props {
   recommendation: Recommendation;
@@ -56,7 +62,7 @@ export function RecommendationCard({ recommendation }: Props) {
         </div>
         <div>
           <Badge variant="outline" className={cn("mb-2 font-bold bg-white/50", styles.text, styles.border)}>
-            {verdict.replace(/_/g, ' ')}
+            {verdictLabels[verdict]}
           </Badge>
           <h2 className={cn("text-3xl font-bold font-heading mb-2", styles.text)}>
             {headline}
@@ -67,7 +73,7 @@ export function RecommendationCard({ recommendation }: Props) {
         </div>
       </div>
 
-      {/* Action Prompt (The "Wait for Sale" Logic) */}
+      {/* Action Prompt (The "Wait for Market Drop" guidance) */}
       {actionPrompt && (
         <div className="mt-6 p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-slate-200 flex items-start gap-3">
           <div className="bg-slate-900 text-white p-1.5 rounded-full mt-0.5">
@@ -85,7 +91,7 @@ export function RecommendationCard({ recommendation }: Props) {
       {/* Signup CTA */}
       <Link
         href="/signup"
-        className="mt-6 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-700 transition-colors"
+        className="mt-6 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors"
       >
         Track this Sneaker
         <ArrowRight className="w-4 h-4" />

@@ -4,18 +4,18 @@ import type { ItemCategory } from '@/components/types/item-category';
 /**
  * CORE TYPES
  */
-export type WearFrequency = 'rarely' | 'monthly' | 'weekly' | 'daily';
+export type RotationScenario = 'daily_beater' | 'weekend_rotation' | 'grail';
 export type ResalePotential = 'none' | 'low' | 'medium' | 'high';
 export type WardrobeRole = 'gap_fill' | 'upgrade' | 'variety' | 'duplicate';
-export type QualityRating = 'low' | 'average' | 'high';
+export type QualityRating = 'low' | 'average' | 'high'; // kept for legacy compatibility
 
 export interface CalculatorInput {
   category: ItemCategory;
   price: number;
-  wearFrequency: WearFrequency;
+  rotationScenario: RotationScenario;
   resalePotential: ResalePotential;
   wardrobeRole: WardrobeRole;
-  qualityRating: QualityRating;
+  qualityRating?: QualityRating; // optional — UI removed, defaults to 'average' in calc
   // Optional enrichment — from eBay search and authenticated collection query
   marketValue?: number;    // eBay current market price
   ownedSameBrand?: number; // Count of owned items from same brand
@@ -59,46 +59,42 @@ export interface CalculatorResults {
 }
 
 /**
- * HELPER: Get annual wears from frequency label
+ * HELPER: Get annual wears from rotation scenario
  */
-export function getWearsFromFrequency(frequency: WearFrequency): number {
-  const frequencyMap: Record<WearFrequency, number> = {
-    rarely: 6,      // ~6 times/year (Special occasions)
-    monthly: 12,    // 12 times/year
-    weekly: 52,     // 52 times/year
-    daily: 180,     // ~Every other day / heavy rotation
+export function getWearsFromScenario(scenario: RotationScenario): number {
+  const scenarioMap: Record<RotationScenario, number> = {
+    daily_beater: 180,      // ~15 wears/mo
+    weekend_rotation: 48,   // ~4 wears/mo
+    grail: 12,              // ~1 wear/mo (special occasion)
   };
-  return frequencyMap[frequency];
+  return scenarioMap[scenario];
 }
 
 /**
- * HELPER: Get readable label
+ * HELPER: Get readable label for rotation scenario
  */
-export function getFrequencyLabel(frequency: WearFrequency): string {
-  const labels: Record<WearFrequency, string> = {
-    rarely: 'Rarely (Special Occasions)',
-    monthly: 'Monthly (Occasional)',
-    weekly: 'Weekly (Regular)',
-    daily: 'Daily (Heavy Rotation)',
+export function getScenarioLabel(scenario: RotationScenario): string {
+  const labels: Record<RotationScenario, string> = {
+    daily_beater: 'Daily Beater',
+    weekend_rotation: 'Weekend Rotation',
+    grail: 'Special Occasion / Grail',
   };
-  return labels[frequency];
+  return labels[scenario];
 }
 
 /**
  * MAIN LOGIC: Calculate Smart Metrics
- * Incorporates Resale Value, Quality (Lifespan), and Category Targets
+ * Incorporates Resale Value, Category Targets, and Rotation Scenario
  */
 export function calculateSmartMetrics(input: CalculatorInput): CalculatorMetrics {
-  const { price, category, wearFrequency, resalePotential, qualityRating } = input;
+  const { price, category, rotationScenario, resalePotential } = input;
 
-  // 1. Calculate Lifespan based on Quality & Category
-  // Shoes generally last less time than jackets. High quality extends life.
+  // 1. Calculate Lifespan — quality removed from UI, use standard sneaker lifespan
   const baseLifespanYears = category === 'boots' ? 4 : 2;
-  const qualityMultiplier = qualityRating === 'high' ? 1.5 : qualityRating === 'low' ? 0.6 : 1.0;
-  const estimatedLifespanYears = Math.max(1, parseFloat((baseLifespanYears * qualityMultiplier).toFixed(1)));
-  
+  const estimatedLifespanYears = baseLifespanYears; // qualityMultiplier = 1.0 (average)
+
   // 2. Calculate Total Lifetime Wears
-  const baseWearsPerYear = getWearsFromFrequency(wearFrequency);
+  const baseWearsPerYear = getWearsFromScenario(rotationScenario);
   const totalLifetimeWears = Math.floor(baseWearsPerYear * estimatedLifespanYears);
 
   // 3. Calculate Resale Value (Net Cost)
@@ -121,7 +117,6 @@ export function calculateSmartMetrics(input: CalculatorInput): CalculatorMetrics
 
   // 6. Target Buy Price (Reverse Engineering)
   // "What price makes Real CPW <= Target CPW?"
-  // Formula derived from: (TargetPrice * (1 - Resale%)) / TotalWears = TargetCPW
   const targetBuyPrice = Math.floor((targetCPW * totalLifetimeWears) / (1 - resalePercent));
 
   return {
@@ -137,7 +132,7 @@ export function calculateSmartMetrics(input: CalculatorInput): CalculatorMetrics
 }
 
 /**
- * RECOMMENDATION ENGINE — 3-Factor Weighted Cop Score (0–100)
+ * RECOMMENDATION ENGINE — 3-Factor Weighted Value Index Score (0–100)
  *
  * Factor 1 — CPW (50 pts max):   How good is the cost-per-wear?
  * Factor 2 — Market Delta (30 pts max): Are you paying below or above market?
@@ -215,8 +210,8 @@ export function generateSmartRecommendation(
       verdict: 'WAIT_FOR_SALE',
       score,
       emoji: '👀',
-      headline: 'Wait for a Sale.',
-      description: `Decent pick, but overpriced relative to its utility right now. Full price pushes your cost-per-wear above the target.`,
+      headline: 'Wait for Market Drop.',
+      description: `Decent pick, but overpriced relative to its utility right now. Current market price pushes your cost-per-wear above the target.`,
       actionPrompt: `Set a price alert for $${targetBuyPrice}. At that price, the numbers make sense.`,
       color: 'sun-500',
       breakdown,
@@ -242,24 +237,22 @@ export function getRecommendation(metrics: CalculatorMetrics, input: CalculatorI
 
 /**
  * Smart defaults for sneaker-only calculations.
- * Hardcoded so the public calculator only needs price + frequency.
  */
 export const SNEAKER_DEFAULTS = {
   category: 'lifestyle' as ItemCategory,
-  qualityRating: 'average' as QualityRating,
   resalePotential: 'low' as ResalePotential,
   wardrobeRole: 'variety' as WardrobeRole,
 };
 
 /**
  * Simplified entry point for the public CPW calculator.
- * Only requires price and wear frequency — everything else uses smart defaults.
+ * Only requires price and rotation scenario — everything else uses smart defaults.
  */
 export function calculateForSneakers(
   price: number,
-  wearFrequency: WearFrequency
+  rotationScenario: RotationScenario
 ): CalculatorResults {
-  const input: CalculatorInput = { ...SNEAKER_DEFAULTS, price, wearFrequency };
+  const input: CalculatorInput = { ...SNEAKER_DEFAULTS, price, rotationScenario };
   const metrics = calculateSmartMetrics(input);
   const recommendation = generateSmartRecommendation(metrics, input);
   return { metrics, recommendation, input };

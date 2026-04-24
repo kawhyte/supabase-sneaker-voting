@@ -5,20 +5,19 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { CalculatorResults, generateSmartRecommendation, calculateSmartMetrics, CalculatorInput } from '@/lib/worth-it-calculator/calculator-logic';
+import { CalculatorResults, generateSmartRecommendation, calculateSmartMetrics, CalculatorInput, ResalePotential, getScenarioLabel } from '@/lib/worth-it-calculator/calculator-logic';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import {
-  Sparkles, ArrowRight, TrendingDown, Shield, Gem,
+  Sparkles, ArrowRight,
   XCircle, Banknote, Flame, Coins, Puzzle, Palette, Copy,
   Footprints, Activity, Trophy, Wind, Dumbbell, Mountain, Package,
-  Search, X as XIcon, Loader2, Bell,
+  Search, X as XIcon, Loader2, Bell, Zap, RotateCw, Star,
 } from 'lucide-react';
 import { ResultsDisplay } from './ResultsDisplay';
 import { cn } from '@/lib/utils';
@@ -42,10 +41,9 @@ function parseEbayPrice(raw: string): number {
 const smartCalculatorSchema = z.object({
   price: z.coerce.number().min(1, "Price is required"),
   category: z.enum(['lifestyle', 'running', 'basketball', 'skate', 'training', 'boots', 'other']),
-  wearFrequency: z.enum(['rarely', 'monthly', 'weekly', 'daily']),
+  rotationScenario: z.enum(['daily_beater', 'weekend_rotation', 'grail']),
   resalePotential: z.enum(['none', 'low', 'medium', 'high']),
   wardrobeRole: z.enum(['gap_fill', 'upgrade', 'variety', 'duplicate']),
-  qualityRating: z.enum(['low', 'average', 'high']),
 });
 
 type FormData = z.infer<typeof smartCalculatorSchema>;
@@ -116,7 +114,21 @@ export function CalculatorForm() {
     setSearchQuery(`${sneaker.brand} ${sneaker.cleanModelName}`);
     setShowDropdown(false);
     const mv = parseEbayPrice(sneaker.price);
-    if (mv > 0) setMarketValue(mv);
+    if (mv > 0) {
+      setMarketValue(mv);
+      form.setValue('price', mv);          // Auto-fill asking price from eBay
+    }
+    form.setValue('category', 'lifestyle'); // Default category for sneakers
+
+    // Brand-to-resale-potential mapping
+    const brandResaleMap: [string, ResalePotential][] = [
+      ['jordan', 'high'], ['off-white', 'high'], ['travis scott', 'high'], ['yeezy', 'high'],
+      ['nike', 'medium'], ['adidas', 'medium'], ['new balance', 'medium'],
+      ['converse', 'low'], ['vans', 'low'], ['asics', 'low'], ['reebok', 'low'],
+    ];
+    const brandLower = sneaker.brand.toLowerCase();
+    const defaultResale = brandResaleMap.find(([k]) => brandLower.includes(k))?.[1] ?? 'low';
+    form.setValue('resalePotential', defaultResale);
 
     // Query collection overlap if authenticated
     if (userId && sneaker.brand) {
@@ -174,10 +186,9 @@ export function CalculatorForm() {
     resolver: zodResolver(smartCalculatorSchema),
     defaultValues: {
       category: undefined,
-      wearFrequency: 'monthly',
+      rotationScenario: 'weekend_rotation',
       resalePotential: 'none',
       wardrobeRole: 'variety',
-      qualityRating: 'average',
     },
   });
 
@@ -365,36 +376,41 @@ export function CalculatorForm() {
                   />
                 </div>
 
-                {/* Frequency Slider */}
+                {/* Rotation Scenario */}
                 <div className="mt-8">
                   <FormField
                     control={form.control}
-                    name="wearFrequency"
+                    name="rotationScenario"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex justify-between">
-                          <span>How often will you wear it?</span>
-                          <span className="text-primary font-medium capitalize">{field.value}</span>
+                          <span>How will you rotate them?</span>
+                          {field.value && (
+                            <span className="text-primary font-medium">{getScenarioLabel(field.value)}</span>
+                          )}
                         </FormLabel>
                         <FormControl>
-                          <RadioGroup 
-                            onValueChange={field.onChange} 
+                          <RadioGroup
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
-                            className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2"
+                            className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2"
                           >
                             {[
-                              { val: 'rarely', label: 'Rarely', sub: '< 1/mo' },
-                              { val: 'monthly', label: 'Monthly', sub: '1-2/mo' },
-                              { val: 'weekly', label: 'Weekly', sub: '1/wk' },
-                              { val: 'daily', label: 'Daily', sub: '3+/wk' },
+                              { val: 'daily_beater', icon: Zap, label: 'Daily Beater', sub: '~15 wears/mo', color: 'text-orange-500' },
+                              { val: 'weekend_rotation', icon: RotateCw, label: 'Weekend Rotation', sub: '~4 wears/mo', color: 'text-blue-500' },
+                              { val: 'grail', icon: Star, label: 'Special Occasion / Grail', sub: '~1 wear/mo', color: 'text-purple-500' },
                             ].map((opt) => (
                               <FormItem key={opt.val}>
                                 <FormControl>
                                   <RadioGroupItem value={opt.val} className="peer sr-only" />
                                 </FormControl>
-                                <FormLabel className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-transparent p-3 hover:bg-slate-50 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 cursor-pointer transition-all text-center h-full">
-                                  <span className="font-semibold text-sm">{opt.label}</span>
-                                  <span className="text-xs text-muted-foreground mt-1">{opt.sub}</span>
+                                <FormLabel className={cn(
+                                  "flex flex-col items-center text-center gap-2 rounded-xl border-2 border-muted bg-transparent p-4 hover:bg-primary/5 cursor-pointer transition-all h-full",
+                                  "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
+                                )}>
+                                  <opt.icon className={cn("w-5 h-5 mb-0.5", opt.color)} />
+                                  <span className="font-semibold text-sm text-foreground leading-tight">{opt.label}</span>
+                                  <span className="text-xs text-muted-foreground">{opt.sub}</span>
                                 </FormLabel>
                               </FormItem>
                             ))}
@@ -410,7 +426,7 @@ export function CalculatorForm() {
                   type="button"
                   className="w-full mt-8 h-12 text-base group bg-primary hover:bg-primary text-slate-900 font-bold shadow-sm hover:shadow-md transition-all"
                   onClick={async () => {
-                    const valid = await form.trigger(['price', 'category', 'wearFrequency']);
+                    const valid = await form.trigger(['price', 'category', 'rotationScenario']);
                     if(valid) setStep(2);
                   }}
                 >
@@ -474,108 +490,47 @@ export function CalculatorForm() {
                     )}
                   />
 
-                  {/* UX SEPARATOR */}
-                  <div className="relative py-4">
-                    <div className="absolute inset-0 flex items-center">
-                      <Separator className="w-full" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white px-2 text-muted-foreground font-semibold tracking-wider">
-                        Asset Value Details
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* ASSET VALUE SECTION */}
-                  <div className="space-y-8">
-                    {/* Quality Rating */}
-                    <FormField
-                        control={form.control}
-                        name="qualityRating"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-base font-semibold">Quality & Durability</FormLabel>
-                            <FormControl>
-                            <RadioGroup 
-                                onValueChange={field.onChange} 
-                                defaultValue={field.value}
-                                className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2"
-                            >
-                                {[
-                                { val: 'low', icon: TrendingDown, label: 'Low', desc: 'Fast Fashion / Delicate' },
-                                { val: 'average', icon: Shield, label: 'Average', desc: 'Standard Durability' },
-                                { val: 'high', icon: Gem, label: 'Premium', desc: 'Buy It For Life' },
-                                ].map((opt) => (
-                                <FormItem key={opt.val}>
-                                    <FormControl>
-                                    <RadioGroupItem value={opt.val} className="peer sr-only" />
-                                    </FormControl>
-                                    <FormLabel className={cn(
-                                    "flex flex-col items-center text-center gap-2 rounded-xl border-2 border-muted bg-transparent p-4 hover:bg-primary/50 cursor-pointer transition-all h-full",
-                                    "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
-                                    )}>
-                                    <opt.icon className={cn(
-                                        "w-6 h-6 mb-1", 
-                                        opt.val === 'low' ? 'text-red-500' : opt.val === 'high' ? 'text-blue-500' : 'text-slate-500'
-                                    )} />
-                                    <div>
-                                        <div className="font-semibold text-foreground">{opt.label}</div>
-                                        <div className="text-xs text-muted-foreground mt-1 leading-tight">{opt.desc}</div>
-                                    </div>
-                                    </FormLabel>
-                                </FormItem>
-                                ))}
-                            </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-
-                    {/* Resale Potential */}
-                    {category !== undefined && (
-                        <FormField
-                        control={form.control}
-                        name="resalePotential"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel className="text-base font-semibold">Resale Potential</FormLabel>
-                            <FormControl>
-                                <RadioGroup 
-                                onValueChange={field.onChange} 
-                                defaultValue={field.value}
-                                className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2"
-                                >
-                                {[
-                                    { val: 'none', icon: XCircle, label: 'None', desc: '$0' },
-                                    { val: 'low', icon: Coins, label: 'Low', desc: '~10%' },
-                                    { val: 'medium', icon: Banknote, label: 'Good', desc: '~25%' },
-                                    { val: 'high', icon: Flame, label: 'Hype', desc: '~50%+' },
-                                ].map((opt) => (
-                                    <FormItem key={opt.val}>
-                                    <FormControl>
-                                        <RadioGroupItem value={opt.val} className="peer sr-only" />
-                                    </FormControl>
-                                    <FormLabel className={cn(
-                                        "flex flex-col items-center text-center gap-2 rounded-xl border-2 border-muted bg-transparent p-3 hover:bg-primary/50 cursor-pointer transition-all h-full",
-                                        "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
-                                    )}>
-                                        <opt.icon className="w-5 h-5 text-slate-600 mb-1" />
-                                        <div>
-                                        <div className="font-semibold text-sm text-foreground">{opt.label}</div>
-                                        <div className="text-[10px] text-muted-foreground mt-0.5">{opt.desc}</div>
-                                        </div>
-                                    </FormLabel>
-                                    </FormItem>
-                                ))}
-                                </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
+                  {/* Resale Potential */}
+                  <FormField
+                    control={form.control}
+                    name="resalePotential"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold">Resale Potential</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2"
+                          >
+                            {[
+                              { val: 'none', icon: XCircle, label: 'None', desc: '$0' },
+                              { val: 'low', icon: Coins, label: 'Low', desc: '~10%' },
+                              { val: 'medium', icon: Banknote, label: 'Good', desc: '~25%' },
+                              { val: 'high', icon: Flame, label: 'Hype', desc: '~50%+' },
+                            ].map((opt) => (
+                              <FormItem key={opt.val}>
+                                <FormControl>
+                                  <RadioGroupItem value={opt.val} className="peer sr-only" />
+                                </FormControl>
+                                <FormLabel className={cn(
+                                  "flex flex-col items-center text-center gap-2 rounded-xl border-2 border-muted bg-transparent p-3 hover:bg-primary/5 cursor-pointer transition-all h-full",
+                                  "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
+                                )}>
+                                  <opt.icon className="w-5 h-5 text-slate-600 mb-1" />
+                                  <div>
+                                    <div className="font-semibold text-sm text-foreground">{opt.label}</div>
+                                    <div className="text-[10px] text-muted-foreground mt-0.5">{opt.desc}</div>
+                                  </div>
+                                </FormLabel>
+                              </FormItem>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  </div>
+                  />
                 </div>
 
                 <div className="flex gap-3 mt-12 pt-4 border-t border-slate-100">

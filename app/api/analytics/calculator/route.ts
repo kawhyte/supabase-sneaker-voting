@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 interface CalculatorAnalyticsPayload {
   category: string;
   priceRange: string; // Bucketed: <$50, $50-150, $150-300, $300+
-  wearFrequency: string;
+  rotationScenario: string;
   verdict: string; // EXCELLENT, GOOD, CAUTION, SKIP
   timestamp: number;
 }
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const data: CalculatorAnalyticsPayload = await request.json();
 
     // Validate payload
-    if (!data.category || !data.priceRange || !data.wearFrequency || !data.verdict) {
+    if (!data.category || !data.priceRange || !data.rotationScenario || !data.verdict) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     console.log('[Calculator Analytics]', {
       category: data.category,
       priceRange: data.priceRange,
-      wearFrequency: data.wearFrequency,
+      rotationScenario: data.rotationScenario,
       verdict: data.verdict,
       timestamp: new Date(data.timestamp).toISOString(),
     });

@@ -6,16 +6,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, Flame, Clock, TrendingUp, Zap } from 'lucide-react'
 import {
   calculateForSneakers,
-  getWearsFromFrequency,
-  type WearFrequency,
+  getWearsFromScenario,
+  type RotationScenario,
   type Verdict,
 } from '@/lib/worth-it-calculator/calculator-logic'
 
-const FREQUENCIES: { value: WearFrequency; label: string; icon: React.ReactNode }[] = [
-  { value: 'rarely',  label: 'Rarely',  icon: <Clock className="w-3.5 h-3.5" /> },
-  { value: 'monthly', label: 'Monthly', icon: <TrendingUp className="w-3.5 h-3.5" /> },
-  { value: 'weekly',  label: 'Weekly',  icon: <Zap className="w-3.5 h-3.5" /> },
-  { value: 'daily',   label: 'Daily',   icon: <Flame className="w-3.5 h-3.5" /> },
+const FREQUENCIES: { value: RotationScenario; label: string; icon: React.ReactNode }[] = [
+  { value: 'daily_beater',    label: 'Daily',    icon: <Flame className="w-3.5 h-3.5" /> },
+  { value: 'weekend_rotation', label: 'Weekend', icon: <Zap className="w-3.5 h-3.5" /> },
+  { value: 'grail',           label: 'Grail',    icon: <TrendingUp className="w-3.5 h-3.5" /> },
 ]
 
 const VERDICT_STYLES: Record<Verdict, { bar: string; badge: string; card: string; text: string }> = {
@@ -26,13 +25,13 @@ const VERDICT_STYLES: Record<Verdict, { bar: string; badge: string; card: string
 
 const VERDICT_LABELS: Record<Verdict, string> = {
   BUY_NOW: 'Buy Now',
-  WAIT_FOR_SALE: 'Wait for Sale',
+  WAIT_FOR_SALE: 'Wait for Market Drop',
   PASS: 'Hard Pass',
 }
 
 export function PublicCPWCalculator() {
   const [rawPrice, setRawPrice] = useState('')
-  const [frequency, setFrequency] = useState<WearFrequency>('weekly')
+  const [frequency, setFrequency] = useState<RotationScenario>('weekend_rotation')
 
   const price = parseFloat(rawPrice)
   const hasPrice = !isNaN(price) && price >= 1
@@ -154,7 +153,7 @@ export function PublicCPWCalculator() {
               </div>
               <div className="bg-white/70 rounded-xl py-2.5 px-1">
                 <p className="text-sm font-extrabold text-slate-900">
-                  {getWearsFromFrequency(frequency) * metrics.estimatedLifespanYears | 0}
+                  {getWearsFromScenario(frequency) * metrics.estimatedLifespanYears | 0}
                 </p>
                 <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mt-0.5">
                   Lifetime Wears

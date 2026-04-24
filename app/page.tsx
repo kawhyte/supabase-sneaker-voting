@@ -14,7 +14,7 @@ const features = [
   },
   {
     icon: BarChart2,
-    title: 'Cop Score',
+    title: 'Value Index',
     description: 'A weighted score that combines CPW, live eBay market data, and your rotation diversity.',
   },
   {
@@ -82,12 +82,12 @@ export default function HomePage() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="h-12 px-8">
-            <Link href="/cop-score">Try the Cop Score</Link>
+            <Link href="/value-index">Try Value Index</Link>
           </Button>
         </motion.div>
       </section>
 
-      {/* Cop Score CTA card */}
+      {/* Value Index CTA card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -101,13 +101,13 @@ export default function HomePage() {
               <BarChart2 className="h-6 w-6 text-primary" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-foreground">Is it worth the cop?</h2>
+              <h2 className="text-xl font-bold text-foreground">Know the real value.</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 Get a data-driven score that weighs cost-per-wear, live market data, and your collection diversity.
               </p>
             </div>
             <Button asChild className="flex-shrink-0 bg-primary hover:bg-primary text-slate-900 font-bold">
-              <Link href="/cop-score">
+              <Link href="/value-index">
                 Open Calculator
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

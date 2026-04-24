@@ -92,7 +92,7 @@ export function HowItWorksSection() {
                   We combine all these factors into a single{' '}
                   <strong className="text-foreground">0–100 Score</strong>.{' '}
                   <span className="text-green-400 font-semibold">80+</span> = Buy Now.{' '}
-                  <span className="text-primary font-semibold">50–79</span> = Wait for Sale.{' '}
+                  <span className="text-primary font-semibold">50–79</span> = Wait for Market Drop.{' '}
                   <span className="text-red-400 font-semibold">&lt;50</span> = Pass.
                 </p>
               </div>

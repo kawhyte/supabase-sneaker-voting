@@ -29,7 +29,7 @@ export async function trackCalculation(input: CalculatorInput, verdict: Verdict)
     const payload = {
       category: input.category,
       priceRange: getPriceRange(input.price),
-      wearFrequency: input.wearFrequency,
+      rotationScenario: input.rotationScenario,
       verdict: verdict,
       timestamp: Date.now(),
       // NO: user ID, IP address, exact price, brand, or any identifying info

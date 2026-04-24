@@ -70,7 +70,7 @@ function DashboardContent() {
 					</div>
 				</div>
 
-				{/* Cop Score Quick Tool */}
+				{/* Value Index Quick Tool */}
 				<div className='mt-8'>
 					<Card className='border border-border bg-card rounded-2xl overflow-hidden'>
 						<div className='px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4'>
@@ -78,10 +78,10 @@ function DashboardContent() {
 								<BarChart2 className='h-5 w-5 text-primary' />
 							</div>
 							<div className='flex-1 min-w-0'>
-								<p className='font-semibold text-foreground text-sm'>Cop Score Calculator</p>
+								<p className='font-semibold text-foreground text-sm'>Value Index Calculator</p>
 								<p className='text-xs text-muted-foreground mt-0.5'>Get a data-driven verdict on your next cop — CPW, eBay market value, and rotation diversity.</p>
 							</div>
-							<Link href='/cop-score' className='flex-shrink-0'>
+							<Link href='/value-index' className='flex-shrink-0'>
 								<Button variant='outline' size='sm' className='flex items-center gap-2 whitespace-nowrap'>
 									Open Calculator
 									<ArrowRight className='h-3.5 w-3.5' />

@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { getFrequencyLabel } from '@/lib/worth-it-calculator/calculator-logic';
 import { ShirtIcon, Shirt, Calendar, type LucideIcon } from 'lucide-react';
 
 interface WearFrequencySliderProps {

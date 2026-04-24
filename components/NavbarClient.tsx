@@ -245,12 +245,12 @@ export function NavbarClient({ authButton, isAuthenticated }: NavbarClientProps)
 
 	const publicNavLinks: NavLink[] = [
 		{ href: '/', label: 'Home' },
-		{ href: '/cop-score', label: 'Cop Score' },
+		{ href: '/value-index', label: 'Value Index' },
 	];
 
 	const authenticatedNavLinks: NavLink[] = [
 		{ href: '/dashboard', label: 'My Collection' },
-		{ href: '/cop-score', label: 'Cop Score' },
+		{ href: '/value-index', label: 'Value Index' },
 		{ href: '/explore', label: 'Explore' },
 		{ href: '/achievements', label: 'Sneaker Insights' },
 	];

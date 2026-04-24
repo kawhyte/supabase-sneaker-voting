@@ -58,7 +58,7 @@ export function CPWMetricsCard({ metrics, input }: CPWMetricsCardProps) {
               {metrics.estimatedLifespanYears} Years
             </div>
             <div className="text-xs text-slate-400 mt-1">
-              Based on quality rating
+              Typical sneaker lifespan
             </div>
           </div>
           <div className="mt-4 pt-4 border-t border-slate-200 flex items-center gap-2 text-slate-600">
