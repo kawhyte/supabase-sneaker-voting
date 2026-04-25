@@ -8,30 +8,25 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 const SNEAKERS = [
-  { name: 'Nike Air Force 1 Low',            src: '/images/sneaker-grid/sneaker-01.png' },
-  { name: 'Air Jordan 1 Retro High OG',      src: '/images/sneaker-grid/sneaker-02.png' },
-  { name: 'Nike Dunk Low',                   src: '/images/sneaker-grid/sneaker-03.png' },
-  { name: 'Adidas Samba OG',                 src: '/images/sneaker-grid/sneaker-04.png' },
-  { name: 'New Balance 550',                 src: '/images/sneaker-grid/sneaker-05.png' },
-  { name: 'Nike Air Max 1',                  src: '/images/sneaker-grid/sneaker-06.png' },
-  { name: 'Air Jordan 4 Retro',              src: '/images/sneaker-grid/sneaker-07.png' },
-  { name: 'Adidas Gazelle Indoor',           src: '/images/sneaker-grid/sneaker-08.png' },
-  { name: 'Nike Air Max 90',                 src: '/images/sneaker-grid/sneaker-09.png' },
-  { name: 'New Balance 9060',                src: '/images/sneaker-grid/sneaker-10.png' },
-  { name: 'Converse Chuck Taylor 70',        src: '/images/sneaker-grid/sneaker-11.png' },
-  { name: 'New Balance 574',                 src: '/images/sneaker-grid/sneaker-12.png' },
-  { name: 'Nike Cortez',                     src: '/images/sneaker-grid/sneaker-13.png' },
-  { name: 'Adidas Campus 00s',               src: '/images/sneaker-grid/sneaker-14.png' },
-  { name: 'Air Jordan 3 Retro',              src: '/images/sneaker-grid/sneaker-15.png' },
-  { name: 'Air Jordan 11 Retro',             src: '/images/sneaker-grid/sneaker-16.png' },
-  { name: 'Travis Scott x AF1',              src: '/images/sneaker-grid/sneaker-17.png' },
-  { name: 'New Balance 2002R',               src: '/images/sneaker-grid/sneaker-18.png' },
-  { name: 'Adidas Yeezy 350 V2',             src: '/images/sneaker-grid/sneaker-19.png' },
-  { name: 'Nike Air Max 95',                 src: '/images/sneaker-grid/sneaker-20.png' },
-  { name: 'Air Jordan 6 Retro',              src: '/images/sneaker-grid/sneaker-21.png' },
-  { name: 'Salehe Bembury x 574',            src: '/images/sneaker-grid/sneaker-22.png' },
-  { name: 'Nike SB Dunk High',               src: '/images/sneaker-grid/sneaker-23.png' },
-  { name: 'Adidas Stan Smith',               src: '/images/sneaker-grid/sneaker-24.png' },
+  { name: 'Nike Air Force 1 Low',            src: '/images/sneaker-grid/sneaker-1.webp' },
+  { name: 'Air Jordan 1 Retro High OG',      src: '/images/sneaker-grid/sneaker-2.webp' },
+  { name: 'Nike Dunk Low',                   src: '/images/sneaker-grid/sneaker-3.webp' },
+  { name: 'Adidas Samba OG',                 src: '/images/sneaker-grid/sneaker-4.webp' },
+  { name: 'New Balance 550',                 src: '/images/sneaker-grid/sneaker-5.webp' },
+  { name: 'Nike Air Max 1',                  src: '/images/sneaker-grid/sneaker-6.webp' },
+  { name: 'Air Jordan 4 Retro',              src: '/images/sneaker-grid/sneaker-7.webp' },
+  { name: 'Adidas Gazelle Indoor',           src: '/images/sneaker-grid/sneaker-8.webp' },
+  { name: 'Nike Air Max 90',                 src: '/images/sneaker-grid/sneaker-9.webp' },
+  { name: 'New Balance 9060',                src: '/images/sneaker-grid/sneaker-10.webp' },
+  { name: 'Converse Chuck Taylor 70',        src: '/images/sneaker-grid/sneaker-11.webp' },
+  { name: 'New Balance 574',                 src: '/images/sneaker-grid/sneaker-12.webp' },
+  { name: 'Nike Cortez',                     src: '/images/sneaker-grid/sneaker-13.webp' },
+  { name: 'Adidas Campus 00s',               src: '/images/sneaker-grid/sneaker-14.webp' },
+  { name: 'Air Jordan 3 Retro',              src: '/images/sneaker-grid/sneaker-15.webp' },
+  { name: 'Air Jordan 11 Retro',             src: '/images/sneaker-grid/sneaker-16.webp' },
+  { name: 'Travis Scott x AF1',              src: '/images/sneaker-grid/sneaker-17.webp' },
+  { name: 'New Balance 2002R',               src: '/images/sneaker-grid/sneaker-18.webp' },
+
 ]
 
 export default function HomePage() {
@@ -82,22 +77,20 @@ export default function HomePage() {
 
       {/* 2. Sneaker Grid */}
       <motion.section
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="w-full bg-zinc-950 relative z-10"
+     
+        className="w-full bg-border relative z-10"
       >
-        <div className="grid grid-cols-5 md:grid-cols-8 gap-px">
+        <div className="grid grid-cols-5 lg:grid-cols-6 gap-px">
           {SNEAKERS.map((sneaker, index) => (
             <Tooltip key={sneaker.name}>
               <TooltipTrigger asChild>
-                <div className={`relative h-[82px] bg-zinc-900 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-zinc-800 transition-colors duration-150${index >= 10 ? ' hidden md:flex' : ''}`}>
+                <div className={`relative h-[72px] sm:h-[82px] lg:h-[140px] bg-background flex items-center justify-center overflow-hidden cursor-pointer hover:bg-muted transition-colors duration-150${index >= 10 ? ' hidden lg:flex' : ''}`}>
                   <Image
                     src={sneaker.src}
                     alt={sneaker.name}
-                    fill
-                    className="object-contain p-1"
+                    width={200}
+                    height={100}
+                    className="object-contain w-full h-full p-1 sm:p-2"
                     unoptimized
                   />
                 </div>
