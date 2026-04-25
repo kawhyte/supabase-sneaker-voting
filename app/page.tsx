@@ -75,33 +75,8 @@ export default function HomePage() {
         </motion.p>
       </section>
 
-      {/* 2. Sneaker Grid */}
-      <motion.section
      
-        className="w-full bg-border relative z-10"
-      >
-        <div className="grid grid-cols-5 lg:grid-cols-6 gap-px">
-          {SNEAKERS.map((sneaker, index) => (
-            <Tooltip key={sneaker.name}>
-              <TooltipTrigger asChild>
-                <div className={`relative h-[72px] sm:h-[82px] lg:h-[140px] bg-background flex items-center justify-center overflow-hidden cursor-pointer hover:bg-muted transition-colors duration-150${index >= 10 ? ' hidden lg:flex' : ''}`}>
-                  <Image
-                    src={sneaker.src}
-                    alt={sneaker.name}
-                    width={200}
-                    height={100}
-                    className="object-contain w-full h-full p-1 sm:p-2"
-                    unoptimized
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="text-xs font-medium">
-                {sneaker.name}
-              </TooltipContent>
-            </Tooltip>
-          ))}
-        </div>
-      </motion.section>
+      
 
       {/* 3. CTA Buttons */}
       <motion.div
@@ -109,7 +84,7 @@ export default function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10"
+        className="mb-12 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10"
       >
         <Button asChild size="lg" className="bg-primary hover:bg-primary text-slate-900 font-bold h-12 px-8">
           <Link href="/login">
@@ -121,6 +96,35 @@ export default function HomePage() {
           <Link href="/value-index">Calculate Value Index</Link>
         </Button>
       </motion.div>
+
+
+ {/* 2. Sneaker Grid */}
+      <motion.section
+     
+        className="w-full  relative z-10"
+      >
+        <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+          {SNEAKERS.map((sneaker, index) => (
+            <Tooltip key={sneaker.name}>
+              <TooltipTrigger asChild>
+                <div className={`relative h-[72px] sm:h-[82px] lg:h-[140px] bg-background flex items-center justify-center overflow-hidden cursor-pointer hover:bg-muted transition-colors duration-150 ${index >= 8 && index < 15 ? 'hidden md:flex' : ''} ${index >= 15 ? 'hidden lg:flex' : ''}`}>
+                  <Image
+                    src={sneaker.src}
+                    alt={sneaker.name}
+                    width={200}
+                    height={100}
+                    className="object-contain w-5xl  h-full p-1 sm:p-2"
+                    unoptimized
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs font-medium">
+                {sneaker.name}
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+      </motion.section>
 
     </main>
   )
