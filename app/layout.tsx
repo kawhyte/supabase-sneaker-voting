@@ -6,7 +6,8 @@ import { Navbar } from "@/components/navbar";
 import { ViewDensityProvider } from "@/lib/view-density-context";
 import { FormModeProvider } from "@/lib/form-mode-context";
 import { UndoProvider } from "@/contexts/UndoContext";
-import { ProfileProvider } from "@/contexts/ProfileContext";
+import { ProfileProvider } from "@/contexts/ProfileContext"
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 const defaultUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
@@ -125,6 +126,7 @@ export default function RootLayout({
     📚 Full documentation in globals.css (lines 97-315, 404-476)
   */}
 			<body className='min-h-screen bg-background text-foreground border-t-6 border-primary'>
+				<ServiceWorkerRegister />
 				<ProfileProvider>
 					<UndoProvider>
 						<FormModeProvider>
