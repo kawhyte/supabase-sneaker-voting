@@ -8,6 +8,7 @@ import { FormModeProvider } from "@/lib/form-mode-context";
 import { UndoProvider } from "@/contexts/UndoContext";
 import { ProfileProvider } from "@/contexts/ProfileContext"
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const defaultUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
@@ -127,6 +128,7 @@ export default function RootLayout({
   */}
 			<body className='min-h-screen bg-background text-foreground border-t-6 border-primary'>
 				<ServiceWorkerRegister />
+				<PWAInstallPrompt />
 				<ProfileProvider>
 					<UndoProvider>
 						<FormModeProvider>

@@ -1,5 +1,5 @@
-// Service Worker for SoleTracker Push Notifications
-const CACHE_NAME = 'soletracker-v1';
+// Service Worker for PurrView Push Notifications
+const CACHE_NAME = 'purrview-v1';
 const urlsToCache = [
   '/',
   '/dashboard',
@@ -36,7 +36,7 @@ self.addEventListener('push', (event) => {
     console.error('Failed to parse push notification data:', e);
   }
 
-  const title = data.title || 'SoleTracker Price Alert';
+  const title = data.title || 'PurrView Alert';
   const options = {
     body: data.body || 'A monitored item has reached your target price!',
     icon: data.icon || '/icon-192x192.png',
