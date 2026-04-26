@@ -44,16 +44,8 @@ export default function HomePage() {
       />
 
       {/* 1. Hero */}
-      <section className="w-full max-w-3xl mx-auto px-6 pt-20 md:pt-32 pb-16 text-center relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="inline-flex items-center gap-2 text-primary mb-6"
-        >
-          <PawPrint className="h-7 w-7" />
-          <span className="text-2xl font-extrabold tracking-tight">PurrView</span>
-        </motion.div>
+      <section className="w-full max-w-3xl mx-auto px-6 pt-20 md:pt-20 pb-16 text-center relative z-10">
+     
 
         <motion.h1
           initial={{ opacity: 0, y: 12 }}
